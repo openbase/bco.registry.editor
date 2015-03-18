@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceClassType;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType;
-import rst.homeautomation.registry.DeviceRegistryType;
+import rst.homeautomation.device.DeviceRegistryType;
 
 /**
  *
