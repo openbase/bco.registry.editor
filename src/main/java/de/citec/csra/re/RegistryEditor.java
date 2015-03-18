@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.re.struct;
+package de.citec.csra.re;
 
 import static de.citec.csra.dm.DeviceManager.DEFAULT_SCOPE;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
@@ -47,9 +47,9 @@ import rst.homeautomation.registry.DeviceRegistryType;
  *
  * @author thuxohl
  */
-public class JavaFXView extends Application {
+public class RegistryEditor extends Application {
 
-    private static final Logger logger = LoggerFactory.getLogger(JavaFXView.class);
+    private static final Logger logger = LoggerFactory.getLogger(RegistryEditor.class);
 
     public static final String APP_NAME = "RegistryView";
 
@@ -65,7 +65,7 @@ public class JavaFXView extends Application {
     private TreeTableColumn<Node, Node> descriptorColumn2;
     private TreeTableColumn<Node, Node> valueColumn2;
 
-    public JavaFXView() {
+    public RegistryEditor() {
         this.remote = new DeviceRegistryRemote();
     }
 
