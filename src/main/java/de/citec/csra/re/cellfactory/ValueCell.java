@@ -8,8 +8,12 @@ package de.citec.csra.re.cellfactory;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.Node;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Observable;
+import java.util.Observer;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -25,12 +29,13 @@ import javafx.scene.input.KeyEvent;
  *
  * @author thuxohl
  */
-public abstract class ValueCell extends RowCell {
+public abstract class ValueCell extends RowCell implements Observer {
 
     private final TextField stringTextField;
     private final TextField decimalTextField;
     private final ComboBox enumComboBox;
     private final DatePicker longDatePicker;
+    private final DateFormat converter = new SimpleDateFormat("dd/MM/yyyy");
     protected final Button applyButton;
     protected Leaf leaf;
 
@@ -99,7 +104,10 @@ public abstract class ValueCell extends RowCell {
 
             @Override
             public void handle(ActionEvent event) {
-                leaf.setValue(longDatePicker.getValue().toEpochDay());
+                if( longDatePicker.getValue() != null && longDatePicker.getValue().toEpochDay() != (Long) leaf.getValue()) {
+                    leaf.setValue(longDatePicker.getValue().toEpochDay()*24*60*60*1000);
+                    commitEdit(leaf);
+                }
             }
         });
     }
@@ -111,7 +119,7 @@ public abstract class ValueCell extends RowCell {
         if (getItem() instanceof Leaf) {
             leaf = ((Leaf) getItem());
 
-            if (leaf.getValue() instanceof String) {
+            if (leaf.getValue() instanceof String && !leaf.getDescriptor().equals("Scope")) {
                 stringTextField.setText((String) leaf.getValue());
                 graphicProperty().setValue(stringTextField);
             } else if (leaf.getValue() instanceof Enum) {
@@ -151,12 +159,16 @@ public abstract class ValueCell extends RowCell {
         } else if (item instanceof Leaf) {
             graphicProperty().setValue(null);
             if (((Leaf) item).getValue() instanceof Long) {
-                setText((new Date((Long) ((Leaf) item).getValue())).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
-            } else {
+                setText(converter.format(new Date((Long) ((Leaf) item).getValue())));
+            } else if((((Leaf) item).getValue() != null )){
                 textProperty().setValue(((Leaf) item).getValue().toString());
             }
             setContextMenu(null);
         }
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+        applyButton.setVisible((Boolean) arg);
+    }
 }

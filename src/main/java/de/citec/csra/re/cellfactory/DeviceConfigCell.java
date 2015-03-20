@@ -7,9 +7,7 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
-import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
-import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.NotAvailableException;
@@ -32,12 +30,12 @@ public class DeviceConfigCell extends ValueCell {
 
     private final ComboBox<DeviceClass> deviceClassComboBox;
     private final ComboBox<LocationConfig> locationConfigComboBox;
-    
+
     public DeviceConfigCell(DeviceRegistryRemote remote) {
         super(remote);
-        
+
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
-            
+
             @Override
             public void handle(ActionEvent event) {
                 DeviceConfig deviceConfig = ((DeviceConfigContainer) getItem()).getBuilder().build();
@@ -52,8 +50,9 @@ public class DeviceConfigCell extends ValueCell {
                 }
             }
         });
-        
+
         deviceClassComboBox = new ComboBox();
+        deviceClassComboBox.setButtonCell(new DeviceClassComboBoxCell());
         deviceClassComboBox.setCellFactory(new Callback<ListView<DeviceClass>, ListCell<DeviceClass>>() {
 
             @Override
@@ -65,12 +64,15 @@ public class DeviceConfigCell extends ValueCell {
 
             @Override
             public void handle(ActionEvent event) {
-                Leaf test = (Leaf<DeviceClass>) getItem();
-                test.setValue(deviceClassComboBox.getValue());
+                if (deviceClassComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(deviceClassComboBox.getSelectionModel().getSelectedItem())) {
+                    leaf.setValue(deviceClassComboBox.getSelectionModel().getSelectedItem());
+                    commitEdit(leaf);
+                }
             }
         });
-        
+
         locationConfigComboBox = new ComboBox<>();
+        locationConfigComboBox.setButtonCell(new LocationConfigComboBoxCell());
         locationConfigComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
 
             @Override
@@ -82,55 +84,67 @@ public class DeviceConfigCell extends ValueCell {
 
             @Override
             public void handle(ActionEvent event) {
-                ((Leaf<LocationConfig>) getItem()).setValue(locationConfigComboBox.getValue());
+                if (locationConfigComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(locationConfigComboBox.getSelectionModel().getSelectedItem())) {
+                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem());
+                    commitEdit(leaf);
+                }
             }
         });
     }
-    
+
     @Override
     public void startEdit() {
         super.startEdit();
-        
-        if( getItem() instanceof DeviceConfigContainer ) {
-            try {
-                deviceClassComboBox.setItems(FXCollections.observableArrayList(remote.getData().getDeviceClassesList()));
-            } catch (NotAvailableException ex) {
-                logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
+
+        if (getItem() instanceof Leaf) {
+            if (((Leaf) getItem()).getValue() instanceof DeviceClass) {
+                try {
+                    deviceClassComboBox.setItems(FXCollections.observableArrayList(remote.getData().getDeviceClassesList()));
+                    setGraphic(deviceClassComboBox);
+                } catch (NotAvailableException ex) {
+                    logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
+                }
+            } else if (((Leaf) getItem()).getValue() instanceof LocationConfig) {
+                locationConfigComboBox.setItems(FXCollections.observableArrayList()); // TODO fill with values from the location registry
+                setGraphic(locationConfigComboBox);
             }
-        } else if( getItem() instanceof LocationConfigContainer ) {
-//            locationConfigComboBox.setItems(FXCollections.observableArrayList(remote.getData().getDeviceClassesList()));
-            // TODO implement if locationConfig is ready
         }
     }
-    
+
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if( item instanceof DeviceConfigContainer) {
+        if (item instanceof DeviceConfigContainer) {
             setGraphic(applyButton);
+        } else if (item instanceof Leaf) {
+            if (((Leaf) item).getValue() instanceof DeviceClass) {
+                setText(((Leaf<DeviceClass>) item).getValue().getId());
+            } else if (((Leaf) item).getValue() instanceof LocationConfig) {
+                setText(((Leaf<LocationConfig>) item).getValue().getLabel());
+            }
         }
     }
-    
+
     private class DeviceClassComboBoxCell extends ListCell<DeviceClass> {
-        
+
         @Override
         public void updateItem(DeviceClass item, boolean empty) {
             super.updateItem(item, empty);
-            
-            if(!empty) {
+
+            if (item != null) {
                 setText(item.getId());
             }
         }
     }
-    
+
     private class LocationConfigComboBoxCell extends ListCell<LocationConfig> {
-        
+
         @Override
         public void updateItem(LocationConfig item, boolean empty) {
             super.updateItem(item, empty);
-            
-            if(!empty) {
+
+            if (item != null) {
                 setText(item.getLabel());
             }
         }

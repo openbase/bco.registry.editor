@@ -16,7 +16,7 @@ public class InventoryStateContainer extends NodeContainer<InventoryState.Builde
     public InventoryStateContainer(InventoryState.Builder inventoryState) {
         super("Inventory State", inventoryState);
         super.add(inventoryState.getInventoryStatus(), "inventory_status");
-        super.add(new LocationConfigContainer(inventoryState.getLocationBuilder()));
+        super.add(inventoryState.getLocation(), "location");
         super.add(new TimestampContainer(inventoryState.getTimestampBuilder()));
         super.add(new PersonContainer(inventoryState.getOwnerBuilder()));
     }

@@ -14,12 +14,11 @@ import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 public class DeviceConfigContainer extends SendableNode<DeviceConfig.Builder> {
 
     public DeviceConfigContainer(DeviceConfig.Builder deviceConfig) {
-        super("Device Configuration", deviceConfig);
-        super.add(deviceConfig.getId(), "id");
+        super(deviceConfig.getId(), deviceConfig);
         super.add(deviceConfig.getLabel(), "label");
         super.add(deviceConfig.getSerialNumber(), "serial_number");
         super.add(new PlacementConfigContainer(deviceConfig.getPlacementConfigBuilder()));
-        super.add(new ScopeContainer(deviceConfig.getScopeBuilder()));
+        super.add(deviceConfig.getScope().getStringRep(), "Scope");
         super.add(new InventoryStateContainer(deviceConfig.getInventoryStateBuilder()));
         super.add(deviceConfig.getDeviceClass(), "device_class");
         super.add(new UnitConfigListContainer(deviceConfig));
