@@ -7,94 +7,59 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
-import de.citec.csra.re.struct.node.DeviceClassContainer;
-import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
-import de.citec.csra.re.struct.node.SendableNode;
-import de.citec.jul.exception.CouldNotPerformException;
+import java.time.ZoneId;
+import java.util.Date;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import rst.homeautomation.device.DeviceClassType;
-import rst.homeautomation.device.DeviceConfigType;
 
 /**
  *
  * @author thuxohl
  */
-public class ValueCell extends RowCell {
+public abstract class ValueCell extends RowCell {
 
-    private final TextField textField;
-    private final ComboBox comboBox;
+    private final TextField stringTextField;
     private final TextField decimalTextField;
-    private final TextField integerTextField;
-    private final Button apply;
-    private Leaf leaf;
+    private final ComboBox enumComboBox;
+    private final DatePicker longDatePicker;
+    protected final Button applyButton;
+    protected Leaf leaf;
 
     public ValueCell(DeviceRegistryRemote remote) {
         super(remote);
-        apply = new Button("Apply Changes");
-        apply.setVisible(true);
-        apply.setOnAction(new EventHandler<ActionEvent>() {
+        applyButton = new Button("Apply Changes");
+        applyButton.setVisible(true);
 
-            @Override
-            public void handle(ActionEvent event) {
-
-                SendableNode sendNode = (SendableNode) getItem();
-//                            sendNode.getApplyButton().setVisible(false);
-                if (sendNode instanceof DeviceClassContainer) {
-                    DeviceClassType.DeviceClass type = ((DeviceClassType.DeviceClass.Builder) sendNode.getBuilder()).build();
-                    try {
-                        if (remote.containsDeviceClass(type)) {
-                            remote.registerDeviceClass(type);
-                        } else {
-                            remote.updateDeviceClass(type);
-                        }
-                    } catch (CouldNotPerformException ex) {
-                        System.out.println("Could not register or update deviceClass [" + type + "]");
-                    }
-                } else if (sendNode instanceof DeviceConfigContainer) {
-                    DeviceConfigType.DeviceConfig type = ((DeviceConfigType.DeviceConfig.Builder) sendNode.getBuilder()).build();
-                    try {
-                        if (remote.containsDeviceConfig(type)) {
-                            remote.registerDeviceConfig(type);
-                        } else {
-                            remote.updateDeviceConfig(type);
-                        }
-                    } catch (CouldNotPerformException ex) {
-                        System.out.println("Could not register or update deviceConfig [" + type + "]");
-                    }
-                }
-            }
-        });
-
-        textField = new TextField();
-        textField.setOnKeyReleased(new EventHandler<KeyEvent>() {
+        stringTextField = new TextField();
+        stringTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode().equals(KeyCode.ESCAPE)) {
                     cancelEdit();
                 } else if (event.getCode().equals(KeyCode.ENTER)) {
-                    leaf.setValue(textField.getText());
+                    leaf.setValue(stringTextField.getText());
                     commitEdit(leaf);
                 }
             }
         });
 
-        comboBox = new ComboBox();
-        comboBox.setOnAction(new EventHandler() {
+        enumComboBox = new ComboBox();
+        enumComboBox.setOnAction(new EventHandler() {
 
             @Override
             public void handle(Event event) {
-                if (comboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(comboBox.getSelectionModel().getSelectedItem())) {
-                    leaf.setValue(comboBox.getSelectionModel().getSelectedItem());
+                if (enumComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(enumComboBox.getSelectionModel().getSelectedItem())) {
+                    leaf.setValue(enumComboBox.getSelectionModel().getSelectedItem());
                     commitEdit(leaf);
                 }
             }
@@ -129,32 +94,12 @@ public class ValueCell extends RowCell {
             }
         });
 
-        integerTextField = new TextField() {
-            @Override
-            public void replaceText(int start, int end, String text) {
-                if (text.matches("[0-9]") || text.equals("")) {
-                    super.replaceText(start, end, text);
-                }
-            }
+        longDatePicker = new DatePicker();
+        longDatePicker.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
-            public void replaceSelection(String text) {
-                if (text.matches("[0-9]") || text.equals("")) {
-                    super.replaceSelection(text);
-                }
-            }
-        };
-        integerTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode().equals(KeyCode.ESCAPE)) {
-                    cancelEdit();
-                } else if (event.getCode().equals(KeyCode.ENTER)) {
-                    long parseLong = Long.parseLong(integerTextField.getText());
-                    leaf.setValue(parseLong);
-                    commitEdit(leaf);
-                }
+            public void handle(ActionEvent event) {
+                leaf.setValue(longDatePicker.getValue().toEpochDay());
             }
         });
     }
@@ -167,18 +112,19 @@ public class ValueCell extends RowCell {
             leaf = ((Leaf) getItem());
 
             if (leaf.getValue() instanceof String) {
-                textField.setText((String) leaf.getValue());
-                graphicProperty().setValue(textField);
+                stringTextField.setText((String) leaf.getValue());
+                graphicProperty().setValue(stringTextField);
             } else if (leaf.getValue() instanceof Enum) {
-                comboBox.setItems(FXCollections.observableArrayList(leaf.getValue().getClass().getEnumConstants()));
-                comboBox.setValue(leaf.getValue());
-                graphicProperty().setValue(comboBox);
+                enumComboBox.setItems(FXCollections.observableArrayList(leaf.getValue().getClass().getEnumConstants()));
+                enumComboBox.setValue(leaf.getValue());
+                graphicProperty().setValue(enumComboBox);
             } else if (leaf.getValue() instanceof Float) {
                 decimalTextField.setText(((Float) leaf.getValue()).toString());
                 graphicProperty().setValue(decimalTextField);
             } else if (leaf.getValue() instanceof Long) {
-                integerTextField.setText(((Long) leaf.getValue()).toString());
-                setGraphic(integerTextField);
+                Date date = new Date((Long) leaf.getValue());
+                longDatePicker.setValue(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                setGraphic(longDatePicker);
             }
         }
     }
@@ -204,10 +150,12 @@ public class ValueCell extends RowCell {
             setContextMenu(null);
         } else if (item instanceof Leaf) {
             graphicProperty().setValue(null);
-            textProperty().setValue(((Leaf) item).getValue().toString());
+            if (((Leaf) item).getValue() instanceof Long) {
+                setText((new Date((Long) ((Leaf) item).getValue())).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString());
+            } else {
+                textProperty().setValue(((Leaf) item).getValue().toString());
+            }
             setContextMenu(null);
-        } else if (item instanceof DeviceClassContainer) {
-            setGraphic(apply);
         }
     }
 

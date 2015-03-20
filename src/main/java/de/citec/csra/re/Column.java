@@ -6,26 +6,19 @@
 package de.citec.csra.re;
 
 import de.citec.csra.re.struct.node.Node;
-import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
-import javafx.util.Callback;
 
 /**
  *
  * @author thuxohl
  */
-public class Column extends TreeTableColumn<Node, Node> {
-    
-    public Column(String text, TreeTableCell<Node, Node> treeTableCell) {
+public abstract class Column extends TreeTableColumn<Node, Node> {
+
+    public static final int COLUMN_WIDTH = 400;
+
+    public Column(String text) {
         super(text);
         this.setCellValueFactory(new TreeItemPropertyValueFactory<>("this"));
-        this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
-            
-            @Override
-            public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-                return treeTableCell;
-            }
-        });
-    }    
+    }
 }

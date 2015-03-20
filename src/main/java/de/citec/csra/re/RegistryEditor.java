@@ -8,7 +8,7 @@ package de.citec.csra.re;
 import static de.citec.csra.dm.DeviceManager.DEFAULT_SCOPE;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.re.cellfactory.DescriptionCell;
-import de.citec.csra.re.cellfactory.ValueCell;
+import de.citec.csra.re.cellfactory.DeviceClassCell;
 import de.citec.csra.re.struct.node.DeviceClassList;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
@@ -52,7 +52,8 @@ public class RegistryEditor extends Application {
     private static final Logger logger = LoggerFactory.getLogger(RegistryEditor.class);
 
     public static final String APP_NAME = "RegistryView";
-
+    public static final int RESOLUTION_WIDTH = 1024;
+    
     private final DeviceRegistryRemote remote;
     private TabPane registryTabPane, tabDeviceRegistryPane;
     private Tab tabDeviceRegistry, tabLocationRegistry, tabDeviceClass, tabDeviceConfig;
@@ -104,14 +105,14 @@ public class RegistryEditor extends Application {
 
             @Override
             public void handle(ActionEvent event) {
-                if( event.getSource().equals(addDeviceClass)) {
+                if (event.getSource().equals(addDeviceClass)) {
                     deviceClassTreeTableView.getRoot().getChildren().add(new DeviceClassContainer(DeviceClassType.DeviceClass.getDefaultInstance().toBuilder()));
                 }
             }
         });
 
         ContextMenu deviceClassTreeTableViewContextMenu = new ContextMenu(addDeviceClass);
-                deviceClassTreeTableView.setContextMenu(deviceClassTreeTableViewContextMenu);
+        deviceClassTreeTableView.setContextMenu(deviceClassTreeTableViewContextMenu);
 
         valueColumn = new TreeTableColumn<>("Value");
         valueColumn.setPrefWidth(1024 - 400);
@@ -122,7 +123,7 @@ public class RegistryEditor extends Application {
             @Override
             public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
 
-                return new ValueCell(remote);
+                return new DeviceClassCell(remote);
             }
         });
         valueColumn.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<Node, Node>>() {
@@ -142,7 +143,7 @@ public class RegistryEditor extends Application {
 
             @Override
             public void handle(ActionEvent event) {
-                if( event.getSource().equals(addDeviceConfig)) {
+                if (event.getSource().equals(addDeviceConfig)) {
                     deviceConfigTreeTableView.getRoot().getChildren().add(new DeviceConfigContainer(DeviceConfigType.DeviceConfig.getDefaultInstance().toBuilder()));
                 }
             }
@@ -150,7 +151,7 @@ public class RegistryEditor extends Application {
 
         ContextMenu deviceConfiglassTreeTableViewContextMenu = new ContextMenu(addDeviceConfig);
         deviceConfigTreeTableView.setContextMenu(deviceConfiglassTreeTableViewContextMenu);
-                
+
         deviceClassTreeTableView.getColumns().addAll(descriptorColumn, valueColumn);
 //        deviceClassTreeTableView.getColumns().addAll(new DescriptorColumn(remote), new ValueColumn(remote));
         deviceClassTreeTableView.setEditable(true);
@@ -187,7 +188,7 @@ public class RegistryEditor extends Application {
             updateDynamicNodes();
         });
         remote.requestStatus();
-        Scene scene = new Scene(registryTabPane, 1024, 576);
+        Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
         primaryStage.setTitle("Registry Editor");
 //        primaryStage.setFullScreen(true);
 //        primaryStage.setFullScreenExitKeyCombination(KeyCombination.ALT_ANY);

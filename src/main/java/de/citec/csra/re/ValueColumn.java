@@ -6,7 +6,6 @@
 package de.citec.csra.re;
 
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
-import de.citec.csra.re.cellfactory.ValueCell;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.Node;
 import javafx.event.EventHandler;
@@ -16,18 +15,18 @@ import javafx.scene.control.TreeTableColumn;
  *
  * @author thuxohl
  */
-public class ValueColumn extends Column {
-    
+public abstract class ValueColumn extends Column {
+
     public ValueColumn(DeviceRegistryRemote remote) {
-        super("Value", new ValueCell(remote));
+        super("Value");
         this.setEditable(true);
         this.setSortable(false);
         this.setOnEditCommit(new EventHandlerImpl());
-        this.setPrefWidth(1024 - 400);
+        this.setPrefWidth(RegistryEditor.RESOLUTION_WIDTH - COLUMN_WIDTH);
     }
-    
+
     private class EventHandlerImpl implements EventHandler<TreeTableColumn.CellEditEvent<Node, Node>> {
-        
+
         @Override
         public void handle(CellEditEvent<Node, Node> event) {
             if (event.getRowValue().getValue() instanceof Leaf) {

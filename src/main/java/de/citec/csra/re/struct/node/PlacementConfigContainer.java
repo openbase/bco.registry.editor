@@ -16,6 +16,7 @@ public class PlacementConfigContainer extends NodeContainer<PlacementConfig.Buil
     public PlacementConfigContainer(PlacementConfig.Builder placement) {
         super("Placement", placement);
         super.add(new PositionContainer(placement.getPositionBuilder()));
-        super.add(new LocationConfigContainer(placement.getLocationBuilder()));
+//        super.add(new LocationConfigContainer(placement.getLocationBuilder()));
+        super.add(placement.getLocation(), "location");
     }
 }
