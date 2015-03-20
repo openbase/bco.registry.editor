@@ -6,10 +6,10 @@
 package de.citec.csra.re.struct.leaf;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.ProtocolMessageEnum;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
-import de.citec.csra.re.struct.node.SendableNode;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
@@ -58,6 +58,8 @@ public class LeafContainer<T> implements Leaf<T> {
         } else if (value instanceof String) {
             parent.getBuilder().setField(field, value);
         } else if (value instanceof Float) {
+            parent.getBuilder().setField(field, value);
+        } else if (value instanceof GeneratedMessage ) {
             parent.getBuilder().setField(field, value);
         }
         

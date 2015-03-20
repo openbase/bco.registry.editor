@@ -21,7 +21,7 @@ public class DeviceConfigContainer extends SendableNode<DeviceConfig.Builder> {
         super.add(new PlacementConfigContainer(deviceConfig.getPlacementConfigBuilder()));
         super.add(new ScopeContainer(deviceConfig.getScopeBuilder()));
         super.add(new InventoryStateContainer(deviceConfig.getInventoryStateBuilder()));
-        super.add(new DeviceClassContainer(deviceConfig.getDeviceClassBuilder()));
+        super.add(deviceConfig.getDeviceClass(), "device_class");
         super.add(new UnitConfigListContainer(deviceConfig));
         super.add(deviceConfig.getDescription(), "description");
     }

@@ -28,9 +28,9 @@ import rst.homeautomation.device.DeviceClassType;
  * 
  * @author thuxohl
  */
-public class RowCell extends TreeTableCell<Node, Node> {
+public abstract class RowCell extends TreeTableCell<Node, Node> {
 
-    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(RowCell.class);
+    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
     
     protected final DeviceRegistryRemote remote;
     
@@ -58,9 +58,6 @@ public class RowCell extends TreeTableCell<Node, Node> {
     }
 
     private class EventHandlerImpl implements EventHandler<ActionEvent> {
-
-        public EventHandlerImpl() {
-        }
 
         @Override
         public void handle(ActionEvent event) {
