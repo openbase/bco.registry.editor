@@ -38,6 +38,10 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
     protected <S> void add(S value, String descriptor) {
         this.add(new LeafContainer(value, descriptor, this));
     }
+    
+    public <S> void add(S value, String descriptor, int index) {
+        this.add(new LeafContainer(value, descriptor, this, index));
+    }
 
     @Override
     public String getDescriptor() {

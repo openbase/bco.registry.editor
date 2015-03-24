@@ -29,10 +29,25 @@ public class DescriptionCell extends RowCell {
             setContextMenu(null);
         } else if (item instanceof Node) {
             graphicProperty().setValue(null);
-            textProperty().setValue(item.getDescriptor());
+            textProperty().setValue(convertDescriptorT(item.getDescriptor()));
             if (!(item instanceof VariableNode)) {
                 setContextMenu(null);
             }
         }
+    }
+    
+    private String convertDescriptorT(String descriptor) {
+        if(descriptor.equals("")) {
+            return descriptor;
+        }
+        
+        String result = "";
+        String[] split = descriptor.split("_");
+        for(int i = 0; i < split.length; i++) {
+            result += Character.toUpperCase(split[i].charAt(0));
+            result += split[i].substring(1);
+            result += " ";
+        }
+        return result;
     }
 }

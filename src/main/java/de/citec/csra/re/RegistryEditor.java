@@ -7,10 +7,7 @@ package de.citec.csra.re;
 
 import static de.citec.csra.dm.DeviceManager.DEFAULT_SCOPE;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
-import de.citec.csra.re.cellfactory.DescriptionCell;
-import de.citec.csra.re.cellfactory.DeviceClassCell;
 import de.citec.csra.re.struct.node.DeviceClassList;
-import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.DeviceConfigList;
@@ -21,26 +18,19 @@ import de.citec.jul.exception.NotAvailableException;
 import de.citec.jul.pattern.Observable;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceClassType;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType;
+import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.device.DeviceRegistryType;
 
 /**
@@ -53,7 +43,7 @@ public class RegistryEditor extends Application {
 
     public static final String APP_NAME = "RegistryView";
     public static final int RESOLUTION_WIDTH = 1024;
-    
+
     private final DeviceRegistryRemote remote;
     private TabPane registryTabPane, tabDeviceRegistryPane;
     private Tab tabDeviceRegistry, tabLocationRegistry, tabDeviceClass, tabDeviceConfig;
@@ -61,10 +51,6 @@ public class RegistryEditor extends Application {
     private ProgressIndicator progressLocationRegistryIndicator;
     private TreeTableView<Node> deviceClassTreeTableView;
     private TreeTableView<Node> deviceConfigTreeTableView;
-    private TreeTableColumn<Node, Node> descriptorColumn;
-    private TreeTableColumn<Node, Node> valueColumn;
-    private TreeTableColumn<Node, Node> descriptorColumn2;
-    private TreeTableColumn<Node, Node> valueColumn2;
 
     public RegistryEditor() {
         this.remote = new DeviceRegistryRemote();
@@ -87,88 +73,16 @@ public class RegistryEditor extends Application {
         tabLocationRegistry.setContent(progressLocationRegistryIndicator);
 
         deviceClassTreeTableView = new TreeTableView<>();
-        deviceConfigTreeTableView = new TreeTableView<>();
-
-        descriptorColumn = new TreeTableColumn<>("Description");
-        descriptorColumn.setPrefWidth(400);
-        descriptorColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("this"));
-        descriptorColumn.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
-
-            @Override
-            public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-                return new DescriptionCell(remote);
-            }
-        });
-
-        MenuItem addDeviceClass = new MenuItem("Add");
-        addDeviceClass.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                if (event.getSource().equals(addDeviceClass)) {
-                    deviceClassTreeTableView.getRoot().getChildren().add(new DeviceClassContainer(DeviceClassType.DeviceClass.getDefaultInstance().toBuilder()));
-                }
-            }
-        });
-
-        ContextMenu deviceClassTreeTableViewContextMenu = new ContextMenu(addDeviceClass);
-        deviceClassTreeTableView.setContextMenu(deviceClassTreeTableViewContextMenu);
-
-        valueColumn = new TreeTableColumn<>("Value");
-        valueColumn.setPrefWidth(1024 - 400);
-        valueColumn.setSortable(false);
-        valueColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("this"));
-        valueColumn.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
-
-            @Override
-            public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-
-                return new DeviceClassCell(remote);
-            }
-        });
-        valueColumn.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<Node, Node>>() {
-
-            @Override
-            public void handle(TreeTableColumn.CellEditEvent<Node, Node> event) {
-                if (event.getRowValue().getValue() instanceof Leaf) {
-                    if (!event.getRowValue().getValue().getDescriptor().equals("ID")) {
-                    }
-                    ((Leaf) event.getRowValue().getValue()).setValue(((Leaf) event.getNewValue()).getValue());
-                }
-            }
-        });
-
-        MenuItem addDeviceConfig = new MenuItem("Add");
-        addDeviceConfig.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                if (event.getSource().equals(addDeviceConfig)) {
-                    deviceConfigTreeTableView.getRoot().getChildren().add(new DeviceConfigContainer(DeviceConfigType.DeviceConfig.getDefaultInstance().toBuilder()));
-                }
-            }
-        });
-
-        ContextMenu deviceConfiglassTreeTableViewContextMenu = new ContextMenu(addDeviceConfig);
-        deviceConfigTreeTableView.setContextMenu(deviceConfiglassTreeTableViewContextMenu);
-
-        deviceClassTreeTableView.getColumns().addAll(descriptorColumn, valueColumn);
-//        deviceClassTreeTableView.getColumns().addAll(new DescriptorColumn(remote), new ValueColumn(remote));
         deviceClassTreeTableView.setEditable(true);
         deviceClassTreeTableView.setShowRoot(false);
+        deviceClassTreeTableView.getColumns().addAll(new DescriptorColumn(remote), new DeviceClassColumn(remote));
+        deviceClassTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceClassTreeTableView, DeviceClass.getDefaultInstance()));
 
-        descriptorColumn2 = new TreeTableColumn<>("Description");
-        descriptorColumn2.setPrefWidth(400);
-        descriptorColumn2.setCellValueFactory(new TreeItemPropertyValueFactory<>("descriptor"));
-
-        valueColumn2 = new TreeTableColumn<>("Value");
-        valueColumn2.setPrefWidth(1024 - 400);
-        valueColumn2.setCellValueFactory(new TreeItemPropertyValueFactory<>("this"));
-        valueColumn2.setCellFactory(valueColumn.getCellFactory());
-        valueColumn2.setOnEditCommit(valueColumn.getOnEditCommit());
-        deviceConfigTreeTableView.getColumns().addAll(descriptorColumn2, valueColumn2);
+        deviceConfigTreeTableView = new TreeTableView<>();
         deviceConfigTreeTableView.setEditable(true);
         deviceConfigTreeTableView.setShowRoot(false);
+        deviceConfigTreeTableView.getColumns().addAll(new DescriptorColumn(remote), new DeviceConfigColumn(remote));
+        deviceConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceConfigTreeTableView, DeviceConfig.getDefaultInstance()));
 
         tabDeviceRegistryPane = new TabPane();
         tabDeviceRegistryPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -196,10 +110,6 @@ public class RegistryEditor extends Application {
         primaryStage.show();
 
         updateDynamicNodes();
-    }
-
-    public DeviceClass getTestData() {
-        return DeviceClassType.DeviceClass.newBuilder().setLabel("MyTestData4").build();
     }
 
     @Override

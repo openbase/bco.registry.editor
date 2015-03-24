@@ -6,6 +6,11 @@
 package de.citec.csra.re.struct.node;
 
 import com.google.protobuf.GeneratedMessage;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  *
@@ -14,18 +19,25 @@ import com.google.protobuf.GeneratedMessage;
  */
 public abstract class SendableNode<MB extends GeneratedMessage.Builder> extends VariableNode<MB> {
 
-    private boolean newNode;
-
+    private final Property<Boolean> changed;
+    
     public SendableNode(String descriptor, MB value) {
         super(descriptor, value);
-        newNode = false;
+        changed = new SimpleObjectProperty<>(false);
     }
 
-    public void setNewNode() {
-        newNode = true;
+    public void setChanged(boolean change) {
+        changed.setValue(change);
+//        synchronized(changed) { 
+//            changed.notify();
+//        }
     }
     
-    public boolean isNewNode() {
-        return newNode;
+    public boolean hasChanged() {
+        return changed.getValue();
+    }
+    
+    public Property<Boolean> getChanged() {
+        return changed;
     }
 }

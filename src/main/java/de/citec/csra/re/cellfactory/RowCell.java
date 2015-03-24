@@ -8,9 +8,8 @@ package de.citec.csra.re.cellfactory;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.Node;
-import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.SendableNode;
-import de.citec.csra.re.struct.node.UnitTypeContainer;
+import de.citec.csra.re.struct.node.UnitTypeListContainer;
 import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.jul.exception.CouldNotPerformException;
 import javafx.event.ActionEvent;
@@ -21,6 +20,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceClassType;
+import rst.homeautomation.unit.UnitTypeHolderType;
 
 /**
  * Cell factory to manage similar options for all cells in a row.
@@ -56,7 +56,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             setContextMenu(contextMenu);
         }
     }
-
+    
     private class EventHandlerImpl implements EventHandler<ActionEvent> {
 
         @Override
@@ -66,24 +66,26 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 VariableNode addedNode = null;
                 if (variableNode instanceof DeviceClassContainer) {
                     addedNode = new DeviceClassContainer(DeviceClassType.DeviceClass.getDefaultInstance().toBuilder());
-                    ((SendableNode) addedNode).setNewNode();
-                } else if (variableNode instanceof UnitTypeContainer) {
-                    addedNode = new UnitTypeContainer(((DeviceClassType.DeviceClass.Builder) ((NodeContainer) variableNode.getParent().getValue()).getBuilder()).addUnitsBuilder());
-                }
-
-                if (addedNode != null) {
+                    addedNode.setExpanded(true);
+                    variableNode.getParent().setExpanded(true);
                     variableNode.getParent().getChildren().add(addedNode);
+                } else if (variableNode instanceof UnitTypeListContainer ) {
+                    UnitTypeListContainer listNode = ((UnitTypeListContainer) variableNode);
+                    UnitTypeHolderType.UnitTypeHolder.Builder test = listNode.getBuilder().addUnitsBuilder();
+                    listNode.add(test.getUnitType(), "units", listNode.getBuilder().getUnitsBuilderList().indexOf(test));
+                    addedNode = listNode;
                 }
 
-                if (addedNode instanceof SendableNode) {
-//                    ((SendableNode) addedNode).getApplyButton().setVisible(true);
-                } else {
-                    TreeItem<Node> parent = addedNode.getParent();
-                    while (!(parent instanceof SendableNode)) {
-                        parent = parent.getParent();
-                    }
-//                    ((SendableNode) parent).getApplyButton().setVisible(true);
-                }
+//                if (addedNode instanceof SendableNode) {
+//                    ((SendableNode) addedNode).setChanged(true);
+//                } else {
+//                    System.out.println(addedNode.getDescriptor());
+//                    TreeItem<Node> parent = addedNode.getParent();
+//                    while (!(parent instanceof SendableNode)) {
+//                        parent = parent.getParent();
+//                    }
+//                    ((SendableNode) parent).setChanged(true);
+//                }
             } else if (event.getSource().equals(removeMenuItem)) {
                 variableNode.getParent().getChildren().remove(variableNode);
 

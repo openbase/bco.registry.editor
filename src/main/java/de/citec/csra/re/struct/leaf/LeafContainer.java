@@ -13,6 +13,8 @@ import de.citec.csra.re.struct.node.NodeContainer;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
+import rst.homeautomation.unit.UnitTypeHolderType;
+import rst.homeautomation.unit.UnitTypeHolderType.UnitTypeHolder.UnitType;
 
 /**
  *
@@ -24,11 +26,20 @@ public class LeafContainer<T> implements Leaf<T> {
     private final Property<T> value;
     private final Property<String> descriptor;
     private final NodeContainer parent;
+    private final int index;
 
     public LeafContainer(T value, String descriptor, NodeContainer parent) {
         this.value = new SimpleObjectProperty<>(value);
         this.descriptor = new ReadOnlyObjectWrapper<>(descriptor);
         this.parent = parent;
+        this.index = -1;
+    }
+
+    public LeafContainer(T value, String descriptor, NodeContainer parent, int index) {
+        this.value = new SimpleObjectProperty<>(value);
+        this.descriptor = new ReadOnlyObjectWrapper<>(descriptor);
+        this.parent = parent;
+        this.index = index;
     }
 
     @Override
@@ -54,15 +65,19 @@ public class LeafContainer<T> implements Leaf<T> {
 //        System.out.println("getValue().Class:" + getValue().getClass());
 
         if (value instanceof ProtocolMessageEnum) {
-            parent.getBuilder().setField(field, ((ProtocolMessageEnum) getValue()).getValueDescriptor());
+            if (index == -1) {
+                parent.getBuilder().setField(field, ((ProtocolMessageEnum) getValue()).getValueDescriptor());
+            } else if(value instanceof UnitType) {
+                parent.getBuilder().setRepeatedField(field, index, UnitTypeHolderType.UnitTypeHolder.newBuilder().setUnitType(((UnitType) value)).build());
+            }
         } else if (value instanceof String) {
             parent.getBuilder().setField(field, value);
         } else if (value instanceof Float) {
             parent.getBuilder().setField(field, value);
-        } else if (value instanceof GeneratedMessage ) {
+        } else if (value instanceof GeneratedMessage) {
             parent.getBuilder().setField(field, value);
         }
-        
+
 //        activateApplyButton();
     }
 
@@ -70,7 +85,7 @@ public class LeafContainer<T> implements Leaf<T> {
     public Node getThis() {
         return this;
     }
-    
+
     private void activateApplyButton() {
 //        int i = 0;
 //        if( parent instanceof SendableNode ) {
