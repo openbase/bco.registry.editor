@@ -15,6 +15,7 @@ import de.citec.jul.exception.NotAvailableException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
@@ -30,44 +31,53 @@ import rst.spatial.LocationConfigType.LocationConfig;
  * @author thuxohl
  */
 public class DeviceConfigCell extends ValueCell {
-    
+
     private final ComboBox<DeviceClass> deviceClassComboBox;
     private final ComboBox<LocationConfig> locationConfigComboBox;
-    
+
     public DeviceConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote);
-        
+
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
-            
+
             @Override
             public void handle(ActionEvent event) {
-                DeviceConfigContainer container = (DeviceConfigContainer) getItem();
-                DeviceConfig deviceConfig = container.getBuilder().build();
-                try {
-                    if (deviceRegistryRemote.containsDeviceConfig(deviceConfig)) {
-                        deviceRegistryRemote.updateDeviceConfig(deviceConfig);
-                    } else {
-                        deviceRegistryRemote.registerDeviceConfig(deviceConfig);
-                        container.setNewNode(false);
-                    }
-                    container.setChanged(false);
-                } catch (CouldNotPerformException ex) {
-                    logger.warn("Could not register or update device config [" + deviceConfig + "]", ex);
-                }
+                Thread thread = new Thread(
+                        new Task<Boolean>() {
+                            @Override
+                            protected Boolean call() throws Exception {
+                                DeviceConfigContainer container = (DeviceConfigContainer) getItem();
+                                DeviceConfig deviceConfig = container.getBuilder().build();
+                                try {
+                                    if (deviceRegistryRemote.containsDeviceConfig(deviceConfig)) {
+                                        deviceRegistryRemote.updateDeviceConfig(deviceConfig);
+                                    } else {
+                                        deviceRegistryRemote.registerDeviceConfig(deviceConfig);
+                                        container.setNewNode(false);
+                                    }
+                                    container.setChanged(false);
+                                } catch (CouldNotPerformException ex) {
+                                    logger.warn("Could not register or update device config [" + deviceConfig + "]", ex);
+                                }
+                                return true;
+                            }
+                        });
+                thread.setDaemon(true);
+                thread.start();
             }
         });
-        
+
         deviceClassComboBox = new ComboBox();
         deviceClassComboBox.setButtonCell(new DeviceClassComboBoxCell());
         deviceClassComboBox.setCellFactory(new Callback<ListView<DeviceClass>, ListCell<DeviceClass>>() {
-            
+
             @Override
             public ListCell<DeviceClass> call(ListView<DeviceClass> param) {
                 return new DeviceClassComboBoxCell();
             }
         });
         deviceClassComboBox.setOnAction(new EventHandler<ActionEvent>() {
-            
+
             @Override
             public void handle(ActionEvent event) {
                 if (deviceClassComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(deviceClassComboBox.getSelectionModel().getSelectedItem())) {
@@ -76,18 +86,18 @@ public class DeviceConfigCell extends ValueCell {
                 }
             }
         });
-        
+
         locationConfigComboBox = new ComboBox<>();
         locationConfigComboBox.setButtonCell(new LocationConfigComboBoxCell());
         locationConfigComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
-            
+
             @Override
             public ListCell<LocationConfig> call(ListView<LocationConfig> param) {
                 return new LocationConfigComboBoxCell();
             }
         });
         locationConfigComboBox.setOnAction(new EventHandler<ActionEvent>() {
-            
+
             @Override
             public void handle(ActionEvent event) {
                 if (locationConfigComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(locationConfigComboBox.getSelectionModel().getSelectedItem())) {
@@ -97,11 +107,11 @@ public class DeviceConfigCell extends ValueCell {
             }
         });
     }
-    
+
     @Override
     public void startEdit() {
         super.startEdit();
-        
+
         if (getItem() instanceof Leaf) {
             if (((Leaf) getItem()).getValue() instanceof DeviceClass) {
                 try {
@@ -120,18 +130,18 @@ public class DeviceConfigCell extends ValueCell {
             }
         }
     }
-    
+
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         if (item instanceof DeviceConfigContainer) {
             setGraphic(applyButton);
             if (item.getDescriptor().equals("")) {
                 applyButton.setVisible(true);
             }
             ((DeviceConfigContainer) item).getChanged().addListener(new ChangeListener<Boolean>() {
-                
+
                 @Override
                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                     applyButton.setVisible(newValue);
@@ -145,25 +155,25 @@ public class DeviceConfigCell extends ValueCell {
             }
         }
     }
-    
+
     private class DeviceClassComboBoxCell extends ListCell<DeviceClass> {
-        
+
         @Override
         public void updateItem(DeviceClass item, boolean empty) {
             super.updateItem(item, empty);
-            
+
             if (item != null) {
                 setText(item.getId());
             }
         }
     }
-    
+
     private class LocationConfigComboBoxCell extends ListCell<LocationConfig> {
-        
+
         @Override
         public void updateItem(LocationConfig item, boolean empty) {
             super.updateItem(item, empty);
-            
+
             if (item != null) {
                 setText(item.getLabel());
             }

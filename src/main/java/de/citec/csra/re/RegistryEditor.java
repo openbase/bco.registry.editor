@@ -5,11 +5,12 @@
  */
 package de.citec.csra.re;
 
+import de.citec.csra.dm.DeviceManager;
 import de.citec.csra.re.column.DeviceClassColumn;
 import de.citec.csra.re.column.DescriptorColumn;
 import de.citec.csra.re.column.DeviceConfigColumn;
-import static de.citec.csra.dm.DeviceManager.DEFAULT_SCOPE;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
+import de.citec.csra.lm.LocationManager;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.node.DeviceClassList;
 import de.citec.csra.re.struct.node.DeviceConfigList;
@@ -79,6 +80,9 @@ public class RegistryEditor extends Application {
         progressDeviceRegistryIndicator = new ProgressIndicator();
         progressLocationRegistryIndicator = new ProgressIndicator();
 
+        deviceClassTreeTableView = new TreeTableView<>();
+        deviceClassTreeTableView.setEditable(true);
+        deviceClassTreeTableView.setShowRoot(false);
         deviceClassTreeTableView.getColumns().addAll(new DescriptorColumn(deviceRemote, locationRemote), new DeviceClassColumn(deviceRemote, locationRemote));
         deviceClassTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceClassTreeTableView, DeviceClass.getDefaultInstance()));
 
@@ -113,11 +117,11 @@ public class RegistryEditor extends Application {
             updateTabDeviceRegistry();
         });
         deviceRemote.requestStatus();
-//        locationRemote.activate();
-//        locationRemote.addObserver((Observable<LocationRegistryType.LocationRegistry> source, LocationRegistryType.LocationRegistry data) -> {
-//            updateTabLocationRegistry();
-//        });
-//        locationRemote.requestStatus();
+        locationRemote.activate();
+        locationRemote.addObserver((Observable<LocationRegistryType.LocationRegistry> source, LocationRegistryType.LocationRegistry data) -> {
+            updateTabLocationRegistry();
+        });
+        locationRemote.requestStatus();
 
         Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
         primaryStage.setTitle("Registry Editor");
@@ -126,13 +130,14 @@ public class RegistryEditor extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-//        updateTabLocationRegistry();
+        updateTabLocationRegistry();
         updateTabDeviceRegistry();
     }
 
     @Override
     public void stop() throws Exception {
         deviceRemote.shutdown();
+        locationRemote.shutdown();
         super.stop();
     }
 
@@ -191,7 +196,8 @@ public class RegistryEditor extends Application {
 
         /* Setup JPService */
         JPService.setApplicationName(APP_NAME);
-        JPService.registerProperty(JPDeviceRegistryScope.class, DEFAULT_SCOPE);
+        JPService.registerProperty(JPDeviceRegistryScope.class, DeviceManager.DEFAULT_SCOPE);
+        JPService.registerProperty(JPLocationRegistryScope.class, LocationManager.DEFAULT_SCOPE);
         launch(args);
     }
 }

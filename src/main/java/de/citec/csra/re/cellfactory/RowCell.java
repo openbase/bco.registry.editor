@@ -6,6 +6,7 @@
 package de.citec.csra.re.cellfactory;
 
 import com.google.protobuf.Descriptors;
+import javafx.application.Platform;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
@@ -23,6 +24,8 @@ import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
@@ -90,11 +93,22 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
         @Override
         public void handle(ActionEvent event) {
-            if (event.getSource().equals(addMenuItem)) {
-                addAction(RowCell.this.getItem());
-            } else if (event.getSource().equals(removeMenuItem)) {
-                removeAction(RowCell.this.getItem());
-            }
+            Thread thread = new Thread(
+                    new Task<Boolean>() {
+
+                        @Override
+                        protected Boolean call() throws Exception {
+                            if (event.getSource().equals(addMenuItem)) {
+                                addAction(RowCell.this.getItem());
+                            } else if (event.getSource().equals(removeMenuItem)) {
+                                removeAction(RowCell.this.getItem());
+                            }
+                            return true;
+                        }
+
+                    });
+            thread.setDaemon(true);
+            thread.start();
         }
 
         private void addAction(Node add) {
@@ -155,11 +169,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             }
         }
 
-        private void removeAction(Node remove) {
+        private void removeAction(Node nodeToRemove) {
             // check if the removed item is an instance of classes that have to be directly
             // removed in the registry [deviceClass, deviceConfig]
-            if (remove instanceof DeviceClassContainer) {
-                DeviceClassContainer item = (DeviceClassContainer) remove;
+            if (nodeToRemove instanceof DeviceClassContainer) {
+                DeviceClassContainer item = (DeviceClassContainer) nodeToRemove;
                 if (item.getNewNode()) {
                     item.getParent().getChildren().remove(item);
                 } else {
@@ -173,8 +187,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                         logger.info("Could not remove deviceClass [" + item.getBuilder().build() + "]", ex);
                     }
                 }
-            } else if (remove instanceof DeviceConfigContainer) {
-                DeviceConfigContainer item = (DeviceConfigContainer) remove;
+            } else if (nodeToRemove instanceof DeviceConfigContainer) {
+                DeviceConfigContainer item = (DeviceConfigContainer) nodeToRemove;
                 if (item.getNewNode()) {
                     item.getParent().getChildren().remove(item);
                 } else {
@@ -189,8 +203,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     }
                 }
                 // check for repeated fields: unitTypes[deviceClasses], unitConfigs[deviceConfigs], serviceConfigs[unitConfigs]
-            } else if (remove instanceof Leaf) {
-                LeafContainer item = (LeafContainer) remove;
+            } else if (nodeToRemove instanceof Leaf) {
+                LeafContainer item = (LeafContainer) nodeToRemove;
                 if (item.getValue() instanceof UnitTypeHolder.UnitType) {
                     Descriptors.FieldDescriptor field = item.getParent().getBuilder().getDescriptorForType().findFieldByName("units");
 
@@ -204,8 +218,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
                 item.getParent().setSendableChanged();
                 item.getParent().getChildren().remove(item);
-            } else if (remove instanceof UnitConfigContainer) {
-                UnitConfigContainer item = (UnitConfigContainer) remove;
+            } else if (nodeToRemove instanceof UnitConfigContainer) {
+                UnitConfigContainer item = (UnitConfigContainer) nodeToRemove;
                 NodeContainer parent = (NodeContainer) item.getParent().getValue();
                 Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName("unit_configs");
 
@@ -217,8 +231,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
                 item.setSendableChanged();
                 item.getParent().getChildren().remove(item);
-            } else if (remove instanceof ServiceConfigContainer) {
-                ServiceConfigContainer item = (ServiceConfigContainer) remove;
+            } else if (nodeToRemove instanceof ServiceConfigContainer) {
+                ServiceConfigContainer item = (ServiceConfigContainer) nodeToRemove;
                 NodeContainer parent = (NodeContainer) item.getParent().getValue();
 
                 Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName("service_configs");

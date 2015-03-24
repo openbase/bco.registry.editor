@@ -12,6 +12,7 @@ import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
@@ -29,19 +30,28 @@ public class DeviceClassCell extends ValueCell {
 
             @Override
             public void handle(ActionEvent event) {
-                DeviceClassContainer container = (DeviceClassContainer) getItem();
-                DeviceClass deviceClass = container.getBuilder().build();
-                try {
-                    if (deviceRegistryRemote.containsDeviceClass(deviceClass)) {
-                        deviceRegistryRemote.updateDeviceClass(deviceClass);
-                    } else {
-                        deviceRegistryRemote.registerDeviceClass(deviceClass);
-                        container.setNewNode(false);
-                    }
-                    container.setChanged(false);
-                } catch (CouldNotPerformException ex) {
-                    logger.warn("Could not register or update device class [" + deviceClass + "]", ex);
-                }
+                Thread thread = new Thread(
+                        new Task<Boolean>() {
+                            @Override
+                            protected Boolean call() throws Exception {
+                                DeviceClassContainer container = (DeviceClassContainer) getItem();
+                                DeviceClass deviceClass = container.getBuilder().build();
+                                try {
+                                    if (deviceRegistryRemote.containsDeviceClass(deviceClass)) {
+                                        deviceRegistryRemote.updateDeviceClass(deviceClass);
+                                    } else {
+                                        deviceRegistryRemote.registerDeviceClass(deviceClass);
+                                        container.setNewNode(false);
+                                    }
+                                    container.setChanged(false);
+                                } catch (CouldNotPerformException ex) {
+                                    logger.warn("Could not register or update device class [" + deviceClass + "]", ex);
+                                }
+                                return true;
+                            }
+                        });
+                thread.setDaemon(true);
+                thread.start();
             }
         });
     }

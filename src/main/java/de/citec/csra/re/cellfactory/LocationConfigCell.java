@@ -12,6 +12,7 @@ import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import rst.spatial.LocationConfigType.LocationConfig;
@@ -29,19 +30,28 @@ public class LocationConfigCell extends ValueCell {
 
             @Override
             public void handle(ActionEvent event) {
-                LocationConfigContainer container = (LocationConfigContainer) getItem();
-                LocationConfig locationConfig = container.getBuilder().build();
-                try {
-                    if (locationRegistryRemote.containsLocationConfig(locationConfig)) {
-                        locationRegistryRemote.updateLocationConfig(locationConfig);
-                    } else {
-                        locationRegistryRemote.registerLocationConfig(locationConfig);
-                        container.setNewNode(false);
-                    }
-                    container.setChanged(false);
-                } catch (CouldNotPerformException ex) {
-                    logger.warn("Could not register or update device class [" + locationConfig + "]", ex);
-                }
+                Thread thread = new Thread(
+                        new Task<Boolean>() {
+                            @Override
+                            protected Boolean call() throws Exception {
+                                LocationConfigContainer container = (LocationConfigContainer) getItem();
+                                LocationConfig locationConfig = container.getBuilder().build();
+                                try {
+                                    if (locationRegistryRemote.containsLocationConfig(locationConfig)) {
+                                        locationRegistryRemote.updateLocationConfig(locationConfig);
+                                    } else {
+                                        locationRegistryRemote.registerLocationConfig(locationConfig);
+                                        container.setNewNode(false);
+                                    }
+                                    container.setChanged(false);
+                                } catch (CouldNotPerformException ex) {
+                                    logger.warn("Could not register or update device class [" + locationConfig + "]", ex);
+                                }
+                                return true;
+                            }
+                        });
+                thread.setDaemon(true);
+                thread.start();
             }
         });
     }
