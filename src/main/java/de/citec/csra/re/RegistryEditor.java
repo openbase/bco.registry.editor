@@ -5,12 +5,10 @@
  */
 package de.citec.csra.re;
 
-import de.citec.csra.dm.DeviceManager;
 import de.citec.csra.re.column.DeviceClassColumn;
 import de.citec.csra.re.column.DescriptorColumn;
 import de.citec.csra.re.column.DeviceConfigColumn;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
-import de.citec.csra.lm.LocationManager;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.column.LocationConfigColumn;
 import de.citec.csra.re.struct.node.DeviceClassList;
@@ -199,8 +197,8 @@ public class RegistryEditor extends Application {
 
         /* Setup JPService */
         JPService.setApplicationName(APP_NAME);
-        JPService.registerProperty(JPDeviceRegistryScope.class, DeviceManager.DEFAULT_SCOPE);
-        JPService.registerProperty(JPLocationRegistryScope.class, LocationManager.DEFAULT_SCOPE);
+        JPService.registerProperty(JPDeviceRegistryScope.class);
+        JPService.registerProperty(JPLocationRegistryScope.class);
         launch(args);
     }
 }
