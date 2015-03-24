@@ -209,24 +209,20 @@ public class RegistryEditor extends Application {
     }
 
     private void updateDynamicNodes() {
-        Platform.runLater(new Runnable() {
-
-            @Override
-            public void run() {
-                if (!remote.isConnected()) {
-                    tabDeviceRegistry.setContent(progressDeviceRegistryIndicator);
-                    return;
-                }
-                try {
-                    DeviceRegistryType.DeviceRegistry data = remote.getData();
-                    deviceClassTreeTableView.setRoot(new DeviceClassList(data.toBuilder()));
-                    deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
-                    tabDeviceRegistry.setContent(tabDeviceRegistryPane);
-
-                } catch (NotAvailableException ex) {
-                    logger.error("Device classes not available!", ex);
-                    tabDeviceRegistry.setContent(new Label("Error: " + ex.getMessage()));
-                }
+        Platform.runLater(() -> {
+            if (!remote.isConnected()) {
+                tabDeviceRegistry.setContent(progressDeviceRegistryIndicator);
+                return;
+            }
+            try {
+                DeviceRegistryType.DeviceRegistry data = remote.getData();
+                deviceClassTreeTableView.setRoot(new DeviceClassList(data.toBuilder()));
+                deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
+                tabDeviceRegistry.setContent(tabDeviceRegistryPane);
+                
+            } catch (NotAvailableException ex) {
+                logger.error("Device classes not available!", ex);
+                tabDeviceRegistry.setContent(new Label("Error: " + ex.getMessage()));
             }
         });
 
