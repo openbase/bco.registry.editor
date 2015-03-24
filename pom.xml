@@ -101,5 +101,11 @@
             <version>0.2.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>de.unibi.csra.config</groupId>
+            <artifactId>device-location</artifactId>
+            <version>0.2.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

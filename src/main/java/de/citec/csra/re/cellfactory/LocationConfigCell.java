@@ -7,40 +7,40 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
-import de.citec.csra.re.struct.node.DeviceClassContainer;
+import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
+import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
  *
  * @author thuxohl
  */
-public class DeviceClassCell extends ValueCell {
+public class LocationConfigCell extends ValueCell {
 
-    public DeviceClassCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
+    public LocationConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote);
 
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
-                DeviceClassContainer container = (DeviceClassContainer) getItem();
-                DeviceClass deviceClass = container.getBuilder().build();
+                LocationConfigContainer container = (LocationConfigContainer) getItem();
+                LocationConfig locationConfig = container.getBuilder().build();
                 try {
-                    if (deviceRegistryRemote.containsDeviceClass(deviceClass)) {
-                        deviceRegistryRemote.updateDeviceClass(deviceClass);
+                    if (locationRegistryRemote.containsLocationConfig(locationConfig)) {
+                        locationRegistryRemote.updateLocationConfig(locationConfig);
                     } else {
-                        deviceRegistryRemote.registerDeviceClass(deviceClass);
+                        locationRegistryRemote.registerLocationConfig(locationConfig);
                         container.setNewNode(false);
                     }
                     container.setChanged(false);
                 } catch (CouldNotPerformException ex) {
-                    logger.warn("Could not register or update device class [" + deviceClass + "]", ex);
+                    logger.warn("Could not register or update device class [" + locationConfig + "]", ex);
                 }
             }
         });
@@ -50,16 +50,12 @@ public class DeviceClassCell extends ValueCell {
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (item instanceof DeviceClassContainer) {
+        if (item instanceof LocationConfigContainer && ((LocationConfigContainer) item).getBuilder().getRoot()) {
             setGraphic(applyButton);
-            if (item.getDescriptor().equals("")) {
-                applyButton.setVisible(true);
-            }
-            ((DeviceClassContainer) item).getChanged().addListener(new ChangeListener<Boolean>() {
+            ((LocationConfigContainer) item).getChanged().addListener(new ChangeListener<Boolean>() {
 
                 @Override
                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    System.out.println("CHANGED! From [" + oldValue + "] to [" + newValue + "]");
                     applyButton.setVisible(newValue);
                 }
             });

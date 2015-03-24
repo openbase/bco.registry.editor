@@ -17,6 +17,5 @@ public class BindingConfigContainer extends NodeContainer<BindingConfig.Builder>
         super("BindingConfig", bindingConfig);
         super.add(bindingConfig.getBindingType(), "binding_type");
     }
-    
-    
+
 }

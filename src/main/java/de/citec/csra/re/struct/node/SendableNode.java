@@ -19,25 +19,32 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public abstract class SendableNode<MB extends GeneratedMessage.Builder> extends VariableNode<MB> {
 
-    private final Property<Boolean> changed;
-    
+    private final SimpleObjectProperty<Boolean> changed;
+    private boolean newNode;
+
     public SendableNode(String descriptor, MB value) {
         super(descriptor, value);
         changed = new SimpleObjectProperty<>(false);
+        newNode = false;
     }
 
     public void setChanged(boolean change) {
-        changed.setValue(change);
-//        synchronized(changed) { 
-//            changed.notify();
-//        }
+        changed.set(change);
     }
-    
+
     public boolean hasChanged() {
         return changed.getValue();
     }
-    
+
     public Property<Boolean> getChanged() {
         return changed;
+    }
+
+    public boolean getNewNode() {
+        return newNode;
+    }
+
+    public void setNewNode(boolean newNode) {
+        this.newNode = newNode;
     }
 }

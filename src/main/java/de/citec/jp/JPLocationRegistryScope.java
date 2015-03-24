@@ -11,16 +11,16 @@ import de.citec.jul.rsb.jp.JPScope;
  *
  * @author mpohling
  */
-public class JPDeviceRegistryScope extends JPScope {
+public class JPLocationRegistryScope extends JPScope {
 
-    public final static String[] COMMAND_IDENTIFIERS = {"--deviceRegistryScope"};
+    public final static String[] COMMAND_IDENTIFIERS = {"--locationRegistryScope"};
 
-    public JPDeviceRegistryScope() {
+    public JPLocationRegistryScope() {
         super(COMMAND_IDENTIFIERS);
     }
 
     @Override
     public String getDescription() {
-        return "Setup the device registry scope which is used for the rsb communication.";
+        return "Setup the location registry scope which is used for the rsb communication.";
     }
 }

@@ -8,6 +8,7 @@ package de.citec.csra.re;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
+import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.SendableNode;
 import javafx.event.ActionEvent;
@@ -17,6 +18,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableView;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
  *
@@ -38,10 +40,13 @@ public class TreeTableViewContextMenu<M extends GeneratedMessage> extends Contex
                     newNode = new DeviceClassContainer(DeviceClass.newBuilder());
                 } else if (type instanceof DeviceConfig) {
                     newNode = new DeviceConfigContainer(DeviceConfig.newBuilder());
+                } else if (type instanceof LocationConfig && treeTableView.getRoot() == null) {
+                    newNode = new LocationConfigContainer(LocationConfig.newBuilder());
                 }
                 if (newNode != null) {
                     newNode.setExpanded(true);
                     newNode.setChanged(true);
+                    newNode.setNewNode(true);
                     treeTableView.getRoot().getChildren().add(newNode);
                 }
             }

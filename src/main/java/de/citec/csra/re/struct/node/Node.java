@@ -12,6 +12,6 @@ package de.citec.csra.re.struct.node;
 public interface Node {
 
     public String getDescriptor();
-    
+
 //    public Node getThis();
 }

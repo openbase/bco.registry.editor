@@ -18,8 +18,5 @@ public class ChildLocationListContainer extends NodeContainer<LocationConfig.Bui
         parentLocationConfig.getChildrenBuilderList().stream().forEach((locationConfigBuilder) -> {
             super.add(new LocationConfigContainer(locationConfigBuilder));
         });
-//        if( parentLocationConfig.getChildrenBuilderList().isEmpty() ) {
-//            super.add(new LocationConfigContainer(parentLocationConfig.addChildrenBuilder()));
-//        }
     }
 }

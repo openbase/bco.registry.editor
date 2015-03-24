@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.re;
+package de.citec.csra.re.column;
 
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
+import de.citec.csra.lm.remote.LocationRegistryRemote;
+import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.Node;
 import javafx.event.EventHandler;
@@ -17,7 +19,7 @@ import javafx.scene.control.TreeTableColumn;
  */
 public abstract class ValueColumn extends Column {
 
-    public ValueColumn(DeviceRegistryRemote remote) {
+    public ValueColumn(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super("Value");
         this.setEditable(true);
         this.setSortable(false);

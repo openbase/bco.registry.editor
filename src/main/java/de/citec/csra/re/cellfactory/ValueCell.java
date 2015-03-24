@@ -6,14 +6,13 @@
 package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
+import de.citec.csra.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.Node;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Observable;
-import java.util.Observer;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -29,7 +28,7 @@ import javafx.scene.input.KeyEvent;
  *
  * @author thuxohl
  */
-public abstract class ValueCell extends RowCell implements Observer {
+public abstract class ValueCell extends RowCell {
 
     private final TextField stringTextField;
     private final TextField decimalTextField;
@@ -39,10 +38,10 @@ public abstract class ValueCell extends RowCell implements Observer {
     protected final Button applyButton;
     protected Leaf leaf;
 
-    public ValueCell(DeviceRegistryRemote remote) {
-        super(remote);
+    public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
+        super(deviceRegistryRemote, locationRegistryRemote);
         applyButton = new Button("Apply Changes");
-        applyButton.setVisible(true);
+        applyButton.setVisible(false);
 
         stringTextField = new TextField();
         stringTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -104,8 +103,8 @@ public abstract class ValueCell extends RowCell implements Observer {
 
             @Override
             public void handle(ActionEvent event) {
-                if( longDatePicker.getValue() != null && longDatePicker.getValue().toEpochDay() != (Long) leaf.getValue()) {
-                    leaf.setValue(longDatePicker.getValue().toEpochDay()*24*60*60*1000);
+                if (longDatePicker.getValue() != null && longDatePicker.getValue().toEpochDay() != (Long) leaf.getValue()) {
+                    leaf.setValue(longDatePicker.getValue().toEpochDay() * 24 * 60 * 60 * 1000);
                     commitEdit(leaf);
                 }
             }
@@ -153,22 +152,16 @@ public abstract class ValueCell extends RowCell implements Observer {
         super.updateItem(item, empty);
 
         if (empty) {
-            graphicProperty().setValue(null);
-            textProperty().setValue("");
+            setGraphic(null);
+            setText("");
             setContextMenu(null);
         } else if (item instanceof Leaf) {
             graphicProperty().setValue(null);
             if (((Leaf) item).getValue() instanceof Long) {
                 setText(converter.format(new Date((Long) ((Leaf) item).getValue())));
-            } else if((((Leaf) item).getValue() != null )){
-                textProperty().setValue(((Leaf) item).getValue().toString());
+            } else if ((((Leaf) item).getValue() != null)) {
+                setText(((Leaf) item).getValue().toString());
             }
-            setContextMenu(null);
         }
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        applyButton.setVisible((Boolean) arg);
     }
 }

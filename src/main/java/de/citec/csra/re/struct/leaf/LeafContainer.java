@@ -52,6 +52,14 @@ public class LeafContainer<T> implements Leaf<T> {
         return descriptor.getValue();
     }
 
+    public NodeContainer getParent() {
+        return parent;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
     @Override
     public void setValue(T value) {
         this.value.setValue(value);
@@ -67,7 +75,7 @@ public class LeafContainer<T> implements Leaf<T> {
         if (value instanceof ProtocolMessageEnum) {
             if (index == -1) {
                 parent.getBuilder().setField(field, ((ProtocolMessageEnum) getValue()).getValueDescriptor());
-            } else if(value instanceof UnitType) {
+            } else if (value instanceof UnitType) {
                 parent.getBuilder().setRepeatedField(field, index, UnitTypeHolderType.UnitTypeHolder.newBuilder().setUnitType(((UnitType) value)).build());
             }
         } else if (value instanceof String) {
@@ -76,33 +84,15 @@ public class LeafContainer<T> implements Leaf<T> {
             parent.getBuilder().setField(field, value);
         } else if (value instanceof GeneratedMessage) {
             parent.getBuilder().setField(field, value);
+        } else if (value instanceof Long) {
+            parent.getBuilder().setField(field, value);
         }
 
-//        activateApplyButton();
+        parent.setSendableChanged();
     }
 
 //    @Override
     public Node getThis() {
         return this;
-    }
-
-    private void activateApplyButton() {
-//        int i = 0;
-//        if( parent instanceof SendableNode ) {
-//            System.out.println("Parent is sendable");
-//            ((SendableNode) parent).getApplyButton().setVisible(true);
-//        } else {
-//            NodeContainer node = (NodeContainer) parent.getParent().getValue();
-//            while( !(node instanceof SendableNode)  ) {
-//                System.out.println("Iterarot ["+i+"] is no sendable");
-//                node = (NodeContainer) parent.getParent().getValue();
-//                i++;
-//                if( i > 10 ) {
-//                    break;
-//                }
-//                Thread.yield();
-//            }
-//            ((SendableNode) node).getApplyButton().setVisible(true);
-//        }
     }
 }

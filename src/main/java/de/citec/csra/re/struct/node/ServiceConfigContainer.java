@@ -11,8 +11,8 @@ import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
  *
  * @author thuxohl
  */
-public class ServiceConfigContainer extends NodeContainer<ServiceConfig.Builder> {
-    
+public class ServiceConfigContainer extends VariableNode<ServiceConfig.Builder> {
+
     public ServiceConfigContainer(ServiceConfig.Builder serviceConfig) {
         super("Service Configuration", serviceConfig);
         super.add(new BindingConfigContainer(serviceConfig.getBindingConfigBuilder()));

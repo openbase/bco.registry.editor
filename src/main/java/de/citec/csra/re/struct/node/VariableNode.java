@@ -16,5 +16,5 @@ public class VariableNode<MB extends GeneratedMessage.Builder> extends NodeConta
 
     public VariableNode(String descriptor, MB value) {
         super(descriptor, value);
-    } 
+    }
 }

@@ -31,14 +31,14 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         this.getChildren().add(new TreeItem<>(leave));
     }
 
-    protected void add(TreeItem<Node> node) {
+    public void add(TreeItem<Node> node) {
         this.getChildren().add(node);
     }
 
-    protected <S> void add(S value, String descriptor) {
+    public <S> void add(S value, String descriptor) {
         this.add(new LeafContainer(value, descriptor, this));
     }
-    
+
     public <S> void add(S value, String descriptor, int index) {
         this.add(new LeafContainer(value, descriptor, this, index));
     }
@@ -52,8 +52,16 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
     public NodeContainer getThis() {
         return this;
     }
-    
+
     public MB getBuilder() {
         return builder;
+    }
+
+    public void setSendableChanged() {
+        NodeContainer sendable = this;
+        while (!(sendable instanceof SendableNode)) {
+            sendable = (NodeContainer) sendable.getParent().getValue();
+        }
+        ((SendableNode) sendable).setChanged(true);
     }
 }

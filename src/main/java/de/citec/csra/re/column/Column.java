@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.re;
+package de.citec.csra.re.column;
 
 import de.citec.csra.re.struct.node.Node;
 import javafx.scene.control.TreeTableColumn;

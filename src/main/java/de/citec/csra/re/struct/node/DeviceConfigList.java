@@ -7,7 +7,6 @@ package de.citec.csra.re.struct.node;
 
 import rst.homeautomation.device.DeviceRegistryType;
 
-
 /**
  *
  * @author thuxohl
