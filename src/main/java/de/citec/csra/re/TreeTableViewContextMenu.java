@@ -40,14 +40,22 @@ public class TreeTableViewContextMenu<M extends GeneratedMessage> extends Contex
                     newNode = new DeviceClassContainer(DeviceClass.newBuilder());
                 } else if (type instanceof DeviceConfig) {
                     newNode = new DeviceConfigContainer(DeviceConfig.newBuilder());
-                } else if (type instanceof LocationConfig && treeTableView.getRoot() == null) {
-                    newNode = new LocationConfigContainer(LocationConfig.newBuilder());
                 }
+
                 if (newNode != null) {
                     newNode.setExpanded(true);
                     newNode.setChanged(true);
                     newNode.setNewNode(true);
                     treeTableView.getRoot().getChildren().add(newNode);
+                }
+
+                if (type instanceof LocationConfig && treeTableView.getRoot() == null ) {
+                    newNode = new LocationConfigContainer(LocationConfig.newBuilder());
+                    newNode.setExpanded(true);
+                    newNode.setChanged(true);
+                    newNode.setNewNode(true);
+                    treeTableView.setRoot(newNode);
+                    addMenuItem.setVisible(false);
                 }
             }
         });

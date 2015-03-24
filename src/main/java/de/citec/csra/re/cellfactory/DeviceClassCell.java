@@ -69,7 +69,6 @@ public class DeviceClassCell extends ValueCell {
 
                 @Override
                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    System.out.println("CHANGED! From [" + oldValue + "] to [" + newValue + "]");
                     applyButton.setVisible(newValue);
                 }
             });

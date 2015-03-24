@@ -6,13 +6,14 @@
 package de.citec.csra.re.cellfactory;
 
 import com.google.protobuf.Descriptors;
-import javafx.application.Platform;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
+import de.citec.csra.re.struct.node.ChildLocationListContainer;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
+import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.ServiceConfigContainer;
@@ -24,7 +25,6 @@ import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -37,6 +37,7 @@ import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.homeautomation.unit.UnitTypeHolderType.UnitTypeHolder;
+import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
  * Cell factory to manage similar options for all cells in a row. Initializes
@@ -70,7 +71,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if ((item instanceof UnitTypeListContainer) || (item instanceof UnitConfigListContainer) || (item instanceof ServiceConfigListContainer)) {
+        if ((item instanceof UnitTypeListContainer) || (item instanceof UnitConfigListContainer) || (item instanceof ServiceConfigListContainer) || (item instanceof ChildLocationListContainer)) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
@@ -166,6 +167,13 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 listNode.add(new ServiceConfigContainer(serviceConfigBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
+            } else if (add instanceof ChildLocationListContainer) {
+                ChildLocationListContainer listNode = ((ChildLocationListContainer) add);
+                LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildrenBuilder();
+                listNode.add(new LocationConfigContainer(locationConfigBuilder));
+                listNode.setExpanded(true);
+                listNode.setSendableChanged();
+            } else if (add instanceof LocationConfigContainer) {
             }
         }
 
