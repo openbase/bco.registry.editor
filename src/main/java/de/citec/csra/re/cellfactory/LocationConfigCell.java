@@ -7,14 +7,23 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
+import de.citec.csra.re.struct.leaf.Leaf;
+import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
+import de.citec.jul.exception.NotAvailableException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.util.Callback;
+import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -22,6 +31,9 @@ import rst.spatial.LocationConfigType.LocationConfig;
  * @author thuxohl
  */
 public class LocationConfigCell extends ValueCell {
+
+    private final ComboBox<LocationConfig> locationConfigComboBox;
+    private final ComboBox<UnitConfig> unitConfigComboBox;
 
     public LocationConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote);
@@ -45,13 +57,53 @@ public class LocationConfigCell extends ValueCell {
                                     }
                                     container.setChanged(false);
                                 } catch (CouldNotPerformException ex) {
-                                    logger.warn("Could not register or update device class [" + locationConfig + "]", ex);
+                                    logger.warn("Could not register or update location config [" + locationConfig + "]", ex);
                                 }
                                 return true;
                             }
                         });
                 thread.setDaemon(true);
                 thread.start();
+            }
+        });
+
+        locationConfigComboBox = new ComboBox<>();
+        locationConfigComboBox.setButtonCell(new LocationConfigCell.LocationConfigComboBoxCell());
+        locationConfigComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
+
+            @Override
+            public ListCell<LocationConfig> call(ListView<LocationConfig> param) {
+                return new LocationConfigCell.LocationConfigComboBoxCell();
+            }
+        });
+        locationConfigComboBox.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                if (locationConfigComboBox.getSelectionModel().getSelectedItem() != null) {
+                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem().getParentId());
+                    commitEdit(leaf);
+                }
+            }
+        });
+
+        unitConfigComboBox = new ComboBox<>();
+        unitConfigComboBox.setButtonCell(new UnitConfigComboBoxCell());
+        unitConfigComboBox.setCellFactory(new Callback<ListView<UnitConfig>, ListCell<UnitConfig>>() {
+
+            @Override
+            public ListCell<UnitConfig> call(ListView<UnitConfig> param) {
+                return new LocationConfigCell.UnitConfigComboBoxCell();
+            }
+        });
+        unitConfigComboBox.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                if (unitConfigComboBox.getSelectionModel().getSelectedItem() != null) {
+                    leaf.setValue(unitConfigComboBox.getSelectionModel().getSelectedItem().getName());
+                    commitEdit(leaf);
+                }
             }
         });
     }
@@ -62,6 +114,9 @@ public class LocationConfigCell extends ValueCell {
 
         if (item instanceof LocationConfigContainer && ((LocationConfigContainer) item).getBuilder().getRoot()) {
             setGraphic(applyButton);
+            if (item.getDescriptor().equals("")) {
+                applyButton.setVisible(true);
+            }
             ((LocationConfigContainer) item).getChanged().addListener(new ChangeListener<Boolean>() {
 
                 @Override
@@ -69,6 +124,53 @@ public class LocationConfigCell extends ValueCell {
                     applyButton.setVisible(newValue);
                 }
             });
+        }
+    }
+
+    @Override
+    public void startEdit() {
+        super.startEdit();
+
+        if (getItem() instanceof LeafContainer) {
+            if (((Leaf) getItem()).getDescriptor().equals("parent_id")) {
+                try {
+                    locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
+                    setGraphic(locationConfigComboBox);
+                } catch (NotAvailableException ex) {
+                    logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
+                }
+            } else if (((Leaf) getItem()).getDescriptor().equals("unit_config_ids")) {
+                try {
+                    unitConfigComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getUnits()));
+                    setGraphic(unitConfigComboBox);
+                } catch (CouldNotPerformException ex) {
+                    logger.warn("Could not receive data to fill the unitConfigComboBox", ex);
+                }
+            }
+        }
+    }
+
+    private class LocationConfigComboBoxCell extends ListCell<LocationConfig> {
+
+        @Override
+        public void updateItem(LocationConfig item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null) {
+                setText(item.getId());
+            }
+        }
+    }
+
+    private class UnitConfigComboBoxCell extends ListCell<UnitConfig> {
+
+        @Override
+        public void updateItem(UnitConfig item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null) {
+                setText(item.getName());
+            }
         }
     }
 }

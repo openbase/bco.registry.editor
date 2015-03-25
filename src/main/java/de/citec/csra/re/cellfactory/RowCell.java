@@ -14,11 +14,13 @@ import de.citec.csra.re.struct.node.ChildLocationListContainer;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
+import de.citec.csra.re.struct.node.LocationConfigListContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.ServiceConfigContainer;
 import de.citec.csra.re.struct.node.ServiceConfigListContainer;
 import de.citec.csra.re.struct.node.UnitConfigContainer;
+import de.citec.csra.re.struct.node.UnitConfigIdListContainer;
 import de.citec.csra.re.struct.node.UnitConfigListContainer;
 import de.citec.csra.re.struct.node.UnitTypeListContainer;
 import de.citec.csra.re.struct.node.VariableNode;
@@ -71,7 +73,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if ((item instanceof UnitTypeListContainer) || (item instanceof UnitConfigListContainer) || (item instanceof ServiceConfigListContainer) || (item instanceof ChildLocationListContainer)) {
+        if ((item instanceof UnitTypeListContainer) || (item instanceof UnitConfigListContainer) || (item instanceof ServiceConfigListContainer) || (item instanceof ChildLocationListContainer) || (item instanceof UnitConfigIdListContainer)) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
@@ -81,6 +83,10 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             setContextMenu(contextMenu);
         } else if (item instanceof Leaf) {
             if (((Leaf) item).getValue() instanceof UnitTypeHolder.UnitType) {
+                addMenuItem.setVisible(true);
+                removeMenuItem.setVisible(true);
+                setContextMenu(contextMenu);
+            } else if (item.getDescriptor().equals("unit_config_ids")) {
                 addMenuItem.setVisible(true);
                 removeMenuItem.setVisible(true);
                 setContextMenu(contextMenu);
@@ -135,11 +141,23 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 listNode.add(unitTypeBuilder.getUnitType(), "units", listNode.getBuilder().getUnitsBuilderList().indexOf(unitTypeBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
+            } else if (add instanceof UnitConfigIdListContainer) {
+                UnitConfigIdListContainer listNode = (UnitConfigIdListContainer) add;
+                listNode.getBuilder().addUnitConfigIds("");
+                listNode.add("", "unit_config_ids", listNode.getBuilder().getUnitConfigIdsList().indexOf(""));
+                listNode.setExpanded(true);
+                listNode.setSendableChanged();
             } else if (add instanceof Leaf) {
                 if (((Leaf) add).getValue() instanceof UnitTypeHolder.UnitType) {
                     UnitTypeListContainer listNode = ((UnitTypeListContainer) ((LeafContainer) add).getParent());
                     UnitTypeHolder.Builder unitTypeBuilder = listNode.getBuilder().addUnitsBuilder();
                     listNode.add(unitTypeBuilder.getUnitType(), "units", listNode.getBuilder().getUnitsBuilderList().indexOf(unitTypeBuilder));
+                    listNode.setExpanded(true);
+                    listNode.setSendableChanged();
+                } else if (((Leaf) add).getDescriptor().equals("unit_config_ids")) {
+                    UnitConfigIdListContainer listNode = ((UnitConfigIdListContainer) ((LeafContainer) add).getParent());
+                    listNode.getBuilder().addUnitConfigIds("");
+                    listNode.add("", "unit_config_ids", listNode.getBuilder().getUnitConfigIdsList().indexOf(""));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
                 }
@@ -169,11 +187,29 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 listNode.setSendableChanged();
             } else if (add instanceof ChildLocationListContainer) {
                 ChildLocationListContainer listNode = ((ChildLocationListContainer) add);
-                LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildrenBuilder();
+                LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildrenBuilder().setRoot(false);
+                locationConfigBuilder.setParentId(listNode.getBuilder().getId());
                 listNode.add(new LocationConfigContainer(locationConfigBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof LocationConfigContainer) {
+                if (((LocationConfigContainer) add).getParent() instanceof ChildLocationListContainer) {
+                    ChildLocationListContainer listNode = (ChildLocationListContainer) ((LocationConfigContainer) add).getParent();
+                    LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildrenBuilder().setRoot(false);
+                    locationConfigBuilder.setParentId(listNode.getBuilder().getId());
+                    listNode.add(new LocationConfigContainer(locationConfigBuilder));
+                    listNode.setExpanded(true);
+                    listNode.setSendableChanged();
+                } else {
+                    LocationConfigListContainer listNode = (LocationConfigListContainer) ((LocationConfigContainer) add).getParent();
+                    LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addLocationConfigsBuilder().setRoot(true);
+                    LocationConfigContainer rootLocation = new LocationConfigContainer(locationConfigBuilder);
+                    listNode.add(rootLocation);
+                    listNode.setExpanded(true);
+                    rootLocation.setExpanded(true);
+                    rootLocation.setNewNode(true);
+                    rootLocation.setChanged(true);
+                }
             }
         }
 
@@ -211,17 +247,36 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     }
                 }
                 // check for repeated fields: unitTypes[deviceClasses], unitConfigs[deviceConfigs], serviceConfigs[unitConfigs]
+            } else if (nodeToRemove instanceof LocationConfigContainer) {
+                LocationConfigContainer item = (LocationConfigContainer) nodeToRemove;
+                if (item.getNewNode()) {
+                    item.getParent().getChildren().remove(item);
+                } else {
+                    LocationConfig locationConfig = item.getBuilder().build();
+                    try {
+                        if (locationRegistryRemote.containsLocationConfig(locationConfig)) {
+                            locationRegistryRemote.removeLocationConfig(locationConfig);
+                        }
+                        item.getParent().getChildren().remove(item);
+                    } catch (CouldNotPerformException ex) {
+                        logger.info("Could not remove locationConfig [" + item.getBuilder().build() + "]", ex);
+                    }
+                }
             } else if (nodeToRemove instanceof Leaf) {
                 LeafContainer item = (LeafContainer) nodeToRemove;
+                Descriptors.FieldDescriptor field = item.getParent().getBuilder().getDescriptorForType().findFieldByName(item.getDescriptor());
                 if (item.getValue() instanceof UnitTypeHolder.UnitType) {
-                    Descriptors.FieldDescriptor field = item.getParent().getBuilder().getDescriptorForType().findFieldByName("units");
-
                     // protobuf does not provide a good api to delete items from a repeated field
                     //  therefore the field has to be cleared entirely and then set with a  new list with the item removed 
                     List<UnitTypeHolder> unitTypeList = new ArrayList<>((List<UnitTypeHolder>) item.getParent().getBuilder().getField(field));
                     unitTypeList.remove(item.getIndex());
                     item.getParent().getBuilder().clearField(field);
                     item.getParent().getBuilder().setField(field, unitTypeList);
+                } else if (item.getDescriptor().equals("unit_config_ids")) {
+                    List<String> unitConfigIds = new ArrayList<>((List<String>) item.getParent().getBuilder().getField(field));
+                    unitConfigIds.remove(item.getIndex());
+                    item.getParent().getBuilder().clearField(field);
+                    item.getParent().getBuilder().setField(field, unitConfigIds);
                 }
 
                 item.getParent().setSendableChanged();

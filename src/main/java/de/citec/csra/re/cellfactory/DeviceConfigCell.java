@@ -175,7 +175,7 @@ public class DeviceConfigCell extends ValueCell {
             super.updateItem(item, empty);
 
             if (item != null) {
-                setText(item.getLabel());
+                setText(item.getId());
             }
         }
     }

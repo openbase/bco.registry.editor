@@ -102,6 +102,7 @@ public class RegistryEditor extends Application {
         
         locationConfigTreeTableView = new TreeTableView<>();
         locationConfigTreeTableView.setEditable(true);
+        locationConfigTreeTableView.setShowRoot(false);
         locationConfigTreeTableView.getColumns().addAll(new DescriptorColumn(deviceRemote, locationRemote), new LocationConfigColumn(deviceRemote, locationRemote));
         locationConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(locationConfigTreeTableView, LocationConfig.getDefaultInstance()));
         
