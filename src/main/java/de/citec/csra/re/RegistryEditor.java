@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re;
 
+import static de.citec.csra.dm.DeviceManager.APP_NAME;
 import de.citec.csra.re.column.DeviceClassColumn;
 import de.citec.csra.re.column.DescriptorColumn;
 import de.citec.csra.re.column.DeviceConfigColumn;
@@ -132,6 +133,7 @@ public class RegistryEditor extends Application {
         
         updateTabLocationRegistry();
         updateTabDeviceRegistry();
+        logger.info(APP_NAME + " successfully started.");
     }
     
     @Override
