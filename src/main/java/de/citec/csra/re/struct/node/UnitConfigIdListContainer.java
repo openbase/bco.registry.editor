@@ -14,9 +14,9 @@ import rst.spatial.LocationConfigType.LocationConfig;
 public class UnitConfigIdListContainer extends VariableNode<LocationConfig.Builder> {
 
     public UnitConfigIdListContainer(final LocationConfig.Builder locationConfig) {
-        super("Units Configs", locationConfig);
+        super("unit_config_ids", locationConfig);
         locationConfig.getUnitConfigIdsList().stream().forEach((unitId) -> {
-            super.add(unitId, "unit_config_ids", locationConfig.getUnitConfigIdsList().indexOf(unitId));
+            super.add(unitId, "unit_config_id", locationConfig.getUnitConfigIdsList().indexOf(unitId));
         });
     }
 }

@@ -14,12 +14,9 @@ import rst.homeautomation.device.DeviceConfigType;
 public class UnitConfigListContainer extends NodeContainer<DeviceConfigType.DeviceConfig.Builder> {
 
     public UnitConfigListContainer(final DeviceConfigType.DeviceConfig.Builder deviceConfig) {
-        super("Unit Configurations", deviceConfig);
+        super("unit_configs", deviceConfig);
         deviceConfig.getUnitConfigsBuilderList().stream().forEach((unitConfigBuilder) -> {
             super.add(new UnitConfigContainer(unitConfigBuilder));
         });
-        if (deviceConfig.getUnitConfigsBuilderList().isEmpty()) {
-            super.add(new UnitConfigContainer(deviceConfig.addUnitConfigsBuilder()));
-        }
     }
 }

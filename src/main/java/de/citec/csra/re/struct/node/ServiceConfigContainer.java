@@ -14,7 +14,7 @@ import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
 public class ServiceConfigContainer extends VariableNode<ServiceConfig.Builder> {
 
     public ServiceConfigContainer(ServiceConfig.Builder serviceConfig) {
-        super("Service Configuration", serviceConfig);
+        super("service_config", serviceConfig);
         super.add(new BindingConfigContainer(serviceConfig.getBindingConfigBuilder()));
         super.add(new OpenhabServiceConfigContainer(serviceConfig.getOpenhabServiceConfigBuilder()));
         super.add(new MieleAtHomeServiceConfigContainer(serviceConfig.getMieleAtHomeServiceConfigBuilder()));
