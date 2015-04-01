@@ -132,6 +132,7 @@ public class LocationConfigCell extends ValueCell {
         super.startEdit();
 
         if (getItem() instanceof LeafContainer) {
+            System.out.println("Leaf container in location config cell!");
             if (((Leaf) getItem()).getDescriptor().equals("parent_id")) {
                 try {
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
@@ -139,7 +140,7 @@ public class LocationConfigCell extends ValueCell {
                 } catch (NotAvailableException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
-            } else if (((Leaf) getItem()).getDescriptor().equals("unit_config_ids")) {
+            } else if (((Leaf) getItem()).getDescriptor().equals("unit_config_id")) {
                 try {
                     unitConfigComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getUnits()));
                     setGraphic(unitConfigComboBox);
