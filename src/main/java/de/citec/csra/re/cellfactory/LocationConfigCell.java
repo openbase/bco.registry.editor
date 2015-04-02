@@ -141,7 +141,7 @@ public class LocationConfigCell extends ValueCell {
                 }
             } else if (((Leaf) getItem()).getDescriptor().equals("unit_config_ids")) {
                 try {
-                    unitConfigComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getUnits()));
+                    unitConfigComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getUnitConfigs()));
                     setGraphic(unitConfigComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the unitConfigComboBox", ex);
