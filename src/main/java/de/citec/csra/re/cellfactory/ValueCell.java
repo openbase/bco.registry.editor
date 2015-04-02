@@ -13,6 +13,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Date;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -44,6 +46,18 @@ public abstract class ValueCell extends RowCell {
         applyButton.setVisible(false);
 
         stringTextField = new TextField();
+        stringTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (!newValue && !leaf.getValue().equals(stringTextField.getText())) {
+                    leaf.setValue(stringTextField.getText());
+                    // even though commit is called the text property won't change fast enough without this line?!?
+                    setText(stringTextField.getText());
+                    commitEdit(leaf);
+                }
+            }
+        });
         stringTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 
             @Override
@@ -97,6 +111,19 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
+        decimalTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                float parseFloat = Float.parseFloat(decimalTextField.getText());
+                if (!newValue && !leaf.getValue().equals(parseFloat)) {
+                    leaf.setValue(parseFloat);
+                    // even though commit is called the text property won't change fast enough without this line?!?
+                    setText(Float.toString(parseFloat));
+                    commitEdit(leaf);
+                }
+            }
+        });
 
         longDatePicker = new DatePicker();
         longDatePicker.setOnAction(new EventHandler<ActionEvent>() {
@@ -105,6 +132,7 @@ public abstract class ValueCell extends RowCell {
             public void handle(ActionEvent event) {
                 if (longDatePicker.getValue() != null && longDatePicker.getValue().toEpochDay() != (Long) leaf.getValue()) {
                     leaf.setValue(longDatePicker.getValue().toEpochDay() * 24 * 60 * 60 * 1000);
+                    setText(converter.format(new Date((Long) leaf.getValue())));
                     commitEdit(leaf);
                 }
             }

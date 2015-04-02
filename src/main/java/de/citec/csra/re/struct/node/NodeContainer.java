@@ -59,11 +59,11 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
 
     public void setSendableChanged() {
         NodeContainer sendable = this;
-        while (!(sendable instanceof SendableNode)) {
-            sendable = (NodeContainer) sendable.getParent().getValue();
-            if (sendable instanceof LocationConfigContainer && !((LocationConfigContainer) sendable).getBuilder().getRoot()) {
-                sendable = (NodeContainer) sendable.getParent().getValue();
+        while (sendable instanceof LocationConfigContainer || !(sendable instanceof SendableNode)) {
+            if (sendable instanceof LocationConfigContainer && ((LocationConfigContainer) sendable).getBuilder().getRoot()) {
+                break;
             }
+            sendable = (NodeContainer) sendable.getParent().getValue();
         }
         ((SendableNode) sendable).setChanged(true);
     }

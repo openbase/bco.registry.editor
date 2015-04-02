@@ -14,7 +14,7 @@ import rst.spatial.LocationConfigType.LocationConfig;
 public class ChildLocationListContainer extends NodeContainer<LocationConfig.Builder> {
 
     public ChildLocationListContainer(final LocationConfig.Builder parentLocationConfig) {
-        super("Child Locations", parentLocationConfig);
+        super("children", parentLocationConfig);
         parentLocationConfig.getChildrenBuilderList().stream().forEach((locationConfigBuilder) -> {
             super.add(new LocationConfigContainer(locationConfigBuilder));
         });

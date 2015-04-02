@@ -14,9 +14,9 @@ import rst.homeautomation.device.DeviceClassType;
 public class UnitTypeListContainer extends VariableNode<DeviceClassType.DeviceClass.Builder> {
 
     public UnitTypeListContainer(final DeviceClassType.DeviceClass.Builder deviceClass) {
-        super("Unit Types", deviceClass);
+        super("units", deviceClass);
         deviceClass.getUnitsBuilderList().stream().forEach((unitTypeBuilder) -> {
-            super.add(unitTypeBuilder.getUnitType(), "units", deviceClass.getUnitsBuilderList().indexOf(unitTypeBuilder));
+            super.add(unitTypeBuilder.getUnitType(), "unit", deviceClass.getUnitsBuilderList().indexOf(unitTypeBuilder));
         });
     }
 }

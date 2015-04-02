@@ -6,8 +6,10 @@
 package de.citec.csra.re.cellfactory;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Message;
 import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
+import de.citec.csra.re.RSTDefaultInstances;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.ChildLocationListContainer;
@@ -17,6 +19,7 @@ import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.LocationConfigListContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
+import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.ServiceConfigContainer;
 import de.citec.csra.re.struct.node.ServiceConfigListContainer;
 import de.citec.csra.re.struct.node.UnitConfigContainer;
@@ -129,7 +132,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 parent.getChildren().add(addedNode);
             } else if (add instanceof DeviceConfigContainer) {
                 NodeContainer parent = (NodeContainer) ((DeviceConfigContainer) add).getParent().getValue();
-                DeviceConfigContainer addedNode = new DeviceConfigContainer(DeviceConfig.getDefaultInstance().toBuilder());
+                DeviceConfigContainer addedNode = new DeviceConfigContainer(RSTDefaultInstances.getDefaultDeviceConfig());
                 addedNode.setChanged(true);
                 addedNode.setNewNode(true);
                 addedNode.setExpanded(true);
@@ -138,38 +141,40 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             } else if (add instanceof UnitTypeListContainer) {
                 UnitTypeListContainer listNode = ((UnitTypeListContainer) add);
                 UnitTypeHolder.Builder unitTypeBuilder = listNode.getBuilder().addUnitsBuilder();
-                listNode.add(unitTypeBuilder.getUnitType(), "units", listNode.getBuilder().getUnitsBuilderList().indexOf(unitTypeBuilder));
+                listNode.add(unitTypeBuilder.getUnitType(), "unit", listNode.getBuilder().getUnitsBuilderList().indexOf(unitTypeBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof UnitConfigIdListContainer) {
                 UnitConfigIdListContainer listNode = (UnitConfigIdListContainer) add;
                 listNode.getBuilder().addUnitConfigIds("");
-                listNode.add("", "unit_config_ids", listNode.getBuilder().getUnitConfigIdsList().indexOf(""));
+                listNode.add("", "unit_config_id", listNode.getBuilder().getUnitConfigIdsList().indexOf(""));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof Leaf) {
                 if (((Leaf) add).getValue() instanceof UnitTypeHolder.UnitType) {
                     UnitTypeListContainer listNode = ((UnitTypeListContainer) ((LeafContainer) add).getParent());
                     UnitTypeHolder.Builder unitTypeBuilder = listNode.getBuilder().addUnitsBuilder();
-                    listNode.add(unitTypeBuilder.getUnitType(), "units", listNode.getBuilder().getUnitsBuilderList().indexOf(unitTypeBuilder));
+                    listNode.add(unitTypeBuilder.getUnitType(), "unit", listNode.getBuilder().getUnitsBuilderList().indexOf(unitTypeBuilder));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
-                } else if (((Leaf) add).getDescriptor().equals("unit_config_ids")) {
+                } else if (((Leaf) add).getDescriptor().equals("unit_config_id")) {
                     UnitConfigIdListContainer listNode = ((UnitConfigIdListContainer) ((LeafContainer) add).getParent());
                     listNode.getBuilder().addUnitConfigIds("");
-                    listNode.add("", "unit_config_ids", listNode.getBuilder().getUnitConfigIdsList().indexOf(""));
+                    listNode.add("", "unit_config_id", listNode.getBuilder().getUnitConfigIdsList().indexOf(""));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
                 }
             } else if (add instanceof UnitConfigListContainer) {
                 UnitConfigListContainer listNode = ((UnitConfigListContainer) add);
-                UnitConfig.Builder unitConfigBuilder = listNode.getBuilder().addUnitConfigsBuilder();
+                UnitConfig.Builder unitConfigBuilder = RSTDefaultInstances.getDefaultUnitConfig();
+                listNode.getBuilder().addUnitConfigs(unitConfigBuilder);
                 listNode.add(new UnitConfigContainer(unitConfigBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof UnitConfigContainer) {
                 UnitConfigListContainer listNode = ((UnitConfigListContainer) ((UnitConfigContainer) add).getParent());
-                UnitConfig.Builder unitConfigBuilder = listNode.getBuilder().addUnitConfigsBuilder();
+                UnitConfig.Builder unitConfigBuilder = RSTDefaultInstances.getDefaultUnitConfig();
+                listNode.getBuilder().addUnitConfigs(unitConfigBuilder);
                 listNode.add(new UnitConfigContainer(unitConfigBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
@@ -215,99 +220,52 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
         private void removeAction(Node nodeToRemove) {
             // check if the removed item is an instance of classes that have to be directly
-            // removed in the registry [deviceClass, deviceConfig]
-            if (nodeToRemove instanceof DeviceClassContainer) {
-                DeviceClassContainer item = (DeviceClassContainer) nodeToRemove;
-                if (item.getNewNode()) {
-                    item.getParent().getChildren().remove(item);
+            // removed in the registry [deviceClass, deviceConfig, locationConfig]
+            if (nodeToRemove instanceof SendableNode) {
+                SendableNode sendable = (SendableNode) nodeToRemove;
+                if (sendable.getNewNode()) {
+                    sendable.getParent().getChildren().remove(sendable);
                 } else {
-                    DeviceClass deviceClass = item.getBuilder().build();
                     try {
-                        if (deviceRegistryRemote.containsDeviceClass(deviceClass)) {
-                            deviceRegistryRemote.removeDeviceClass(deviceClass);
+                        Message message = sendable.getBuilder().build();
+                        if (message instanceof DeviceClass) {
+                            if (deviceRegistryRemote.containsDeviceClass((DeviceClass) message)) {
+                                deviceRegistryRemote.removeDeviceClass((DeviceClass) message);
+                            }
+                        } else if (message instanceof DeviceConfig) {
+                            if (deviceRegistryRemote.containsDeviceConfig((DeviceConfig) message)) {
+                                deviceRegistryRemote.removeDeviceConfig((DeviceConfig) message);
+                            }
+                        } else if (message instanceof LocationConfig) {
+                            if (locationRegistryRemote.containsLocationConfig((LocationConfig) message)) {
+                                locationRegistryRemote.removeLocationConfig((LocationConfig) message);
+                            }
                         }
-                        item.getParent().getChildren().remove(item);
+                        sendable.getParent().getChildren().remove(sendable);
                     } catch (CouldNotPerformException ex) {
-                        logger.info("Could not remove deviceClass [" + item.getBuilder().build() + "]", ex);
-                    }
-                }
-            } else if (nodeToRemove instanceof DeviceConfigContainer) {
-                DeviceConfigContainer item = (DeviceConfigContainer) nodeToRemove;
-                if (item.getNewNode()) {
-                    item.getParent().getChildren().remove(item);
-                } else {
-                    DeviceConfig deviceConfig = item.getBuilder().build();
-                    try {
-                        if (deviceRegistryRemote.containsDeviceConfig(deviceConfig)) {
-                            deviceRegistryRemote.removeDeviceConfig(deviceConfig);
-                        }
-                        item.getParent().getChildren().remove(item);
-                    } catch (CouldNotPerformException ex) {
-                        logger.info("Could not remove deviceConfig [" + item.getBuilder().build() + "]", ex);
-                    }
-                }
-                // check for repeated fields: unitTypes[deviceClasses], unitConfigs[deviceConfigs], serviceConfigs[unitConfigs]
-            } else if (nodeToRemove instanceof LocationConfigContainer) {
-                LocationConfigContainer item = (LocationConfigContainer) nodeToRemove;
-                if (item.getNewNode()) {
-                    item.getParent().getChildren().remove(item);
-                } else {
-                    LocationConfig locationConfig = item.getBuilder().build();
-                    try {
-                        if (locationRegistryRemote.containsLocationConfig(locationConfig)) {
-                            locationRegistryRemote.removeLocationConfig(locationConfig);
-                        }
-                        item.getParent().getChildren().remove(item);
-                    } catch (CouldNotPerformException ex) {
-                        logger.info("Could not remove locationConfig [" + item.getBuilder().build() + "]", ex);
+                        logger.info("Could not remove sendable [" + sendable.getBuilder() + "]", ex);
                     }
                 }
             } else if (nodeToRemove instanceof Leaf) {
-                LeafContainer item = (LeafContainer) nodeToRemove;
-                Descriptors.FieldDescriptor field = item.getParent().getBuilder().getDescriptorForType().findFieldByName(item.getDescriptor());
-                if (item.getValue() instanceof UnitTypeHolder.UnitType) {
-                    // protobuf does not provide a good api to delete items from a repeated field
-                    //  therefore the field has to be cleared entirely and then set with a  new list with the item removed 
-                    List<UnitTypeHolder> unitTypeList = new ArrayList<>((List<UnitTypeHolder>) item.getParent().getBuilder().getField(field));
-                    unitTypeList.remove(item.getIndex());
-                    item.getParent().getBuilder().clearField(field);
-                    item.getParent().getBuilder().setField(field, unitTypeList);
-                } else if (item.getDescriptor().equals("unit_config_ids")) {
-                    List<String> unitConfigIds = new ArrayList<>((List<String>) item.getParent().getBuilder().getField(field));
-                    unitConfigIds.remove(item.getIndex());
-                    item.getParent().getBuilder().clearField(field);
-                    item.getParent().getBuilder().setField(field, unitConfigIds);
-                }
-
-                item.getParent().setSendableChanged();
-                item.getParent().getChildren().remove(item);
-            } else if (nodeToRemove instanceof UnitConfigContainer) {
-                UnitConfigContainer item = (UnitConfigContainer) nodeToRemove;
-                NodeContainer parent = (NodeContainer) item.getParent().getValue();
-                Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName("unit_configs");
-
-                List<UnitConfig> unitConfigList = new ArrayList<>((List<UnitConfig>) parent.getBuilder().getField(field));
-                unitConfigList.remove(item.getParent().getChildren().indexOf(item));
-
-                parent.getBuilder().clearField(field);
-                parent.getBuilder().setField(field, unitConfigList);
-
-                item.setSendableChanged();
-                item.getParent().getChildren().remove(item);
-            } else if (nodeToRemove instanceof ServiceConfigContainer) {
-                ServiceConfigContainer item = (ServiceConfigContainer) nodeToRemove;
-                NodeContainer parent = (NodeContainer) item.getParent().getValue();
-
-                Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName("service_configs");
-
-                List<ServiceConfig> serviceConfigList = new ArrayList<>((List<ServiceConfig>) parent.getBuilder().getField(field));
-                serviceConfigList.remove(item.getParent().getChildren().indexOf(item));
-                parent.getBuilder().clearField(field);
-                parent.getBuilder().setField(field, serviceConfigList);
-
-                item.setSendableChanged();
-                item.getParent().getChildren().remove(item);
+                removeNodeFromRepeatedField(((LeafContainer) nodeToRemove).getParent(), ((LeafContainer) nodeToRemove).getIndex());
+            } else {
+                removeNodeFromRepeatedField((NodeContainer) ((NodeContainer) nodeToRemove).getParent().getValue(), nodeToRemove);
             }
         }
     }
+
+    private void removeNodeFromRepeatedField(NodeContainer parent, Node nodeToRemove) {
+        removeNodeFromRepeatedField(parent, parent.getChildren().indexOf(nodeToRemove));
+    }
+
+    private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
+        Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(parent.getDescriptor());
+        List updatedList = new ArrayList((List) parent.getBuilder().getField(field));
+        updatedList.remove(index);
+        parent.getBuilder().clearField(field);
+        parent.getBuilder().setField(field, updatedList);
+        parent.setSendableChanged();
+        parent.getChildren().remove(index);
+    }
+
 }

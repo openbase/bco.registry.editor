@@ -6,13 +6,9 @@
 package de.citec.csra.re.struct.leaf;
 
 import com.google.protobuf.Descriptors;
-import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.ProtocolMessageEnum;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
-import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleObjectProperty;
 import rst.homeautomation.unit.UnitTypeHolderType;
 import rst.homeautomation.unit.UnitTypeHolderType.UnitTypeHolder.UnitType;
 
@@ -23,33 +19,33 @@ import rst.homeautomation.unit.UnitTypeHolderType.UnitTypeHolder.UnitType;
  */
 public class LeafContainer<T> implements Leaf<T> {
 
-    private final Property<T> value;
-    private final Property<String> descriptor;
+    private T value;
+    private final String descriptor;
     private final NodeContainer parent;
     private final int index;
 
     public LeafContainer(T value, String descriptor, NodeContainer parent) {
-        this.value = new SimpleObjectProperty<>(value);
-        this.descriptor = new ReadOnlyObjectWrapper<>(descriptor);
+        this.value = value;
+        this.descriptor = descriptor;
         this.parent = parent;
         this.index = -1;
     }
 
     public LeafContainer(T value, String descriptor, NodeContainer parent, int index) {
-        this.value = new SimpleObjectProperty<>(value);
-        this.descriptor = new ReadOnlyObjectWrapper<>(descriptor);
+        this.value = value;
+        this.descriptor = descriptor;
         this.parent = parent;
         this.index = index;
     }
 
     @Override
     public T getValue() {
-        return value.getValue();
+        return value;
     }
 
     @Override
     public String getDescriptor() {
-        return descriptor.getValue();
+        return descriptor;
     }
 
     public NodeContainer getParent() {
@@ -62,9 +58,9 @@ public class LeafContainer<T> implements Leaf<T> {
 
     @Override
     public void setValue(T value) {
-        this.value.setValue(value);
+        this.value = value;
 
-        Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(descriptor.getValue());
+        Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(descriptor);
 //        System.out.println("field:fullname" + field.getFullName());
 //        System.out.println("field:name" + field.getName());
 //        System.out.println("field:type" + field.getType());
@@ -78,14 +74,10 @@ public class LeafContainer<T> implements Leaf<T> {
             } else if (value instanceof UnitType) {
                 parent.getBuilder().setRepeatedField(field, index, UnitTypeHolderType.UnitTypeHolder.newBuilder().setUnitType(((UnitType) value)).build());
             }
-        } else if (value instanceof String) {
+        } else if (index == -1) {
             parent.getBuilder().setField(field, value);
-        } else if (value instanceof Float) {
-            parent.getBuilder().setField(field, value);
-        } else if (value instanceof GeneratedMessage) {
-            parent.getBuilder().setField(field, value);
-        } else if (value instanceof Long) {
-            parent.getBuilder().setField(field, value);
+        } else {
+            parent.getBuilder().setRepeatedField(field, index, value);
         }
 
         parent.setSendableChanged();

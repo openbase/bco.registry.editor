@@ -11,6 +11,7 @@ import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.SendableNode;
+import java.util.Date;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
@@ -18,7 +19,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableView;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.homeautomation.state.InventoryStateType;
+import rst.math.Vec3DFloatType;
 import rst.spatial.LocationConfigType.LocationConfig;
+import rst.spatial.PlacementConfigType;
+import rst.timing.TimestampType;
 
 /**
  *
@@ -39,8 +44,8 @@ public class TreeTableViewContextMenu<M extends GeneratedMessage> extends Contex
                 if (type instanceof DeviceClass) {
                     newNode = new DeviceClassContainer(DeviceClass.newBuilder());
                 } else if (type instanceof DeviceConfig) {
-                    newNode = new DeviceConfigContainer(DeviceConfig.newBuilder());
-                } else if ( type instanceof LocationConfig ) {
+                    newNode = new DeviceConfigContainer(RSTDefaultInstances.getDefaultDeviceConfig());
+                } else if (type instanceof LocationConfig) {
                     newNode = new LocationConfigContainer(LocationConfig.newBuilder().setRoot(true));
                 }
 

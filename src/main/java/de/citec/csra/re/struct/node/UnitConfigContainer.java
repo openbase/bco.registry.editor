@@ -14,7 +14,7 @@ import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 public class UnitConfigContainer extends VariableNode<UnitConfig.Builder> {
 
     public UnitConfigContainer(UnitConfig.Builder unitConfig) {
-        super("Unit Configuration", unitConfig);
+        super("unit_config", unitConfig);
         super.add(unitConfig.getLabel(), "label");
         super.add(unitConfig.getName(), "name");
         super.add(new PlacementConfigContainer(unitConfig.getPlacementBuilder()));
