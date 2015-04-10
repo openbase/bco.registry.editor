@@ -11,7 +11,7 @@ import rst.homeautomation.unit.UnitConfigType.UnitConfig;
  *
  * @author thuxohl
  */
-public class UnitConfigContainer extends VariableNode<UnitConfig.Builder> {
+public class UnitConfigContainer extends NodeContainer<UnitConfig.Builder> {
 
     public UnitConfigContainer(UnitConfig.Builder unitConfig) {
         super("unit_config", unitConfig);

@@ -22,10 +22,11 @@ import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.ServiceConfigContainer;
 import de.citec.csra.re.struct.node.ServiceConfigListContainer;
+import de.citec.csra.re.struct.node.ServiceTypeListContainer;
 import de.citec.csra.re.struct.node.UnitConfigContainer;
-import de.citec.csra.re.struct.node.UnitConfigIdListContainer;
+import de.citec.csra.re.struct.node.UnitIdListContainer;
 import de.citec.csra.re.struct.node.UnitConfigListContainer;
-import de.citec.csra.re.struct.node.UnitTypeListContainer;
+import de.citec.csra.re.struct.node.UnitTemplateListContainer;
 import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
-import rst.homeautomation.unit.UnitTypeHolderType.UnitTypeHolder;
+import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -76,7 +77,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if ((item instanceof UnitTypeListContainer) || (item instanceof UnitConfigListContainer) || (item instanceof ServiceConfigListContainer) || (item instanceof ChildLocationListContainer) || (item instanceof UnitConfigIdListContainer)) {
+        if ((item instanceof UnitTemplateListContainer) || (item instanceof ChildLocationListContainer) || (item instanceof UnitIdListContainer) || (item instanceof ServiceTypeListContainer)) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
@@ -85,7 +86,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             removeMenuItem.setVisible(true);
             setContextMenu(contextMenu);
         } else if (item instanceof Leaf) {
-            if (((Leaf) item).getValue() instanceof UnitTypeHolder.UnitType) {
+            if (((Leaf) item).getValue() instanceof UnitTemplate.UnitType) {
                 addMenuItem.setVisible(true);
                 removeMenuItem.setVisible(true);
                 setContextMenu(contextMenu);
@@ -138,61 +139,35 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 addedNode.setExpanded(true);
                 parent.setExpanded(true);
                 parent.getChildren().add(addedNode);
-            } else if (add instanceof UnitTypeListContainer) {
-                UnitTypeListContainer listNode = ((UnitTypeListContainer) add);
-                UnitTypeHolder.Builder unitTypeBuilder = listNode.getBuilder().addUnitsBuilder();
-                listNode.add(unitTypeBuilder.getUnitType(), "unit", listNode.getBuilder().getUnitsBuilderList().indexOf(unitTypeBuilder));
+            } else if (add instanceof UnitTemplateListContainer) {
+                UnitTemplateListContainer listNode = ((UnitTemplateListContainer) add);
+                UnitTemplate.Builder unitTypeBuilder = listNode.getBuilder().addUnitBuilder();
+                listNode.add(unitTypeBuilder.getType(), "unit", listNode.getBuilder().getUnitBuilderList().indexOf(unitTypeBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
-            } else if (add instanceof UnitConfigIdListContainer) {
-                UnitConfigIdListContainer listNode = (UnitConfigIdListContainer) add;
-                listNode.getBuilder().addUnitConfigIds("");
-                listNode.add("", "unit_config_id", listNode.getBuilder().getUnitConfigIdsList().indexOf(""));
+            } else if (add instanceof UnitIdListContainer) {
+                UnitIdListContainer listNode = (UnitIdListContainer) add;
+                listNode.getBuilder().addUnitId("");
+                listNode.add("", "unit_config_id", listNode.getBuilder().getUnitIdList().indexOf(""));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof Leaf) {
-                if (((Leaf) add).getValue() instanceof UnitTypeHolder.UnitType) {
-                    UnitTypeListContainer listNode = ((UnitTypeListContainer) ((LeafContainer) add).getParent());
-                    UnitTypeHolder.Builder unitTypeBuilder = listNode.getBuilder().addUnitsBuilder();
-                    listNode.add(unitTypeBuilder.getUnitType(), "unit", listNode.getBuilder().getUnitsBuilderList().indexOf(unitTypeBuilder));
+                if (((Leaf) add).getValue() instanceof UnitTemplate.UnitType) {
+                    UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((LeafContainer) add).getParent());
+                    UnitTemplate.Builder unitTypeBuilder = listNode.getBuilder().addUnitBuilder();
+                    listNode.add(unitTypeBuilder.getType(), "unit", listNode.getBuilder().getUnitBuilderList().indexOf(unitTypeBuilder));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
                 } else if (((Leaf) add).getDescriptor().equals("unit_config_id")) {
-                    UnitConfigIdListContainer listNode = ((UnitConfigIdListContainer) ((LeafContainer) add).getParent());
-                    listNode.getBuilder().addUnitConfigIds("");
-                    listNode.add("", "unit_config_id", listNode.getBuilder().getUnitConfigIdsList().indexOf(""));
+                    UnitIdListContainer listNode = ((UnitIdListContainer) ((LeafContainer) add).getParent());
+                    listNode.getBuilder().addUnitId("");
+                    listNode.add("", "unit_config_id", listNode.getBuilder().getUnitIdList().indexOf(""));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
                 }
-            } else if (add instanceof UnitConfigListContainer) {
-                UnitConfigListContainer listNode = ((UnitConfigListContainer) add);
-                UnitConfig.Builder unitConfigBuilder = RSTDefaultInstances.getDefaultUnitConfig();
-                listNode.getBuilder().addUnitConfigs(unitConfigBuilder);
-                listNode.add(new UnitConfigContainer(unitConfigBuilder));
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof UnitConfigContainer) {
-                UnitConfigListContainer listNode = ((UnitConfigListContainer) ((UnitConfigContainer) add).getParent());
-                UnitConfig.Builder unitConfigBuilder = RSTDefaultInstances.getDefaultUnitConfig();
-                listNode.getBuilder().addUnitConfigs(unitConfigBuilder);
-                listNode.add(new UnitConfigContainer(unitConfigBuilder));
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof ServiceConfigListContainer) {
-                ServiceConfigListContainer listNode = ((ServiceConfigListContainer) add);
-                ServiceConfig.Builder serviceConfigBuilder = listNode.getBuilder().addServiceConfigsBuilder();
-                listNode.add(new ServiceConfigContainer(serviceConfigBuilder));
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof ServiceConfigContainer) {
-                ServiceConfigListContainer listNode = ((ServiceConfigListContainer) ((ServiceConfigContainer) add).getParent());
-                ServiceConfig.Builder serviceConfigBuilder = listNode.getBuilder().addServiceConfigsBuilder();
-                listNode.add(new ServiceConfigContainer(serviceConfigBuilder));
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
             } else if (add instanceof ChildLocationListContainer) {
                 ChildLocationListContainer listNode = ((ChildLocationListContainer) add);
-                LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildrenBuilder().setRoot(false);
+                LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildBuilder().setRoot(false);
                 locationConfigBuilder.setParentId(listNode.getBuilder().getId());
                 listNode.add(new LocationConfigContainer(locationConfigBuilder));
                 listNode.setExpanded(true);
@@ -200,7 +175,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             } else if (add instanceof LocationConfigContainer) {
                 if (((LocationConfigContainer) add).getParent() instanceof ChildLocationListContainer) {
                     ChildLocationListContainer listNode = (ChildLocationListContainer) ((LocationConfigContainer) add).getParent();
-                    LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildrenBuilder().setRoot(false);
+                    LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildBuilder().setRoot(false);
                     locationConfigBuilder.setParentId(listNode.getBuilder().getId());
                     listNode.add(new LocationConfigContainer(locationConfigBuilder));
                     listNode.setExpanded(true);

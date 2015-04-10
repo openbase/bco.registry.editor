@@ -25,8 +25,8 @@ public class RSTDefaultInstances {
         return DeviceConfig.newBuilder().setPlacementConfig(placementConfig).setInventoryState(inventoryState);
     }
     
-    public static UnitConfig.Builder getDefaultUnitConfig() {
+    public static UnitConfig.Builder getDefaultUnitConfig(UnitConfig.Builder unitBuilder) {
         PlacementConfig placementConfig = PlacementConfig.newBuilder().setPosition(Vec3DFloat.newBuilder().setX(0).setY(0).setZ(0).build()).build();
-        return UnitConfig.newBuilder().setPlacement(placementConfig);
+        return unitBuilder.setPlacement(placementConfig);
     }
 }

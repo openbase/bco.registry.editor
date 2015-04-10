@@ -6,9 +6,6 @@
 package de.citec.csra.re.struct.node;
 
 import com.google.protobuf.GeneratedMessage;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 

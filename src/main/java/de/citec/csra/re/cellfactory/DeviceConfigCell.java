@@ -11,7 +11,6 @@ import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.NotAvailableException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -115,16 +114,16 @@ public class DeviceConfigCell extends ValueCell {
         if (getItem() instanceof Leaf) {
             if (((Leaf) getItem()).getValue() instanceof DeviceClass) {
                 try {
-                    deviceClassComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getData().getDeviceClassesList()));
+                    deviceClassComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getData().getDeviceClasseList()));
                     setGraphic(deviceClassComboBox);
-                } catch (NotAvailableException ex) {
+                } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getValue() instanceof LocationConfig) {
                 try {
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
                     setGraphic(locationConfigComboBox);
-                } catch (NotAvailableException ex) {
+                } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
             }
@@ -136,17 +135,19 @@ public class DeviceConfigCell extends ValueCell {
         super.updateItem(item, empty);
 
         if (item instanceof DeviceConfigContainer) {
-            setGraphic(applyButton);
-            if (item.getDescriptor().equals("")) {
-                applyButton.setVisible(true);
-            }
-            ((DeviceConfigContainer) item).getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    applyButton.setVisible(newValue);
+            if (getGraphic() == null) {
+                setGraphic(applyButton);
+                if (item.getDescriptor().equals("")) {
+                    applyButton.setVisible(true);
                 }
-            });
+                ((DeviceConfigContainer) item).getChanged().addListener(new ChangeListener<Boolean>() {
+
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        applyButton.setVisible(newValue);
+                    }
+                });
+            }
         } else if (item instanceof Leaf) {
             if (((Leaf) item).getValue() instanceof DeviceClass) {
                 setText(((Leaf<DeviceClass>) item).getValue().getId());

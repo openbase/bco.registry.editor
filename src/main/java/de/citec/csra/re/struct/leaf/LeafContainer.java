@@ -7,10 +7,16 @@ package de.citec.csra.re.struct.leaf;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.ProtocolMessageEnum;
+import de.citec.csra.re.cellfactory.DescriptionCell;
+import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
-import rst.homeautomation.unit.UnitTypeHolderType;
-import rst.homeautomation.unit.UnitTypeHolderType.UnitTypeHolder.UnitType;
+import de.citec.csra.re.struct.node.UnitConfigListContainer;
+import rst.homeautomation.device.DeviceClassType.DeviceClass;
+import rst.homeautomation.service.ServiceConfigType;
+import rst.homeautomation.service.ServiceTypeHolderType;
+import rst.homeautomation.unit.UnitConfigType;
+import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 
 /**
  *
@@ -71,8 +77,8 @@ public class LeafContainer<T> implements Leaf<T> {
         if (value instanceof ProtocolMessageEnum) {
             if (index == -1) {
                 parent.getBuilder().setField(field, ((ProtocolMessageEnum) getValue()).getValueDescriptor());
-            } else if (value instanceof UnitType) {
-                parent.getBuilder().setRepeatedField(field, index, UnitTypeHolderType.UnitTypeHolder.newBuilder().setUnitType(((UnitType) value)).build());
+            } else {
+                parent.getBuilder().setRepeatedField(field, index, ((ProtocolMessageEnum) getValue()).getValueDescriptor());
             }
         } else if (index == -1) {
             parent.getBuilder().setField(field, value);
@@ -80,10 +86,24 @@ public class LeafContainer<T> implements Leaf<T> {
             parent.getBuilder().setRepeatedField(field, index, value);
         }
 
+        if (value instanceof DeviceClass) {
+            DeviceClass deviceClass = (DeviceClass) value;
+            DeviceConfigContainer container = (DeviceConfigContainer) this.getParent();
+            container.getBuilder().clearUnitConfig();
+            for (UnitTemplate unit : deviceClass.getUnitList()) {
+                UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setName(DescriptionCell.convertDescriptorT(unit.getType().toString()));
+                for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unit.getServiceTypeList()) {
+                    unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));
+                }
+                container.getBuilder().addUnitConfig(unitConfigBuilder.build());
+                container.add(new UnitConfigListContainer(container.getBuilder()));
+            }
+        }
+
         parent.setSendableChanged();
     }
 
-//    @Override
+    @Override
     public Node getThis() {
         return this;
     }

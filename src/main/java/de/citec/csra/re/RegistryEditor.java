@@ -5,7 +5,6 @@
  */
 package de.citec.csra.re;
 
-import static de.citec.csra.dm.DeviceManager.APP_NAME;
 import de.citec.csra.re.column.DeviceClassColumn;
 import de.citec.csra.re.column.DescriptorColumn;
 import de.citec.csra.re.column.DeviceConfigColumn;
@@ -19,7 +18,7 @@ import de.citec.csra.re.struct.node.Node;
 import de.citec.jp.JPDeviceRegistryScope;
 import de.citec.jp.JPLocationRegistryScope;
 import de.citec.jps.core.JPService;
-import de.citec.jul.exception.NotAvailableException;
+import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.pattern.Observable;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -140,6 +139,7 @@ public class RegistryEditor extends Application {
     public void stop() throws Exception {
         deviceRemote.shutdown();
         locationRemote.shutdown();
+        // TODO fix that the registry editor won't shut down
         super.stop();
     }
     
@@ -158,7 +158,7 @@ public class RegistryEditor extends Application {
                     deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
                     tabDeviceRegistry.setContent(tabDeviceRegistryPane);
                     
-                } catch (NotAvailableException ex) {
+                } catch (CouldNotPerformException ex) {
                     logger.error("Device registry not available!", ex);
                     tabDeviceRegistry.setContent(new Label("Error: " + ex.getMessage()));
                 }
@@ -184,7 +184,7 @@ public class RegistryEditor extends Application {
                         }
                     }
                     locationConfigTreeTableView.setRoot(new LocationConfigListContainer(rootLocations));
-                } catch (NotAvailableException ex) {
+                } catch (CouldNotPerformException ex) {
                     logger.error("Location registry not available!", ex);
                     tabLocationRegistry.setContent(new Label("Error: " + ex.getMessage()));
                 }

@@ -33,11 +33,12 @@ public class DescriptionCell extends RowCell {
         }
     }
     
-    private String convertDescriptorT(String descriptor) {
+    public static String convertDescriptorT(String descriptor) {
         if (descriptor.equals("")) {
             return descriptor;
         }
         
+        descriptor.toLowerCase();
         String result = "";
         String[] split = descriptor.split("_");
         for (int i = 0; i < split.length; i++) {

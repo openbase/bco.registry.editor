@@ -9,6 +9,7 @@ import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.node.SendableNode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -190,6 +191,8 @@ public abstract class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 setText(((Leaf) item).getValue().toString());
             }
+        } else if (item instanceof SendableNode) {
+            applyButton.setVisible(((SendableNode)item).hasChanged());
         }
     }
 }

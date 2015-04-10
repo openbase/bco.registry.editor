@@ -15,7 +15,7 @@ public class ServiceConfigListContainer extends NodeContainer<UnitConfigType.Uni
 
     public ServiceConfigListContainer(final UnitConfigType.UnitConfig.Builder unitConfig) {
         super("service_configs", unitConfig);
-        unitConfig.getServiceConfigsBuilderList().stream().forEach((serviceConfigBuilder) -> {
+        unitConfig.getServiceConfigBuilderList().stream().forEach((serviceConfigBuilder) -> {
             super.add(new ServiceConfigContainer(serviceConfigBuilder));
         });
     }

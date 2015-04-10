@@ -11,14 +11,12 @@ import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
  *
  * @author thuxohl
  */
-public class ServiceConfigContainer extends VariableNode<ServiceConfig.Builder> {
+public class ServiceConfigContainer extends NodeContainer<ServiceConfig.Builder> {
 
     public ServiceConfigContainer(ServiceConfig.Builder serviceConfig) {
         super("service_config", serviceConfig);
-        super.add(new BindingConfigContainer(serviceConfig.getBindingConfigBuilder()));
-        super.add(new OpenhabServiceConfigContainer(serviceConfig.getOpenhabServiceConfigBuilder()));
-        super.add(new MieleAtHomeServiceConfigContainer(serviceConfig.getMieleAtHomeServiceConfigBuilder()));
-        super.add(new HandlesServiceConfigContainer(serviceConfig.getHandlesServiceConfigBuilder()));
-        super.add(new SinactServiceConfigContainer(serviceConfig.getSinactServiceConfigBuilder()));
+        super.add(serviceConfig.getType(), "type");
+        super.add(serviceConfig.getUnitId(), "unit_id");
+        super.add(new BindingServiceConfigContainer(serviceConfig.getBindingServiceConfigBuilder()));
     }
 }

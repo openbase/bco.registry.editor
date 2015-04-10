@@ -12,7 +12,6 @@ import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.NotAvailableException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -132,12 +131,11 @@ public class LocationConfigCell extends ValueCell {
         super.startEdit();
 
         if (getItem() instanceof LeafContainer) {
-            System.out.println("Leaf container in location config cell!");
             if (((Leaf) getItem()).getDescriptor().equals("parent_id")) {
                 try {
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
                     setGraphic(locationConfigComboBox);
-                } catch (NotAvailableException ex) {
+                } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getDescriptor().equals("unit_config_id")) {

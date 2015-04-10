@@ -15,7 +15,7 @@ public class DeviceClassList extends NodeContainer<DeviceRegistryType.DeviceRegi
 
     public DeviceClassList(final DeviceRegistryType.DeviceRegistry.Builder deviceRegistry) {
         super("Device Classes", deviceRegistry);
-        deviceRegistry.getDeviceClassesBuilderList().stream().forEach((deviceClassBuilder) -> {
+        deviceRegistry.getDeviceClasseBuilderList().stream().forEach((deviceClassBuilder) -> {
             super.add(new DeviceClassContainer(deviceClassBuilder));
         });
     }
