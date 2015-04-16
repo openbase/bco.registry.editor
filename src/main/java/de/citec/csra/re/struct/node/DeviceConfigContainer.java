@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
+import de.citec.jul.rsb.scope.ScopeGenerator;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 
 /**
@@ -18,7 +19,7 @@ public class DeviceConfigContainer extends SendableNode<DeviceConfig.Builder> {
         super.add(deviceConfig.getLabel(), "label");
         super.add(deviceConfig.getSerialNumber(), "serial_number");
         super.add(new PlacementConfigContainer(deviceConfig.getPlacementConfigBuilder()));
-        super.add(deviceConfig.getScope().getStringRep(), "Scope");
+        super.add(ScopeGenerator.generateStringRep(deviceConfig.getScope()), "Scope");
         super.add(new InventoryStateContainer(deviceConfig.getInventoryStateBuilder()));
         super.add(deviceConfig.getDeviceClass(), "device_class");
         super.add(new UnitConfigListContainer(deviceConfig));

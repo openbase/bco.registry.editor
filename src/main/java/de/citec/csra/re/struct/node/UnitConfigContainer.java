@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
+import de.citec.jul.rsb.scope.ScopeGenerator;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 
 /**
@@ -19,7 +20,7 @@ public class UnitConfigContainer extends NodeContainer<UnitConfig.Builder> {
         super.add(unitConfig.getName(), "name");
         super.add(new PlacementConfigContainer(unitConfig.getPlacementBuilder()));
         super.add(new ServiceConfigListContainer(unitConfig));
-        super.add(unitConfig.getScope().getStringRep(), "Scope");
+        super.add(ScopeGenerator.generateStringRep(unitConfig.getScope()), "Scope");
         super.add(unitConfig.getDescription(), "description");
     }
 }
