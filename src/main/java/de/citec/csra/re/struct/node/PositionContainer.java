@@ -5,18 +5,17 @@
  */
 package de.citec.csra.re.struct.node;
 
-import rst.math.Vec3DFloatType.Vec3DFloat;
+import rst.geometry.PoseType.Pose;
 
 /**
  *
  * @author thuxohl
  */
-public class PositionContainer extends NodeContainer<Vec3DFloat.Builder> {
+public class PositionContainer extends NodeContainer<Pose.Builder> {
 
-    public PositionContainer(Vec3DFloat.Builder position) {
+    public PositionContainer(Pose.Builder position) {
         super("Position", position);
-        super.add(position.getX(), "x");
-        super.add(position.getY(), "y");
-        super.add(position.getZ(), "z");
+        super.add(new TranslationContainer(position.getTranslationBuilder()));
+        super.add(new RotationContainer(position.getRotationBuilder()));
     }
 }
