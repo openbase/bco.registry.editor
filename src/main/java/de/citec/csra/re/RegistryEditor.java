@@ -130,7 +130,11 @@ public class RegistryEditor extends Application {
                 updateTabLocationRegistry();
             });
 
-            locationRemote.requestStatus();
+            try {
+                deviceRemote.requestStatus();
+            } catch (CouldNotPerformException ex) {
+                ExceptionPrinter.printHistory(logger, ex);
+            }
 
             Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
             primaryStage.setTitle("Registry Editor");

@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
+import de.citec.jul.rsb.scope.ScopeGenerator;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -17,7 +18,7 @@ public class LocationConfigContainer extends SendableNode<LocationConfig.Builder
         super(location.getId(), location);
         super.add(location.getLabel(), "label");
         super.add(location.getParentId(), "parent_id");
-        super.add(location.getScope().getStringRep(), "Scope");
+        super.add(ScopeGenerator.generateStringRep(location.getScope()), "Scope");
         super.add(new UnitIdListContainer(location));
         super.add(new ChildLocationListContainer(location));
     }
