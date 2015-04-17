@@ -15,7 +15,7 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
 
     public RotationContainer(Rotation.Builder rotation) {
         super("rotation", rotation);
-        super.add(rotation.getFrameId(), "frame_id");
+        super.add(rotation.getFrameId(), "frame_id", false);
         super.add(rotation.getQw(), "qw");
         super.add(rotation.getQx(), "qx");
         super.add(rotation.getQy(), "qy");

@@ -14,7 +14,7 @@ import rst.geometry.PoseType.Pose;
 public class PositionContainer extends NodeContainer<Pose.Builder> {
 
     public PositionContainer(Pose.Builder position) {
-        super("Position", position);
+        super("position", position);
         super.add(new TranslationContainer(position.getTranslationBuilder()));
         super.add(new RotationContainer(position.getRotationBuilder()));
     }

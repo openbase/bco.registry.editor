@@ -47,6 +47,7 @@ public class DeviceConfigCell extends ValueCell {
                             protected Boolean call() throws Exception {
                                 DeviceConfigContainer container = (DeviceConfigContainer) getItem();
                                 DeviceConfig deviceConfig = container.getBuilder().build();
+                                // TODO: Check why there is an exception thrown in the build method and complain why it istn't visible for you :/
                                 try {
                                     if (deviceRegistryRemote.containsDeviceConfig(deviceConfig)) {
                                         deviceRegistryRemote.updateDeviceConfig(deviceConfig);
@@ -81,6 +82,7 @@ public class DeviceConfigCell extends ValueCell {
             public void handle(ActionEvent event) {
                 if (deviceClassComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(deviceClassComboBox.getSelectionModel().getSelectedItem())) {
                     leaf.setValue(deviceClassComboBox.getSelectionModel().getSelectedItem());
+                    setText(deviceClassComboBox.getSelectionModel().getSelectedItem().getId());
                     commitEdit(leaf);
                 }
             }
@@ -101,6 +103,7 @@ public class DeviceConfigCell extends ValueCell {
             public void handle(ActionEvent event) {
                 if (locationConfigComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(locationConfigComboBox.getSelectionModel().getSelectedItem())) {
                     leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem());
+                    setText(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
                     commitEdit(leaf);
                 }
             }
@@ -115,14 +118,14 @@ public class DeviceConfigCell extends ValueCell {
             if (((Leaf) getItem()).getValue() instanceof DeviceClass) {
                 try {
                     deviceClassComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getData().getDeviceClasseList()));
-                    setGraphic(deviceClassComboBox);
+                    super.setEditingGraphic(deviceClassComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getValue() instanceof LocationConfig) {
                 try {
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
-                    setGraphic(locationConfigComboBox);
+                    super.setEditingGraphic(locationConfigComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }

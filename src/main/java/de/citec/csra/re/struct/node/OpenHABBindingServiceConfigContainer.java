@@ -14,7 +14,7 @@ import rst.homeautomation.service.OpenHABBindingServiceConfigType.OpenHABBinding
 public class OpenHABBindingServiceConfigContainer extends NodeContainer<OpenHABBindingServiceConfig.Builder> {
 
     public OpenHABBindingServiceConfigContainer(OpenHABBindingServiceConfig.Builder openhabBindingServiceConfig) {
-        super("Openhab Service Configuration", openhabBindingServiceConfig);
+        super("openhab_service_configuration", openhabBindingServiceConfig);
         super.add(openhabBindingServiceConfig.getItemId(), "item_id");
         super.add(openhabBindingServiceConfig.getItemHardwareConfig(), "hardware_config");
     }

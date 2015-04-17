@@ -14,7 +14,7 @@ import rst.spatial.LocationRegistryType;
 public class LocationConfigListContainer extends NodeContainer<LocationRegistryType.LocationRegistry.Builder> {
 
     public LocationConfigListContainer(final LocationRegistryType.LocationRegistry.Builder locationRegistry) {
-        super("Location Configurations", locationRegistry);
+        super("Location Configs", locationRegistry);
         locationRegistry.getLocationConfigsBuilderList().stream().forEach((locationConfigBuilder) -> {
             super.add(new LocationConfigContainer(locationConfigBuilder));
         });

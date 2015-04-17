@@ -131,7 +131,7 @@ public class RegistryEditor extends Application {
             });
 
             try {
-                deviceRemote.requestStatus();
+                locationRemote.requestStatus();
             } catch (CouldNotPerformException ex) {
                 ExceptionPrinter.printHistory(logger, ex);
             }

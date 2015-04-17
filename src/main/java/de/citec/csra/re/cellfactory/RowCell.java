@@ -22,6 +22,7 @@ import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.ServiceTypeListContainer;
 import de.citec.csra.re.struct.node.UnitIdListContainer;
+import de.citec.csra.re.struct.node.UnitTemplateContainer;
 import de.citec.csra.re.struct.node.UnitTemplateListContainer;
 import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.jul.exception.CouldNotPerformException;
@@ -38,6 +39,7 @@ import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceTypeHolderType.ServiceTypeHolder.ServiceType;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
+import rst.homeautomation.unit.UnitTypeHolderType;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -81,11 +83,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             removeMenuItem.setVisible(true);
             setContextMenu(contextMenu);
         } else if (item instanceof Leaf) {
-            if (((Leaf) item).getValue() instanceof UnitTemplate.UnitType) {
+            if (((Leaf) item).getValue() instanceof ServiceType) {
                 addMenuItem.setVisible(true);
                 removeMenuItem.setVisible(true);
                 setContextMenu(contextMenu);
-            } else if (item.getDescriptor().equals("unit_config_ids")) {
+            } else if (item.getDescriptor().equals("unit_id")) {
                 addMenuItem.setVisible(true);
                 removeMenuItem.setVisible(true);
                 setContextMenu(contextMenu);
@@ -136,27 +138,45 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 parent.getChildren().add(addedNode);
             } else if (add instanceof UnitTemplateListContainer) {
                 UnitTemplateListContainer listNode = ((UnitTemplateListContainer) add);
-                UnitTemplate.Builder unitTypeBuilder = listNode.getBuilder().addUnitBuilder();
-                listNode.add(unitTypeBuilder.getType(), "unit", listNode.getBuilder().getUnitBuilderList().indexOf(unitTypeBuilder));
+                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitBuilder();
+                listNode.add(new UnitTemplateContainer(unitTemplate));
+                listNode.setExpanded(true);
+                listNode.setSendableChanged();
+            } else if (add instanceof UnitTemplateContainer) {
+                UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((NodeContainer) add).getParent().getValue());
+                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitBuilder();
+                listNode.add(new UnitTemplateContainer(unitTemplate));
+                listNode.setExpanded(true);
+                listNode.setSendableChanged();
+            } else if (add instanceof ServiceTypeListContainer) {
+                ServiceTypeListContainer listNode = ((ServiceTypeListContainer) add);
+                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addServiceType(ServiceType.UNKNOWN);
+                listNode.add(ServiceType.UNKNOWN, "service_type", listNode.getBuilder().getServiceTypeList().size() - 1);
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof UnitIdListContainer) {
                 UnitIdListContainer listNode = (UnitIdListContainer) add;
                 listNode.getBuilder().addUnitId("");
-                listNode.add("", "unit_config_id", listNode.getBuilder().getUnitIdList().indexOf(""));
+                listNode.add("", "unit_id", listNode.getBuilder().getUnitIdList().size() - 1);
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof Leaf) {
                 if (((Leaf) add).getValue() instanceof ServiceType) {
                     ServiceTypeListContainer listNode = ((ServiceTypeListContainer) ((LeafContainer) add).getParent());
-                    UnitTemplate.Builder unitTypeBuilder = listNode.getBuilder().addServiceType(ServiceType.UNKNOWN);
-                    listNode.add(ServiceType.UNKNOWN, "service_type", listNode.getBuilder().getServiceTypeList().indexOf(unitTypeBuilder));
+                    UnitTemplate.Builder unitTemplate = listNode.getBuilder().addServiceType(ServiceType.UNKNOWN);
+                    listNode.add(ServiceType.UNKNOWN, "service_type", listNode.getBuilder().getServiceTypeList().size() - 1);
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
-                } else if (((Leaf) add).getDescriptor().equals("unit_config_id")) {
+                } else if (((Leaf) add).getDescriptor().equals("unit_id")) {
                     UnitIdListContainer listNode = ((UnitIdListContainer) ((LeafContainer) add).getParent());
                     listNode.getBuilder().addUnitId("");
-                    listNode.add("", "unit_config_id", listNode.getBuilder().getUnitIdList().indexOf(""));
+                    listNode.add("", "unit_id", listNode.getBuilder().getUnitIdList().size() - 1);
+                    listNode.setExpanded(true);
+                    listNode.setSendableChanged();
+                } else if (((Leaf) add).getValue() instanceof UnitTypeHolderType.UnitTypeHolder.UnitType) {
+                    UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((LeafContainer) add).getParent());
+                    UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitBuilder();
+                    listNode.add(new UnitTemplateContainer(unitTemplate));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
                 }
@@ -227,7 +247,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     }
 
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
-        Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(parent.getDescriptor());
+        Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(parent.getDescriptor().substring(0, parent.getDescriptor().length() - 1));
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));
         updatedList.remove(index);
         parent.getBuilder().clearField(field);

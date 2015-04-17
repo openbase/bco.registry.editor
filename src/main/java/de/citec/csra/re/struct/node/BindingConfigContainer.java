@@ -14,7 +14,7 @@ import rst.homeautomation.binding.BindingConfigType.BindingConfig;
 public class BindingConfigContainer extends NodeContainer<BindingConfig.Builder> {
 
     public BindingConfigContainer(BindingConfig.Builder bindingConfig) {
-        super("BindingConfig", bindingConfig);
+        super("binding_config", bindingConfig);
         super.add(bindingConfig.getType(), "binding_type");
         super.add(new OpenHABBindingConfigContainer(bindingConfig.getOpenhabBindingConfigBuilder()));
         super.add(new MieleAtHomeBindingConfigContainer(bindingConfig.getMieleAtHomeBindingConfigBuilder()));

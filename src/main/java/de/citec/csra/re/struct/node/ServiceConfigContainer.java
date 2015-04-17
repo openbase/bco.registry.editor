@@ -15,7 +15,7 @@ public class ServiceConfigContainer extends NodeContainer<ServiceConfig.Builder>
 
     public ServiceConfigContainer(ServiceConfig.Builder serviceConfig) {
         super("service_config", serviceConfig);
-        super.add(serviceConfig.getType(), "type");
+        super.add(serviceConfig.getType(), "type", false);
         super.add(serviceConfig.getUnitId(), "unit_id");
         super.add(new BindingServiceConfigContainer(serviceConfig.getBindingServiceConfigBuilder()));
     }

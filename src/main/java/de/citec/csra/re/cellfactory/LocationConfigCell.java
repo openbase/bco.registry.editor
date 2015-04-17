@@ -12,6 +12,8 @@ import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -80,7 +82,8 @@ public class LocationConfigCell extends ValueCell {
             @Override
             public void handle(ActionEvent event) {
                 if (locationConfigComboBox.getSelectionModel().getSelectedItem() != null) {
-                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem().getParentId());
+                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
+                    setText(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
                     commitEdit(leaf);
                 }
             }
@@ -101,6 +104,7 @@ public class LocationConfigCell extends ValueCell {
             public void handle(ActionEvent event) {
                 if (unitConfigComboBox.getSelectionModel().getSelectedItem() != null) {
                     leaf.setValue(unitConfigComboBox.getSelectionModel().getSelectedItem().getName());
+                    setText(unitConfigComboBox.getSelectionModel().getSelectedItem().getName());
                     commitEdit(leaf);
                 }
             }
@@ -133,15 +137,18 @@ public class LocationConfigCell extends ValueCell {
         if (getItem() instanceof LeafContainer) {
             if (((Leaf) getItem()).getDescriptor().equals("parent_id")) {
                 try {
-                    locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
-                    setGraphic(locationConfigComboBox);
+                    List<LocationConfig> comboBoxList = new ArrayList(locationRegistryRemote.getData().getLocationConfigsList());
+                    comboBoxList.remove((LocationConfig) ((LeafContainer)getItem()).getParent().getBuilder().build());
+//                    locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
+                    locationConfigComboBox.setItems(FXCollections.observableArrayList(comboBoxList));
+                    super.setEditingGraphic(locationConfigComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
-            } else if (((Leaf) getItem()).getDescriptor().equals("unit_config_id")) {
+            } else if (((Leaf) getItem()).getDescriptor().equals("unit_id")) {
                 try {
                     unitConfigComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getUnitConfigs()));
-                    setGraphic(unitConfigComboBox);
+                    super.setEditingGraphic(unitConfigComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the unitConfigComboBox", ex);
                 }

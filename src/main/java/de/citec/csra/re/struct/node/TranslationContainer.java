@@ -15,7 +15,7 @@ public class TranslationContainer extends NodeContainer<Translation.Builder> {
 
     public TranslationContainer(Translation.Builder translation) {
         super("translation", translation);
-        super.add(translation.getFrameId(), "frame_id");
+        super.add(translation.getFrameId(), "frame_id", false);
         super.add(translation.getX(), "x");
         super.add(translation.getY(), "y");
         super.add(translation.getZ(), "z");
