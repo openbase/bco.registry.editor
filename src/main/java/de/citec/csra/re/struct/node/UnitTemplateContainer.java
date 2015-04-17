@@ -16,7 +16,7 @@ public class UnitTemplateContainer extends VariableNode<UnitTemplate.Builder>{
     public UnitTemplateContainer(UnitTemplate.Builder unitTemplate) {
         super("unit", unitTemplate);
         super.add(unitTemplate.getType(), "type");
-        super.add(this);
+        super.add(new ServiceTypeListContainer(unitTemplate));
     }
     
 }

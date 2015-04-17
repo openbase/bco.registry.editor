@@ -14,7 +14,7 @@ import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 public class ServiceTypeListContainer extends NodeContainer<UnitTemplate.Builder> {
 
     public ServiceTypeListContainer(UnitTemplate.Builder unitTemplate) {
-        super("service_types", unitTemplate);
+        super("service_type", unitTemplate);
         unitTemplate.getServiceTypeList().stream().forEach((serviceType) -> {
             super.add(serviceType, "service_type", unitTemplate.getServiceTypeList().indexOf(serviceType));
         });

@@ -20,12 +20,8 @@ import de.citec.csra.re.struct.node.LocationConfigListContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.SendableNode;
-import de.citec.csra.re.struct.node.ServiceConfigContainer;
-import de.citec.csra.re.struct.node.ServiceConfigListContainer;
 import de.citec.csra.re.struct.node.ServiceTypeListContainer;
-import de.citec.csra.re.struct.node.UnitConfigContainer;
 import de.citec.csra.re.struct.node.UnitIdListContainer;
-import de.citec.csra.re.struct.node.UnitConfigListContainer;
 import de.citec.csra.re.struct.node.UnitTemplateListContainer;
 import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.jul.exception.CouldNotPerformException;
@@ -40,8 +36,7 @@ import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
-import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.homeautomation.service.ServiceTypeHolderType.ServiceTypeHolder.ServiceType;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.LocationConfigType.LocationConfig;
 
@@ -152,10 +147,10 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof Leaf) {
-                if (((Leaf) add).getValue() instanceof UnitTemplate.UnitType) {
-                    UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((LeafContainer) add).getParent());
-                    UnitTemplate.Builder unitTypeBuilder = listNode.getBuilder().addUnitBuilder();
-                    listNode.add(unitTypeBuilder.getType(), "unit", listNode.getBuilder().getUnitBuilderList().indexOf(unitTypeBuilder));
+                if (((Leaf) add).getValue() instanceof ServiceType) {
+                    ServiceTypeListContainer listNode = ((ServiceTypeListContainer) ((LeafContainer) add).getParent());
+                    UnitTemplate.Builder unitTypeBuilder = listNode.getBuilder().addServiceType(ServiceType.UNKNOWN);
+                    listNode.add(ServiceType.UNKNOWN, "service_type", listNode.getBuilder().getServiceTypeList().indexOf(unitTypeBuilder));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
                 } else if (((Leaf) add).getDescriptor().equals("unit_config_id")) {
@@ -198,9 +193,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             // removed in the registry [deviceClass, deviceConfig, locationConfig]
             if (nodeToRemove instanceof SendableNode) {
                 SendableNode sendable = (SendableNode) nodeToRemove;
-                if (sendable.getNewNode()) {
-                    sendable.getParent().getChildren().remove(sendable);
-                } else {
+                if (!sendable.getNewNode()) {
                     try {
                         Message message = sendable.getBuilder().build();
                         if (message instanceof DeviceClass) {
@@ -216,11 +209,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                                 locationRegistryRemote.removeLocationConfig((LocationConfig) message);
                             }
                         }
-                        sendable.getParent().getChildren().remove(sendable);
                     } catch (CouldNotPerformException ex) {
-                        logger.info("Could not remove sendable [" + sendable.getBuilder() + "]", ex);
+                        logger.warn("Could not remove sendable [" + sendable.getBuilder() + "]", ex);
                     }
                 }
+                sendable.getParent().getChildren().remove(sendable);
             } else if (nodeToRemove instanceof Leaf) {
                 removeNodeFromRepeatedField(((LeafContainer) nodeToRemove).getParent(), ((LeafContainer) nodeToRemove).getIndex());
             } else {
