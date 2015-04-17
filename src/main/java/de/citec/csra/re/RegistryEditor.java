@@ -19,6 +19,7 @@ import de.citec.jp.JPDeviceRegistryScope;
 import de.citec.jp.JPLocationRegistryScope;
 import de.citec.jps.core.JPService;
 import de.citec.jul.exception.CouldNotPerformException;
+import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.pattern.Observable;
 import javafx.application.Application;
@@ -59,7 +60,7 @@ public class RegistryEditor extends Application {
     private TreeTableView<Node> deviceConfigTreeTableView;
     private TreeTableView<Node> locationConfigTreeTableView;
 
-    public RegistryEditor() {
+    public RegistryEditor() throws InstantiationException {
         this.deviceRemote = new DeviceRegistryRemote();
         this.locationRemote = new LocationRegistryRemote();
     }
@@ -112,28 +113,38 @@ public class RegistryEditor extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        try {
+            deviceRemote.activate();
+            deviceRemote.addObserver((Observable<DeviceRegistryType.DeviceRegistry> source, DeviceRegistryType.DeviceRegistry data) -> {
+                updateTabDeviceRegistry();
+            });
 
-        deviceRemote.activate();
-        deviceRemote.addObserver((Observable<DeviceRegistryType.DeviceRegistry> source, DeviceRegistryType.DeviceRegistry data) -> {
-            updateTabDeviceRegistry();
-        });
-        deviceRemote.requestStatus();
-        locationRemote.activate();
-        locationRemote.addObserver((Observable<LocationRegistryType.LocationRegistry> source, LocationRegistryType.LocationRegistry data) -> {
-            updateTabLocationRegistry();
-        });
-        locationRemote.requestStatus();
+            try {
+                deviceRemote.requestStatus();
+            } catch (CouldNotPerformException ex) {
+                ExceptionPrinter.printHistory(logger, ex);
+            }
 
-        Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
-        primaryStage.setTitle("Registry Editor");
+            locationRemote.activate();
+            locationRemote.addObserver((Observable<LocationRegistryType.LocationRegistry> source, LocationRegistryType.LocationRegistry data) -> {
+                updateTabLocationRegistry();
+            });
+
+            locationRemote.requestStatus();
+
+            Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
+            primaryStage.setTitle("Registry Editor");
 //        primaryStage.setFullScreen(true);
 //        primaryStage.setFullScreenExitKeyCombination(KeyCombination.ALT_ANY);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            primaryStage.setScene(scene);
+            primaryStage.show();
 
-        updateTabLocationRegistry();
-        updateTabDeviceRegistry();
-        logger.info(APP_NAME + " successfully started.");
+            updateTabLocationRegistry();
+            updateTabDeviceRegistry();
+            logger.info(APP_NAME + " successfully started.");
+        } catch (Exception ex) {
+            throw ExceptionPrinter.printHistory(logger, ex);
+        }
     }
 
     @Override
