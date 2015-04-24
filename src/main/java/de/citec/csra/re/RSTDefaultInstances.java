@@ -27,7 +27,7 @@ public class RSTDefaultInstances {
         return DeviceConfig.newBuilder().setPlacementConfig(placementConfig).setInventoryState(inventoryState);
     }
 
-    public static UnitConfig.Builder getDefaultUnitConfig(UnitConfig.Builder unitBuilder) {
+    public static UnitConfig.Builder setDefaultPlacement(UnitConfig.Builder unitBuilder) {
         PlacementConfig placementConfig = PlacementConfig.newBuilder().setPosition(getDefaultPose()).build();
         return unitBuilder.setPlacement(placementConfig);
     }

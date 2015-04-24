@@ -7,6 +7,7 @@ package de.citec.csra.re.struct.leaf;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.ProtocolMessageEnum;
+import de.citec.csra.re.RSTDefaultInstances;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
@@ -101,7 +102,6 @@ public class LeafContainer<T> implements Leaf<T> {
         }
         
         if (value instanceof DeviceClass) {
-            System.out.println("Adjusting unit configs");
             DeviceClass deviceClass = (DeviceClass) value;
             DeviceConfigContainer container = (DeviceConfigContainer) this.getParent();
 
@@ -119,7 +119,7 @@ public class LeafContainer<T> implements Leaf<T> {
                 for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unitTemplate.getServiceTypeList()) {
                     unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));
                 }
-                container.getBuilder().addUnitConfig(unitConfigBuilder.build());
+                container.getBuilder().addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
             }
             container.add(new UnitConfigListContainer(container.getBuilder()));
         }

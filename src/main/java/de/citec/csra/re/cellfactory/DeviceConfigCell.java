@@ -47,7 +47,6 @@ public class DeviceConfigCell extends ValueCell {
                             protected Boolean call() throws Exception {
                                 DeviceConfigContainer container = (DeviceConfigContainer) getItem();
                                 DeviceConfig deviceConfig = container.getBuilder().build();
-                                // TODO: Check why there is an exception thrown in the build method and complain why it istn't visible for you :/
                                 try {
                                     if (deviceRegistryRemote.containsDeviceConfig(deviceConfig)) {
                                         deviceRegistryRemote.updateDeviceConfig(deviceConfig);

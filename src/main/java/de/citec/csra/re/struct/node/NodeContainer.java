@@ -22,6 +22,8 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
     protected final MB builder;
 
     public NodeContainer(String descriptor, MB builder) {
+        assert descriptor != null;
+        assert builder != null;
         this.builder = builder;
         this.setValue(this);
         this.descriptor = new ReadOnlyObjectWrapper<>(descriptor);
