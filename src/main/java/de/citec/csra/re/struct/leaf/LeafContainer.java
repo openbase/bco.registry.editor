@@ -7,13 +7,10 @@ package de.citec.csra.re.struct.leaf;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.ProtocolMessageEnum;
-import de.citec.csra.re.cellfactory.DescriptionCell;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.UnitConfigListContainer;
-import javafx.application.Platform;
-import javafx.scene.control.TreeItem;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.service.ServiceConfigType;
 import rst.homeautomation.service.ServiceTypeHolderType;
@@ -117,9 +114,9 @@ public class LeafContainer<T> implements Leaf<T> {
             }
             
             container.getBuilder().clearUnitConfig();
-            for (UnitTemplate unit : deviceClass.getUnitList()) {
-                UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setName(DescriptionCell.convertDescriptorT(unit.getType().toString()));
-                for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unit.getServiceTypeList()) {
+            for (UnitTemplate unitTemplate : deviceClass.getUnitList()) {
+                UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setTemplate(unitTemplate);
+                for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unitTemplate.getServiceTypeList()) {
                     unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));
                 }
                 container.getBuilder().addUnitConfig(unitConfigBuilder.build());

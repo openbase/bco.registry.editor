@@ -39,7 +39,6 @@ import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceTypeHolderType.ServiceTypeHolder.ServiceType;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
-import rst.homeautomation.unit.UnitTypeHolderType;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -173,7 +172,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     listNode.add("", "unit_id", listNode.getBuilder().getUnitIdList().size() - 1);
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
-                } else if (((Leaf) add).getValue() instanceof UnitTypeHolderType.UnitTypeHolder.UnitType) {
+                } else if (((Leaf) add).getValue() instanceof UnitTemplate.UnitType) {
                     UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((LeafContainer) add).getParent());
                     UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitBuilder();
                     listNode.add(new UnitTemplateContainer(unitTemplate));

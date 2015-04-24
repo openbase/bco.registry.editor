@@ -103,8 +103,8 @@ public class LocationConfigCell extends ValueCell {
             @Override
             public void handle(ActionEvent event) {
                 if (unitConfigComboBox.getSelectionModel().getSelectedItem() != null) {
-                    leaf.setValue(unitConfigComboBox.getSelectionModel().getSelectedItem().getName());
-                    setText(unitConfigComboBox.getSelectionModel().getSelectedItem().getName());
+                    leaf.setValue(unitConfigComboBox.getSelectionModel().getSelectedItem().getLabel());
+                    setText(unitConfigComboBox.getSelectionModel().getSelectedItem().getLabel());
                     commitEdit(leaf);
                 }
             }
@@ -175,7 +175,7 @@ public class LocationConfigCell extends ValueCell {
             super.updateItem(item, empty);
 
             if (item != null) {
-                setText(item.getName());
+                setText(item.getLabel());
             }
         }
     }
