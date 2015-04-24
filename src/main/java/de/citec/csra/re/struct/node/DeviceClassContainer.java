@@ -19,6 +19,7 @@ public class DeviceClassContainer extends SendableNode<DeviceClass.Builder> {
         super.add(deviceClass.getProductNumber(), "product_number");
         super.add(new BindingConfigContainer(deviceClass.getBindingConfigBuilder()));
         super.add(new UnitTemplateListContainer(deviceClass));
+        super.add(deviceClass.getCompany(), "company");
         super.add(deviceClass.getDescription(), "description");
     }
 }
