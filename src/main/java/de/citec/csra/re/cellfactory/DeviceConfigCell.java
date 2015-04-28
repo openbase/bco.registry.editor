@@ -116,14 +116,14 @@ public class DeviceConfigCell extends ValueCell {
         if (getItem() instanceof Leaf) {
             if (((Leaf) getItem()).getValue() instanceof DeviceClass) {
                 try {
-                    deviceClassComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getData().getDeviceClasseList()));
+                    deviceClassComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getData().getDeviceClassList()));
                     super.setEditingGraphic(deviceClassComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getValue() instanceof LocationConfig) {
                 try {
-                    locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
+                    locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigList()));
                     super.setEditingGraphic(locationConfigComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);

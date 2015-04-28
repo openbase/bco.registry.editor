@@ -137,7 +137,7 @@ public class LocationConfigCell extends ValueCell {
         if (getItem() instanceof LeafContainer) {
             if (((Leaf) getItem()).getDescriptor().equals("parent_id")) {
                 try {
-                    List<LocationConfig> comboBoxList = new ArrayList(locationRegistryRemote.getData().getLocationConfigsList());
+                    List<LocationConfig> comboBoxList = new ArrayList(locationRegistryRemote.getData().getLocationConfigList());
                     comboBoxList.remove((LocationConfig) ((LeafContainer)getItem()).getParent().getBuilder().build());
 //                    locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(comboBoxList));

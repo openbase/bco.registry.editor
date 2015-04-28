@@ -29,7 +29,7 @@ public class RSTDefaultInstances {
 
     public static UnitConfig.Builder setDefaultPlacement(UnitConfig.Builder unitBuilder) {
         PlacementConfig placementConfig = PlacementConfig.newBuilder().setPosition(getDefaultPose()).build();
-        return unitBuilder.setPlacement(placementConfig);
+        return unitBuilder.setPlacementConfig(placementConfig);
     }
 
     private static Pose getDefaultPose() {

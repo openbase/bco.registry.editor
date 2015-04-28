@@ -137,13 +137,13 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 parent.getChildren().add(addedNode);
             } else if (add instanceof UnitTemplateListContainer) {
                 UnitTemplateListContainer listNode = ((UnitTemplateListContainer) add);
-                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitBuilder();
+                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
                 listNode.add(new UnitTemplateContainer(unitTemplate));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof UnitTemplateContainer) {
                 UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((NodeContainer) add).getParent().getValue());
-                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitBuilder();
+                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
                 listNode.add(new UnitTemplateContainer(unitTemplate));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
@@ -174,7 +174,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     listNode.setSendableChanged();
                 } else if (((Leaf) add).getValue() instanceof UnitTemplate.UnitType) {
                     UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((LeafContainer) add).getParent());
-                    UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitBuilder();
+                    UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
                     listNode.add(new UnitTemplateContainer(unitTemplate));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
@@ -196,7 +196,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     listNode.setSendableChanged();
                 } else {
                     LocationConfigListContainer listNode = (LocationConfigListContainer) ((LocationConfigContainer) add).getParent();
-                    LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addLocationConfigsBuilder().setRoot(true);
+                    LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addLocationConfigBuilder().setRoot(true);
                     LocationConfigContainer rootLocation = new LocationConfigContainer(locationConfigBuilder);
                     listNode.add(rootLocation);
                     listNode.setExpanded(true);

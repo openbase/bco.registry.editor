@@ -15,7 +15,7 @@ public class LocationConfigListContainer extends NodeContainer<LocationRegistryT
 
     public LocationConfigListContainer(final LocationRegistryType.LocationRegistry.Builder locationRegistry) {
         super("Location Configs", locationRegistry);
-        locationRegistry.getLocationConfigsBuilderList().stream().forEach((locationConfigBuilder) -> {
+        locationRegistry.getLocationConfigBuilderList().stream().forEach((locationConfigBuilder) -> {
             super.add(new LocationConfigContainer(locationConfigBuilder));
         });
     }

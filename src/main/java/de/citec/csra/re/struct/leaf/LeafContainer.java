@@ -114,7 +114,7 @@ public class LeafContainer<T> implements Leaf<T> {
             }
             
             container.getBuilder().clearUnitConfig();
-            for (UnitTemplate unitTemplate : deviceClass.getUnitList()) {
+            for (UnitTemplate unitTemplate : deviceClass.getUnitTemplateList()) {
                 UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setTemplate(unitTemplate);
                 for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unitTemplate.getServiceTypeList()) {
                     unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));

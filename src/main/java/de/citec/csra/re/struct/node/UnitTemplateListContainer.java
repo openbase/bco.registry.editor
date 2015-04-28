@@ -15,7 +15,7 @@ public class UnitTemplateListContainer extends NodeContainer<DeviceClassType.Dev
 
     public UnitTemplateListContainer(final DeviceClassType.DeviceClass.Builder deviceClass) {
         super("units", deviceClass);
-        deviceClass.getUnitBuilderList().stream().forEach((unitTemplateBuilder) -> {
+        deviceClass.getUnitTemplateBuilderList().stream().forEach((unitTemplateBuilder) -> {
             super.add(new UnitTemplateContainer(unitTemplateBuilder));
         });
     }

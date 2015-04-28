@@ -194,9 +194,9 @@ public class RegistryEditor extends Application {
                 try {
                     LocationRegistryType.LocationRegistry data = locationRemote.getData();
                     LocationRegistryType.LocationRegistry.Builder rootLocations = LocationRegistryType.LocationRegistry.newBuilder();
-                    for (LocationConfig locationConfig : data.getLocationConfigsList()) {
+                    for (LocationConfig locationConfig : data.getLocationConfigList()) {
                         if (locationConfig.getRoot()) {
-                            rootLocations.addLocationConfigs(locationConfig);
+                            rootLocations.addLocationConfig(locationConfig);
                         }
                     }
                     locationConfigTreeTableView.setRoot(new LocationConfigListContainer(rootLocations));
