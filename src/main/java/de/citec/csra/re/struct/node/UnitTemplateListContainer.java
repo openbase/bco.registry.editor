@@ -14,7 +14,7 @@ import rst.homeautomation.device.DeviceClassType;
 public class UnitTemplateListContainer extends NodeContainer<DeviceClassType.DeviceClass.Builder> {
 
     public UnitTemplateListContainer(final DeviceClassType.DeviceClass.Builder deviceClass) {
-        super("units", deviceClass);
+        super("unit_templates", deviceClass);
         deviceClass.getUnitTemplateBuilderList().stream().forEach((unitTemplateBuilder) -> {
             super.add(new UnitTemplateContainer(unitTemplateBuilder));
         });

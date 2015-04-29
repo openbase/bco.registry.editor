@@ -86,7 +86,7 @@ public class LeafContainer<T> implements Leaf<T> {
 //        System.out.println("field:name" + field.getName());
 //        System.out.println("field:type" + field.getType());
 //        System.out.println("field:Jvatype" + field.getJavaType());
-//        System.out.println("getValue():" + getValue());
+        System.out.println("getValue():" + getValue());
 //        System.out.println("getValue().Class:" + getValue().getClass());
 
         if (value instanceof ProtocolMessageEnum) {

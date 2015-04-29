@@ -33,7 +33,7 @@ import javafx.scene.input.KeyEvent;
  * @author thuxohl
  */
 public abstract class ValueCell extends RowCell {
-    
+        
     private final TextField stringTextField;
     private final TextField decimalTextField;
     private final ComboBox enumComboBox;

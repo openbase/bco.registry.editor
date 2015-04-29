@@ -34,6 +34,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
+import javafx.scene.paint.Color;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
@@ -51,6 +52,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
     protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
+//    public static final String BACKGROUND_COLOR = "-fx-text-fill: black;-fx-background-color: ";
+
     protected final DeviceRegistryRemote deviceRegistryRemote;
     protected final LocationRegistryRemote locationRegistryRemote;
 
@@ -60,7 +63,6 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     public RowCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         this.deviceRegistryRemote = deviceRegistryRemote;
         this.locationRegistryRemote = locationRegistryRemote;
-
         addMenuItem = new MenuItem("Add");
         removeMenuItem = new MenuItem("Remove");
         EventHandlerImpl eventHandler = new EventHandlerImpl();

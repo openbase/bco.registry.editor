@@ -137,6 +137,7 @@ public class RegistryEditor extends Application {
             }
 
             Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
+            scene.getStylesheets().add("test.css");
             primaryStage.setTitle("Registry Editor");
 //        primaryStage.setFullScreen(true);
 //        primaryStage.setFullScreenExitKeyCombination(KeyCombination.ALT_ANY);
@@ -155,7 +156,6 @@ public class RegistryEditor extends Application {
     public void stop() throws Exception {
         deviceRemote.shutdown();
         locationRemote.shutdown();
-        // TODO fix that the registry editor won't shut down
         super.stop();
     }
 

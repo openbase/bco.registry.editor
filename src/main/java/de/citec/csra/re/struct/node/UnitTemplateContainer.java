@@ -14,7 +14,7 @@ import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 public class UnitTemplateContainer extends VariableNode<UnitTemplate.Builder>{
 
     public UnitTemplateContainer(UnitTemplate.Builder unitTemplate) {
-        super("unit", unitTemplate);
+        super("unit_template", unitTemplate);
         super.add(unitTemplate.getType(), "type");
         super.add(new ServiceTypeListContainer(unitTemplate));
     }

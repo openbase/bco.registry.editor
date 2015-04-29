@@ -9,6 +9,7 @@ import de.citec.csra.dm.remote.DeviceRegistryRemote;
 import de.citec.csra.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.jul.exception.CouldNotPerformException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -35,6 +36,7 @@ public class DeviceClassCell extends ValueCell {
                             @Override
                             protected Boolean call() throws Exception {
                                 DeviceClassContainer container = (DeviceClassContainer) getItem();
+                                
                                 DeviceClass deviceClass = container.getBuilder().build();
                                 try {
                                     if (deviceRegistryRemote.containsDeviceClass(deviceClass)) {
@@ -44,8 +46,10 @@ public class DeviceClassCell extends ValueCell {
                                         container.setNewNode(false);
                                     }
                                     container.setChanged(false);
+                                    container.setColor("white");
                                 } catch (CouldNotPerformException ex) {
                                     logger.warn("Could not register or update device class [" + deviceClass + "]", ex);
+                                    container.setColor("red");
                                 }
                                 return true;
                             }

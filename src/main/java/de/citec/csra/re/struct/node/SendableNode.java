@@ -15,7 +15,8 @@ import javafx.beans.property.SimpleObjectProperty;
  * @param <MB>
  */
 public abstract class SendableNode<MB extends GeneratedMessage.Builder> extends VariableNode<MB> {
-
+    
+    private String color;
     private final SimpleObjectProperty<Boolean> changed;
     private boolean newNode;
 
@@ -23,10 +24,16 @@ public abstract class SendableNode<MB extends GeneratedMessage.Builder> extends 
         super(descriptor, value);
         changed = new SimpleObjectProperty<>(false);
         newNode = false;
+        color = "white";
     }
 
     public void setChanged(boolean change) {
         changed.set(change);
+        if(change) {
+            setColor("yellow");
+        } else {
+            setColor("white");
+        }
     }
 
     public boolean hasChanged() {
@@ -43,5 +50,13 @@ public abstract class SendableNode<MB extends GeneratedMessage.Builder> extends 
 
     public void setNewNode(boolean newNode) {
         this.newNode = newNode;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }
