@@ -24,13 +24,13 @@ import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
  * @param <T>
  */
 public class LeafContainer<T> implements Leaf<T> {
-    
+
     private T value;
     private final boolean editable;
     private final String descriptor;
     private final NodeContainer parent;
     private final int index;
-    
+
     public LeafContainer(T value, String descriptor, NodeContainer parent) {
         this.value = value;
         this.descriptor = descriptor;
@@ -38,7 +38,7 @@ public class LeafContainer<T> implements Leaf<T> {
         this.index = -1;
         editable = true;
     }
-    
+
     public LeafContainer(T value, String descriptor, NodeContainer parent, int index) {
         this.value = value;
         this.descriptor = descriptor;
@@ -46,7 +46,7 @@ public class LeafContainer<T> implements Leaf<T> {
         this.index = index;
         editable = true;
     }
-    
+
     public LeafContainer(T value, String descriptor, NodeContainer parent, boolean editable) {
         this.value = value;
         this.descriptor = descriptor;
@@ -54,39 +54,41 @@ public class LeafContainer<T> implements Leaf<T> {
         this.index = -1;
         this.editable = editable;
     }
-    
+
     @Override
     public T getValue() {
         return value;
     }
-    
+
     @Override
     public String getDescriptor() {
         return descriptor;
     }
-    
+
     public NodeContainer getParent() {
         return parent;
     }
-    
+
     public int getIndex() {
         return index;
     }
-    
+
     public boolean getEditable() {
         return editable;
     }
-    
+
     @Override
     public void setValue(T value) {
         this.value = value;
-        
+
+//        System.out.println("Value = "+ value);
+//        System.out.println("Container [" + parent.getDescriptor() + "], expected field name [" + descriptor + "]");
         Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(descriptor);
 //        System.out.println("field:fullname" + field.getFullName());
 //        System.out.println("field:name" + field.getName());
 //        System.out.println("field:type" + field.getType());
 //        System.out.println("field:Jvatype" + field.getJavaType());
-        System.out.println("getValue():" + getValue());
+//        System.out.println("getValue():" + getValue());
 //        System.out.println("getValue().Class:" + getValue().getClass());
 
         if (value instanceof ProtocolMessageEnum) {
@@ -100,7 +102,7 @@ public class LeafContainer<T> implements Leaf<T> {
         } else {
             parent.getBuilder().setRepeatedField(field, index, value);
         }
-        
+
         if (value instanceof DeviceClass) {
             DeviceClass deviceClass = (DeviceClass) value;
             DeviceConfigContainer container = (DeviceConfigContainer) this.getParent();
@@ -112,7 +114,7 @@ public class LeafContainer<T> implements Leaf<T> {
                     i--;
                 }
             }
-            
+
             container.getBuilder().clearUnitConfig();
             for (UnitTemplate unitTemplate : deviceClass.getUnitTemplateList()) {
                 UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setTemplate(unitTemplate);
@@ -123,10 +125,10 @@ public class LeafContainer<T> implements Leaf<T> {
             }
             container.add(new UnitConfigListContainer(container.getBuilder()));
         }
-        
+
         parent.setSendableChanged();
     }
-    
+
     @Override
     public Node getThis() {
         return this;

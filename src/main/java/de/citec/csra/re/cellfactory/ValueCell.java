@@ -46,7 +46,6 @@ public abstract class ValueCell extends RowCell {
         super(deviceRegistryRemote, locationRegistryRemote);
         applyButton = new Button("Apply Changes");
         applyButton.setVisible(false);
-        
         stringTextField = new TextField();
         stringTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
             

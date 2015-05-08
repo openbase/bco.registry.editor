@@ -24,7 +24,7 @@ public abstract class ValueColumn extends Column {
         this.setEditable(true);
         this.setSortable(false);
         this.setOnEditCommit(new EventHandlerImpl());
-        this.setPrefWidth(RegistryEditor.RESOLUTION_WIDTH - COLUMN_WIDTH);
+//        this.setPrefWidth(RegistryEditor.RESOLUTION_WIDTH - COLUMN_WIDTH);
     }
 
     private class EventHandlerImpl implements EventHandler<TreeTableColumn.CellEditEvent<Node, Node>> {

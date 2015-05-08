@@ -22,7 +22,7 @@ public class DescriptorColumn extends Column {
 
     public DescriptorColumn(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super("Description");
-        this.setPrefWidth(COLUMN_WIDTH);
+//        this.setPrefWidth(COLUMN_WIDTH);
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
 
             @Override
