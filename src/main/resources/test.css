@@ -6,7 +6,11 @@
     -fx-background-color: rgb(230,230,230);
 }
 
-.tree-table-row:hover {
+.tree-table-cell:hover {
     -fx-background-color: rgb(230,230,250);
+}
+
+.tree-table-cell:selected {
+    -fx-text-color: black;
 }
 
