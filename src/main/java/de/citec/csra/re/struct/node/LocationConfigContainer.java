@@ -5,7 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
-import de.citec.jul.rsb.scope.ScopeGenerator;
+import de.citec.jul.extension.rsb.scope.ScopeGenerator;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
