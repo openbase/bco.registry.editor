@@ -36,7 +36,7 @@
                     <programs>
                         <program>
                             <mainClass>de.citec.csra.re.RegistryEditor</mainClass>
-                            <name>registry-editor</name>
+                            <id>registry-editor</id>
                             <platforms>
                                 <platform>unix</platform>
                             </platforms>
