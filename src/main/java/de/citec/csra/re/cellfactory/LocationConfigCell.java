@@ -5,12 +5,12 @@
  */
 package de.citec.csra.re.cellfactory;
 
-import de.citec.csra.dm.remote.DeviceRegistryRemote;
-import de.citec.csra.lm.remote.LocationRegistryRemote;
+import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
 import java.util.List;

@@ -5,10 +5,10 @@
  */
 package de.citec.csra.re.column;
 
-import de.citec.csra.dm.remote.DeviceRegistryRemote;
-import de.citec.csra.lm.remote.LocationRegistryRemote;
+import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.cellfactory.LocationConfigCell;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.dm.remote.DeviceRegistryRemote;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;

@@ -5,12 +5,12 @@
  */
 package de.citec.csra.re.cellfactory;
 
-import de.citec.csra.dm.remote.DeviceRegistryRemote;
-import de.citec.csra.lm.remote.LocationRegistryRemote;
+import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.SendableNode;
+import de.citec.dm.remote.DeviceRegistryRemote;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
