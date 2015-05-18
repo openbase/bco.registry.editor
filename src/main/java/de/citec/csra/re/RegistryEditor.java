@@ -218,6 +218,7 @@ public class RegistryEditor extends Application {
         JPService.setApplicationName(APP_NAME);
         JPService.registerProperty(JPDeviceRegistryScope.class);
         JPService.registerProperty(JPLocationRegistryScope.class);
+        JPService.parseAndExitOnError(args);
         launch(args);
     }
 }
