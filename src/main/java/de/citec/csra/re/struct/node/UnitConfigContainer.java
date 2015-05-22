@@ -15,7 +15,7 @@ import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 public class UnitConfigContainer extends NodeContainer<UnitConfig.Builder> {
 
     public UnitConfigContainer(UnitConfig.Builder unitConfig) {
-        super("unit_config", unitConfig);
+        super(unitConfig.getId(), unitConfig);
         super.add(unitConfig.getLabel(), "label");
         super.add(unitConfig.getTemplate().getType(), "type");
         super.add(new PlacementConfigContainer(unitConfig.getPlacementConfigBuilder()));
