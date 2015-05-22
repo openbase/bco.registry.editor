@@ -101,7 +101,7 @@ public class DeviceConfigCell extends ValueCell {
             @Override
             public void handle(ActionEvent event) {
                 if (locationConfigComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(locationConfigComboBox.getSelectionModel().getSelectedItem())) {
-                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem());
+                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
                     setText(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
                     commitEdit(leaf);
                 }
@@ -121,7 +121,7 @@ public class DeviceConfigCell extends ValueCell {
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
                 }
-            } else if (((Leaf) getItem()).getValue() instanceof LocationConfig) {
+            } else if (((Leaf) getItem()).getDescriptor().equals("location_id")) {
                 try {
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigList()));
                     super.setEditingGraphic(locationConfigComboBox);
@@ -153,8 +153,8 @@ public class DeviceConfigCell extends ValueCell {
         } else if (item instanceof Leaf) {
             if (((Leaf) item).getValue() instanceof DeviceClass) {
                 setText(((Leaf<DeviceClass>) item).getValue().getId());
-            } else if (((Leaf) item).getValue() instanceof LocationConfig) {
-                setText(((Leaf<LocationConfig>) item).getValue().getLabel());
+            } else if (((Leaf) item).getDescriptor().equals("location_id")) {
+                setText(((Leaf<LocationConfig>) item).getValue().getId());
             }
         }
     }
