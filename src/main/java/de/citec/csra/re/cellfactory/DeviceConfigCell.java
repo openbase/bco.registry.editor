@@ -154,7 +154,7 @@ public class DeviceConfigCell extends ValueCell {
             if (((Leaf) item).getValue() instanceof DeviceClass) {
                 setText(((Leaf<DeviceClass>) item).getValue().getId());
             } else if (((Leaf) item).getDescriptor().equals("location_id")) {
-                setText(((Leaf<LocationConfig>) item).getValue().getId());
+                setText(((Leaf<String>) item).getValue());
             }
         }
     }
