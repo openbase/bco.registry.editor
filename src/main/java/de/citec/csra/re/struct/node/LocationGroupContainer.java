@@ -15,12 +15,19 @@ import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
  */
 public class LocationGroupContainer extends NodeContainer<DeviceRegistry.Builder> {
 
+    private final String locationId;
+    
     public LocationGroupContainer(final DeviceRegistry.Builder deviceRegistry, List<DeviceConfigType.DeviceConfig.Builder> devices, String locationId) {
         super(locationId, deviceRegistry);
+        this.locationId = locationId;
         deviceRegistry.getDeviceConfigBuilderList().stream().forEach((deviceConfigBuilder) -> {
             if (devices.contains(deviceConfigBuilder) && deviceConfigBuilder.getPlacementConfig().getLocationId().equals(locationId)) {
                 super.add(new DeviceConfigContainer(deviceConfigBuilder));
             }
         });
+    }
+
+    public String getLocationId() {
+        return locationId;
     }
 }

@@ -10,7 +10,8 @@
     -fx-background-color: rgb(230,230,250);
 }
 
-.tree-table-cell:selected {
+.tree-table-row:selected {
     -fx-text-color: black;
+    -fx-text-fill: black;
 }
 

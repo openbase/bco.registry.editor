@@ -14,12 +14,15 @@ import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.ChildLocationListContainer;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
+import de.citec.csra.re.struct.node.DeviceConfigGroupContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.LocationConfigListContainer;
+import de.citec.csra.re.struct.node.LocationGroupContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.ServiceTypeListContainer;
+import de.citec.csra.re.struct.node.UnitConfigListContainer;
 import de.citec.csra.re.struct.node.UnitIdListContainer;
 import de.citec.csra.re.struct.node.UnitTemplateContainer;
 import de.citec.csra.re.struct.node.UnitTemplateListContainer;
@@ -37,7 +40,10 @@ import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.homeautomation.service.ServiceConfigType;
+import rst.homeautomation.service.ServiceTypeHolderType;
 import rst.homeautomation.service.ServiceTypeHolderType.ServiceTypeHolder.ServiceType;
+import rst.homeautomation.unit.UnitConfigType;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.LocationConfigType.LocationConfig;
 
@@ -52,7 +58,6 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
 //    public static final String BACKGROUND_COLOR = "-fx-text-fill: black;-fx-background-color: ";
-
     protected final DeviceRegistryRemote deviceRegistryRemote;
     protected final LocationRegistryRemote locationRegistryRemote;
 
@@ -74,7 +79,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if ((item instanceof UnitTemplateListContainer) || (item instanceof ChildLocationListContainer) || (item instanceof UnitIdListContainer) || (item instanceof ServiceTypeListContainer)) {
+        if ((item instanceof UnitTemplateListContainer) || (item instanceof ChildLocationListContainer) || (item instanceof UnitIdListContainer) || (item instanceof ServiceTypeListContainer) || (item instanceof LocationGroupContainer) || (item instanceof DeviceConfigGroupContainer)) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
@@ -129,13 +134,18 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 parent.setExpanded(true);
                 parent.getChildren().add(addedNode);
             } else if (add instanceof DeviceConfigContainer) {
-                NodeContainer parent = (NodeContainer) ((DeviceConfigContainer) add).getParent().getValue();
-                DeviceConfigContainer addedNode = new DeviceConfigContainer(RSTDefaultInstances.getDefaultDeviceConfig());
+                LocationGroupContainer parentNode = (LocationGroupContainer) ((DeviceConfigContainer) add).getParent();
+                DeviceClass deviceClass = ((DeviceConfigGroupContainer) parentNode.getParent()).getDeviceClass();
+                DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
+                deviceConfig.setDeviceClass(deviceClass);
+                addUnitConfigs(deviceConfig, deviceClass);
+                deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
+                DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
                 addedNode.setChanged(true);
                 addedNode.setNewNode(true);
                 addedNode.setExpanded(true);
-                parent.setExpanded(true);
-                parent.getChildren().add(addedNode);
+                parentNode.setExpanded(true);
+                parentNode.getChildren().add(addedNode);
             } else if (add instanceof UnitTemplateListContainer) {
                 UnitTemplateListContainer listNode = ((UnitTemplateListContainer) add);
                 UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
@@ -205,6 +215,41 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     rootLocation.setNewNode(true);
                     rootLocation.setChanged(true);
                 }
+            } else if (add instanceof DeviceConfigGroupContainer) {
+                DeviceConfigGroupContainer parentNode = (DeviceConfigGroupContainer) add;
+                DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
+                deviceConfig.setDeviceClass(parentNode.getDeviceClass());
+                addUnitConfigs(deviceConfig, parentNode.getDeviceClass());
+                DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
+                addedNode.setChanged(true);
+                addedNode.setNewNode(true);
+                addedNode.setExpanded(true);
+                parentNode.setExpanded(true);
+                parentNode.getChildren().add(addedNode);
+            } else if (add instanceof LocationGroupContainer) {
+                LocationGroupContainer parentNode = (LocationGroupContainer) add;
+                DeviceClass deviceClass = ((DeviceConfigGroupContainer) parentNode.getParent()).getDeviceClass();
+                DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
+                deviceConfig.setDeviceClass(deviceClass);
+                addUnitConfigs(deviceConfig, deviceClass);
+                deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
+                DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
+                addedNode.setChanged(true);
+                addedNode.setNewNode(true);
+                addedNode.setExpanded(true);
+                parentNode.setExpanded(true);
+                parentNode.getChildren().add(addedNode);
+            }
+        }
+
+        private void addUnitConfigs(DeviceConfig.Builder deviceConfig, DeviceClass deviceClass) {
+            deviceConfig.clearUnitConfig();
+            for (UnitTemplate unitTemplate : deviceClass.getUnitTemplateList()) {
+                UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setTemplate(unitTemplate);
+                for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unitTemplate.getServiceTypeList()) {
+                    unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));
+                }
+                deviceConfig.addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
             }
         }
 

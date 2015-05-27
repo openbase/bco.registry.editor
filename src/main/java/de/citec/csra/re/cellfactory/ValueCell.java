@@ -8,8 +8,11 @@ package de.citec.csra.re.cellfactory;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
+import de.citec.csra.re.struct.node.DeviceClassContainer;
+import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.SendableNode;
+import de.citec.csra.re.struct.node.UnitConfigContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,7 +36,7 @@ import javafx.scene.input.KeyEvent;
  * @author thuxohl
  */
 public abstract class ValueCell extends RowCell {
-        
+
     private final TextField stringTextField;
     private final TextField decimalTextField;
     private final ComboBox enumComboBox;
@@ -41,14 +44,14 @@ public abstract class ValueCell extends RowCell {
     private final DateFormat converter = new SimpleDateFormat("dd/MM/yyyy");
     protected final Button applyButton;
     protected LeafContainer leaf;
-    
+
     public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote);
         applyButton = new Button("Apply Changes");
         applyButton.setVisible(false);
         stringTextField = new TextField();
         stringTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            
+
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (!newValue && !leaf.getValue().equals(stringTextField.getText())) {
@@ -60,7 +63,7 @@ public abstract class ValueCell extends RowCell {
             }
         });
         stringTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            
+
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode().equals(KeyCode.ESCAPE)) {
@@ -71,10 +74,10 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
-        
+
         enumComboBox = new ComboBox();
         enumComboBox.setOnAction(new EventHandler() {
-            
+
             @Override
             public void handle(Event event) {
                 if (enumComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(enumComboBox.getSelectionModel().getSelectedItem())) {
@@ -83,7 +86,7 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
-        
+
         decimalTextField = new TextField() {
             @Override
             public void replaceText(int start, int end, String text) {
@@ -91,7 +94,7 @@ public abstract class ValueCell extends RowCell {
                     super.replaceText(start, end, text);
                 }
             }
-            
+
             @Override
             public void replaceSelection(String text) {
                 if (text.matches("[0-9.]") || text.equals("")) {
@@ -100,7 +103,7 @@ public abstract class ValueCell extends RowCell {
             }
         };
         decimalTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-            
+
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode().equals(KeyCode.ESCAPE)) {
@@ -118,7 +121,7 @@ public abstract class ValueCell extends RowCell {
             }
         });
         decimalTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            
+
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 double parsedValue = 0;
@@ -135,10 +138,10 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
-        
+
         longDatePicker = new DatePicker();
         longDatePicker.setOnAction(new EventHandler<ActionEvent>() {
-            
+
             @Override
             public void handle(ActionEvent event) {
                 if (longDatePicker.getValue() != null && longDatePicker.getValue().toEpochDay() != (Long) leaf.getValue()) {
@@ -149,14 +152,14 @@ public abstract class ValueCell extends RowCell {
             }
         });
     }
-    
+
     @Override
     public void startEdit() {
         super.startEdit();
-        
+
         if (getItem() instanceof Leaf) {
             leaf = ((LeafContainer) getItem());
-            
+
             if (leaf.getValue() instanceof String) {
                 stringTextField.setText((String) leaf.getValue());
                 setEditingGraphic(stringTextField);
@@ -177,28 +180,28 @@ public abstract class ValueCell extends RowCell {
             }
         }
     }
-    
+
     public void setEditingGraphic(javafx.scene.Node node) {
         if (leaf.getEditable()) {
             super.setGraphic(node);
         }
     }
-    
+
     @Override
     public void commitEdit(Node newValue) {
         super.commitEdit(newValue);
     }
-    
+
     @Override
     public void cancelEdit() {
         super.cancelEdit();
         graphicProperty().setValue(null);
     }
-    
+
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         if (empty) {
             setGraphic(null);
             setText("");
@@ -212,6 +215,14 @@ public abstract class ValueCell extends RowCell {
             }
         } else if (item instanceof SendableNode) {
             applyButton.setVisible(((SendableNode) item).hasChanged());
+        }
+
+        if (item instanceof DeviceClassContainer) {
+            setText(((DeviceClassContainer) item).getBuilder().getDescription());
+        } else if (item instanceof DeviceConfigContainer) {
+            setText(((DeviceConfigContainer) item).getBuilder().getDescription());
+        } else if (item instanceof UnitConfigContainer) {
+            setText(((UnitConfigContainer) item).getBuilder().getDescription());
         }
     }
 }

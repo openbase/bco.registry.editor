@@ -16,6 +16,7 @@ public class UnitConfigContainer extends NodeContainer<UnitConfig.Builder> {
 
     public UnitConfigContainer(UnitConfig.Builder unitConfig) {
         super(unitConfig.getId(), unitConfig);
+        super.add(unitConfig.getId(), "Id", false);
         super.add(unitConfig.getLabel(), "label");
         super.add(unitConfig.getTemplate().getType(), "type");
         super.add(new PlacementConfigContainer(unitConfig.getPlacementConfigBuilder()));

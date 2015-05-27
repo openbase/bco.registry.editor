@@ -23,6 +23,7 @@ import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.spatial.LocationConfigType;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -32,6 +33,7 @@ import rst.spatial.LocationConfigType.LocationConfig;
 public class DeviceConfigCell extends ValueCell {
 
     private final ComboBox<DeviceClass> deviceClassComboBox;
+    private final ComboBox<LocationConfig> locationIdComboBox;
     private final ComboBox<LocationConfig> locationConfigComboBox;
 
     public DeviceConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
@@ -87,6 +89,27 @@ public class DeviceConfigCell extends ValueCell {
             }
         });
 
+        locationIdComboBox = new ComboBox<>();
+        locationIdComboBox.setButtonCell(new LocationConfigComboBoxCell());
+        locationIdComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
+
+            @Override
+            public ListCell<LocationConfig> call(ListView<LocationConfig> param) {
+                return new LocationConfigComboBoxCell();
+            }
+        });
+        locationIdComboBox.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                if (locationIdComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(locationIdComboBox.getSelectionModel().getSelectedItem())) {
+                    leaf.setValue(locationIdComboBox.getSelectionModel().getSelectedItem().getId());
+                    setText(locationIdComboBox.getSelectionModel().getSelectedItem().getId());
+                    commitEdit(leaf);
+                }
+            }
+        });
+        
         locationConfigComboBox = new ComboBox<>();
         locationConfigComboBox.setButtonCell(new LocationConfigComboBoxCell());
         locationConfigComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
@@ -101,7 +124,7 @@ public class DeviceConfigCell extends ValueCell {
             @Override
             public void handle(ActionEvent event) {
                 if (locationConfigComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(locationConfigComboBox.getSelectionModel().getSelectedItem())) {
-                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
+                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem());
                     setText(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
                     commitEdit(leaf);
                 }
@@ -122,6 +145,13 @@ public class DeviceConfigCell extends ValueCell {
                     logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getDescriptor().equals("location_id")) {
+                try {
+                    locationIdComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigList()));
+                    super.setEditingGraphic(locationIdComboBox);
+                } catch (CouldNotPerformException ex) {
+                    logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
+                }
+            } else if (((Leaf) getItem()).getDescriptor().equals("location_config")) {
                 try {
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigList()));
                     super.setEditingGraphic(locationConfigComboBox);
@@ -155,6 +185,8 @@ public class DeviceConfigCell extends ValueCell {
                 setText(((Leaf<DeviceClass>) item).getValue().getId());
             } else if (((Leaf) item).getDescriptor().equals("location_id")) {
                 setText(((Leaf<String>) item).getValue());
+            } else if (((Leaf) item).getDescriptor().equals("location_config")) {
+                setText(((Leaf<LocationConfig>) item).getValue().getId());
             }
         }
     }
