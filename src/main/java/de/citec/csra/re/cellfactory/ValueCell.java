@@ -10,6 +10,7 @@ import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
+import de.citec.csra.re.struct.node.DeviceConfigGroupContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.UnitConfigContainer;
@@ -223,6 +224,8 @@ public abstract class ValueCell extends RowCell {
             setText(((DeviceConfigContainer) item).getBuilder().getDescription());
         } else if (item instanceof UnitConfigContainer) {
             setText(((UnitConfigContainer) item).getBuilder().getDescription());
+        } else if (item instanceof DeviceConfigGroupContainer) {
+            setText(((DeviceConfigGroupContainer) item).getDeviceClass().getDescription());
         }
     }
 }
