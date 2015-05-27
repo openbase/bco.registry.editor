@@ -46,6 +46,7 @@ import rst.homeautomation.service.ServiceTypeHolderType.ServiceTypeHolder.Servic
 import rst.homeautomation.unit.UnitConfigType;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.LocationConfigType.LocationConfig;
+import rst.spatial.PlacementConfigType;
 
 /**
  * Cell factory to manage similar options for all cells in a row. Initializes
@@ -140,6 +141,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 deviceConfig.setDeviceClass(deviceClass);
                 addUnitConfigs(deviceConfig, deviceClass);
                 deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
+                addLocationIDToAllUnits(deviceConfig, parentNode.getLocationId());
                 DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
                 addedNode.setChanged(true);
                 addedNode.setNewNode(true);
@@ -233,6 +235,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 deviceConfig.setDeviceClass(deviceClass);
                 addUnitConfigs(deviceConfig, deviceClass);
                 deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
+                addLocationIDToAllUnits(deviceConfig, parentNode.getLocationId());
                 DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
                 addedNode.setChanged(true);
                 addedNode.setNewNode(true);
@@ -251,6 +254,17 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 }
                 deviceConfig.addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
             }
+        }
+        
+        private void addLocationIDToAllUnits(DeviceConfig.Builder deviceConfig, String locationId) {
+            List<UnitConfigType.UnitConfig.Builder> unitBuilder = deviceConfig.getUnitConfigBuilderList();
+            List<UnitConfigType.UnitConfig> units = new ArrayList<>();
+            for(UnitConfigType.UnitConfig.Builder unit : unitBuilder) {
+                PlacementConfigType.PlacementConfig placement = unit.getPlacementConfigBuilder().setLocationId(locationId).build();
+                units.add(unit.setPlacementConfig(placement).clone().build());
+            }
+            deviceConfig.clearUnitConfig();
+            deviceConfig.addAllUnitConfig(units);
         }
 
         private void removeAction(Node nodeToRemove) {
