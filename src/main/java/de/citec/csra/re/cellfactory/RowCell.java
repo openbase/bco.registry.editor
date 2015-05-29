@@ -9,6 +9,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.RSTDefaultInstances;
+import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.ChildLocationListContainer;
@@ -126,6 +127,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
         }
 
         private void addAction(Node add) {
+            RegistryEditor.setModified(true);
             if (add instanceof DeviceClassContainer) {
                 NodeContainer parent = (NodeContainer) ((DeviceClassContainer) add).getParent().getValue();
                 DeviceClassContainer addedNode = new DeviceClassContainer(DeviceClass.getDefaultInstance().toBuilder());
@@ -268,6 +270,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
         }
 
         private void removeAction(Node nodeToRemove) {
+            RegistryEditor.setModified(true);
             // check if the removed item is an instance of classes that have to be directly
             // removed in the registry [deviceClass, deviceConfig, locationConfig]
             if (nodeToRemove instanceof SendableNode) {

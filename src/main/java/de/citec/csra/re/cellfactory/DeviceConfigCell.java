@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.cellfactory;
 
+import de.citec.csra.re.RegistryEditor;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
@@ -47,6 +48,7 @@ public class DeviceConfigCell extends ValueCell {
                         new Task<Boolean>() {
                             @Override
                             protected Boolean call() throws Exception {
+                                RegistryEditor.setModified(false);
                                 DeviceConfigContainer container = (DeviceConfigContainer) getItem();
                                 DeviceConfig deviceConfig = container.getBuilder().build();
                                 try {
