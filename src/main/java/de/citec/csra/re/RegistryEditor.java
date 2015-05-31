@@ -50,6 +50,7 @@ public class RegistryEditor extends Application {
     public static final String APP_NAME = "RegistryView";
     public static final int RESOLUTION_WIDTH = 1024;
 
+    private static boolean modified = false;
     private final DeviceRegistryRemote deviceRemote;
     private final LocationRegistryRemote locationRemote;
     private TabPane registryTabPane, tabDeviceRegistryPane;
@@ -169,10 +170,12 @@ public class RegistryEditor extends Application {
                     return;
                 }
                 try {
+                    if(!modified) {
                     DeviceRegistryType.DeviceRegistry data = deviceRemote.getData();
                     deviceClassTreeTableView.setRoot(new DeviceClassList(data.toBuilder()));
                     deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
                     tabDeviceRegistry.setContent(tabDeviceRegistryPane);
+                    }
 
                 } catch (CouldNotPerformException ex) {
                     logger.error("Device registry not available!", ex);
@@ -192,6 +195,8 @@ public class RegistryEditor extends Application {
                     return;
                 }
                 try {
+                    System.out.println("Trying to update locations, modified ["+modified+"]");
+                    if(!modified) {
                     LocationRegistryType.LocationRegistry data = locationRemote.getData();
                     LocationRegistryType.LocationRegistry.Builder rootLocations = LocationRegistryType.LocationRegistry.newBuilder();
                     for (LocationConfig locationConfig : data.getLocationConfigList()) {
@@ -200,12 +205,18 @@ public class RegistryEditor extends Application {
                         }
                     }
                     locationConfigTreeTableView.setRoot(new LocationConfigListContainer(rootLocations));
+                    }
                 } catch (CouldNotPerformException ex) {
                     logger.error("Location registry not available!", ex);
                     tabLocationRegistry.setContent(new Label("Error: " + ex.getMessage()));
                 }
             }
         });
+    }
+    
+    public static void setModified(boolean value) {
+        System.out.println("Modiefied ["+modified+"]");
+        modified = value;
     }
 
     /**

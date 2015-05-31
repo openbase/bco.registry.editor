@@ -25,7 +25,7 @@ public class DeviceConfigGroupContainer extends NodeContainer<DeviceRegistry.Bui
         this.deviceClass = deviceClass;
         List<DeviceConfigType.DeviceConfig.Builder> deviceConfigs = new ArrayList<>();
         deviceRegistry.getDeviceConfigBuilderList().stream().forEach((deviceConfigBuilder) -> {
-            if (deviceConfigBuilder.getDeviceClass().equals(deviceClass)) {
+            if (deviceConfigBuilder.getDeviceClass().getId().equals(deviceClass.getId())) {
                 deviceConfigs.add(deviceConfigBuilder);
             }
         });

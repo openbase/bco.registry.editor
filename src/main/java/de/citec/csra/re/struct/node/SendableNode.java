@@ -6,6 +6,7 @@
 package de.citec.csra.re.struct.node;
 
 import com.google.protobuf.GeneratedMessage;
+import de.citec.csra.re.RegistryEditor;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -29,6 +30,7 @@ public abstract class SendableNode<MB extends GeneratedMessage.Builder> extends 
 
     public void setChanged(boolean change) {
         changed.set(change);
+        RegistryEditor.setModified(change);
         if(change) {
             setColor("yellow");
         } else {
