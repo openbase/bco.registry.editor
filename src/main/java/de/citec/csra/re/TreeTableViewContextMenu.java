@@ -46,7 +46,7 @@ public class TreeTableViewContextMenu<M extends GeneratedMessage> extends Contex
                 } else if (type instanceof DeviceConfig) {
                     newNode = new DeviceConfigContainer(RSTDefaultInstances.getDefaultDeviceConfig());
                 } else if (type instanceof LocationConfig) {
-                    newNode = new LocationConfigContainer(LocationConfig.newBuilder().setRoot(true));
+                    newNode = new LocationConfigContainer(RSTDefaultInstances.getDefaultLocationConfig().setRoot(true));
                 }
 
                 if (newNode != null) {

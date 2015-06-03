@@ -12,6 +12,7 @@ import rst.geometry.TranslationType.Translation;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.spatial.LocationConfigType.LocationConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 import rst.timing.TimestampType.Timestamp;
 
@@ -32,9 +33,13 @@ public class RSTDefaultInstances {
         return unitBuilder.setPlacementConfig(placementConfig);
     }
 
-    private static Pose getDefaultPose() {
+    public static Pose getDefaultPose() {
         Rotation rotation = Rotation.newBuilder().setQw(1).setQx(0).setQy(0).setQz(0).build();
         Translation translation = Translation.newBuilder().setX(0).setY(0).setZ(0).build();
         return Pose.newBuilder().setRotation(rotation).setTranslation(translation).build();
+    }
+    
+    public static LocationConfig.Builder getDefaultLocationConfig() {
+        return LocationConfig.newBuilder().setPosition(getDefaultPose());
     }
 }

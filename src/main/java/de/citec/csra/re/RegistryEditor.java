@@ -195,7 +195,6 @@ public class RegistryEditor extends Application {
                     return;
                 }
                 try {
-                    System.out.println("Trying to update locations, modified ["+modified+"]");
                     if(!modified) {
                     LocationRegistryType.LocationRegistry data = locationRemote.getData();
                     LocationRegistryType.LocationRegistry.Builder rootLocations = LocationRegistryType.LocationRegistry.newBuilder();
@@ -215,7 +214,6 @@ public class RegistryEditor extends Application {
     }
     
     public static void setModified(boolean value) {
-        System.out.println("Modiefied ["+modified+"]");
         modified = value;
     }
 

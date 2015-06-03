@@ -11,6 +11,7 @@ import de.citec.csra.re.RSTDefaultInstances;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
+import de.citec.csra.re.struct.node.RotationContainer;
 import de.citec.csra.re.struct.node.UnitConfigListContainer;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.service.ServiceConfigType;
@@ -98,7 +99,15 @@ public class LeafContainer<T> implements Leaf<T> {
                 parent.getBuilder().setRepeatedField(field, index, ((ProtocolMessageEnum) getValue()).getValueDescriptor());
             }
         } else if (index == -1) {
-            parent.getBuilder().setField(field, value);
+            if (descriptor.equals("roll")) {
+                ((RotationContainer) parent).setRoll((Double) value);
+            } else if (descriptor.equals("pitch")) {
+                ((RotationContainer) parent).setPitch((Double) value);
+            } else if (descriptor.equals("yaw")) {
+                ((RotationContainer) parent).setYaw((Double) value);
+            } else {
+                parent.getBuilder().setField(field, value);
+            }
         } else {
             parent.getBuilder().setRepeatedField(field, index, value);
         }

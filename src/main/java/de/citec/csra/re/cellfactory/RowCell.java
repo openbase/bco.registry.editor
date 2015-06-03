@@ -197,6 +197,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             } else if (add instanceof ChildLocationListContainer) {
                 ChildLocationListContainer listNode = ((ChildLocationListContainer) add);
                 LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildBuilder().setRoot(false);
+                locationConfigBuilder.setPosition(RSTDefaultInstances.getDefaultPose());
                 locationConfigBuilder.setParentId(listNode.getBuilder().getId());
                 listNode.add(new LocationConfigContainer(locationConfigBuilder));
                 listNode.setExpanded(true);
@@ -205,6 +206,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 if (((LocationConfigContainer) add).getParent() instanceof ChildLocationListContainer) {
                     ChildLocationListContainer listNode = (ChildLocationListContainer) ((LocationConfigContainer) add).getParent();
                     LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildBuilder().setRoot(false);
+                    locationConfigBuilder.setPosition(RSTDefaultInstances.getDefaultPose());
                     locationConfigBuilder.setParentId(listNode.getBuilder().getId());
                     listNode.add(new LocationConfigContainer(locationConfigBuilder));
                     listNode.setExpanded(true);
@@ -212,6 +214,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 } else {
                     LocationConfigListContainer listNode = (LocationConfigListContainer) ((LocationConfigContainer) add).getParent();
                     LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addLocationConfigBuilder().setRoot(true);
+                    locationConfigBuilder.setPosition(RSTDefaultInstances.getDefaultPose());
                     LocationConfigContainer rootLocation = new LocationConfigContainer(locationConfigBuilder);
                     listNode.add(rootLocation);
                     listNode.setExpanded(true);

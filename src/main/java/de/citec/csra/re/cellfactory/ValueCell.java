@@ -16,6 +16,7 @@ import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.UnitConfigContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Date;
@@ -38,6 +39,7 @@ import javafx.scene.input.KeyEvent;
  */
 public abstract class ValueCell extends RowCell {
 
+    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
     private final TextField stringTextField;
     private final TextField decimalTextField;
     private final ComboBox enumComboBox;
@@ -171,7 +173,6 @@ public abstract class ValueCell extends RowCell {
                     setEditingGraphic(enumComboBox);
                 }
             } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
-                decimalTextField.setText(((Float) leaf.getValue()).toString());
                 decimalTextField.setText(leaf.getValue().toString());
                 setEditingGraphic(decimalTextField);
             } else if (leaf.getValue() instanceof Long) {
@@ -211,6 +212,8 @@ public abstract class ValueCell extends RowCell {
             graphicProperty().setValue(null);
             if (((Leaf) item).getValue() instanceof Long) {
                 setText(converter.format(new Date((Long) ((Leaf) item).getValue())));
+            } else if(((Leaf) item).getValue() instanceof Double) {
+                setText(decimalFormat.format(((Double) ((Leaf) item).getValue())));
             } else if ((((Leaf) item).getValue() != null)) {
                 setText(((Leaf) item).getValue().toString());
             }
