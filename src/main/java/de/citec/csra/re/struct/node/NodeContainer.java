@@ -37,14 +37,17 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         this.getChildren().add(node);
     }
 
+    // TODO tamino: generic not specified ! S == Object
     public <S> void add(S value, String descriptor) {
         this.add(new LeafContainer(value, descriptor, this));
     }
 
+    // TODO tamino: generic not specified ! S == Object
     public <S> void add(S value, String descriptor, int index) {
         this.add(new LeafContainer(value, descriptor, this, index));
     }
     
+    // TODO tamino: generic not specified ! S == Object
     public <S> void add(S value, String descriptor, boolean editable) {
         this.add(new LeafContainer(value, descriptor, this, editable));
     }
@@ -56,6 +59,7 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
 
     @Override
     public NodeContainer getThis() {
+        // TODO tamino: what the hell??? x.getThis().getThis().getThis() == x !!!
         return this;
     }
 

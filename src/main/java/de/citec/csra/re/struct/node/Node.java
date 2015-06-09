@@ -13,5 +13,6 @@ public interface Node {
 
     public String getDescriptor();
 
+    // TODO tamino: what the hell??? x.getThis().getThis().getThis() == x !!!
     public Node getThis();
 }

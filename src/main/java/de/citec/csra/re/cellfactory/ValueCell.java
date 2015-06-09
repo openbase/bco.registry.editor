@@ -90,17 +90,22 @@ public abstract class ValueCell extends RowCell {
             }
         });
 
+        
+        
         decimalTextField = new TextField() {
+            
+            public static final String NUMBER_REGEX = "\\-{0,1}(0|[1-9][0-9]*)(\\.[0-9]+){0,1}";
+            
             @Override
             public void replaceText(int start, int end, String text) {
-                if (text.matches("[0-9.]") || text.equals("")) {
+                if (text.matches(NUMBER_REGEX) || text.isEmpty()) {
                     super.replaceText(start, end, text);
                 }
             }
 
             @Override
             public void replaceSelection(String text) {
-                if (text.matches("[0-9.]") || text.equals("")) {
+                if (text.matches(NUMBER_REGEX) || text.isEmpty()) {
                     super.replaceSelection(text);
                 }
             }
