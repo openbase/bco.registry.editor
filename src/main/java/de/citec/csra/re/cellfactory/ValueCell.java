@@ -39,6 +39,9 @@ import javafx.scene.input.KeyEvent;
  */
 public abstract class ValueCell extends RowCell {
 
+    public static final String VALID_DECIMAL_REGEX = "\\-{0,1}((\\.[0-9]+|[0-9]+\\.){0,1})([0-9]*){0,1}";
+    public static final String INPUT_CHAR_DECIMAL_REGEX = "(\\-{0,1}[0-9]*\\.{0,1}[0-9]*)";
+
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
     private final TextField stringTextField;
     private final TextField decimalTextField;
@@ -90,26 +93,25 @@ public abstract class ValueCell extends RowCell {
             }
         });
 
-        
-        
         decimalTextField = new TextField() {
-            
-            public static final String NUMBER_REGEX = "\\-{0,1}(0|[1-9][0-9]*)(\\.[0-9]+){0,1}";
-            
+
             @Override
             public void replaceText(int start, int end, String text) {
-                if (text.matches(NUMBER_REGEX) || text.isEmpty()) {
+                if (text.matches(INPUT_CHAR_DECIMAL_REGEX) || text.isEmpty()) {
                     super.replaceText(start, end, text);
                 }
+                validateDecimalField();
             }
 
             @Override
             public void replaceSelection(String text) {
-                if (text.matches(NUMBER_REGEX) || text.isEmpty()) {
+                if (text.matches(INPUT_CHAR_DECIMAL_REGEX) || text.isEmpty()) {
                     super.replaceSelection(text);
                 }
+                validateDecimalField();
             }
         };
+
         decimalTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
 
             @Override
@@ -117,6 +119,11 @@ public abstract class ValueCell extends RowCell {
                 if (event.getCode().equals(KeyCode.ESCAPE)) {
                     cancelEdit();
                 } else if (event.getCode().equals(KeyCode.ENTER)) {
+
+                    if (!validateDecimalField()) {
+                        return;
+                    }
+
                     if (leaf.getValue() instanceof Float) {
                         float parsedValue = Float.parseFloat(decimalTextField.getText());
                         leaf.setValue(parsedValue);
@@ -132,6 +139,11 @@ public abstract class ValueCell extends RowCell {
 
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+
+                if (!validateDecimalField()) {
+                    return;
+                }
+
                 double parsedValue = 0;
                 if (leaf.getValue() instanceof Float) {
                     parsedValue = Float.parseFloat(decimalTextField.getText());
@@ -159,6 +171,16 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
+    }
+
+    private boolean validateDecimalField() {
+        if (!decimalTextField.getText().matches(VALID_DECIMAL_REGEX)) {
+            decimalTextField.setStyle("-fx-text-inner-color: red;");
+            return false;
+        }
+
+        decimalTextField.setStyle("-fx-text-inner-color: black;");
+        return true;
     }
 
     @Override
@@ -217,7 +239,7 @@ public abstract class ValueCell extends RowCell {
             graphicProperty().setValue(null);
             if (((Leaf) item).getValue() instanceof Long) {
                 setText(converter.format(new Date((Long) ((Leaf) item).getValue())));
-            } else if(((Leaf) item).getValue() instanceof Double) {
+            } else if (((Leaf) item).getValue() instanceof Double) {
                 setText(decimalFormat.format(((Double) ((Leaf) item).getValue())));
             } else if ((((Leaf) item).getValue() != null)) {
                 setText(((Leaf) item).getValue().toString());
