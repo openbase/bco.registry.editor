@@ -18,6 +18,7 @@ public class BindingConfigContainer extends NodeContainer<BindingConfig.Builder>
         super.add(bindingConfig.getType(), "type");
         super.add(new OpenHABBindingConfigContainer(bindingConfig.getOpenhabBindingConfigBuilder()));
         super.add(new MieleAtHomeBindingConfigContainer(bindingConfig.getMieleAtHomeBindingConfigBuilder()));
+        super.add(new FloorBaseBindingConfigContainer(bindingConfig.getFloorBaseBindingConfigBuilder()));
     }
 
 }

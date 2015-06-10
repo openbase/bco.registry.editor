@@ -24,7 +24,6 @@ import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.spatial.LocationConfigType;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**

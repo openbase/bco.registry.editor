@@ -16,6 +16,8 @@ import de.citec.csra.re.struct.node.ChildLocationListContainer;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.DeviceConfigGroupContainer;
+import de.citec.csra.re.struct.node.FloorBaseBindingConfigLabelIdEntryContainer;
+import de.citec.csra.re.struct.node.FloorBaseBindingConfigLabelIdEntryListContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.LocationConfigListContainer;
 import de.citec.csra.re.struct.node.LocationGroupContainer;
@@ -23,7 +25,6 @@ import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.ServiceTypeListContainer;
-import de.citec.csra.re.struct.node.UnitConfigListContainer;
 import de.citec.csra.re.struct.node.UnitIdListContainer;
 import de.citec.csra.re.struct.node.UnitTemplateContainer;
 import de.citec.csra.re.struct.node.UnitTemplateListContainer;
@@ -39,6 +40,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
+import rst.homeautomation.binding.FloorBaseBindingConfigType.FloorBaseBindingConfig.LabelIdEntry;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType;
@@ -81,7 +83,13 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if ((item instanceof UnitTemplateListContainer) || (item instanceof ChildLocationListContainer) || (item instanceof UnitIdListContainer) || (item instanceof ServiceTypeListContainer) || (item instanceof LocationGroupContainer) || (item instanceof DeviceConfigGroupContainer)) {
+        if ((item instanceof UnitTemplateListContainer) || 
+                (item instanceof ChildLocationListContainer) || 
+                (item instanceof UnitIdListContainer) || 
+                (item instanceof ServiceTypeListContainer) || 
+                (item instanceof LocationGroupContainer) || 
+                (item instanceof FloorBaseBindingConfigLabelIdEntryListContainer) || 
+                (item instanceof DeviceConfigGroupContainer)) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
@@ -154,6 +162,12 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 UnitTemplateListContainer listNode = ((UnitTemplateListContainer) add);
                 UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
                 listNode.add(new UnitTemplateContainer(unitTemplate));
+                listNode.setExpanded(true);
+                listNode.setSendableChanged();
+            } else if (add instanceof FloorBaseBindingConfigLabelIdEntryListContainer) {
+                FloorBaseBindingConfigLabelIdEntryListContainer listNode = ((FloorBaseBindingConfigLabelIdEntryListContainer) add);
+                LabelIdEntry.Builder labelIdEntryBuilder = listNode.getBuilder().addLabelIdEntryBuilder();
+                listNode.add(new FloorBaseBindingConfigLabelIdEntryContainer(labelIdEntryBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof UnitTemplateContainer) {
