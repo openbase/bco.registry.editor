@@ -11,11 +11,11 @@ import rst.homeautomation.binding.FloorBaseBindingConfigType.FloorBaseBindingCon
  *
  * @author thuxohl
  */
-public class FloorBaseBindingConfigLabelIdEntryContainer extends NodeContainer<FloorBaseBindingConfig.LabelIdEntry.Builder> {
+public class FloorBaseBindingConfigSerialHardwareEntryContainer extends NodeContainer<FloorBaseBindingConfig.SerialHardwareEntry.Builder> {
 
-    public FloorBaseBindingConfigLabelIdEntryContainer(FloorBaseBindingConfig.LabelIdEntry.Builder builder) {
-        super("label_id_entry", builder);
-        super.add(builder.getLabel(), "label");
+    public FloorBaseBindingConfigSerialHardwareEntryContainer(FloorBaseBindingConfig.SerialHardwareEntry.Builder builder) {
+        super("serial_hardware_mapping", builder);
+        super.add(builder.getSerialNumber(), "serial_number");
         super.add(builder.getHardwareId(), "hardware_id");
     }
 }

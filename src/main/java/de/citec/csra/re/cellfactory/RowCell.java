@@ -16,8 +16,8 @@ import de.citec.csra.re.struct.node.ChildLocationListContainer;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.DeviceConfigGroupContainer;
-import de.citec.csra.re.struct.node.FloorBaseBindingConfigLabelIdEntryContainer;
-import de.citec.csra.re.struct.node.FloorBaseBindingConfigLabelIdEntryListContainer;
+import de.citec.csra.re.struct.node.FloorBaseBindingConfigSerialHardwareEntryContainer;
+import de.citec.csra.re.struct.node.FloorBaseBindingConfigSerialHardwareEntryListContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.LocationConfigListContainer;
 import de.citec.csra.re.struct.node.LocationGroupContainer;
@@ -40,7 +40,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
-import rst.homeautomation.binding.FloorBaseBindingConfigType.FloorBaseBindingConfig.LabelIdEntry;
+import rst.homeautomation.binding.FloorBaseBindingConfigType;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType;
@@ -88,7 +88,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 (item instanceof UnitIdListContainer) || 
                 (item instanceof ServiceTypeListContainer) || 
                 (item instanceof LocationGroupContainer) || 
-                (item instanceof FloorBaseBindingConfigLabelIdEntryListContainer) || 
+                (item instanceof FloorBaseBindingConfigSerialHardwareEntryListContainer) || 
                 (item instanceof DeviceConfigGroupContainer)) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
@@ -164,10 +164,10 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 listNode.add(new UnitTemplateContainer(unitTemplate));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
-            } else if (add instanceof FloorBaseBindingConfigLabelIdEntryListContainer) {
-                FloorBaseBindingConfigLabelIdEntryListContainer listNode = ((FloorBaseBindingConfigLabelIdEntryListContainer) add);
-                LabelIdEntry.Builder labelIdEntryBuilder = listNode.getBuilder().addLabelIdEntryBuilder();
-                listNode.add(new FloorBaseBindingConfigLabelIdEntryContainer(labelIdEntryBuilder));
+            } else if (add instanceof FloorBaseBindingConfigSerialHardwareEntryListContainer) {
+                FloorBaseBindingConfigSerialHardwareEntryListContainer listNode = ((FloorBaseBindingConfigSerialHardwareEntryListContainer) add);
+                FloorBaseBindingConfigType.FloorBaseBindingConfig.SerialHardwareEntry.Builder labelIdEntryBuilder = listNode.getBuilder().addSerialHardwareEntryBuilder();
+                listNode.add(new FloorBaseBindingConfigSerialHardwareEntryContainer(labelIdEntryBuilder));
                 listNode.setExpanded(true);
                 listNode.setSendableChanged();
             } else if (add instanceof UnitTemplateContainer) {

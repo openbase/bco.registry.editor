@@ -16,7 +16,7 @@ public class FloorBaseBindingConfigContainer extends NodeContainer<FloorBaseBind
     public FloorBaseBindingConfigContainer(FloorBaseBindingConfig.Builder builder) {
         super("floor_base_binding_config", builder);
         super.add(builder.getUsbPort(), "usb_port");
-        super.add(new FloorBaseBindingConfigLabelIdEntryListContainer(builder));
+        super.add(new FloorBaseBindingConfigSerialHardwareEntryListContainer(builder));
     }
     
 }
