@@ -266,13 +266,15 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
         private void addUnitConfigs(DeviceConfig.Builder deviceConfig, DeviceClass deviceClass) {
             deviceConfig.clearUnitConfig();
-            for (UnitTemplate unitTemplate : deviceClass.getUnitTemplateList()) {
+            deviceClass.getUnitTemplateList().stream().map((unitTemplate) -> {
                 UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setTemplate(unitTemplate);
-                for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unitTemplate.getServiceTypeList()) {
+                unitTemplate.getServiceTypeList().stream().forEach((serviceType) -> {
                     unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));
-                }
+                });
+                return unitConfigBuilder;
+            }).forEach((unitConfigBuilder) -> {
                 deviceConfig.addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
-            }
+            });
         }
         
         private void addLocationIDToAllUnits(DeviceConfig.Builder deviceConfig, String locationId) {
