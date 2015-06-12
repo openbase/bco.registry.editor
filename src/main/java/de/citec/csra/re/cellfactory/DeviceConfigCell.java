@@ -12,6 +12,7 @@ import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -69,6 +70,36 @@ public class DeviceConfigCell extends ValueCell {
             }
         });
 
+        cancel.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                Thread thread = new Thread(
+                        new Task<Boolean>() {
+                            @Override
+                            protected Boolean call() throws Exception {
+                                RegistryEditor.setModified(false);
+                                DeviceConfigContainer container = (DeviceConfigContainer) getItem();
+
+                                DeviceConfig deviceConfig = container.getBuilder().build();
+                                try {
+                                    if (container.getNewNode()) {
+                                        container.getParent().getChildren().remove(container);
+                                    } else {
+                                        int index = container.getParent().getChildren().indexOf(container);
+                                        container.getParent().getChildren().set(index, new DeviceConfigContainer(deviceRegistryRemote.getDeviceConfigById(deviceConfig.getId()).toBuilder()));
+                                    }
+                                } catch (CouldNotPerformException ex) {
+                                    logger.warn("Could cancel update of [" + deviceConfig + "]", ex);
+                                }
+                                return true;
+                            }
+                        });
+                thread.setDaemon(true);
+                thread.start();
+            }
+        });
+
         deviceClassComboBox = new ComboBox();
         deviceClassComboBox.setButtonCell(new DeviceClassComboBoxCell());
         deviceClassComboBox.setCellFactory(new Callback<ListView<DeviceClass>, ListCell<DeviceClass>>() {
@@ -110,7 +141,7 @@ public class DeviceConfigCell extends ValueCell {
                 }
             }
         });
-        
+
         locationConfigComboBox = new ComboBox<>();
         locationConfigComboBox.setButtonCell(new LocationConfigComboBoxCell());
         locationConfigComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
@@ -168,20 +199,35 @@ public class DeviceConfigCell extends ValueCell {
         super.updateItem(item, empty);
 
         if (item instanceof DeviceConfigContainer) {
-            if (getGraphic() == null) {
-                setGraphic(applyButton);
-                if (item.getDescriptor().equals("")) {
-                    applyButton.setVisible(true);
-                }
-                ((DeviceConfigContainer) item).getChanged().addListener(new ChangeListener<Boolean>() {
-
-                    @Override
-                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                        applyButton.setVisible(newValue);
-                    }
-                });
+            DeviceConfigContainer container = (DeviceConfigContainer) item;
+            if (container.getNewNode() || container.hasChanged()) {
+                setGraphic(buttonBox);
+            } else {
+                setGraphic(null);
             }
-        } else if (item instanceof Leaf) {
+
+            container.getChanged().addListener(new ChangeListener<Boolean>() {
+
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    Platform.runLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (newValue) {
+                                setGraphic(buttonBox);
+                            } else {
+                                setGraphic(null);
+                            }
+                        }
+                    });
+                }
+            });
+        } else {
+            setGraphic(null);
+        }
+
+        if (item instanceof Leaf) {
             if (((Leaf) item).getValue() instanceof DeviceClass) {
                 setText(((Leaf<DeviceClass>) item).getValue().getId());
             } else if (((Leaf) item).getDescriptor().equals("location_id")) {
@@ -211,7 +257,7 @@ public class DeviceConfigCell extends ValueCell {
             super.updateItem(item, empty);
 
             if (item != null) {
-                setText(item.getId());
+                setText(item.getLabel());
             }
         }
     }

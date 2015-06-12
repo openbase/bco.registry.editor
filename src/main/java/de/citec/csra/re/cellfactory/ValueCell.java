@@ -32,6 +32,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 
 /**
  *
@@ -49,12 +50,15 @@ public abstract class ValueCell extends RowCell {
     private final DatePicker longDatePicker;
     private final DateFormat converter = new SimpleDateFormat("dd/MM/yyyy");
     protected final Button applyButton;
+    protected final Button cancel;
+    protected final HBox buttonBox;
     protected LeafContainer leaf;
 
     public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote);
         applyButton = new Button("Apply Changes");
-        applyButton.setVisible(false);
+        cancel = new Button("Cancel");
+        buttonBox = new HBox(applyButton, cancel);
         stringTextField = new TextField();
         stringTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
 
@@ -244,8 +248,6 @@ public abstract class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 setText(((Leaf) item).getValue().toString());
             }
-        } else if (item instanceof SendableNode) {
-            applyButton.setVisible(((SendableNode) item).hasChanged());
         }
 
         if (item instanceof DeviceClassContainer) {
