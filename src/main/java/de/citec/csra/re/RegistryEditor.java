@@ -30,6 +30,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,6 +141,7 @@ public class RegistryEditor extends Application {
             Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
             scene.getStylesheets().add("test.css");
             primaryStage.setTitle("Registry Editor");
+            primaryStage.getIcons().add(new Image("registry-editor.png"));
 //        primaryStage.setFullScreen(true);
 //        primaryStage.setFullScreenExitKeyCombination(KeyCombination.ALT_ANY);
             primaryStage.setScene(scene);
@@ -170,11 +172,11 @@ public class RegistryEditor extends Application {
                     return;
                 }
                 try {
-                    if(!modified) {
-                    DeviceRegistryType.DeviceRegistry data = deviceRemote.getData();
-                    deviceClassTreeTableView.setRoot(new DeviceClassList(data.toBuilder()));
-                    deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
-                    tabDeviceRegistry.setContent(tabDeviceRegistryPane);
+                    if (!modified) {
+                        DeviceRegistryType.DeviceRegistry data = deviceRemote.getData();
+                        deviceClassTreeTableView.setRoot(new DeviceClassList(data.toBuilder()));
+                        deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
+                        tabDeviceRegistry.setContent(tabDeviceRegistryPane);
                     }
 
                 } catch (CouldNotPerformException ex) {
@@ -195,15 +197,15 @@ public class RegistryEditor extends Application {
                     return;
                 }
                 try {
-                    if(!modified) {
-                    LocationRegistryType.LocationRegistry data = locationRemote.getData();
-                    LocationRegistryType.LocationRegistry.Builder rootLocations = LocationRegistryType.LocationRegistry.newBuilder();
-                    for (LocationConfig locationConfig : data.getLocationConfigList()) {
-                        if (locationConfig.getRoot()) {
-                            rootLocations.addLocationConfig(locationConfig);
+                    if (!modified) {
+                        LocationRegistryType.LocationRegistry data = locationRemote.getData();
+                        LocationRegistryType.LocationRegistry.Builder rootLocations = LocationRegistryType.LocationRegistry.newBuilder();
+                        for (LocationConfig locationConfig : data.getLocationConfigList()) {
+                            if (locationConfig.getRoot()) {
+                                rootLocations.addLocationConfig(locationConfig);
+                            }
                         }
-                    }
-                    locationConfigTreeTableView.setRoot(new LocationConfigListContainer(rootLocations));
+                        locationConfigTreeTableView.setRoot(new LocationConfigListContainer(rootLocations));
                     }
                 } catch (CouldNotPerformException ex) {
                     logger.error("Location registry not available!", ex);
@@ -212,7 +214,7 @@ public class RegistryEditor extends Application {
             }
         });
     }
-    
+
     public static void setModified(boolean value) {
         modified = value;
     }
