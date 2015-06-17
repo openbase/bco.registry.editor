@@ -15,6 +15,7 @@ import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -61,6 +62,36 @@ public class LocationConfigCell extends ValueCell {
                                     container.setChanged(false);
                                 } catch (CouldNotPerformException ex) {
                                     logger.warn("Could not register or update location config [" + locationConfig + "]", ex);
+                                }
+                                return true;
+                            }
+                        });
+                thread.setDaemon(true);
+                thread.start();
+            }
+        });
+
+        cancel.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                Thread thread = new Thread(
+                        new Task<Boolean>() {
+                            @Override
+                            protected Boolean call() throws Exception {
+                                RegistryEditor.setModified(false);
+                                LocationConfigContainer container = (LocationConfigContainer) getItem();
+
+                                LocationConfig locationConfig = container.getBuilder().build();
+                                try {
+                                    if (container.getNewNode()) {
+                                        container.getParent().getChildren().remove(container);
+                                    } else {
+                                        int index = container.getParent().getChildren().indexOf(container);
+                                        container.getParent().getChildren().set(index, new LocationConfigContainer(locationRegistryRemote.getLocationConfigById(locationConfig.getId()).toBuilder()));
+                                    }
+                                } catch (CouldNotPerformException ex) {
+                                    logger.warn("Could cancel update of [" + locationConfig + "]", ex);
                                 }
                                 return true;
                             }
@@ -118,17 +149,31 @@ public class LocationConfigCell extends ValueCell {
         super.updateItem(item, empty);
 
         if (item instanceof LocationConfigContainer && ((LocationConfigContainer) item).getBuilder().getRoot()) {
-            setGraphic(applyButton);
-            if (item.getDescriptor().equals("")) {
-                applyButton.setVisible(true);
+            LocationConfigContainer container = (LocationConfigContainer) item;
+            if (container.getNewNode() || container.hasChanged()) {
+                setGraphic(buttonBox);
+            } else {
+                setGraphic(null);
             }
-            ((LocationConfigContainer) item).getChanged().addListener(new ChangeListener<Boolean>() {
+            container.getChanged().addListener(new ChangeListener<Boolean>() {
 
                 @Override
                 public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    applyButton.setVisible(newValue);
+                    Platform.runLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            if (newValue) {
+                                setGraphic(buttonBox);
+                            } else {
+                                setGraphic(null);
+                            }
+                        }
+                    });
                 }
             });
+        } else {
+            setGraphic(null);
         }
     }
 
@@ -140,8 +185,7 @@ public class LocationConfigCell extends ValueCell {
             if (((Leaf) getItem()).getDescriptor().equals("parent_id")) {
                 try {
                     List<LocationConfig> comboBoxList = new ArrayList(locationRegistryRemote.getData().getLocationConfigList());
-                    comboBoxList.remove((LocationConfig) ((LeafContainer)getItem()).getParent().getBuilder().build());
-//                    locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigsList()));
+                    comboBoxList.remove((LocationConfig) ((LeafContainer) getItem()).getParent().getBuilder().build());
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(comboBoxList));
                     super.setEditingGraphic(locationConfigComboBox);
                 } catch (CouldNotPerformException ex) {
@@ -165,7 +209,7 @@ public class LocationConfigCell extends ValueCell {
             super.updateItem(item, empty);
 
             if (item != null) {
-                setText(item.getId());
+                setText(item.getLabel());
             }
         }
     }

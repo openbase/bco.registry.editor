@@ -15,10 +15,10 @@ import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 public class UnitConfigContainer extends NodeContainer<UnitConfig.Builder> {
 
     public UnitConfigContainer(UnitConfig.Builder unitConfig) {
-        super(unitConfig.getId(), unitConfig);
+        super(unitConfig.getLabel(), unitConfig);
         super.add(unitConfig.getId(), "Id", false);
         super.add(unitConfig.getLabel(), "label");
-        super.add(unitConfig.getTemplate().getType(), "type");
+        super.add(unitConfig.getTemplate().getType(), "type", false);
         super.add(new PlacementConfigContainer(unitConfig.getPlacementConfigBuilder()));
         super.add(new ServiceConfigListContainer(unitConfig));
         super.add(ScopeGenerator.generateStringRep(unitConfig.getScope()), "scope", false);

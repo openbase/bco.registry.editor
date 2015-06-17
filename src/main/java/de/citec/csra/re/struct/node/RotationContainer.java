@@ -20,9 +20,9 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
         super("rotation", rotation);
         super.add(rotation.getFrameId(), "frame_id", false);
         euler = QuaternionEulerTransform.transform(rotation.getQw(), rotation.getQx(), rotation.getQy(), rotation.getQz());
-        super.add(getRoll(), "roll");
-        super.add(getPitch(), "pitch");
-        super.add(getYaw(), "yaw");
+        super.add((double) Math.round(getRoll()), "roll");
+        super.add((double) Math.round(getPitch()), "pitch");
+        super.add((double) Math.round(getYaw()), "yaw");
     }
 
     /**
