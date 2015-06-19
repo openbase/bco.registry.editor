@@ -124,7 +124,7 @@ public class RegistryEditor extends Application {
             try {
                 deviceRemote.requestStatus();
             } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistory(logger, ex);
+                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
             }
 
             locationRemote.activate();
@@ -135,7 +135,7 @@ public class RegistryEditor extends Application {
             try {
                 locationRemote.requestStatus();
             } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistory(logger, ex);
+                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
             }
 
             Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
@@ -151,7 +151,7 @@ public class RegistryEditor extends Application {
             updateTabDeviceRegistry();
             logger.info(APP_NAME + " successfully started.");
         } catch (Exception ex) {
-            throw ExceptionPrinter.printHistory(logger, ex);
+            throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
         }
     }
 
