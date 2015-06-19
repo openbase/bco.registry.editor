@@ -6,6 +6,8 @@
 package de.citec.csra.re.struct.node;
 
 import de.citec.jul.processing.QuaternionEulerTransform;
+import javax.vecmath.Quat4d;
+import javax.vecmath.Vector3d;
 import rst.geometry.RotationType.Rotation;
 
 /**
@@ -14,12 +16,12 @@ import rst.geometry.RotationType.Rotation;
  */
 public class RotationContainer extends NodeContainer<Rotation.Builder> {
 
-    private double[] euler = new double[3];
+    private final Vector3d euler;
 
     public RotationContainer(Rotation.Builder rotation) {
         super("rotation", rotation);
         super.add(rotation.getFrameId(), "frame_id", false);
-        euler = QuaternionEulerTransform.transform(rotation.getQw(), rotation.getQx(), rotation.getQy(), rotation.getQz());
+        euler = QuaternionEulerTransform.transform(new Quat4d(rotation.getQw(), rotation.getQx(), rotation.getQy(), rotation.getQz()));
         super.add((double) Math.round(getRoll()), "roll");
         super.add((double) Math.round(getPitch()), "pitch");
         super.add((double) Math.round(getYaw()), "yaw");
@@ -31,7 +33,7 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
      * @param roll in degree
      */
     public void setRoll(double roll) {
-        euler[0] = Math.toRadians(roll);
+        euler.x = Math.toRadians(roll);
         updateQuaternion();
     }
 
@@ -41,7 +43,7 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
      * @param pitch in degree
      */
     public void setPitch(double pitch) {
-        euler[1] = Math.toRadians(pitch);
+        euler.y = Math.toRadians(pitch);
         updateQuaternion();
     }
 
@@ -51,7 +53,7 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
      * @param yaw in degree
      */
     public void setYaw(double yaw) {
-        euler[2] = Math.toRadians(yaw);
+        euler.y = Math.toRadians(yaw);
         updateQuaternion();
     }
 
@@ -59,11 +61,11 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
      * Update the rotation builder.
      */
     public void updateQuaternion() {
-        double[] quaternion = QuaternionEulerTransform.transformEulerToQuaternion(euler);
-        builder.setQw(quaternion[0]);
-        builder.setQx(quaternion[1]);
-        builder.setQy(quaternion[2]);
-        builder.setQz(quaternion[3]);
+        Quat4d quaternion = QuaternionEulerTransform.transform(euler);
+        builder.setQw(quaternion.w);
+        builder.setQx(quaternion.x);
+        builder.setQy(quaternion.y);
+        builder.setQz(quaternion.z);
     }
 
     /**
@@ -72,7 +74,7 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
      * @return roll in degree
      */
     public double getRoll() {
-        return Math.toDegrees(euler[0]);
+        return Math.toDegrees(euler.x);
     }
 
     /**
@@ -81,7 +83,7 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
      * @return pitch in degree
      */
     public double getPitch() {
-        return Math.toDegrees(euler[1]);
+        return Math.toDegrees(euler.y);
     }
 
     /**
@@ -90,6 +92,6 @@ public class RotationContainer extends NodeContainer<Rotation.Builder> {
      * @return yaw in degree
      */
     public double getYaw() {
-        return Math.toDegrees(euler[2]);
+        return Math.toDegrees(euler.z);
     }
 }

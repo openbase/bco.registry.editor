@@ -12,7 +12,6 @@ import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.DeviceConfigGroupContainer;
 import de.citec.csra.re.struct.node.Node;
-import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.UnitConfigContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import java.text.DateFormat;
@@ -28,11 +27,14 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 
 /**
  *
@@ -248,6 +250,12 @@ public abstract class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 setText(((Leaf) item).getValue().toString());
             }
+
+            if ("scope".equals(item.getDescriptor()) || "id".equals(item.getDescriptor())) {
+                setText("");
+                String text = ((Leaf) item).getValue().toString();
+                setGraphic(makeSelectable(new Label(text)));
+            }
         }
 
         if (item instanceof DeviceClassContainer) {
@@ -259,5 +267,24 @@ public abstract class ValueCell extends RowCell {
         } else if (item instanceof DeviceConfigGroupContainer) {
             setText(((DeviceConfigGroupContainer) item).getDeviceClass().getDescription());
         }
+    }
+
+    private Label makeSelectable(Label label) {
+        StackPane textStack = new StackPane();
+        TextField textField = new TextField(label.getText());
+        textField.setEditable(false);
+        textField.setStyle(
+                "-fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0;"
+        );
+        // the invisible label is a hack to get the textField to size like a label.
+        Label invisibleLabel = new Label();
+        invisibleLabel.textProperty().bind(label.textProperty());
+        invisibleLabel.setVisible(false);
+        textStack.getChildren().addAll(invisibleLabel, textField);
+        label.textProperty().bindBidirectional(textField.textProperty());
+        label.setGraphic(textStack);
+        label.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+        return label;
     }
 }

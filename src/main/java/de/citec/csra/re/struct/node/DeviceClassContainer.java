@@ -15,7 +15,7 @@ public class DeviceClassContainer extends SendableNode<DeviceClass.Builder> {
     
     public DeviceClassContainer(final DeviceClass.Builder deviceClass) {
         super(deviceClass.getId(), deviceClass);
-        super.add(deviceClass.getId(), "Id", false);
+        super.add(deviceClass.getId(), "id", false);
         super.add(deviceClass.getLabel(), "label");
         super.add(deviceClass.getProductNumber(), "product_number");
         super.add(new BindingConfigContainer(deviceClass.getBindingConfigBuilder()));

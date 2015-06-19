@@ -77,6 +77,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
         addMenuItem.setOnAction(eventHandler);
         removeMenuItem.setOnAction(eventHandler);
         contextMenu = new ContextMenu(addMenuItem, removeMenuItem);
+        this.setFocused(true);
+        this.setEditable(true);
     }
 
     @Override

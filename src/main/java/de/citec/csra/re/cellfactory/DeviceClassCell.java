@@ -96,10 +96,12 @@ public class DeviceClassCell extends ValueCell {
 
         if (item instanceof DeviceClassContainer) {
             DeviceClassContainer container = (DeviceClassContainer) item;
-            if (container.getNewNode() || container.hasChanged()) {
+            if ((container.getNewNode() || container.hasChanged()) && getGraphic() != buttonBox) {
+                System.out.println("Setting buttons on [" + item.getDescriptor() + "] case1");
                 setGraphic(buttonBox);
-            } else {
+            } else if (!(container.getNewNode() || container.hasChanged()) && getGraphic() != null) {
                 setGraphic(null);
+                System.out.println("Resetting buttons on [" + item.getDescriptor() + "] case1");
             }
             container.getChanged().addListener(new ChangeListener<Boolean>() {
 
@@ -109,9 +111,11 @@ public class DeviceClassCell extends ValueCell {
 
                         @Override
                         public void run() {
-                            if (newValue) {
+                            if (newValue && getGraphic() != buttonBox) {
+                                System.out.println("Setting buttons on [" + item.getDescriptor() + "] case2");
                                 setGraphic(buttonBox);
-                            } else {
+                            } else if (getGraphic() != null) {
+                                System.out.println("Resetting buttons on [" + item.getDescriptor() + "] case2");
                                 setGraphic(null);
                             }
                         }
@@ -119,7 +123,9 @@ public class DeviceClassCell extends ValueCell {
                 }
             });
         } else {
-            setGraphic(null);
+            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
+                setGraphic(null);
+            }
         }
     }
 }

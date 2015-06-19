@@ -16,7 +16,7 @@ public class LocationConfigContainer extends SendableNode<LocationConfig.Builder
 
     public LocationConfigContainer(LocationConfig.Builder location) {
         super(location.getLabel(), location);
-        super.add(location.getId(), "Id", false);
+        super.add(location.getId(), "id", false);
         super.add(location.getLabel(), "label");
         super.add(location.getParentId(), "parent_id");
         super.add(ScopeGenerator.generateStringRep(location.getScope()), "scope", false);

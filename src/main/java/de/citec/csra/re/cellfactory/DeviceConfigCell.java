@@ -224,7 +224,9 @@ public class DeviceConfigCell extends ValueCell {
                 }
             });
         } else {
-            setGraphic(null);
+            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
+                setGraphic(null);
+            }
         }
 
         if (item instanceof Leaf) {
