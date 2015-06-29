@@ -18,12 +18,14 @@ import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.DeviceConfigGroupContainer;
 import de.citec.csra.re.struct.node.FloorBaseBindingConfigSerialHardwareEntryContainer;
 import de.citec.csra.re.struct.node.FloorBaseBindingConfigSerialHardwareEntryListContainer;
+import de.citec.csra.re.struct.node.GenericListContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.LocationConfigListContainer;
 import de.citec.csra.re.struct.node.LocationGroupContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.SendableNode;
+import de.citec.csra.re.struct.node.ServiceTemplateContainer;
 import de.citec.csra.re.struct.node.ServiceTypeListContainer;
 import de.citec.csra.re.struct.node.UnitIdListContainer;
 import de.citec.csra.re.struct.node.UnitTemplateContainer;
@@ -31,11 +33,15 @@ import de.citec.csra.re.struct.node.UnitTemplateListContainer;
 import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
+import de.citec.jul.exception.ExceptionPrinter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
@@ -85,13 +91,15 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if ((item instanceof UnitTemplateListContainer) || 
-                (item instanceof ChildLocationListContainer) || 
-                (item instanceof UnitIdListContainer) || 
-                (item instanceof ServiceTypeListContainer) || 
-                (item instanceof LocationGroupContainer) || 
-                (item instanceof FloorBaseBindingConfigSerialHardwareEntryListContainer) || 
-                (item instanceof DeviceConfigGroupContainer)) {
+        if ((item instanceof UnitTemplateListContainer)
+                || (item instanceof ChildLocationListContainer)
+                || (item instanceof UnitIdListContainer)
+                || (item instanceof GenericListContainer)
+                || (item instanceof ServiceTypeListContainer)
+                || (item instanceof LocationGroupContainer)
+                || (item instanceof FloorBaseBindingConfigSerialHardwareEntryListContainer)
+                || (item instanceof DeviceConfigGroupContainer)) {
+//                || (item instanceof ServiceTemplateContainer)) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
@@ -137,132 +145,143 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
         }
 
         private void addAction(Node add) {
-            RegistryEditor.setModified(true);
-            if (add instanceof DeviceClassContainer) {
-                NodeContainer parent = (NodeContainer) ((DeviceClassContainer) add).getParent().getValue();
-                DeviceClassContainer addedNode = new DeviceClassContainer(DeviceClass.getDefaultInstance().toBuilder());
-                addedNode.setChanged(true);
-                addedNode.setNewNode(true);
-                addedNode.setExpanded(true);
-                parent.setExpanded(true);
-                parent.getChildren().add(addedNode);
-            } else if (add instanceof DeviceConfigContainer) {
-                LocationGroupContainer parentNode = (LocationGroupContainer) ((DeviceConfigContainer) add).getParent();
-                DeviceClass deviceClass = ((DeviceConfigGroupContainer) parentNode.getParent()).getDeviceClass();
-                DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
-                deviceConfig.setDeviceClass(deviceClass);
-                addUnitConfigs(deviceConfig, deviceClass);
-                deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
-                addLocationIDToAllUnits(deviceConfig, parentNode.getLocationId());
-                DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
-                addedNode.setChanged(true);
-                addedNode.setNewNode(true);
-                addedNode.setExpanded(true);
-                parentNode.setExpanded(true);
-                parentNode.getChildren().add(addedNode);
-            } else if (add instanceof UnitTemplateListContainer) {
-                UnitTemplateListContainer listNode = ((UnitTemplateListContainer) add);
-                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
-                listNode.add(new UnitTemplateContainer(unitTemplate));
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof FloorBaseBindingConfigSerialHardwareEntryListContainer) {
-                FloorBaseBindingConfigSerialHardwareEntryListContainer listNode = ((FloorBaseBindingConfigSerialHardwareEntryListContainer) add);
-                FloorBaseBindingConfigType.FloorBaseBindingConfig.SerialHardwareEntry.Builder labelIdEntryBuilder = listNode.getBuilder().addSerialHardwareEntryBuilder();
-                listNode.add(new FloorBaseBindingConfigSerialHardwareEntryContainer(labelIdEntryBuilder));
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof UnitTemplateContainer) {
-                UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((NodeContainer) add).getParent().getValue());
-                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
-                listNode.add(new UnitTemplateContainer(unitTemplate));
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof ServiceTypeListContainer) {
-                ServiceTypeListContainer listNode = ((ServiceTypeListContainer) add);
-                UnitTemplate.Builder unitTemplate = listNode.getBuilder().addServiceType(ServiceType.UNKNOWN);
-                listNode.add(ServiceType.UNKNOWN, "service_type", listNode.getBuilder().getServiceTypeList().size() - 1);
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof UnitIdListContainer) {
-                UnitIdListContainer listNode = (UnitIdListContainer) add;
-                listNode.getBuilder().addUnitId("");
-                listNode.add("", "unit_id", listNode.getBuilder().getUnitIdList().size() - 1);
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof Leaf) {
-                if (((Leaf) add).getValue() instanceof ServiceType) {
-                    ServiceTypeListContainer listNode = ((ServiceTypeListContainer) ((LeafContainer) add).getParent());
-                    UnitTemplate.Builder unitTemplate = listNode.getBuilder().addServiceType(ServiceType.UNKNOWN);
-                    listNode.add(ServiceType.UNKNOWN, "service_type", listNode.getBuilder().getServiceTypeList().size() - 1);
-                    listNode.setExpanded(true);
-                    listNode.setSendableChanged();
-                } else if (((Leaf) add).getDescriptor().equals("unit_id")) {
-                    UnitIdListContainer listNode = ((UnitIdListContainer) ((LeafContainer) add).getParent());
-                    listNode.getBuilder().addUnitId("");
-                    listNode.add("", "unit_id", listNode.getBuilder().getUnitIdList().size() - 1);
-                    listNode.setExpanded(true);
-                    listNode.setSendableChanged();
-                } else if (((Leaf) add).getValue() instanceof UnitTemplate.UnitType) {
-                    UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((LeafContainer) add).getParent());
+            // TODO Tamino: implement ExceptionHanlding
+            try {
+                RegistryEditor.setModified(true);
+                if (add instanceof DeviceClassContainer) {
+                    NodeContainer parent = (NodeContainer) ((DeviceClassContainer) add).getParent().getValue();
+                    DeviceClassContainer addedNode = new DeviceClassContainer(DeviceClass.getDefaultInstance().toBuilder());
+                    addedNode.setChanged(true);
+                    addedNode.setNewNode(true);
+                    addedNode.setExpanded(true);
+                    parent.setExpanded(true);
+                    parent.getChildren().add(addedNode);
+                } else if (add instanceof DeviceConfigContainer) {
+                    LocationGroupContainer parentNode = (LocationGroupContainer) ((DeviceConfigContainer) add).getParent();
+                    DeviceClass deviceClass = ((DeviceConfigGroupContainer) parentNode.getParent()).getDeviceClass();
+                    DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
+                    deviceConfig.setDeviceClass(deviceClass);
+                    addUnitConfigs(deviceConfig, deviceClass);
+                    deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
+                    addLocationIDToAllUnits(deviceConfig, parentNode.getLocationId());
+                    DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
+                    addedNode.setChanged(true);
+                    addedNode.setNewNode(true);
+                    addedNode.setExpanded(true);
+                    parentNode.setExpanded(true);
+                    parentNode.getChildren().add(addedNode);
+                } else if (add instanceof UnitTemplateListContainer) {
+                    UnitTemplateListContainer listNode = ((UnitTemplateListContainer) add);
                     UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
                     listNode.add(new UnitTemplateContainer(unitTemplate));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
-                }
-            } else if (add instanceof ChildLocationListContainer) {
-                ChildLocationListContainer listNode = ((ChildLocationListContainer) add);
-                LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildBuilder().setRoot(false);
-                locationConfigBuilder.setPosition(RSTDefaultInstances.getDefaultPose());
-                locationConfigBuilder.setParentId(listNode.getBuilder().getId());
-                listNode.add(new LocationConfigContainer(locationConfigBuilder));
-                listNode.setExpanded(true);
-                listNode.setSendableChanged();
-            } else if (add instanceof LocationConfigContainer) {
-                if (((LocationConfigContainer) add).getParent() instanceof ChildLocationListContainer) {
-                    ChildLocationListContainer listNode = (ChildLocationListContainer) ((LocationConfigContainer) add).getParent();
+                } else if (add instanceof FloorBaseBindingConfigSerialHardwareEntryListContainer) {
+                    FloorBaseBindingConfigSerialHardwareEntryListContainer listNode = ((FloorBaseBindingConfigSerialHardwareEntryListContainer) add);
+                    FloorBaseBindingConfigType.FloorBaseBindingConfig.SerialHardwareEntry.Builder labelIdEntryBuilder = listNode.getBuilder().addSerialHardwareEntryBuilder();
+                    listNode.add(new FloorBaseBindingConfigSerialHardwareEntryContainer(labelIdEntryBuilder));
+                    listNode.setExpanded(true);
+                    listNode.setSendableChanged();
+                } else if (add instanceof UnitTemplateContainer) {
+                    UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((NodeContainer) add).getParent().getValue());
+                    UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
+                    listNode.add(new UnitTemplateContainer(unitTemplate));
+                    listNode.setExpanded(true);
+                    listNode.setSendableChanged();
+                } else if (add instanceof ServiceTypeListContainer) {
+                    ServiceTypeListContainer listNode = ((ServiceTypeListContainer) add);
+                    UnitTemplate.Builder unitTemplate = listNode.getBuilder().addServiceType(ServiceType.UNKNOWN);
+                    listNode.add(ServiceType.UNKNOWN, "service_type", listNode.getBuilder().getServiceTypeList().size() - 1);
+                    listNode.setExpanded(true);
+                    listNode.setSendableChanged();
+                } else if (add instanceof UnitIdListContainer) {
+                    UnitIdListContainer listNode = (UnitIdListContainer) add;
+                    listNode.getBuilder().addUnitId("");
+                    listNode.add("", "unit_id", listNode.getBuilder().getUnitIdList().size() - 1);
+                    listNode.setExpanded(true);
+                    listNode.setSendableChanged();
+                } else if (add instanceof Leaf) {
+                    if (((Leaf) add).getValue() instanceof ServiceType) {
+                        ServiceTypeListContainer listNode = ((ServiceTypeListContainer) ((LeafContainer) add).getParent());
+                        UnitTemplate.Builder unitTemplate = listNode.getBuilder().addServiceType(ServiceType.UNKNOWN);
+                        listNode.add(ServiceType.UNKNOWN, "service_type", listNode.getBuilder().getServiceTypeList().size() - 1);
+                        listNode.setExpanded(true);
+                        listNode.setSendableChanged();
+                    } else if (((Leaf) add).getDescriptor().equals("unit_id")) {
+                        UnitIdListContainer listNode = ((UnitIdListContainer) ((LeafContainer) add).getParent());
+                        listNode.getBuilder().addUnitId("");
+                        listNode.add("", "unit_id", listNode.getBuilder().getUnitIdList().size() - 1);
+                        listNode.setExpanded(true);
+                        listNode.setSendableChanged();
+                    } else if (((Leaf) add).getValue() instanceof UnitTemplate.UnitType) {
+                        UnitTemplateListContainer listNode = ((UnitTemplateListContainer) ((LeafContainer) add).getParent());
+                        UnitTemplate.Builder unitTemplate = listNode.getBuilder().addUnitTemplateBuilder();
+                        listNode.add(new UnitTemplateContainer(unitTemplate));
+                        listNode.setExpanded(true);
+                        listNode.setSendableChanged();
+                    }
+                } else if (add instanceof ChildLocationListContainer) {
+                    ChildLocationListContainer listNode = ((ChildLocationListContainer) add);
                     LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildBuilder().setRoot(false);
                     locationConfigBuilder.setPosition(RSTDefaultInstances.getDefaultPose());
                     locationConfigBuilder.setParentId(listNode.getBuilder().getId());
                     listNode.add(new LocationConfigContainer(locationConfigBuilder));
                     listNode.setExpanded(true);
                     listNode.setSendableChanged();
-                } else {
-                    LocationConfigListContainer listNode = (LocationConfigListContainer) ((LocationConfigContainer) add).getParent();
-                    LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addLocationConfigBuilder().setRoot(true);
-                    locationConfigBuilder.setPosition(RSTDefaultInstances.getDefaultPose());
-                    LocationConfigContainer rootLocation = new LocationConfigContainer(locationConfigBuilder);
-                    listNode.add(rootLocation);
-                    listNode.setExpanded(true);
-                    rootLocation.setExpanded(true);
-                    rootLocation.setNewNode(true);
-                    rootLocation.setChanged(true);
+                } else if (add instanceof LocationConfigContainer) {
+                    if (((LocationConfigContainer) add).getParent() instanceof ChildLocationListContainer) {
+                        ChildLocationListContainer listNode = (ChildLocationListContainer) ((LocationConfigContainer) add).getParent();
+                        LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addChildBuilder().setRoot(false);
+                        locationConfigBuilder.setPosition(RSTDefaultInstances.getDefaultPose());
+                        locationConfigBuilder.setParentId(listNode.getBuilder().getId());
+                        listNode.add(new LocationConfigContainer(locationConfigBuilder));
+                        listNode.setExpanded(true);
+                        listNode.setSendableChanged();
+                    } else {
+                        LocationConfigListContainer listNode = (LocationConfigListContainer) ((LocationConfigContainer) add).getParent();
+                        LocationConfig.Builder locationConfigBuilder = listNode.getBuilder().addLocationConfigBuilder().setRoot(true);
+                        locationConfigBuilder.setPosition(RSTDefaultInstances.getDefaultPose());
+                        LocationConfigContainer rootLocation = new LocationConfigContainer(locationConfigBuilder);
+                        listNode.add(rootLocation);
+                        listNode.setExpanded(true);
+                        rootLocation.setExpanded(true);
+                        rootLocation.setNewNode(true);
+                        rootLocation.setChanged(true);
+                    }
+                } else if (add instanceof DeviceConfigGroupContainer) {
+                    DeviceConfigGroupContainer parentNode = (DeviceConfigGroupContainer) add;
+                    DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
+                    deviceConfig.setDeviceClass(parentNode.getDeviceClass());
+                    addUnitConfigs(deviceConfig, parentNode.getDeviceClass());
+                    DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
+                    addedNode.setChanged(true);
+                    addedNode.setNewNode(true);
+                    addedNode.setExpanded(true);
+                    parentNode.setExpanded(true);
+                    parentNode.getChildren().add(addedNode);
+                } else if (add instanceof LocationGroupContainer) {
+                    LocationGroupContainer parentNode = (LocationGroupContainer) add;
+                    DeviceClass deviceClass = ((DeviceConfigGroupContainer) parentNode.getParent()).getDeviceClass();
+                    DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
+                    deviceConfig.setDeviceClass(deviceClass);
+                    addUnitConfigs(deviceConfig, deviceClass);
+                    deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
+                    addLocationIDToAllUnits(deviceConfig, parentNode.getLocationId());
+                    DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
+                    addedNode.setChanged(true);
+                    addedNode.setNewNode(true);
+                    addedNode.setExpanded(true);
+                    parentNode.setExpanded(true);
+                    parentNode.getChildren().add(addedNode);
+//                } else if (add instanceof ServiceTemplateContainer) {
+//                    ServiceTemplateContainer parentNode = (ServiceTemplateContainer) add;
+//                    parentNode.addNewDefaultElement();
+                } else if (add instanceof GenericListContainer) {
+                    GenericListContainer parentNode = (GenericListContainer) add;
+                    parentNode.addNewDefaultElement();
                 }
-            } else if (add instanceof DeviceConfigGroupContainer) {
-                DeviceConfigGroupContainer parentNode = (DeviceConfigGroupContainer) add;
-                DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
-                deviceConfig.setDeviceClass(parentNode.getDeviceClass());
-                addUnitConfigs(deviceConfig, parentNode.getDeviceClass());
-                DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
-                addedNode.setChanged(true);
-                addedNode.setNewNode(true);
-                addedNode.setExpanded(true);
-                parentNode.setExpanded(true);
-                parentNode.getChildren().add(addedNode);
-            } else if (add instanceof LocationGroupContainer) {
-                LocationGroupContainer parentNode = (LocationGroupContainer) add;
-                DeviceClass deviceClass = ((DeviceConfigGroupContainer) parentNode.getParent()).getDeviceClass();
-                DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
-                deviceConfig.setDeviceClass(deviceClass);
-                addUnitConfigs(deviceConfig, deviceClass);
-                deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
-                addLocationIDToAllUnits(deviceConfig, parentNode.getLocationId());
-                DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
-                addedNode.setChanged(true);
-                addedNode.setNewNode(true);
-                addedNode.setExpanded(true);
-                parentNode.setExpanded(true);
-                parentNode.getChildren().add(addedNode);
+            } catch (CouldNotPerformException ex) {
+                ExceptionPrinter.printHistory(logger, ex);
             }
         }
 
@@ -278,11 +297,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 deviceConfig.addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
             });
         }
-        
+
         private void addLocationIDToAllUnits(DeviceConfig.Builder deviceConfig, String locationId) {
             List<UnitConfigType.UnitConfig.Builder> unitBuilder = deviceConfig.getUnitConfigBuilderList();
             List<UnitConfigType.UnitConfig> units = new ArrayList<>();
-            for(UnitConfigType.UnitConfig.Builder unit : unitBuilder) {
+            for (UnitConfigType.UnitConfig.Builder unit : unitBuilder) {
                 PlacementConfigType.PlacementConfig placement = unit.getPlacementConfigBuilder().setLocationId(locationId).build();
                 units.add(unit.setPlacementConfig(placement).clone().build());
             }

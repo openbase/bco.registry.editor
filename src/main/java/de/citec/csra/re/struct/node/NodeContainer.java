@@ -10,6 +10,8 @@ import de.citec.csra.re.struct.leaf.LeafContainer;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.TreeItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -17,6 +19,8 @@ import javafx.scene.control.TreeItem;
  * @param <MB>
  */
 public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<Node> implements Node {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Property<String> descriptor;
     protected final MB builder;

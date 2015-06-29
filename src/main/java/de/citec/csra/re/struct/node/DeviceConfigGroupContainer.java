@@ -7,7 +7,6 @@ package de.citec.csra.re.struct.node;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType;
 import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
@@ -21,7 +20,7 @@ public class DeviceConfigGroupContainer extends NodeContainer<DeviceRegistry.Bui
     private final DeviceClass deviceClass;
     
     public DeviceConfigGroupContainer(final DeviceRegistry.Builder deviceRegistry, DeviceClass deviceClass) {
-        super(deviceClass.getId() + "'s", deviceRegistry);
+        super(deviceClass.getId(), deviceRegistry);
         this.deviceClass = deviceClass;
         List<DeviceConfigType.DeviceConfig.Builder> deviceConfigs = new ArrayList<>();
         deviceRegistry.getDeviceConfigBuilderList().stream().forEach((deviceConfigBuilder) -> {
@@ -31,7 +30,6 @@ public class DeviceConfigGroupContainer extends NodeContainer<DeviceRegistry.Bui
         });
 
         List<String> locationIds = new ArrayList<>();
-        int counter;
         for (DeviceConfigType.DeviceConfig.Builder deviceConfig : deviceConfigs) {
             if(!locationIds.contains(deviceConfig.getPlacementConfig().getLocationId())) {
                 locationIds.add(deviceConfig.getPlacementConfig().getLocationId());

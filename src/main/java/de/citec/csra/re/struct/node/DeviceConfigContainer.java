@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
+import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.extension.rsb.scope.ScopeGenerator;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 
@@ -24,6 +25,14 @@ public class DeviceConfigContainer extends SendableNode<DeviceConfig.Builder> {
         super.add(new InventoryStateContainer(deviceConfig.getInventoryStateBuilder()));
         super.add(deviceConfig.getDeviceClass(), "device_class");
         super.add(new UnitConfigListContainer(deviceConfig));
+        
+        // TODO Tamino: implement global exception handling if gui elements are not able to init.
+        try {
+            super.add(new MetaConfigContainer(deviceConfig.getMetaConfigBuilder()));
+        } catch (de.citec.jul.exception.InstantiationException ex) {
+            ExceptionPrinter.printHistory(logger, ex);
+        }
+
         super.add(deviceConfig.getDescription(), "description");
     }
 }

@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
+import de.citec.jul.exception.ExceptionPrinter;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 
 /**
