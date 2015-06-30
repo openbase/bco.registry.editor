@@ -49,6 +49,8 @@
 	
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <global.version.jul>0.1.0</global.version.jul>
+        <global.version.registry-manager>0.3.0</global.version.registry-manager>
     </properties>
 	
     <scm>
@@ -78,33 +80,33 @@
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>jul.extension.rsb.com</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${global.version.jul}</version>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>jul.storage</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${global.version.jul}</version>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>jul.extension.rsb.scope</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${global.version.jul}</version>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>jul.processing</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>${global.version.jul}</version>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>dm.remote</artifactId>
-            <version>0.3.0-SNAPSHOT</version>
+            <version>${global.version.registry-manager}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>lm.remote</artifactId>
-            <version>0.3.0-SNAPSHOT</version>
+            <version>${global.version.registry-manager}</version>
             <type>jar</type>
         </dependency>
     </dependencies>
