@@ -350,6 +350,9 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
         Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(parent.getDescriptor().substring(0, parent.getDescriptor().length() - 1));
+        if(parent.getDescriptor().equals("meta_configs")) {
+            field = parent.getBuilder().getDescriptorForType().findFieldByName("entry");
+        }
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));
         updatedList.remove(index);
         parent.getBuilder().clearField(field);
