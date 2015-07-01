@@ -194,18 +194,16 @@ public abstract class ValueCell extends RowCell {
     public void startEdit() {
         super.startEdit();
 
-        if (getItem() instanceof Leaf) {
+        if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
 
             if (leaf.getValue() instanceof String) {
                 stringTextField.setText((String) leaf.getValue());
                 setEditingGraphic(stringTextField);
             } else if (leaf.getValue() instanceof Enum) {
-                if (!((LeafContainer) leaf).getParent().getDescriptor().equals("service_config")) {
-                    enumComboBox.setItems(FXCollections.observableArrayList(leaf.getValue().getClass().getEnumConstants()));
-                    enumComboBox.setValue(leaf.getValue());
-                    setEditingGraphic(enumComboBox);
-                }
+                enumComboBox.setItems(FXCollections.observableArrayList(leaf.getValue().getClass().getEnumConstants()));
+                enumComboBox.setValue(leaf.getValue());
+                setEditingGraphic(enumComboBox);
             } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
                 decimalTextField.setText(leaf.getValue().toString());
                 setEditingGraphic(decimalTextField);

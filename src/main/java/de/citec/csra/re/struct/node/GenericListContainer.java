@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * @author Divine Threepwood
  * @param <MB>
  * @param <RFM>
+ * @param <RFMB>
  */
 public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM extends GeneratedMessage, RFMB extends RFM.Builder<RFMB>> extends NodeContainer<MB> {
 
@@ -31,7 +32,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
     }
 
     public GenericListContainer(final String name, final int repeatedFieldNumber, final MB builder, final Class<? extends NodeContainer> elementNodeContainerClass) throws InstantiationException {
-        super(name, builder);
+        super(name + "s", builder);
 
         try {
             this.elementNodeContainerClass = elementNodeContainerClass;
@@ -49,7 +50,13 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
     }
 
     public void addNewDefaultElement() throws CouldNotPerformException {
-        addElement((RFMB) BuilderProcessor.addDefaultInstanceToRepeatedField(repeatedFieldDescriptor, getBuilder()));
+        try {
+            registerElement((RFMB) BuilderProcessor.addDefaultInstanceToRepeatedField(repeatedFieldDescriptor, getBuilder()));
+            setExpanded(true);
+            setSendableChanged();
+        } catch (CouldNotPerformException ex) {
+            throw new CouldNotPerformException("Could not add Element!", ex);
+        }
     }
 
     public void addElement(RFM element) throws CouldNotPerformException {
@@ -60,6 +67,8 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
         try {
             BuilderProcessor.addMessageToRepeatedField(repeatedFieldDescriptor, elementBuilder, (GeneratedMessage.Builder) getBuilder());
             registerElement(elementBuilder);
+            setExpanded(true);
+            setSendableChanged();
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not add Element!", ex);
         }

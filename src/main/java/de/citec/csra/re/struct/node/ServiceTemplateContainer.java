@@ -12,11 +12,11 @@ import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
  *
  * @author thuxohl
  */
-public class ServiceTemplateContainer extends NodeContainer<ServiceTemplate.Builder> {
+public class ServiceTemplateContainer extends VariableNode<ServiceTemplate.Builder> {
 
     public ServiceTemplateContainer(ServiceTemplate.Builder serviceTemplate) {
         super("service_template", serviceTemplate);
-        super.add(serviceTemplate.getSericeType(), "service_type");
+        super.add(serviceTemplate.getServiceType(), "service_type");
 
         // TODO Tamino: implement global exception handling if gui elements are not able to init.
         try {

@@ -55,7 +55,7 @@ public class RegistryEditor extends Application {
     private final DeviceRegistryRemote deviceRemote;
     private final LocationRegistryRemote locationRemote;
     private TabPane registryTabPane, tabDeviceRegistryPane;
-    private Tab tabDeviceRegistry, tabLocationRegistry, tabDeviceClass, tabDeviceConfig;
+    private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig;
     private ProgressIndicator progressDeviceRegistryIndicator;
     private ProgressIndicator progressLocationRegistryIndicator;
     private TreeTableView<Node> deviceClassTreeTableView;
@@ -78,7 +78,9 @@ public class RegistryEditor extends Application {
 
         tabDeviceRegistry = new Tab("DeviceRegistry");
         tabLocationRegistry = new Tab("LocationRegistry");
-        registryTabPane.getTabs().addAll(tabDeviceRegistry, tabLocationRegistry);
+        tabSceneRegistry = new Tab("SceneRegistry");
+        tabAgentRegistry = new Tab("AgentRegistry");
+        registryTabPane.getTabs().addAll(tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry);
 
         progressDeviceRegistryIndicator = new ProgressIndicator();
         progressLocationRegistryIndicator = new ProgressIndicator();

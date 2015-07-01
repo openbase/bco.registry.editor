@@ -82,15 +82,15 @@ public class LeafContainer<T> implements Leaf<T> {
     public void setValue(T value) {
         this.value = value;
 
-//        System.out.println("Value = "+ value);
-//        System.out.println("Container [" + parent.getDescriptor() + "], expected field name [" + descriptor + "]");
+        System.out.println("Value = "+ value);
+        System.out.println("Container [" + parent.getDescriptor() + "], expected field name [" + descriptor + "]");
         Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(descriptor);
-//        System.out.println("field:fullname" + field.getFullName());
-//        System.out.println("field:name" + field.getName());
-//        System.out.println("field:type" + field.getType());
-//        System.out.println("field:Jvatype" + field.getJavaType());
-//        System.out.println("getValue():" + getValue());
-//        System.out.println("getValue().Class:" + getValue().getClass());
+        System.out.println("field:fullname" + field.getFullName());
+        System.out.println("field:name" + field.getName());
+        System.out.println("field:type" + field.getType());
+        System.out.println("field:Jvatype" + field.getJavaType());
+        System.out.println("getValue():" + getValue());
+        System.out.println("getValue().Class:" + getValue().getClass());
 
         if (value instanceof ProtocolMessageEnum) {
             if (index == -1) {
@@ -139,7 +139,7 @@ public class LeafContainer<T> implements Leaf<T> {
     }
 
     @Override
-    public Node getThis() {
+    public Node getContext() {
         return this;
     }
 }

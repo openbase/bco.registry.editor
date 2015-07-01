@@ -12,7 +12,6 @@ package de.citec.csra.re.struct.node;
 public interface Node {
 
     public String getDescriptor();
-
-    // TODO tamino: what the hell??? x.getThis().getThis().getThis() == x !!!
-    public Node getThis();
+    
+    public Node getContext();
 }

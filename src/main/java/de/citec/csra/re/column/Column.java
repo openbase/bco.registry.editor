@@ -19,6 +19,6 @@ public abstract class Column extends TreeTableColumn<Node, Node> {
 
     public Column(String text) {
         super(text);
-        this.setCellValueFactory(new TreeItemPropertyValueFactory<>("this"));
+        this.setCellValueFactory(new TreeItemPropertyValueFactory<>("context"));
     }
 }

@@ -62,7 +62,7 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
     }
 
     @Override
-    public NodeContainer getThis() {
+    public NodeContainer getContext() {
         // TODO tamino: what the hell??? x.getThis().getThis().getThis() == x !!!
         return this;
     }

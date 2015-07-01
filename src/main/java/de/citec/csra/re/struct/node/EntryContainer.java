@@ -11,7 +11,7 @@ import rst.configuration.EntryType.Entry;
  *
  * @author thuxohl
  */
-public class EntryContainer extends NodeContainer<Entry.Builder>{
+public class EntryContainer extends VariableNode<Entry.Builder>{
 
     public EntryContainer(Entry.Builder builder) {
         super("entry", builder);
