@@ -23,6 +23,7 @@ public class AgentConfigContainer extends SendableNode<AgentConfig.Builder> {
         super.add(ScopeGenerator.generateStringRep(value.getScope()), "scope", false);
         super.add(value.getDescription(), "description");
         super.add(new ActivationStateContainer("activation_state", value.getActivationStateBuilder()));
+        super.add(builder.getType(), "type");
 
         try {
             super.add(new MetaConfigContainer(builder.getMetaConfigBuilder()));
