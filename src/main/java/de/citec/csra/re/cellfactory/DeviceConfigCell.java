@@ -38,7 +38,7 @@ public class DeviceConfigCell extends ValueCell {
     private final ComboBox<LocationConfig> locationConfigComboBox;
 
     public DeviceConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote);
+        super(deviceRegistryRemote, locationRegistryRemote, null, null, null);
 
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -252,7 +252,7 @@ public class DeviceConfigCell extends ValueCell {
         }
     }
 
-    private class LocationConfigComboBoxCell extends ListCell<LocationConfig> {
+    public class LocationConfigComboBoxCell extends ListCell<LocationConfig> {
 
         @Override
         public void updateItem(LocationConfig item, boolean empty) {

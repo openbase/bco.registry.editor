@@ -9,7 +9,11 @@ import java.util.Date;
 import rst.geometry.PoseType.Pose;
 import rst.geometry.RotationType.Rotation;
 import rst.geometry.TranslationType.Translation;
+import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
+import rst.homeautomation.control.app.AppConfigType.AppConfig;
+import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.homeautomation.state.ActivationStateType.ActivationState;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
@@ -41,5 +45,21 @@ public class RSTDefaultInstances {
     
     public static LocationConfig.Builder getDefaultLocationConfig() {
         return LocationConfig.newBuilder().setPosition(getDefaultPose());
+    }
+    
+    public static ActivationState getDefaultActivationState() {
+        return ActivationState.newBuilder().setValue(ActivationState.State.ACTIVE).build();
+    }
+    
+    public static SceneConfig.Builder getDefaultSceneConfig() {
+        return SceneConfig.newBuilder().setActivationState(getDefaultActivationState());
+    }
+    
+    public static AgentConfig.Builder getDefaultAgentConfig() {
+        return AgentConfig.newBuilder().setActivationState(getDefaultActivationState());
+    }
+    
+    public static AppConfig.Builder getDefaultAppConfig() {
+        return AppConfig.newBuilder().setActivationState(getDefaultActivationState());
     }
 }

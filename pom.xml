@@ -109,5 +109,23 @@
             <version>${global.version.registry-manager}</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>de.citec</groupId>
+            <artifactId>scm.remote</artifactId>
+            <version>${global.version.registry-manager}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>de.citec</groupId>
+            <artifactId>agm.remote</artifactId>
+            <version>${global.version.registry-manager}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>de.citec</groupId>
+            <artifactId>apm.remote</artifactId>
+            <version>${global.version.registry-manager}</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

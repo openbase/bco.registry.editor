@@ -6,24 +6,25 @@
 package de.citec.csra.re;
 
 import com.google.protobuf.GeneratedMessage;
+import de.citec.csra.re.struct.node.AgentConfigContainer;
+import de.citec.csra.re.struct.node.AppConfigContainer;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.node.SceneConfigContainer;
 import de.citec.csra.re.struct.node.SendableNode;
-import java.util.Date;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableView;
+import rst.homeautomation.control.agent.AgentConfigType;
+import rst.homeautomation.control.app.AppConfigType;
+import rst.homeautomation.control.scene.SceneConfigType;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.homeautomation.state.InventoryStateType;
-import rst.math.Vec3DFloatType;
 import rst.spatial.LocationConfigType.LocationConfig;
-import rst.spatial.PlacementConfigType;
-import rst.timing.TimestampType;
 
 /**
  *
@@ -47,6 +48,12 @@ public class TreeTableViewContextMenu<M extends GeneratedMessage> extends Contex
                     newNode = new DeviceConfigContainer(RSTDefaultInstances.getDefaultDeviceConfig());
                 } else if (type instanceof LocationConfig) {
                     newNode = new LocationConfigContainer(RSTDefaultInstances.getDefaultLocationConfig().setRoot(true));
+                } else if (type instanceof SceneConfigType.SceneConfig) {
+                    newNode = new SceneConfigContainer(RSTDefaultInstances.getDefaultSceneConfig());
+                } else if (type instanceof AgentConfigType.AgentConfig) {
+                    newNode = new AgentConfigContainer(RSTDefaultInstances.getDefaultAgentConfig());
+                } else if (type instanceof AppConfigType.AppConfig) {
+                    newNode = new AppConfigContainer(RSTDefaultInstances.getDefaultAppConfig());
                 }
 
                 if (newNode != null) {

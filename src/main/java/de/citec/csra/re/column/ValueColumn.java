@@ -19,7 +19,7 @@ import javafx.scene.control.TreeTableColumn;
  */
 public abstract class ValueColumn extends Column {
 
-    public ValueColumn(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
+    public ValueColumn() {
         super("Value");
         this.setEditable(true);
         this.setSortable(false);

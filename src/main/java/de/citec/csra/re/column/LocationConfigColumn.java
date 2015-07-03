@@ -8,7 +8,6 @@ package de.citec.csra.re.column;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.cellfactory.LocationConfigCell;
 import de.citec.csra.re.struct.node.Node;
-import de.citec.dm.remote.DeviceRegistryRemote;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
@@ -19,13 +18,13 @@ import javafx.util.Callback;
  */
 public class LocationConfigColumn extends ValueColumn {
 
-    public LocationConfigColumn(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote);
+    public LocationConfigColumn(LocationRegistryRemote locationRegistryRemote) {
+        super();
         setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
 
             @Override
             public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-                return new LocationConfigCell(deviceRegistryRemote, locationRegistryRemote);
+                return new LocationConfigCell(locationRegistryRemote);
             }
         });
     }

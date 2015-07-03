@@ -5,6 +5,8 @@
  */
 package de.citec.csra.re.cellfactory;
 
+import de.citec.agm.remote.AgentRegistryRemote;
+import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
@@ -15,6 +17,7 @@ import de.citec.csra.re.struct.node.EntryContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.UnitConfigContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.scm.remote.SceneRegistryRemote;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -27,6 +30,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.DatePicker;
@@ -36,6 +40,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import rst.homeautomation.state.ActivationStateType;
 
 /**
  *
@@ -56,9 +61,10 @@ public abstract class ValueCell extends RowCell {
     protected final Button cancel;
     protected final HBox buttonBox;
     protected LeafContainer leaf;
+    private final CheckBox checkBox;
 
-    public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote);
+    public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
+        super(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
         applyButton = new Button("Apply Changes");
         cancel = new Button("Cancel");
         buttonBox = new HBox(applyButton, cancel);
@@ -178,6 +184,24 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
+
+        checkBox = new CheckBox();
+        checkBox.setVisible(true);
+        checkBox.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                ActivationStateType.ActivationState.State state;
+                if (checkBox.isSelected()) {
+                    state = ActivationStateType.ActivationState.State.ACTIVE;
+                } else {
+                    state = ActivationStateType.ActivationState.State.DEACTIVE;
+                }
+                leaf.setValue(state);
+                    setText(state.toString());
+                    commitEdit(leaf);
+            }
+        });
     }
 
     private boolean validateDecimalField() {
@@ -201,9 +225,14 @@ public abstract class ValueCell extends RowCell {
                 stringTextField.setText((String) leaf.getValue());
                 setEditingGraphic(stringTextField);
             } else if (leaf.getValue() instanceof Enum) {
-                enumComboBox.setItems(FXCollections.observableArrayList(leaf.getValue().getClass().getEnumConstants()));
-                enumComboBox.setValue(leaf.getValue());
-                setEditingGraphic(enumComboBox);
+                if (leaf.getParent().getBuilder() instanceof ActivationStateType.ActivationState.Builder && leaf.getDescriptor().equals("value")) {
+                    checkBox.setSelected(leaf.getValue().equals(ActivationStateType.ActivationState.State.ACTIVE));
+                    setEditingGraphic(checkBox);
+                } else {
+                    enumComboBox.setItems(FXCollections.observableArrayList(leaf.getValue().getClass().getEnumConstants()));
+                    enumComboBox.setValue(leaf.getValue());
+                    setEditingGraphic(enumComboBox);
+                }
             } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
                 decimalTextField.setText(leaf.getValue().toString());
                 setEditingGraphic(decimalTextField);

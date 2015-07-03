@@ -7,6 +7,8 @@ package de.citec.csra.re.cellfactory;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
+import de.citec.agm.remote.AgentRegistryRemote;
+import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.RSTDefaultInstances;
 import de.citec.csra.re.RegistryEditor;
@@ -25,7 +27,6 @@ import de.citec.csra.re.struct.node.LocationGroupContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.SendableNode;
-import de.citec.csra.re.struct.node.ServiceTemplateContainer;
 import de.citec.csra.re.struct.node.ServiceTypeListContainer;
 import de.citec.csra.re.struct.node.UnitIdListContainer;
 import de.citec.csra.re.struct.node.UnitTemplateContainer;
@@ -34,23 +35,23 @@ import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.scm.remote.SceneRegistryRemote;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.binding.FloorBaseBindingConfigType;
+import rst.homeautomation.control.agent.AgentConfigType;
+import rst.homeautomation.control.app.AppConfigType;
+import rst.homeautomation.control.scene.SceneConfigType;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType;
-import rst.homeautomation.service.ServiceTypeHolderType;
 import rst.homeautomation.service.ServiceTypeHolderType.ServiceTypeHolder.ServiceType;
 import rst.homeautomation.unit.UnitConfigType;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
@@ -70,13 +71,19 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 //    public static final String BACKGROUND_COLOR = "-fx-text-fill: black;-fx-background-color: ";
     protected final DeviceRegistryRemote deviceRegistryRemote;
     protected final LocationRegistryRemote locationRegistryRemote;
+    protected final SceneRegistryRemote sceneRegistryRemote;
+    protected final AgentRegistryRemote agentRegistryRemote;
+    protected final AppRegistryRemote appRegistryRemote;
 
     private final ContextMenu contextMenu;
     private final MenuItem addMenuItem, removeMenuItem;
 
-    public RowCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
+    public RowCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
         this.deviceRegistryRemote = deviceRegistryRemote;
         this.locationRegistryRemote = locationRegistryRemote;
+        this.sceneRegistryRemote = sceneRegistryRemote;
+        this.agentRegistryRemote = agentRegistryRemote;
+        this.appRegistryRemote = appRegistryRemote;
         addMenuItem = new MenuItem("Add");
         removeMenuItem = new MenuItem("Remove");
         EventHandlerImpl eventHandler = new EventHandlerImpl();
@@ -330,6 +337,18 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                             if (locationRegistryRemote.containsLocationConfig((LocationConfig) message)) {
                                 locationRegistryRemote.removeLocationConfig((LocationConfig) message);
                             }
+                        } else if (message instanceof SceneConfigType.SceneConfig) {
+                            if (sceneRegistryRemote.containsSceneConfig((SceneConfigType.SceneConfig) message)) {
+                                sceneRegistryRemote.removeSceneConfig((SceneConfigType.SceneConfig) message);
+                            }
+                        } else if (message instanceof AgentConfigType.AgentConfig) {
+                            if (agentRegistryRemote.containsAgentConfig((AgentConfigType.AgentConfig) message)) {
+                                agentRegistryRemote.removeAgentConfig((AgentConfigType.AgentConfig) message);
+                            }
+                        } else if (message instanceof AppConfigType.AppConfig) {
+                            if (appRegistryRemote.containsAppConfig((AppConfigType.AppConfig) message)) {
+                                appRegistryRemote.removeAppConfig((AppConfigType.AppConfig) message);
+                            }
                         }
                     } catch (CouldNotPerformException ex) {
                         logger.warn("Could not remove sendable [" + sendable.getBuilder() + "]", ex);
@@ -350,7 +369,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
         Descriptors.FieldDescriptor field = parent.getBuilder().getDescriptorForType().findFieldByName(parent.getDescriptor().substring(0, parent.getDescriptor().length() - 1));
-        if(parent.getDescriptor().equals("meta_configs")) {
+        if (parent.getDescriptor().equals("meta_configs")) {
             field = parent.getBuilder().getDescriptorForType().findFieldByName("entry");
         }
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));

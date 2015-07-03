@@ -6,7 +6,6 @@
 package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.re.RegistryEditor;
-import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
@@ -25,8 +24,8 @@ import rst.homeautomation.device.DeviceClassType.DeviceClass;
  */
 public class DeviceClassCell extends ValueCell {
 
-    public DeviceClassCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote);
+    public DeviceClassCell(DeviceRegistryRemote deviceRegistryRemote) {
+        super(deviceRegistryRemote, null, null, null, null);
 
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
 

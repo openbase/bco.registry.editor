@@ -38,8 +38,8 @@ public class LocationConfigCell extends ValueCell {
     private final ComboBox<LocationConfig> locationConfigComboBox;
     private final ComboBox<UnitConfig> unitConfigComboBox;
 
-    public LocationConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote);
+    public LocationConfigCell(LocationRegistryRemote locationRegistryRemote) {
+        super(null, locationRegistryRemote, null, null, null);
 
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
 

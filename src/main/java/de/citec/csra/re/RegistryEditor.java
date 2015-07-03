@@ -5,23 +5,36 @@
  */
 package de.citec.csra.re;
 
+import de.citec.agm.remote.AgentRegistryRemote;
+import de.citec.apm.remote.AppRegistryRemote;
+import de.citec.csra.re.column.AgentConfigColumn;
+import de.citec.csra.re.column.AppConfigColumn;
 import de.citec.csra.re.column.DeviceClassColumn;
 import de.citec.csra.re.column.DescriptorColumn;
 import de.citec.csra.re.column.DeviceConfigColumn;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.column.LocationConfigColumn;
+import de.citec.csra.re.column.SceneConfigColumn;
+import de.citec.csra.re.struct.node.AgentConfigContainer;
+import de.citec.csra.re.struct.node.AppConfigContainer;
 import de.citec.csra.re.struct.node.DeviceClassList;
 import de.citec.csra.re.struct.node.DeviceConfigList;
+import de.citec.csra.re.struct.node.GenericListContainer;
 import de.citec.csra.re.struct.node.LocationConfigListContainer;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.node.SceneConfigContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.jp.JPAgentRegistryScope;
+import de.citec.jp.JPAppRegistryScope;
 import de.citec.jp.JPDeviceRegistryScope;
 import de.citec.jp.JPLocationRegistryScope;
+import de.citec.jp.JPSceneRegistryScope;
 import de.citec.jps.core.JPService;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.pattern.Observable;
+import de.citec.scm.remote.SceneRegistryRemote;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -34,6 +47,12 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.homeautomation.control.agent.AgentConfigType;
+import rst.homeautomation.control.agent.AgentRegistryType;
+import rst.homeautomation.control.app.AppConfigType;
+import rst.homeautomation.control.app.AppRegistryType;
+import rst.homeautomation.control.scene.SceneConfigType;
+import rst.homeautomation.control.scene.SceneRegistryType;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.device.DeviceRegistryType;
@@ -54,17 +73,26 @@ public class RegistryEditor extends Application {
     private static boolean modified = false;
     private final DeviceRegistryRemote deviceRemote;
     private final LocationRegistryRemote locationRemote;
+    private final SceneRegistryRemote sceneRemote;
+    private final AgentRegistryRemote agentRemote;
+    private final AppRegistryRemote appRemote;
     private TabPane registryTabPane, tabDeviceRegistryPane;
-    private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig;
+    private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig, tabAppRegistry;
     private ProgressIndicator progressDeviceRegistryIndicator;
     private ProgressIndicator progressLocationRegistryIndicator;
     private TreeTableView<Node> deviceClassTreeTableView;
     private TreeTableView<Node> deviceConfigTreeTableView;
     private TreeTableView<Node> locationConfigTreeTableView;
+    private TreeTableView<Node> sceneConfigTreeTableView;
+    private TreeTableView<Node> agentConfigTreeTableView;
+    private TreeTableView<Node> appConfigTreeTableView;
 
     public RegistryEditor() throws InstantiationException {
         this.deviceRemote = new DeviceRegistryRemote();
         this.locationRemote = new LocationRegistryRemote();
+        this.sceneRemote = new SceneRegistryRemote();
+        this.agentRemote = new AgentRegistryRemote();
+        this.appRemote = new AppRegistryRemote();
     }
 
     @Override
@@ -72,6 +100,9 @@ public class RegistryEditor extends Application {
         super.init();
         deviceRemote.init(JPService.getProperty(JPDeviceRegistryScope.class).getValue());
         locationRemote.init(JPService.getProperty(JPLocationRegistryScope.class).getValue());
+        sceneRemote.init(JPService.getProperty(JPSceneRegistryScope.class).getValue());
+        agentRemote.init(JPService.getProperty(JPAgentRegistryScope.class).getValue());
+        appRemote.init(JPService.getProperty(JPAppRegistryScope.class).getValue());
 
         registryTabPane = new TabPane();
         registryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -80,7 +111,8 @@ public class RegistryEditor extends Application {
         tabLocationRegistry = new Tab("LocationRegistry");
         tabSceneRegistry = new Tab("SceneRegistry");
         tabAgentRegistry = new Tab("AgentRegistry");
-        registryTabPane.getTabs().addAll(tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry);
+        tabAppRegistry = new Tab("AppRegistry");
+        registryTabPane.getTabs().addAll(tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabAppRegistry);
 
         progressDeviceRegistryIndicator = new ProgressIndicator();
         progressLocationRegistryIndicator = new ProgressIndicator();
@@ -88,13 +120,13 @@ public class RegistryEditor extends Application {
         deviceClassTreeTableView = new TreeTableView<>();
         deviceClassTreeTableView.setEditable(true);
         deviceClassTreeTableView.setShowRoot(false);
-        deviceClassTreeTableView.getColumns().addAll(new DescriptorColumn(deviceRemote, locationRemote), new DeviceClassColumn(deviceRemote, locationRemote));
+        deviceClassTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceClassColumn(deviceRemote));
         deviceClassTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceClassTreeTableView, DeviceClass.getDefaultInstance()));
 
         deviceConfigTreeTableView = new TreeTableView<>();
         deviceConfigTreeTableView.setEditable(true);
         deviceConfigTreeTableView.setShowRoot(false);
-        deviceConfigTreeTableView.getColumns().addAll(new DescriptorColumn(deviceRemote, locationRemote), new DeviceConfigColumn(deviceRemote, locationRemote));
+        deviceConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceConfigColumn(deviceRemote, locationRemote));
         deviceConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceConfigTreeTableView, DeviceConfig.getDefaultInstance()));
 
         tabDeviceRegistryPane = new TabPane();
@@ -109,10 +141,34 @@ public class RegistryEditor extends Application {
         locationConfigTreeTableView = new TreeTableView<>();
         locationConfigTreeTableView.setEditable(true);
         locationConfigTreeTableView.setShowRoot(false);
-        locationConfigTreeTableView.getColumns().addAll(new DescriptorColumn(deviceRemote, locationRemote), new LocationConfigColumn(deviceRemote, locationRemote));
+        locationConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new LocationConfigColumn(locationRemote));
         locationConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(locationConfigTreeTableView, LocationConfig.getDefaultInstance()));
 
         tabLocationRegistry.setContent(locationConfigTreeTableView);
+
+        sceneConfigTreeTableView = new TreeTableView<>();
+        sceneConfigTreeTableView.setEditable(true);
+        sceneConfigTreeTableView.setShowRoot(false);
+        sceneConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new SceneConfigColumn(sceneRemote, locationRemote));
+        sceneConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(sceneConfigTreeTableView, SceneConfigType.SceneConfig.getDefaultInstance()));
+
+        tabSceneRegistry.setContent(sceneConfigTreeTableView);
+
+        agentConfigTreeTableView = new TreeTableView<>();
+        agentConfigTreeTableView.setEditable(true);
+        agentConfigTreeTableView.setShowRoot(false);
+        agentConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AgentConfigColumn(agentRemote, locationRemote));
+        agentConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(agentConfigTreeTableView, AgentConfigType.AgentConfig.getDefaultInstance()));
+
+        tabAgentRegistry.setContent(agentConfigTreeTableView);
+
+        appConfigTreeTableView = new TreeTableView<>();
+        appConfigTreeTableView.setEditable(true);
+        appConfigTreeTableView.setShowRoot(false);
+        appConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AppConfigColumn(appRemote, locationRemote));
+        appConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(appConfigTreeTableView, AppConfigType.AppConfig.getDefaultInstance()));
+
+        tabAppRegistry.setContent(appConfigTreeTableView);
     }
 
     @Override
@@ -140,6 +196,39 @@ public class RegistryEditor extends Application {
                 ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
             }
 
+            sceneRemote.activate();
+            sceneRemote.addObserver((Observable<SceneRegistryType.SceneRegistry> source, SceneRegistryType.SceneRegistry data) -> {
+                updateTabSceneRegistry();
+            });
+
+            try {
+                sceneRemote.requestStatus();
+            } catch (CouldNotPerformException ex) {
+                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+            }
+
+            agentRemote.activate();
+            agentRemote.addObserver((Observable<AgentRegistryType.AgentRegistry> source, AgentRegistryType.AgentRegistry data) -> {
+                updateTabAgentRegistry();
+            });
+
+            try {
+                agentRemote.requestStatus();
+            } catch (CouldNotPerformException ex) {
+                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+            }
+
+            appRemote.activate();
+            appRemote.addObserver((Observable<AppRegistryType.AppRegistry> source, AppRegistryType.AppRegistry data) -> {
+                updateTabAppRegistry();
+            });
+
+            try {
+                appRemote.requestStatus();
+            } catch (CouldNotPerformException ex) {
+                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+            }
+
             Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
             scene.getStylesheets().add("test.css");
             primaryStage.setTitle("Registry Editor");
@@ -161,7 +250,14 @@ public class RegistryEditor extends Application {
     public void stop() throws Exception {
         deviceRemote.shutdown();
         locationRemote.shutdown();
+        sceneRemote.shutdown();
+        agentRemote.shutdown();
+        appRemote.shutdown();
         super.stop();
+    }
+
+    public DescriptorColumn getDescriptorColumn() {
+        return new DescriptorColumn(deviceRemote, locationRemote, sceneRemote, agentRemote, appRemote);
     }
 
     private void updateTabDeviceRegistry() {
@@ -212,6 +308,72 @@ public class RegistryEditor extends Application {
                 } catch (CouldNotPerformException ex) {
                     logger.error("Location registry not available!", ex);
                     tabLocationRegistry.setContent(new Label("Error: " + ex.getMessage()));
+                }
+            }
+        });
+    }
+
+    private void updateTabSceneRegistry() {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (!sceneRemote.isConnected()) {
+                    tabSceneRegistry.setContent(progressLocationRegistryIndicator);
+                    return;
+                }
+                try {
+                    if (!modified) {
+                        SceneRegistryType.SceneRegistry data = sceneRemote.getData();
+                        sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistryType.SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder(), SceneConfigContainer.class));
+                    }
+                } catch (CouldNotPerformException ex) {
+                    logger.error("Scene registry not available!", ex);
+                    tabSceneRegistry.setContent(new Label("Error: " + ex.getMessage()));
+                }
+            }
+        });
+    }
+
+    private void updateTabAgentRegistry() {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (!agentRemote.isConnected()) {
+                    tabAgentRegistry.setContent(progressLocationRegistryIndicator);
+                    return;
+                }
+                try {
+                    if (!modified) {
+                        AgentRegistryType.AgentRegistry data = agentRemote.getData();
+                        agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistryType.AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder(), AgentConfigContainer.class));
+                    }
+                } catch (CouldNotPerformException ex) {
+                    logger.error("Agent registry not available!", ex);
+                    tabAgentRegistry.setContent(new Label("Error: " + ex.getMessage()));
+                }
+            }
+        });
+    }
+
+    private void updateTabAppRegistry() {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                if (!appRemote.isConnected()) {
+                    tabAgentRegistry.setContent(progressLocationRegistryIndicator);
+                    return;
+                }
+                try {
+                    if (!modified) {
+                        AppRegistryType.AppRegistry data = appRemote.getData();
+                        appConfigTreeTableView.setRoot(new GenericListContainer(AppRegistryType.AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder(), AppConfigContainer.class));
+                    }
+                } catch (CouldNotPerformException ex) {
+                    logger.error("App registry not available!", ex);
+                    tabAppRegistry.setContent(new Label("Error: " + ex.getMessage()));
                 }
             }
         });

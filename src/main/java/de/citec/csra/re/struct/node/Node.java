@@ -12,6 +12,11 @@ package de.citec.csra.re.struct.node;
 public interface Node {
 
     public String getDescriptor();
-    
+
+    /**
+     * Used by the tree table column to fill its cells with values.
+     *
+     * @return itself
+     */
     public Node getContext();
 }

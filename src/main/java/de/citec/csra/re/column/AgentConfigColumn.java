@@ -5,10 +5,10 @@
  */
 package de.citec.csra.re.column;
 
-import de.citec.lm.remote.LocationRegistryRemote;
-import de.citec.csra.re.cellfactory.DeviceClassCell;
+import de.citec.agm.remote.AgentRegistryRemote;
+import de.citec.csra.re.cellfactory.AgentConfigCell;
 import de.citec.csra.re.struct.node.Node;
-import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.lm.remote.LocationRegistryRemote;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
@@ -17,17 +17,17 @@ import javafx.util.Callback;
  *
  * @author thuxohl
  */
-public class DeviceClassColumn extends ValueColumn {
+public class AgentConfigColumn extends ValueColumn {
 
-    public DeviceClassColumn(DeviceRegistryRemote deviceRegistryRemote) {
+    public AgentConfigColumn(AgentRegistryRemote agentRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super();
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
 
             @Override
             public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-                return new DeviceClassCell(deviceRegistryRemote);
+                return new AgentConfigCell(agentRegistryRemote, locationRegistryRemote);
             }
         });
     }
-
+    
 }

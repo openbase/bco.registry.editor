@@ -5,9 +5,12 @@
  */
 package de.citec.csra.re.cellfactory;
 
+import de.citec.agm.remote.AgentRegistryRemote;
+import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.scm.remote.SceneRegistryRemote;
 
 /**
  *
@@ -15,8 +18,8 @@ import de.citec.dm.remote.DeviceRegistryRemote;
  */
 public class DescriptionCell extends RowCell {
     
-    public DescriptionCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote);
+    public DescriptionCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
+        super(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
     }
     
     @Override
