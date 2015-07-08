@@ -22,6 +22,14 @@ public class DeviceClassContainer extends SendableNode<DeviceClass.Builder> {
         super.add(new BindingConfigContainer(deviceClass.getBindingConfigBuilder()));
         super.add(new UnitTemplateListContainer(deviceClass));
         super.add(deviceClass.getCompany(), "company");
+        
+        // TODO Tamino: implement global exception handling if gui elements are not able to init.
+        try {
+            super.add(new MetaConfigContainer(deviceClass.getMetaConfigBuilder()));
+        } catch (de.citec.jul.exception.InstantiationException ex) {
+            ExceptionPrinter.printHistory(logger, ex);
+        }
+        
         super.add(deviceClass.getDescription(), "description");
     }
 }

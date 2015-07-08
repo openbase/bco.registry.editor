@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
+import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.extension.rsb.scope.ScopeGenerator;
 import rst.spatial.LocationConfigType.LocationConfig;
 
@@ -23,5 +24,14 @@ public class LocationConfigContainer extends SendableNode<LocationConfig.Builder
         super.add(new UnitIdListContainer(location));
         super.add(new PositionContainer(location.getPositionBuilder()));
         super.add(new ChildLocationListContainer(location));
+        
+        // TODO Tamino: implement global exception handling if gui elements are not able to init.
+        try {
+            super.add(new MetaConfigContainer(location.getMetaConfigBuilder()));
+        } catch (de.citec.jul.exception.InstantiationException ex) {
+            ExceptionPrinter.printHistory(logger, ex);
+        }
+        
+        super.add(location.getDescription(), "description");
     }
 }
