@@ -35,6 +35,9 @@ import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.pattern.Observable;
 import de.citec.scm.remote.SceneRegistryRemote;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -80,6 +83,9 @@ public class RegistryEditor extends Application {
     private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig, tabAppRegistry;
     private ProgressIndicator progressDeviceRegistryIndicator;
     private ProgressIndicator progressLocationRegistryIndicator;
+    private ProgressIndicator progressSceneRegistryIndicator;
+    private ProgressIndicator progressAgentRegistryIndicator;
+    private ProgressIndicator progressAppRegistryIndicator;
     private TreeTableView<Node> deviceClassTreeTableView;
     private TreeTableView<Node> deviceConfigTreeTableView;
     private TreeTableView<Node> locationConfigTreeTableView;
@@ -116,6 +122,9 @@ public class RegistryEditor extends Application {
 
         progressDeviceRegistryIndicator = new ProgressIndicator();
         progressLocationRegistryIndicator = new ProgressIndicator();
+        progressSceneRegistryIndicator = new ProgressIndicator();
+        progressAgentRegistryIndicator = new ProgressIndicator();
+        progressAppRegistryIndicator = new ProgressIndicator();
 
         deviceClassTreeTableView = new TreeTableView<>();
         deviceClassTreeTableView.setEditable(true);
@@ -173,77 +182,134 @@ public class RegistryEditor extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        try {
-            deviceRemote.activate();
-            deviceRemote.addObserver((Observable<DeviceRegistryType.DeviceRegistry> source, DeviceRegistryType.DeviceRegistry data) -> {
-                updateTabDeviceRegistry();
-            });
 
-            try {
-                deviceRemote.requestStatus();
-            } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-            }
-
-            locationRemote.activate();
-            locationRemote.addObserver((Observable<LocationRegistryType.LocationRegistry> source, LocationRegistryType.LocationRegistry data) -> {
-                updateTabLocationRegistry();
-            });
-
-            try {
-                locationRemote.requestStatus();
-            } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-            }
-
-            sceneRemote.activate();
-            sceneRemote.addObserver((Observable<SceneRegistryType.SceneRegistry> source, SceneRegistryType.SceneRegistry data) -> {
-                updateTabSceneRegistry();
-            });
-
-            try {
-                sceneRemote.requestStatus();
-            } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-            }
-
-            agentRemote.activate();
-            agentRemote.addObserver((Observable<AgentRegistryType.AgentRegistry> source, AgentRegistryType.AgentRegistry data) -> {
-                updateTabAgentRegistry();
-            });
-
-            try {
-                agentRemote.requestStatus();
-            } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-            }
-
-            appRemote.activate();
-            appRemote.addObserver((Observable<AppRegistryType.AppRegistry> source, AppRegistryType.AppRegistry data) -> {
-                updateTabAppRegistry();
-            });
-
-            try {
-                appRemote.requestStatus();
-            } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-            }
-
-            Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
-            scene.getStylesheets().add("test.css");
-            primaryStage.setTitle("Registry Editor");
-            primaryStage.getIcons().add(new Image("registry-editor.png"));
+        Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
+        scene.getStylesheets().add("test.css");
+        primaryStage.setTitle("Registry Editor");
+        primaryStage.getIcons().add(new Image("registry-editor.png"));
 //        primaryStage.setFullScreen(true);
 //        primaryStage.setFullScreenExitKeyCombination(KeyCombination.ALT_ANY);
-            primaryStage.setScene(scene);
-            primaryStage.show();
+        primaryStage.setScene(scene);
+        primaryStage.show();
 
-            updateTabLocationRegistry();
-            updateTabDeviceRegistry();
-            logger.info(APP_NAME + " successfully started.");
-        } catch (Exception ex) {
-            throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-        }
+        updateTabLocationRegistry();
+        updateTabDeviceRegistry();
+        updateTabSceneRegistry();
+        updateTabAgentRegistry();
+        updateTabAppRegistry();
+        logger.info(APP_NAME + " successfully started.");
+
+        ExecutorService executerService = Executors.newFixedThreadPool(10);
+
+        executerService.submit(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                try {
+                    deviceRemote.activate();
+                    deviceRemote.addObserver((Observable<DeviceRegistryType.DeviceRegistry> source, DeviceRegistryType.DeviceRegistry data) -> {
+                        updateTabDeviceRegistry();
+                    });
+
+                    try {
+                        deviceRemote.requestStatus();
+                    } catch (CouldNotPerformException ex) {
+                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                    }
+                } catch (Exception ex) {
+                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                }
+                return null;
+            }
+        });
+
+        executerService.submit(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                try {
+                    locationRemote.activate();
+                    locationRemote.addObserver((Observable<LocationRegistryType.LocationRegistry> source, LocationRegistryType.LocationRegistry data) -> {
+                        updateTabLocationRegistry();
+                    });
+
+                    try {
+                        locationRemote.requestStatus();
+                    } catch (CouldNotPerformException ex) {
+                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                    }
+                } catch (Exception ex) {
+                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                }
+                return null;
+            }
+        });
+
+        executerService.submit(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                try {
+                    sceneRemote.activate();
+                    sceneRemote.addObserver((Observable<SceneRegistryType.SceneRegistry> source, SceneRegistryType.SceneRegistry data) -> {
+                        updateTabSceneRegistry();
+                    });
+
+                    try {
+                        sceneRemote.requestStatus();
+                    } catch (CouldNotPerformException ex) {
+                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                    }
+                } catch (Exception ex) {
+                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                }
+                return null;
+            }
+        });
+
+        executerService.submit(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                try {
+                    agentRemote.activate();
+                    agentRemote.addObserver((Observable<AgentRegistryType.AgentRegistry> source, AgentRegistryType.AgentRegistry data) -> {
+                        updateTabAgentRegistry();
+                    });
+
+                    try {
+                        agentRemote.requestStatus();
+                    } catch (CouldNotPerformException ex) {
+                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                    }
+                } catch (Exception ex) {
+                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                }
+                return null;
+            }
+        });
+
+        executerService.submit(new Callable<Void>() {
+
+            @Override
+            public Void call() throws Exception {
+                try {
+                    appRemote.activate();
+                    appRemote.addObserver((Observable<AppRegistryType.AppRegistry> source, AppRegistryType.AppRegistry data) -> {
+                        updateTabAppRegistry();
+                    });
+
+                    try {
+                        appRemote.requestStatus();
+                    } catch (CouldNotPerformException ex) {
+                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                    }
+                } catch (Exception ex) {
+                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                }
+                return null;
+            }
+        });
     }
 
     @Override
@@ -319,13 +385,14 @@ public class RegistryEditor extends Application {
             @Override
             public void run() {
                 if (!sceneRemote.isConnected()) {
-                    tabSceneRegistry.setContent(progressLocationRegistryIndicator);
+                    tabSceneRegistry.setContent(progressSceneRegistryIndicator);
                     return;
                 }
                 try {
                     if (!modified) {
                         SceneRegistryType.SceneRegistry data = sceneRemote.getData();
-                        sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistryType.SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder(), SceneConfigContainer.class));
+                        sceneConfigTreeTableView
+                                .setRoot(new GenericListContainer(SceneRegistryType.SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder(), SceneConfigContainer.class));
                     }
                 } catch (CouldNotPerformException ex) {
                     logger.error("Scene registry not available!", ex);
@@ -341,13 +408,14 @@ public class RegistryEditor extends Application {
             @Override
             public void run() {
                 if (!agentRemote.isConnected()) {
-                    tabAgentRegistry.setContent(progressLocationRegistryIndicator);
+                    tabAgentRegistry.setContent(progressAgentRegistryIndicator);
                     return;
                 }
                 try {
                     if (!modified) {
                         AgentRegistryType.AgentRegistry data = agentRemote.getData();
-                        agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistryType.AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder(), AgentConfigContainer.class));
+                        agentConfigTreeTableView
+                                .setRoot(new GenericListContainer(AgentRegistryType.AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder(), AgentConfigContainer.class));
                     }
                 } catch (CouldNotPerformException ex) {
                     logger.error("Agent registry not available!", ex);
@@ -363,13 +431,14 @@ public class RegistryEditor extends Application {
             @Override
             public void run() {
                 if (!appRemote.isConnected()) {
-                    tabAgentRegistry.setContent(progressLocationRegistryIndicator);
+                    tabAppRegistry.setContent(progressAppRegistryIndicator);
                     return;
                 }
                 try {
                     if (!modified) {
                         AppRegistryType.AppRegistry data = appRemote.getData();
-                        appConfigTreeTableView.setRoot(new GenericListContainer(AppRegistryType.AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder(), AppConfigContainer.class));
+                        appConfigTreeTableView
+                                .setRoot(new GenericListContainer(AppRegistryType.AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder(), AppConfigContainer.class));
                     }
                 } catch (CouldNotPerformException ex) {
                     logger.error("App registry not available!", ex);
@@ -393,7 +462,11 @@ public class RegistryEditor extends Application {
         JPService.setApplicationName(APP_NAME);
         JPService.registerProperty(JPDeviceRegistryScope.class);
         JPService.registerProperty(JPLocationRegistryScope.class);
+        JPService.registerProperty(JPSceneRegistryScope.class);
+        JPService.registerProperty(JPAgentRegistryScope.class);
+        JPService.registerProperty(JPAppRegistryScope.class);
         JPService.parseAndExitOnError(args);
+
         launch(args);
     }
 }
