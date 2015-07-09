@@ -183,20 +183,20 @@ public class RegistryEditor extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
-        scene.getStylesheets().add("test.css");
-        primaryStage.setTitle("Registry Editor");
-        primaryStage.getIcons().add(new Image("registry-editor.png"));
-//        primaryStage.setFullScreen(true);
-//        primaryStage.setFullScreenExitKeyCombination(KeyCombination.ALT_ANY);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
         updateTabLocationRegistry();
         updateTabDeviceRegistry();
         updateTabSceneRegistry();
         updateTabAgentRegistry();
         updateTabAppRegistry();
+
+        Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
+        scene.getStylesheets().add("test.css");
+        primaryStage.setTitle("Registry Editor");
+        primaryStage.getIcons().add(new Image("registry-editor.png"));
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+        
         logger.info(APP_NAME + " successfully started.");
 
         ExecutorService executerService = Executors.newFixedThreadPool(10);
@@ -370,6 +370,7 @@ public class RegistryEditor extends Application {
                             }
                         }
                         locationConfigTreeTableView.setRoot(new LocationConfigListContainer(rootLocations));
+                        tabLocationRegistry.setContent(locationConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {
                     logger.error("Location registry not available!", ex);
@@ -393,6 +394,7 @@ public class RegistryEditor extends Application {
                         SceneRegistryType.SceneRegistry data = sceneRemote.getData();
                         sceneConfigTreeTableView
                                 .setRoot(new GenericListContainer(SceneRegistryType.SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder(), SceneConfigContainer.class));
+                        tabSceneRegistry.setContent(sceneConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {
                     logger.error("Scene registry not available!", ex);
@@ -416,6 +418,7 @@ public class RegistryEditor extends Application {
                         AgentRegistryType.AgentRegistry data = agentRemote.getData();
                         agentConfigTreeTableView
                                 .setRoot(new GenericListContainer(AgentRegistryType.AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder(), AgentConfigContainer.class));
+                        tabAgentRegistry.setContent(agentConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {
                     logger.error("Agent registry not available!", ex);
@@ -439,6 +442,7 @@ public class RegistryEditor extends Application {
                         AppRegistryType.AppRegistry data = appRemote.getData();
                         appConfigTreeTableView
                                 .setRoot(new GenericListContainer(AppRegistryType.AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder(), AppConfigContainer.class));
+                        tabAppRegistry.setContent(appConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {
                     logger.error("App registry not available!", ex);
