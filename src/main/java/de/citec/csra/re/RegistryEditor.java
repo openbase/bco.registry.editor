@@ -192,7 +192,13 @@ public class RegistryEditor extends Application {
         Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
         scene.getStylesheets().add("test.css");
         primaryStage.setTitle("Registry Editor");
-        primaryStage.getIcons().add(new Image("registry-editor.png"));
+        try {
+            logger.info("Try to load icon...");
+            primaryStage.getIcons().add(new Image("registry-editor.png"));
+            logger.info("App icon loaded...");
+        } catch (Exception ex) {
+            ExceptionPrinter.printHistory(logger, new CouldNotPerformException("Could not load app icon!", ex));
+        }
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -324,6 +330,7 @@ public class RegistryEditor extends Application {
 
     public DescriptorColumn getDescriptorColumn() {
         return new DescriptorColumn(deviceRemote, locationRemote, sceneRemote, agentRemote, appRemote);
+
     }
 
     private void updateTabDeviceRegistry() {
