@@ -78,6 +78,7 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
             }
             sendable = (NodeContainer) sendable.getParent().getValue();
         }
+        logger.info("Sendable ["+sendable.getDescriptor()+"] set to change");
         ((SendableNode) sendable).setChanged(true);
     }
 }

@@ -85,12 +85,16 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends T
     }
 
     private void registerLeaf(FieldDescriptor field) {
-        if ("id".equals(field.getName())) {
-            this.add(new LeafContainer(builder.getField(field), field.getName(), null, false));
-        } else if ("scope".equals(field.getName())) {
-            this.add(new LeafContainer(ScopeGenerator.generateStringRep((ScopeType.Scope) builder.getField(field)), field.getName(), null, false));
-        } else {
-            this.add(new LeafContainer(builder.getField(field), field.getName(), null));
+        if (null != field.getName()) switch (field.getName()) {
+            case "id":
+                this.add(new LeafContainer(builder.getField(field), field.getName(), null, false));
+                break;
+            case "scope":
+                this.add(new LeafContainer(ScopeGenerator.generateStringRep((ScopeType.Scope) builder.getField(field)), field.getName(), null, false));
+                break;
+            default:
+                this.add(new LeafContainer(builder.getField(field), field.getName(), null));
+                break;
         }
     }
 }
