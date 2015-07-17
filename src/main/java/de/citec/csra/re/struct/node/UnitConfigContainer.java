@@ -19,7 +19,7 @@ public class UnitConfigContainer extends NodeContainer<UnitConfig.Builder> {
         super(unitConfig.getLabel(), unitConfig);
         super.add(unitConfig.getId(), "id", false);
         super.add(unitConfig.getLabel(), "label");
-        super.add(unitConfig.getTemplate().getType(), "type", false);
+        super.add(unitConfig.getType(), "type", false);
         super.add(new PlacementConfigContainer(unitConfig.getPlacementConfigBuilder()));
         super.add(new ServiceConfigListContainer(unitConfig));
         super.add(ScopeGenerator.generateStringRep(unitConfig.getScope()), "scope", false);

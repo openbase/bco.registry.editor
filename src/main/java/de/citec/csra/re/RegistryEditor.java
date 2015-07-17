@@ -202,7 +202,6 @@ public class RegistryEditor extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        
         logger.info(APP_NAME + " successfully started.");
 
         ExecutorService executerService = Executors.newFixedThreadPool(10);
@@ -370,13 +369,7 @@ public class RegistryEditor extends Application {
                 try {
                     if (!modified) {
                         LocationRegistryType.LocationRegistry data = locationRemote.getData();
-                        LocationRegistryType.LocationRegistry.Builder rootLocations = LocationRegistryType.LocationRegistry.newBuilder();
-                        for (LocationConfig locationConfig : data.getLocationConfigList()) {
-                            if (locationConfig.getRoot()) {
-                                rootLocations.addLocationConfig(locationConfig);
-                            }
-                        }
-                        locationConfigTreeTableView.setRoot(new LocationConfigListContainer(rootLocations));
+                        locationConfigTreeTableView.setRoot(new LocationConfigListContainer(data.toBuilder()));
                         tabLocationRegistry.setContent(locationConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {

@@ -50,7 +50,7 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
     public <S> void add(S value, String descriptor, int index) {
         this.add(new LeafContainer(value, descriptor, this, index));
     }
-    
+
     // TODO tamino: generic not specified ! S == Object
     public <S> void add(S value, String descriptor, boolean editable) {
         this.add(new LeafContainer(value, descriptor, this, editable));
@@ -72,13 +72,9 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
 
     public void setSendableChanged() {
         NodeContainer sendable = this;
-        while (sendable instanceof LocationConfigContainer || !(sendable instanceof SendableNode)) {
-            if (sendable instanceof LocationConfigContainer && ((LocationConfigContainer) sendable).getBuilder().getRoot()) {
-                break;
-            }
+        while (!(sendable instanceof SendableNode)) {
             sendable = (NodeContainer) sendable.getParent().getValue();
         }
-        logger.info("Sendable ["+sendable.getDescriptor()+"] set to change");
         ((SendableNode) sendable).setChanged(true);
     }
 }

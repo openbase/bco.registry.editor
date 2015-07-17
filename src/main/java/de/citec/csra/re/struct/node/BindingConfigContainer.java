@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
+import de.citec.jul.exception.ExceptionPrinter;
 import rst.homeautomation.binding.BindingConfigType.BindingConfig;
 
 /**
@@ -16,9 +17,12 @@ public class BindingConfigContainer extends NodeContainer<BindingConfig.Builder>
     public BindingConfigContainer(BindingConfig.Builder bindingConfig) {
         super("binding_config", bindingConfig);
         super.add(bindingConfig.getType(), "type");
-        super.add(new OpenHABBindingConfigContainer(bindingConfig.getOpenhabBindingConfigBuilder()));
-        super.add(new MieleAtHomeBindingConfigContainer(bindingConfig.getMieleAtHomeBindingConfigBuilder()));
-        super.add(new FloorBaseBindingConfigContainer(bindingConfig.getFloorBaseBindingConfigBuilder()));
+
+        try {
+            super.add(new MetaConfigContainer(bindingConfig.getMetaConfigBuilder()));
+        } catch (de.citec.jul.exception.InstantiationException ex) {
+            ExceptionPrinter.printHistory(logger, ex);
+        }
     }
 
 }

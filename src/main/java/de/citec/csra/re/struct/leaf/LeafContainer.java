@@ -112,28 +112,28 @@ public class LeafContainer<T> implements Leaf<T> {
             parent.getBuilder().setRepeatedField(field, index, value);
         }
 
-        if (value instanceof DeviceClass) {
-            DeviceClass deviceClass = (DeviceClass) value;
-            DeviceConfigContainer container = (DeviceConfigContainer) this.getParent();
-
-            for (int i = 0; i < container.getChildren().size(); i++) {
-                Node item = container.getChildren().get(i).getValue();
-                if (item instanceof NodeContainer && ((NodeContainer) item).getDescriptor().equals("unit_configs")) {
-                    container.getChildren().remove(i);
-                    i--;
-                }
-            }
-
-            container.getBuilder().clearUnitConfig();
-            for (UnitTemplate unitTemplate : deviceClass.getUnitTemplateList()) {
-                UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setTemplate(unitTemplate);
-                for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unitTemplate.getServiceTypeList()) {
-                    unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));
-                }
-                container.getBuilder().addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
-            }
-            container.add(new UnitConfigListContainer(container.getBuilder()));
-        }
+//        if (value instanceof DeviceClass) {
+//            DeviceClass deviceClass = (DeviceClass) value;
+//            DeviceConfigContainer container = (DeviceConfigContainer) this.getParent();
+//
+//            for (int i = 0; i < container.getChildren().size(); i++) {
+//                Node item = container.getChildren().get(i).getValue();
+//                if (item instanceof NodeContainer && ((NodeContainer) item).getDescriptor().equals("unit_configs")) {
+//                    container.getChildren().remove(i);
+//                    i--;
+//                }
+//            }
+//
+//            container.getBuilder().clearUnitConfig();
+//            for (UnitTemplate unitTemplate : deviceClass.getUnitTemplateList()) {
+//                UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setTemplate(unitTemplate);
+//                for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unitTemplate.getServiceTypeList()) {
+//                    unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));
+//                }
+//                container.getBuilder().addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
+//            }
+//            container.add(new UnitConfigListContainer(container.getBuilder()));
+//        }
 
         parent.setSendableChanged();
     }

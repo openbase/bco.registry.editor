@@ -23,9 +23,9 @@ public class DeviceConfigContainer extends SendableNode<DeviceConfig.Builder> {
         super.add(new PlacementConfigContainer(deviceConfig.getPlacementConfigBuilder()));
         super.add(ScopeGenerator.generateStringRep(deviceConfig.getScope()), "scope", false);
         super.add(new InventoryStateContainer(deviceConfig.getInventoryStateBuilder()));
-        super.add(deviceConfig.getDeviceClass(), "device_class");
+        super.add(deviceConfig.getDeviceClassId(), "device_class_id");
         super.add(new UnitConfigListContainer(deviceConfig));
-        
+
         // TODO Tamino: implement global exception handling if gui elements are not able to init.
         try {
             super.add(new MetaConfigContainer(deviceConfig.getMetaConfigBuilder()));

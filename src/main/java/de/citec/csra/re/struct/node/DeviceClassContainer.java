@@ -20,7 +20,7 @@ public class DeviceClassContainer extends SendableNode<DeviceClass.Builder> {
         super.add(deviceClass.getLabel(), "label");
         super.add(deviceClass.getProductNumber(), "product_number");
         super.add(new BindingConfigContainer(deviceClass.getBindingConfigBuilder()));
-        super.add(new UnitTemplateListContainer(deviceClass));
+        super.add(new UnitTemplateConfigListContainer(deviceClass));
         super.add(deviceClass.getCompany(), "company");
         
         // TODO Tamino: implement global exception handling if gui elements are not able to init.
