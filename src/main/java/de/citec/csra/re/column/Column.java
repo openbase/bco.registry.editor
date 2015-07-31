@@ -5,7 +5,7 @@
  */
 package de.citec.csra.re.column;
 
-import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.Node;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 

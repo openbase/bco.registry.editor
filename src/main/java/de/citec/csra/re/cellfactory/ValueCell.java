@@ -8,14 +8,9 @@ package de.citec.csra.re.cellfactory;
 import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.lm.remote.LocationRegistryRemote;
-import de.citec.csra.re.struct.leaf.Leaf;
-import de.citec.csra.re.struct.leaf.LeafContainer;
-import de.citec.csra.re.struct.node.DeviceClassContainer;
-import de.citec.csra.re.struct.node.DeviceConfigContainer;
-import de.citec.csra.re.struct.node.DeviceConfigGroupContainer;
-import de.citec.csra.re.struct.node.EntryContainer;
-import de.citec.csra.re.struct.node.Node;
-import de.citec.csra.re.struct.node.UnitConfigContainer;
+import de.citec.csra.re.struct.Leaf;
+import de.citec.csra.re.struct.LeafContainer;
+import de.citec.csra.re.struct.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
 import java.text.DateFormat;
@@ -198,8 +193,8 @@ public abstract class ValueCell extends RowCell {
                     state = ActivationStateType.ActivationState.State.DEACTIVE;
                 }
                 leaf.setValue(state);
-                    setText(state.toString());
-                    commitEdit(leaf);
+                setText(state.toString());
+                commitEdit(leaf);
             }
         });
     }
@@ -286,17 +281,17 @@ public abstract class ValueCell extends RowCell {
             }
         }
 
-        if (item instanceof DeviceClassContainer) {
-            setText(((DeviceClassContainer) item).getBuilder().getDescription());
-        } else if (item instanceof DeviceConfigContainer) {
-            setText(((DeviceConfigContainer) item).getBuilder().getDescription());
-        } else if (item instanceof UnitConfigContainer) {
-            setText(((UnitConfigContainer) item).getBuilder().getDescription());
-        } else if (item instanceof DeviceConfigGroupContainer) {
-            setText(((DeviceConfigGroupContainer) item).getDeviceClass().getDescription());
-        } else if (item instanceof EntryContainer) {
-            setText(((EntryContainer) item).getDescription());
-        }
+//        if (item instanceof DeviceClassContainer) {
+//            setText(((DeviceClassContainer) item).getBuilder().getDescription());
+//        } else if (item instanceof DeviceConfigContainer) {
+//            setText(((DeviceConfigContainer) item).getBuilder().getDescription());
+//        } else if (item instanceof UnitConfigContainer) {
+//            setText(((UnitConfigContainer) item).getBuilder().getDescription());
+//        } else if (item instanceof DeviceConfigGroupContainer) {
+//            setText(((DeviceConfigGroupContainer) item).getDeviceClass().getDescription());
+//        } else if (item instanceof EntryContainer) {
+//            setText(((EntryContainer) item).getDescription());
+//        }
     }
 
     private Label makeSelectable(Label label) {

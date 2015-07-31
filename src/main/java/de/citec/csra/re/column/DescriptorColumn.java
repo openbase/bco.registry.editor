@@ -9,7 +9,7 @@ import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.cellfactory.DescriptionCell;
-import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
 import java.util.Comparator;

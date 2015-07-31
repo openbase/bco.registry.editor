@@ -7,9 +7,8 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.re.RegistryEditor;
 import de.citec.lm.remote.LocationRegistryRemote;
-import de.citec.csra.re.struct.leaf.Leaf;
-import de.citec.csra.re.struct.node.DeviceConfigContainer;
-import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.Leaf;
+import de.citec.csra.re.struct.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
 import javafx.application.Platform;
@@ -40,65 +39,65 @@ public class DeviceConfigCell extends ValueCell {
     public DeviceConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote, null, null, null);
 
-        applyButton.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                Thread thread = new Thread(
-                        new Task<Boolean>() {
-                            @Override
-                            protected Boolean call() throws Exception {
-                                RegistryEditor.setModified(false);
-                                DeviceConfigContainer container = (DeviceConfigContainer) getItem();
-                                DeviceConfig deviceConfig = container.getBuilder().build();
-                                try {
-                                    if (deviceRegistryRemote.containsDeviceConfig(deviceConfig)) {
-                                        deviceRegistryRemote.updateDeviceConfig(deviceConfig);
-                                    } else {
-                                        deviceRegistryRemote.registerDeviceConfig(deviceConfig);
-                                        container.setNewNode(false);
-                                    }
-                                    container.setChanged(false);
-                                } catch (CouldNotPerformException ex) {
-                                    logger.warn("Could not register or update device config [" + deviceConfig + "]", ex);
-                                }
-                                return true;
-                            }
-                        });
-                thread.setDaemon(true);
-                thread.start();
-            }
-        });
-
-        cancel.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                Thread thread = new Thread(
-                        new Task<Boolean>() {
-                            @Override
-                            protected Boolean call() throws Exception {
-                                RegistryEditor.setModified(false);
-                                DeviceConfigContainer container = (DeviceConfigContainer) getItem();
-
-                                DeviceConfig deviceConfig = container.getBuilder().build();
-                                try {
-                                    if (container.getNewNode()) {
-                                        container.getParent().getChildren().remove(container);
-                                    } else {
-                                        int index = container.getParent().getChildren().indexOf(container);
-                                        container.getParent().getChildren().set(index, new DeviceConfigContainer(deviceRegistryRemote.getDeviceConfigById(deviceConfig.getId()).toBuilder()));
-                                    }
-                                } catch (CouldNotPerformException ex) {
-                                    logger.warn("Could cancel update of [" + deviceConfig + "]", ex);
-                                }
-                                return true;
-                            }
-                        });
-                thread.setDaemon(true);
-                thread.start();
-            }
-        });
+//        applyButton.setOnAction(new EventHandler<ActionEvent>() {
+//
+//            @Override
+//            public void handle(ActionEvent event) {
+//                Thread thread = new Thread(
+//                        new Task<Boolean>() {
+//                            @Override
+//                            protected Boolean call() throws Exception {
+//                                RegistryEditor.setModified(false);
+//                                DeviceConfigContainer container = (DeviceConfigContainer) getItem();
+//                                DeviceConfig deviceConfig = container.getBuilder().build();
+//                                try {
+//                                    if (deviceRegistryRemote.containsDeviceConfig(deviceConfig)) {
+//                                        deviceRegistryRemote.updateDeviceConfig(deviceConfig);
+//                                    } else {
+//                                        deviceRegistryRemote.registerDeviceConfig(deviceConfig);
+//                                        container.setNewNode(false);
+//                                    }
+//                                    container.setChanged(false);
+//                                } catch (CouldNotPerformException ex) {
+//                                    logger.warn("Could not register or update device config [" + deviceConfig + "]", ex);
+//                                }
+//                                return true;
+//                            }
+//                        });
+//                thread.setDaemon(true);
+//                thread.start();
+//            }
+//        });
+//
+//        cancel.setOnAction(new EventHandler<ActionEvent>() {
+//
+//            @Override
+//            public void handle(ActionEvent event) {
+//                Thread thread = new Thread(
+//                        new Task<Boolean>() {
+//                            @Override
+//                            protected Boolean call() throws Exception {
+//                                RegistryEditor.setModified(false);
+//                                DeviceConfigContainer container = (DeviceConfigContainer) getItem();
+//
+//                                DeviceConfig deviceConfig = container.getBuilder().build();
+//                                try {
+//                                    if (container.getNewNode()) {
+//                                        container.getParent().getChildren().remove(container);
+//                                    } else {
+//                                        int index = container.getParent().getChildren().indexOf(container);
+//                                        container.getParent().getChildren().set(index, new DeviceConfigContainer(deviceRegistryRemote.getDeviceConfigById(deviceConfig.getId()).toBuilder()));
+//                                    }
+//                                } catch (CouldNotPerformException ex) {
+//                                    logger.warn("Could cancel update of [" + deviceConfig + "]", ex);
+//                                }
+//                                return true;
+//                            }
+//                        });
+//                thread.setDaemon(true);
+//                thread.start();
+//            }
+//        });
 
         deviceClassComboBox = new ComboBox();
         deviceClassComboBox.setButtonCell(new DeviceClassComboBoxCell());
@@ -198,44 +197,44 @@ public class DeviceConfigCell extends ValueCell {
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (item instanceof DeviceConfigContainer) {
-            DeviceConfigContainer container = (DeviceConfigContainer) item;
-            if (container.getNewNode() || container.hasChanged()) {
-                setGraphic(buttonBox);
-            } else {
-                setGraphic(null);
-            }
-
-            container.getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (newValue) {
-                                setGraphic(buttonBox);
-                            } else {
-                                setGraphic(null);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
-                setGraphic(null);
-            }
-        }
+//        if (item instanceof DeviceConfigContainer) {
+//            DeviceConfigContainer container = (DeviceConfigContainer) item;
+//            if (container.getNewNode() || container.hasChanged()) {
+//                setGraphic(buttonBox);
+//            } else {
+//                setGraphic(null);
+//            }
+//
+//            container.getChanged().addListener(new ChangeListener<Boolean>() {
+//
+//                @Override
+//                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+//                    Platform.runLater(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            if (newValue) {
+//                                setGraphic(buttonBox);
+//                            } else {
+//                                setGraphic(null);
+//                            }
+//                        }
+//                    });
+//                }
+//            });
+//        } else {
+//            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
+//                setGraphic(null);
+//            }
+//        }
 
         if (item instanceof Leaf) {
             if (((Leaf) item).getValue() instanceof DeviceClass) {
-                setText(((Leaf<DeviceClass>) item).getValue().getId());
+                setText(((DeviceClass) ((Leaf) (item)).getValue()).getId());
             } else if (((Leaf) item).getDescriptor().equals("location_id")) {
-                setText(((Leaf<String>) item).getValue());
+                setText((String) ((Leaf) (item)).getValue());
             } else if (((Leaf) item).getDescriptor().equals("location_config")) {
-                setText(((Leaf<LocationConfig>) item).getValue().getId());
+                setText(((LocationConfig) ((Leaf) (item)).getValue()).getId());
             }
         }
     }

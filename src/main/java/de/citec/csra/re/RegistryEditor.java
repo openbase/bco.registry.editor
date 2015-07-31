@@ -5,24 +5,17 @@
  */
 package de.citec.csra.re;
 
+import com.google.protobuf.Descriptors;
 import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
-import de.citec.csra.re.column.AgentConfigColumn;
-import de.citec.csra.re.column.AppConfigColumn;
-import de.citec.csra.re.column.DeviceClassColumn;
 import de.citec.csra.re.column.DescriptorColumn;
 import de.citec.csra.re.column.DeviceConfigColumn;
+import de.citec.csra.re.TreeTableViewContextMenu.SendableType;
 import de.citec.lm.remote.LocationRegistryRemote;
-import de.citec.csra.re.column.LocationConfigColumn;
-import de.citec.csra.re.column.SceneConfigColumn;
-import de.citec.csra.re.struct.node.AgentConfigContainer;
-import de.citec.csra.re.struct.node.AppConfigContainer;
-import de.citec.csra.re.struct.node.DeviceClassList;
-import de.citec.csra.re.struct.node.DeviceConfigList;
-import de.citec.csra.re.struct.node.GenericListContainer;
-import de.citec.csra.re.struct.node.LocationConfigListContainer;
-import de.citec.csra.re.struct.node.Node;
-import de.citec.csra.re.struct.node.SceneConfigContainer;
+import de.citec.csra.re.struct.GenericGroupContainer;
+import de.citec.csra.re.struct.GenericListContainer;
+import de.citec.csra.re.struct.Node;
+import de.citec.csra.re.util.FieldGroup;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jp.JPAgentRegistryScope;
 import de.citec.jp.JPAppRegistryScope;
@@ -50,17 +43,13 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.homeautomation.control.agent.AgentConfigType;
-import rst.homeautomation.control.agent.AgentRegistryType;
-import rst.homeautomation.control.app.AppConfigType;
-import rst.homeautomation.control.app.AppRegistryType;
-import rst.homeautomation.control.scene.SceneConfigType;
-import rst.homeautomation.control.scene.SceneRegistryType;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
+import rst.homeautomation.control.agent.AgentRegistryType.AgentRegistry;
+import rst.homeautomation.control.app.AppRegistryType.AppRegistry;
+import rst.homeautomation.control.scene.SceneRegistryType.SceneRegistry;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.homeautomation.device.DeviceRegistryType;
-import rst.spatial.LocationConfigType.LocationConfig;
-import rst.spatial.LocationRegistryType;
+import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
+import rst.spatial.LocationRegistryType.LocationRegistry;
+import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
  *
@@ -129,14 +118,14 @@ public class RegistryEditor extends Application {
         deviceClassTreeTableView = new TreeTableView<>();
         deviceClassTreeTableView.setEditable(true);
         deviceClassTreeTableView.setShowRoot(false);
-        deviceClassTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceClassColumn(deviceRemote));
-        deviceClassTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceClassTreeTableView, DeviceClass.getDefaultInstance()));
+//        deviceClassTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceClassColumn(deviceRemote));
+        deviceClassTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceClassTreeTableView, SendableType.DEVICE_CLASS));
 
         deviceConfigTreeTableView = new TreeTableView<>();
         deviceConfigTreeTableView.setEditable(true);
         deviceConfigTreeTableView.setShowRoot(false);
         deviceConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceConfigColumn(deviceRemote, locationRemote));
-        deviceConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceConfigTreeTableView, DeviceConfig.getDefaultInstance()));
+        deviceConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceConfigTreeTableView, SendableType.DEVICE_CONFIG));
 
         tabDeviceRegistryPane = new TabPane();
         tabDeviceRegistryPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -150,32 +139,32 @@ public class RegistryEditor extends Application {
         locationConfigTreeTableView = new TreeTableView<>();
         locationConfigTreeTableView.setEditable(true);
         locationConfigTreeTableView.setShowRoot(false);
-        locationConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new LocationConfigColumn(locationRemote));
-        locationConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(locationConfigTreeTableView, LocationConfig.getDefaultInstance()));
+//        locationConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new LocationConfigColumn(locationRemote));
+        locationConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(locationConfigTreeTableView, SendableType.LOCATION_CONFIG));
 
         tabLocationRegistry.setContent(locationConfigTreeTableView);
 
         sceneConfigTreeTableView = new TreeTableView<>();
         sceneConfigTreeTableView.setEditable(true);
         sceneConfigTreeTableView.setShowRoot(false);
-        sceneConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new SceneConfigColumn(sceneRemote, locationRemote));
-        sceneConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(sceneConfigTreeTableView, SceneConfigType.SceneConfig.getDefaultInstance()));
+//        sceneConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new SceneConfigColumn(sceneRemote, locationRemote));
+        sceneConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(sceneConfigTreeTableView, SendableType.SCENE_CONFIG));
 
         tabSceneRegistry.setContent(sceneConfigTreeTableView);
 
         agentConfigTreeTableView = new TreeTableView<>();
         agentConfigTreeTableView.setEditable(true);
         agentConfigTreeTableView.setShowRoot(false);
-        agentConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AgentConfigColumn(agentRemote, locationRemote));
-        agentConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(agentConfigTreeTableView, AgentConfigType.AgentConfig.getDefaultInstance()));
+//        agentConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AgentConfigColumn(agentRemote, locationRemote));
+        agentConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(agentConfigTreeTableView, SendableType.AGENT_CONFIG));
 
         tabAgentRegistry.setContent(agentConfigTreeTableView);
 
         appConfigTreeTableView = new TreeTableView<>();
         appConfigTreeTableView.setEditable(true);
         appConfigTreeTableView.setShowRoot(false);
-        appConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AppConfigColumn(appRemote, locationRemote));
-        appConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(appConfigTreeTableView, AppConfigType.AppConfig.getDefaultInstance()));
+//        appConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AppConfigColumn(appRemote, locationRemote));
+        appConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(appConfigTreeTableView, SendableType.APP_CONFIG));
 
         tabAppRegistry.setContent(appConfigTreeTableView);
     }
@@ -212,7 +201,7 @@ public class RegistryEditor extends Application {
             public Void call() throws Exception {
                 try {
                     deviceRemote.activate();
-                    deviceRemote.addObserver((Observable<DeviceRegistryType.DeviceRegistry> source, DeviceRegistryType.DeviceRegistry data) -> {
+                    deviceRemote.addObserver((Observable<DeviceRegistry> source, DeviceRegistry data) -> {
                         updateTabDeviceRegistry();
                     });
 
@@ -234,7 +223,7 @@ public class RegistryEditor extends Application {
             public Void call() throws Exception {
                 try {
                     locationRemote.activate();
-                    locationRemote.addObserver((Observable<LocationRegistryType.LocationRegistry> source, LocationRegistryType.LocationRegistry data) -> {
+                    locationRemote.addObserver((Observable<LocationRegistry> source, LocationRegistry data) -> {
                         updateTabLocationRegistry();
                     });
 
@@ -256,7 +245,7 @@ public class RegistryEditor extends Application {
             public Void call() throws Exception {
                 try {
                     sceneRemote.activate();
-                    sceneRemote.addObserver((Observable<SceneRegistryType.SceneRegistry> source, SceneRegistryType.SceneRegistry data) -> {
+                    sceneRemote.addObserver((Observable<SceneRegistry> source, SceneRegistry data) -> {
                         updateTabSceneRegistry();
                     });
 
@@ -278,7 +267,7 @@ public class RegistryEditor extends Application {
             public Void call() throws Exception {
                 try {
                     agentRemote.activate();
-                    agentRemote.addObserver((Observable<AgentRegistryType.AgentRegistry> source, AgentRegistryType.AgentRegistry data) -> {
+                    agentRemote.addObserver((Observable<AgentRegistry> source, AgentRegistry data) -> {
                         updateTabAgentRegistry();
                     });
 
@@ -300,7 +289,7 @@ public class RegistryEditor extends Application {
             public Void call() throws Exception {
                 try {
                     appRemote.activate();
-                    appRemote.addObserver((Observable<AppRegistryType.AppRegistry> source, AppRegistryType.AppRegistry data) -> {
+                    appRemote.addObserver((Observable<AppRegistry> source, AppRegistry data) -> {
                         updateTabAppRegistry();
                     });
 
@@ -343,9 +332,12 @@ public class RegistryEditor extends Application {
                 }
                 try {
                     if (!modified) {
-                        DeviceRegistryType.DeviceRegistry data = deviceRemote.getData();
-                        deviceClassTreeTableView.setRoot(new DeviceClassList(data.toBuilder()));
-                        deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
+                        DeviceRegistry data = deviceRemote.getData();
+                        deviceClassTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.DEVICE_CLASS_FIELD_NUMBER, data.toBuilder()));
+                        FieldGroup deviceClassId = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
+                        FieldGroup locationId = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+                        Descriptors.FieldDescriptor field = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER);
+                        deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(field.getName(), field, data.toBuilder(), data.toBuilder().getDeviceConfigBuilderList(), deviceClassId, locationId));
                         tabDeviceRegistry.setContent(tabDeviceRegistryPane);
                     }
 
@@ -368,8 +360,8 @@ public class RegistryEditor extends Application {
                 }
                 try {
                     if (!modified) {
-                        LocationRegistryType.LocationRegistry data = locationRemote.getData();
-                        locationConfigTreeTableView.setRoot(new LocationConfigListContainer(data.toBuilder()));
+                        LocationRegistry data = locationRemote.getData();
+                        locationConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, data.toBuilder()));
                         tabLocationRegistry.setContent(locationConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {
@@ -391,9 +383,8 @@ public class RegistryEditor extends Application {
                 }
                 try {
                     if (!modified) {
-                        SceneRegistryType.SceneRegistry data = sceneRemote.getData();
-                        sceneConfigTreeTableView
-                                .setRoot(new GenericListContainer(SceneRegistryType.SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder(), SceneConfigContainer.class));
+                        SceneRegistry data = sceneRemote.getData();
+                        sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder()));
                         tabSceneRegistry.setContent(sceneConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {
@@ -415,9 +406,9 @@ public class RegistryEditor extends Application {
                 }
                 try {
                     if (!modified) {
-                        AgentRegistryType.AgentRegistry data = agentRemote.getData();
+                        AgentRegistry data = agentRemote.getData();
                         agentConfigTreeTableView
-                                .setRoot(new GenericListContainer(AgentRegistryType.AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder(), AgentConfigContainer.class));
+                                .setRoot(new GenericListContainer(AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder()));
                         tabAgentRegistry.setContent(agentConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {
@@ -439,9 +430,9 @@ public class RegistryEditor extends Application {
                 }
                 try {
                     if (!modified) {
-                        AppRegistryType.AppRegistry data = appRemote.getData();
+                        AppRegistry data = appRemote.getData();
                         appConfigTreeTableView
-                                .setRoot(new GenericListContainer(AppRegistryType.AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder(), AppConfigContainer.class));
+                                .setRoot(new GenericListContainer(AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder()));
                         tabAppRegistry.setContent(appConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {

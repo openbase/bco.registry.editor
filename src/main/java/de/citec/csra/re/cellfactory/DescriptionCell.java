@@ -5,10 +5,11 @@
  */
 package de.citec.csra.re.cellfactory;
 
+import de.citec.csra.re.util.SelectableLabel;
 import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.lm.remote.LocationRegistryRemote;
-import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
 
@@ -17,30 +18,30 @@ import de.citec.scm.remote.SceneRegistryRemote;
  * @author thuxohl
  */
 public class DescriptionCell extends RowCell {
-    
+
     public DescriptionCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
     }
-    
+
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         if (empty) {
             graphicProperty().setValue(null);
             textProperty().setValue("");
             setContextMenu(null);
         } else if (item instanceof Node) {
-            graphicProperty().setValue(null);
-            textProperty().setValue(convertDescriptorT(item.getDescriptor()));
+            graphicProperty().setValue(new SelectableLabel(convertDescriptorToReadable(item.getDescriptor())));
+            textProperty().setValue(convertDescriptorToReadable(item.getDescriptor()));
         }
     }
-    
-    public static String convertDescriptorT(String descriptor) {
+
+    private String convertDescriptorToReadable(String descriptor) {
         if (descriptor.equals("")) {
             return descriptor;
         }
-        
+
         descriptor.toLowerCase();
         String result = "";
         String[] split = descriptor.split("_");

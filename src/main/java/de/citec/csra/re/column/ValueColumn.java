@@ -6,8 +6,8 @@
 package de.citec.csra.re.column;
 
 import de.citec.csra.re.RegistryEditor;
-import de.citec.csra.re.struct.leaf.Leaf;
-import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.Leaf;
+import de.citec.csra.re.struct.Node;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeTableColumn;
 

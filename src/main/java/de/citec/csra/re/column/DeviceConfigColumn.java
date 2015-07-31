@@ -6,7 +6,7 @@
 package de.citec.csra.re.column;
 
 import de.citec.csra.re.cellfactory.DeviceConfigCell;
-import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.lm.remote.LocationRegistryRemote;
 import javafx.scene.control.TreeTableCell;
