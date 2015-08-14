@@ -81,4 +81,8 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
         }
         this.setValue(this);
     }
+
+    public FieldGroup getFieldGroup() {
+        return fieldGroup;
+    }
 }
