@@ -6,30 +6,27 @@
 package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.re.RegistryEditor;
-import de.citec.csra.re.struct.node.DeviceClassContainer;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.node.UnitTemplateContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
-import java.awt.Color;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
+import rst.homeautomation.unit.UnitTemplateType;
 
 /**
  *
  * @author thuxohl
  */
-public class DeviceClassCell extends ValueCell {
+public class UnitTemplateCell extends ValueCell {
 
-    private final String defaultButtonStyle;
-
-    public DeviceClassCell(DeviceRegistryRemote deviceRegistryRemote) {
+    public UnitTemplateCell(DeviceRegistryRemote deviceRegistryRemote) {
         super(deviceRegistryRemote, null, null, null, null);
-        defaultButtonStyle = applyButton.getStyle();
+
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -39,26 +36,16 @@ public class DeviceClassCell extends ValueCell {
                             @Override
                             protected Boolean call() throws Exception {
                                 RegistryEditor.setModified(false);
-                                DeviceClassContainer container = (DeviceClassContainer) getItem();
+                                UnitTemplateContainer container = (UnitTemplateContainer) getItem();
 
-                                DeviceClass deviceClass = container.getBuilder().build();
-                                if (deviceClass.getUnitTemplateConfigList().isEmpty()) {
-                                    applyButton.setStyle("-fx-base: #333333;");
-                                    applyButton.setText("AddaUnitTemplate");
-                                } else {
-                                    applyButton.setStyle(defaultButtonStyle);
-                                    applyButton.setText("Apply");
-                                    try {
-                                        if (deviceRegistryRemote.containsDeviceClass(deviceClass)) {
-                                            deviceRegistryRemote.updateDeviceClass(deviceClass);
-                                        } else {
-                                            deviceRegistryRemote.registerDeviceClass(deviceClass);
-                                            container.setNewNode(false);
-                                        }
-                                        container.setChanged(false);
-                                    } catch (CouldNotPerformException ex) {
-                                        logger.warn("Could not register or update device class [" + deviceClass + "]", ex);
+                                UnitTemplateType.UnitTemplate unitTemplate = container.getBuilder().build();
+                                try {
+                                    if (deviceRegistryRemote.containsUnitTemplate(unitTemplate)) {
+                                        deviceRegistryRemote.updateUnitTemplate(unitTemplate);
                                     }
+                                    container.setChanged(false);
+                                } catch (CouldNotPerformException ex) {
+                                    logger.warn("Could not register or update unit template [" + unitTemplate + "]", ex);
                                 }
                                 return true;
                             }
@@ -77,18 +64,18 @@ public class DeviceClassCell extends ValueCell {
                             @Override
                             protected Boolean call() throws Exception {
                                 RegistryEditor.setModified(false);
-                                DeviceClassContainer container = (DeviceClassContainer) getItem();
+                                UnitTemplateContainer container = (UnitTemplateContainer) getItem();
 
-                                DeviceClass deviceClass = container.getBuilder().build();
+                                UnitTemplateType.UnitTemplate unitTemplate = container.getBuilder().build();
                                 try {
                                     if (container.getNewNode()) {
                                         container.getParent().getChildren().remove(container);
                                     } else {
                                         int index = container.getParent().getChildren().indexOf(container);
-                                        container.getParent().getChildren().set(index, new DeviceClassContainer(deviceRegistryRemote.getDeviceClassById(deviceClass.getId()).toBuilder()));
+                                        container.getParent().getChildren().set(index, new UnitTemplateContainer(deviceRegistryRemote.getUnitTemplateById(unitTemplate.getId()).toBuilder()));
                                     }
                                 } catch (CouldNotPerformException ex) {
-                                    logger.warn("Could cancel update of [" + deviceClass + "]", ex);
+                                    logger.warn("Could cancel update of [" + unitTemplate + "]", ex);
                                 }
                                 return true;
                             }
@@ -103,14 +90,12 @@ public class DeviceClassCell extends ValueCell {
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (item instanceof DeviceClassContainer) {
-            DeviceClassContainer container = (DeviceClassContainer) item;
+        if (item instanceof UnitTemplateContainer) {
+            UnitTemplateContainer container = (UnitTemplateContainer) item;
             if ((container.getNewNode() || container.hasChanged()) && getGraphic() != buttonBox) {
-                System.out.println("Setting buttons on [" + item.getDescriptor() + "] case1");
                 setGraphic(buttonBox);
             } else if (!(container.getNewNode() || container.hasChanged()) && getGraphic() != null) {
                 setGraphic(null);
-                System.out.println("Resetting buttons on [" + item.getDescriptor() + "] case1");
             }
             container.getChanged().addListener(new ChangeListener<Boolean>() {
 
@@ -121,10 +106,8 @@ public class DeviceClassCell extends ValueCell {
                         @Override
                         public void run() {
                             if (newValue && getGraphic() != buttonBox) {
-                                System.out.println("Setting buttons on [" + item.getDescriptor() + "] case2");
                                 setGraphic(buttonBox);
                             } else if (getGraphic() != null) {
-                                System.out.println("Resetting buttons on [" + item.getDescriptor() + "] case2");
                                 setGraphic(null);
                             }
                         }

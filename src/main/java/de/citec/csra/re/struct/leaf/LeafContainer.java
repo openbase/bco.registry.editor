@@ -7,9 +7,19 @@ package de.citec.csra.re.struct.leaf;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.ProtocolMessageEnum;
+import de.citec.csra.re.struct.node.GenericListContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.RotationContainer;
+import de.citec.csra.re.struct.node.ServiceTemplateContainer;
+import de.citec.csra.re.struct.node.UnitTemplateConfigContainer;
+import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.jul.exception.ExceptionPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import rst.homeautomation.service.ServiceTemplateType;
+import rst.homeautomation.unit.UnitTemplateConfigType;
+import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 
 /**
  *
@@ -17,6 +27,8 @@ import de.citec.csra.re.struct.node.RotationContainer;
  * @param <T>
  */
 public class LeafContainer<T> implements Leaf<T> {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private T value;
     private final boolean editable;
@@ -104,28 +116,36 @@ public class LeafContainer<T> implements Leaf<T> {
             parent.getBuilder().setRepeatedField(field, index, value);
         }
 
-//        if (value instanceof DeviceClass) {
-//            DeviceClass deviceClass = (DeviceClass) value;
-//            DeviceConfigContainer container = (DeviceConfigContainer) this.getParent();
-//
-//            for (int i = 0; i < container.getChildren().size(); i++) {
-//                Node item = container.getChildren().get(i).getValue();
-//                if (item instanceof NodeContainer && ((NodeContainer) item).getDescriptor().equals("unit_configs")) {
-//                    container.getChildren().remove(i);
-//                    i--;
-//                }
-//            }
-//
-//            container.getBuilder().clearUnitConfig();
-//            for (UnitTemplate unitTemplate : deviceClass.getUnitTemplateList()) {
-//                UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setTemplate(unitTemplate);
-//                for (ServiceTypeHolderType.ServiceTypeHolder.ServiceType serviceType : unitTemplate.getServiceTypeList()) {
-//                    unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceType));
-//                }
-//                container.getBuilder().addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
-//            }
-//            container.add(new UnitConfigListContainer(container.getBuilder()));
-//        }
+        if (value instanceof UnitTemplate.UnitType) {
+            try {
+                UnitTemplate.UnitType type = (UnitTemplate.UnitType) value;
+                UnitTemplateConfigContainer container = (UnitTemplateConfigContainer) this.getParent();
+
+                for (int i = 0; i < container.getChildren().size(); i++) {
+                    Node item = container.getChildren().get(i).getValue();
+                    if (item instanceof NodeContainer && ((NodeContainer) item).getDescriptor().equals("service_templates")) {
+                        container.getChildren().remove(i);
+                        i--;
+                    }
+                }
+
+                DeviceRegistryRemote remote = new DeviceRegistryRemote();
+                remote.init();
+                remote.activate();
+                container.getBuilder().clearServiceTemplate();
+                for (ServiceTemplateType.ServiceTemplate.ServiceType serviceType : remote.getUnitTemplateByType(type).getServiceTypeList()) {
+                    ServiceTemplateType.ServiceTemplate.Builder serviceTemplateBuilder = ServiceTemplateType.ServiceTemplate.newBuilder().setServiceType(serviceType);
+                    container.getBuilder().addServiceTemplate(serviceTemplateBuilder);
+                }
+                try {
+                    container.add(new GenericListContainer(UnitTemplateConfigType.UnitTemplateConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder(), ServiceTemplateContainer.class));
+                } catch (de.citec.jul.exception.InstantiationException ex) {
+                    ExceptionPrinter.printHistory(logger, ex);
+                }
+            } catch (Exception ex) {
+                ExceptionPrinter.printHistory(logger, ex);
+            }
+        }
 
         parent.setSendableChanged();
     }

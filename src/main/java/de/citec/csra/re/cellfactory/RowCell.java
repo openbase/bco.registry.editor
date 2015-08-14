@@ -49,7 +49,7 @@ import rst.homeautomation.control.scene.SceneConfigType;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType;
-import rst.homeautomation.service.ServiceTypeHolderType.ServiceTypeHolder.ServiceType;
+import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate.ServiceType;
 import rst.homeautomation.unit.UnitConfigType;
 import rst.homeautomation.unit.UnitTemplateConfigType.UnitTemplateConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate.UnitType;
