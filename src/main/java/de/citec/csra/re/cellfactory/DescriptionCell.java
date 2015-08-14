@@ -6,12 +6,8 @@
 package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.re.util.SelectableLabel;
-import de.citec.agm.remote.AgentRegistryRemote;
-import de.citec.apm.remote.AppRegistryRemote;
-import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.Node;
-import de.citec.dm.remote.DeviceRegistryRemote;
-import de.citec.scm.remote.SceneRegistryRemote;
+import de.citec.jul.exception.InstantiationException;
 
 /**
  *
@@ -19,8 +15,8 @@ import de.citec.scm.remote.SceneRegistryRemote;
  */
 public class DescriptionCell extends RowCell {
 
-    public DescriptionCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
+    public DescriptionCell() {
+        super();
     }
 
     @Override
@@ -32,8 +28,7 @@ public class DescriptionCell extends RowCell {
             textProperty().setValue("");
             setContextMenu(null);
         } else if (item instanceof Node) {
-            graphicProperty().setValue(new SelectableLabel(convertDescriptorToReadable(item.getDescriptor())));
-            textProperty().setValue(convertDescriptorToReadable(item.getDescriptor()));
+            setGraphic(new SelectableLabel(convertDescriptorToReadable(item.getDescriptor())));
         }
     }
 

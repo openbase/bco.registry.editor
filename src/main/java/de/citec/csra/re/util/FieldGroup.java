@@ -93,6 +93,20 @@ public class FieldGroup<MB extends GeneratedMessage.Builder<MB>> {
     }
 
     /**
+     * Set the value for the group from one builder.
+     *
+     * @param builder the builder from which the value is set
+     * @param value the value set for that field
+     */
+    public void setValue(MB builder, Object value) {
+        Message.Builder mBuilder = builder;
+        for (int i = 0; i < fieldDescriptors.length - 1; i++) {
+            mBuilder = ((GeneratedMessage) mBuilder.getField(fieldDescriptors[i])).toBuilder();
+        }
+        mBuilder.setField(fieldDescriptors[fieldDescriptors.length - 1], value);
+    }
+
+    /**
      * Test if the builder has the same value for the group as the given value.
      *
      * @param builder the tested builder

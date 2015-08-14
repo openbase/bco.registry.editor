@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.util;
 
+import com.google.protobuf.GeneratedMessage.Builder;
 import java.util.Date;
 import rst.geometry.PoseType.Pose;
 import rst.geometry.RotationType.Rotation;
@@ -42,24 +43,40 @@ public class RSTDefaultInstances {
         Translation translation = Translation.newBuilder().setX(0).setY(0).setZ(0).build();
         return Pose.newBuilder().setRotation(rotation).setTranslation(translation).build();
     }
-    
+
     public static LocationConfig.Builder getDefaultLocationConfig() {
         return LocationConfig.newBuilder().setPosition(getDefaultPose());
     }
-    
+
     public static ActivationState getDefaultActivationState() {
         return ActivationState.newBuilder().setValue(ActivationState.State.ACTIVE).build();
     }
-    
+
     public static SceneConfig.Builder getDefaultSceneConfig() {
         return SceneConfig.newBuilder().setActivationState(getDefaultActivationState());
     }
-    
+
     public static AgentConfig.Builder getDefaultAgentConfig() {
         return AgentConfig.newBuilder().setActivationState(getDefaultActivationState());
     }
-    
+
     public static AppConfig.Builder getDefaultAppConfig() {
         return AppConfig.newBuilder().setActivationState(getDefaultActivationState());
+    }
+
+    public static Builder getDefaultBuilder(Builder builderType) {
+        if (builderType instanceof DeviceConfig.Builder) {
+            return getDefaultDeviceConfig();
+        } else if (builderType instanceof LocationConfig.Builder) {
+            return getDefaultLocationConfig();
+        } else if (builderType instanceof SceneConfig.Builder) {
+            return getDefaultSceneConfig();
+        } else if (builderType instanceof AgentConfig.Builder) {
+            return getDefaultAgentConfig();
+        } else if (builderType instanceof AppConfig.Builder) {
+            return getDefaultAppConfig();
+        } else {
+            return (Builder) builderType.build().getDefaultInstanceForType().toBuilder();
+        }
     }
 }

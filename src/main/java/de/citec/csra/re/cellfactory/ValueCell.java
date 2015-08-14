@@ -11,7 +11,9 @@ import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.Leaf;
 import de.citec.csra.re.struct.LeafContainer;
 import de.citec.csra.re.struct.Node;
+import de.citec.csra.re.util.SelectableLabel;
 import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.jul.exception.InstantiationException;
 import de.citec.scm.remote.SceneRegistryRemote;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -58,8 +60,8 @@ public abstract class ValueCell extends RowCell {
     protected LeafContainer leaf;
     private final CheckBox checkBox;
 
-    public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
+    public ValueCell() {
+        super();
         applyButton = new Button("Apply Changes");
         cancel = new Button("Cancel");
         buttonBox = new HBox(applyButton, cancel);
@@ -265,20 +267,15 @@ public abstract class ValueCell extends RowCell {
             setText("");
             setContextMenu(null);
         } else if (item instanceof Leaf) {
-            graphicProperty().setValue(null);
+            String text = "";
             if (((Leaf) item).getValue() instanceof Long) {
-                setText(converter.format(new Date((Long) ((Leaf) item).getValue())));
+                text = converter.format(new Date((Long) ((Leaf) item).getValue()));
             } else if (((Leaf) item).getValue() instanceof Double) {
-                setText(decimalFormat.format(((Double) ((Leaf) item).getValue())));
+                text = decimalFormat.format(((Double) ((Leaf) item).getValue()));
             } else if ((((Leaf) item).getValue() != null)) {
-                setText(((Leaf) item).getValue().toString());
+                text = ((Leaf) item).getValue().toString();
             }
-
-            if ("scope".equals(item.getDescriptor()) || "id".equals(item.getDescriptor())) {
-                setText("");
-                String text = ((Leaf) item).getValue().toString();
-                setGraphic(makeSelectable(new Label(text)));
-            }
+            setGraphic(new SelectableLabel(text));
         }
 
 //        if (item instanceof DeviceClassContainer) {
@@ -292,24 +289,5 @@ public abstract class ValueCell extends RowCell {
 //        } else if (item instanceof EntryContainer) {
 //            setText(((EntryContainer) item).getDescription());
 //        }
-    }
-
-    private Label makeSelectable(Label label) {
-        StackPane textStack = new StackPane();
-        TextField textField = new TextField(label.getText());
-        textField.setEditable(false);
-        textField.setStyle(
-                "-fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0;"
-        );
-        // the invisible label is a hack to get the textField to size like a label.
-        Label invisibleLabel = new Label();
-        invisibleLabel.textProperty().bind(label.textProperty());
-        invisibleLabel.setVisible(false);
-        textStack.getChildren().addAll(invisibleLabel, textField);
-        label.textProperty().bindBidirectional(textField.textProperty());
-        label.setGraphic(textStack);
-        label.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-        return label;
     }
 }

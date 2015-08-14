@@ -7,10 +7,8 @@ package de.citec.csra.re.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
-import de.citec.csra.re.struct.LeafContainer;
 import de.citec.csra.re.util.FieldUtil;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.NotAvailableException;
 import de.citec.jul.extension.rsb.scope.ScopeGenerator;
@@ -25,6 +23,17 @@ import rst.rsb.ScopeType;
 public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends NodeContainer<MB> {
 
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+
+    public GenericNodeContainer(String descriptor, final MB builder) throws InstantiationException {
+        super(descriptor, null, builder);
+        try {
+            for (FieldDescriptor field : builder.getDescriptorForType().getFields()) {
+                registerElement(field);
+            }
+        } catch (InstantiationException ex) {
+            throw new InstantiationException(this, ex);
+        }
+    }
 
     public GenericNodeContainer(final int fieldNumber, final MB builder) throws InstantiationException {
         this(FieldUtil.getField(fieldNumber, builder), builder);

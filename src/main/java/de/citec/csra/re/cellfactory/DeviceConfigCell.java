@@ -36,8 +36,8 @@ public class DeviceConfigCell extends ValueCell {
     private final ComboBox<LocationConfig> locationIdComboBox;
     private final ComboBox<LocationConfig> locationConfigComboBox;
 
-    public DeviceConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super(deviceRegistryRemote, locationRegistryRemote, null, null, null);
+    public DeviceConfigCell() {
+        super();
 
 //        applyButton.setOnAction(new EventHandler<ActionEvent>() {
 //
@@ -170,21 +170,21 @@ public class DeviceConfigCell extends ValueCell {
         if (getItem() instanceof Leaf) {
             if (((Leaf) getItem()).getValue() instanceof DeviceClass) {
                 try {
-                    deviceClassComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getData().getDeviceClassList()));
+                    deviceClassComboBox.setItems(FXCollections.observableArrayList(remotePool.getDeviceRemote().getData().getDeviceClassList()));
                     super.setEditingGraphic(deviceClassComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getDescriptor().equals("location_id")) {
                 try {
-                    locationIdComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigList()));
+                    locationIdComboBox.setItems(FXCollections.observableArrayList(remotePool.getLocationRemote().getData().getLocationConfigList()));
                     super.setEditingGraphic(locationIdComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getDescriptor().equals("location_config")) {
                 try {
-                    locationConfigComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigList()));
+                    locationConfigComboBox.setItems(FXCollections.observableArrayList(remotePool.getLocationRemote().getData().getLocationConfigList()));
                     super.setEditingGraphic(locationConfigComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);

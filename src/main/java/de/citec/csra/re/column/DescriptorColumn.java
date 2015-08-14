@@ -5,13 +5,9 @@
  */
 package de.citec.csra.re.column;
 
-import de.citec.agm.remote.AgentRegistryRemote;
-import de.citec.apm.remote.AppRegistryRemote;
-import de.citec.lm.remote.LocationRegistryRemote;
+import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.cellfactory.DescriptionCell;
 import de.citec.csra.re.struct.Node;
-import de.citec.dm.remote.DeviceRegistryRemote;
-import de.citec.scm.remote.SceneRegistryRemote;
 import java.util.Comparator;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
@@ -23,14 +19,14 @@ import javafx.util.Callback;
  */
 public class DescriptorColumn extends Column {
 
-    public DescriptorColumn(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
+    public DescriptorColumn() {
         super("Description");
-        this.setPrefWidth(COLUMN_WIDTH);
+        this.setPrefWidth(RegistryEditor.RESOLUTION_WIDTH / 4);
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
 
             @Override
             public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-                return new DescriptionCell(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
+                return new DescriptionCell();
             }
         });
         setComparator(new Comparator<Node>() {

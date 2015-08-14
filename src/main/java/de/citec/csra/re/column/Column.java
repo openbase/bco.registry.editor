@@ -15,8 +15,6 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
  */
 public abstract class Column extends TreeTableColumn<Node, Node> {
 
-    public static final int COLUMN_WIDTH = 400;
-
     public Column(String text) {
         super(text);
         this.setCellValueFactory(new TreeItemPropertyValueFactory<>("context"));

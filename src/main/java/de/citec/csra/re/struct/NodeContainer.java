@@ -7,9 +7,9 @@ package de.citec.csra.re.struct;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
-import de.citec.csra.re.struct.LeafContainer;
+import de.citec.csra.re.RegistryEditor;
 import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +26,8 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
     protected final Descriptors.FieldDescriptor fieldDescriptor;
     protected final MB builder;
     protected final String descriptor;
+    protected final boolean sendable;
+    protected final SimpleObjectProperty<Boolean> changed;
 
     public NodeContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder) {
         assert fieldDescriptor != null;
@@ -35,6 +37,8 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         this.fieldDescriptor = fieldDescriptor;
         this.descriptor = descriptor;
         this.setValue(this);
+        changed = new SimpleObjectProperty<>(false);
+        sendable = false;
     }
 
     protected void add(LeafContainer leaf) {
@@ -59,12 +63,29 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         return builder;
     }
 
+    public boolean isSendable() {
+        return sendable;
+    }
+
+    public void setChanged(boolean change) {
+        changed.set(change);
+        RegistryEditor.setModified(change);
+    }
+
+    public boolean hasChanged() {
+        return changed.getValue();
+    }
+
+    public Property<Boolean> getChanged() {
+        return changed;
+    }
+
     public void setSendableChanged() {
-        NodeContainer sendable = this;
-        while (!(sendable instanceof SendableNode)) {
-            sendable = (NodeContainer) sendable.getParent().getValue();
+        NodeContainer sendableNode = this;
+        while (!sendableNode.isSendable()) {
+            sendableNode = (NodeContainer) sendableNode.getParent().getValue();
         }
-        ((SendableNode) sendable).setChanged(true);
+        ((NodeContainer) sendableNode).setChanged(true);
     }
 
     @Override

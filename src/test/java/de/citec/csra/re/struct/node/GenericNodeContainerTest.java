@@ -9,6 +9,7 @@ import de.citec.csra.re.struct.Node;
 import de.citec.csra.re.struct.GenericNodeContainer;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.FieldDescriptor.Type;
+import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.re.struct.GenericGroupContainer;
 import de.citec.csra.re.struct.GenericListContainer;
 import de.citec.csra.re.struct.Leaf;
@@ -18,11 +19,14 @@ import de.citec.jul.exception.InstantiationException;
 import javafx.scene.control.TreeItem;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import rst.homeautomation.device.DeviceClassType;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
+import rst.homeautomation.unit.UnitConfigType;
 import rst.rsb.ScopeType;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
@@ -125,5 +129,19 @@ public class GenericNodeContainerTest {
             }
         }
     }
+    
+    @Test
+    public void testSimpleName() {
+        DeviceClassType.DeviceClass test = DeviceClassType.DeviceClass.getDefaultInstance();
+        assertEquals("DeviceClass", print(test));
+        System.out.println(print(test));
+    }
 
+    private String print(GeneratedMessage msg) {
+        return msg.getClass().getSimpleName();
+    }
+    
+    @Test
+    public void testBuilderforRepeared() {
+    }
 }

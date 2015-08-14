@@ -6,16 +6,17 @@
 package de.citec.csra.re;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.GeneratedMessage;
 import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.csra.re.column.DescriptorColumn;
-import de.citec.csra.re.column.DeviceConfigColumn;
 import de.citec.csra.re.TreeTableViewContextMenu.SendableType;
-import de.citec.lm.remote.LocationRegistryRemote;
+import de.citec.csra.re.column.ValueColumn;
 import de.citec.csra.re.struct.GenericGroupContainer;
 import de.citec.csra.re.struct.GenericListContainer;
 import de.citec.csra.re.struct.Node;
 import de.citec.csra.re.util.FieldGroup;
+import de.citec.csra.re.util.RemotePool;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jp.JPAgentRegistryScope;
 import de.citec.jp.JPAppRegistryScope;
@@ -26,7 +27,9 @@ import de.citec.jps.core.JPService;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
+import de.citec.jul.extension.rsb.com.RSBRemoteService;
 import de.citec.jul.pattern.Observable;
+import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -61,122 +64,58 @@ public class RegistryEditor extends Application {
 
     public static final String APP_NAME = "RegistryView";
     public static final int RESOLUTION_WIDTH = 1024;
-
     private static boolean modified = false;
-    private final DeviceRegistryRemote deviceRemote;
-    private final LocationRegistryRemote locationRemote;
-    private final SceneRegistryRemote sceneRemote;
-    private final AgentRegistryRemote agentRemote;
-    private final AppRegistryRemote appRemote;
-    private TabPane registryTabPane, tabDeviceRegistryPane;
-    private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig, tabAppRegistry;
-    private ProgressIndicator progressDeviceRegistryIndicator;
-    private ProgressIndicator progressLocationRegistryIndicator;
-    private ProgressIndicator progressSceneRegistryIndicator;
-    private ProgressIndicator progressAgentRegistryIndicator;
-    private ProgressIndicator progressAppRegistryIndicator;
-    private TreeTableView<Node> deviceClassTreeTableView;
-    private TreeTableView<Node> deviceConfigTreeTableView;
-    private TreeTableView<Node> locationConfigTreeTableView;
-    private TreeTableView<Node> sceneConfigTreeTableView;
-    private TreeTableView<Node> agentConfigTreeTableView;
-    private TreeTableView<Node> appConfigTreeTableView;
+
+    private final RemotePool remotePool;
+    private TabPane registryTabPane, deviceRegistryTabPane;
+    private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab;
+    private Tab deviceClassTab, deviceConfigTab;
+    private ProgressIndicator progressIndicator;
+    private TreeTableView<Node> deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView;
 
     public RegistryEditor() throws InstantiationException {
-        this.deviceRemote = new DeviceRegistryRemote();
-        this.locationRemote = new LocationRegistryRemote();
-        this.sceneRemote = new SceneRegistryRemote();
-        this.agentRemote = new AgentRegistryRemote();
-        this.appRemote = new AppRegistryRemote();
+        remotePool = RemotePool.getInstance();
     }
 
     @Override
     public void init() throws Exception {
         super.init();
-        deviceRemote.init(JPService.getProperty(JPDeviceRegistryScope.class).getValue());
-        locationRemote.init(JPService.getProperty(JPLocationRegistryScope.class).getValue());
-        sceneRemote.init(JPService.getProperty(JPSceneRegistryScope.class).getValue());
-        agentRemote.init(JPService.getProperty(JPAgentRegistryScope.class).getValue());
-        appRemote.init(JPService.getProperty(JPAppRegistryScope.class).getValue());
+        remotePool.init();
 
         registryTabPane = new TabPane();
         registryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        tabDeviceRegistry = new Tab("DeviceRegistry");
-        tabLocationRegistry = new Tab("LocationRegistry");
-        tabSceneRegistry = new Tab("SceneRegistry");
-        tabAgentRegistry = new Tab("AgentRegistry");
-        tabAppRegistry = new Tab("AppRegistry");
-        registryTabPane.getTabs().addAll(tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabAppRegistry);
+        deviceRegistryTab = new Tab("DeviceRegistry");
+        locationRegistryTab = new Tab("LocationRegistry");
+        sceneRegistryTab = new Tab("SceneRegistry");
+        agentRegistryTab = new Tab("AgentRegistry");
+        appRegistryTab = new Tab("AppRegistry");
+        registryTabPane.getTabs().addAll(deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab);
 
-        progressDeviceRegistryIndicator = new ProgressIndicator();
-        progressLocationRegistryIndicator = new ProgressIndicator();
-        progressSceneRegistryIndicator = new ProgressIndicator();
-        progressAgentRegistryIndicator = new ProgressIndicator();
-        progressAppRegistryIndicator = new ProgressIndicator();
+        progressIndicator = new ProgressIndicator();
 
-        deviceClassTreeTableView = new TreeTableView<>();
-        deviceClassTreeTableView.setEditable(true);
-        deviceClassTreeTableView.setShowRoot(false);
-//        deviceClassTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceClassColumn(deviceRemote));
-        deviceClassTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceClassTreeTableView, SendableType.DEVICE_CLASS));
+        deviceClassTreeTableView = new RegistryTreeTableView(SendableType.DEVICE_CLASS);
+        deviceConfigTreeTableView = new RegistryTreeTableView(SendableType.DEVICE_CONFIG);
+        locationConfigTreeTableView = new RegistryTreeTableView(SendableType.LOCATION_CONFIG);
+        sceneConfigTreeTableView = new RegistryTreeTableView(SendableType.SCENE_CONFIG);
+        agentConfigTreeTableView = new RegistryTreeTableView(SendableType.AGENT_CONFIG);
+        appConfigTreeTableView = new RegistryTreeTableView(SendableType.APP_CONFIG);
 
-        deviceConfigTreeTableView = new TreeTableView<>();
-        deviceConfigTreeTableView.setEditable(true);
-        deviceConfigTreeTableView.setShowRoot(false);
-        deviceConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceConfigColumn(deviceRemote, locationRemote));
-        deviceConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceConfigTreeTableView, SendableType.DEVICE_CONFIG));
-
-        tabDeviceRegistryPane = new TabPane();
-        tabDeviceRegistryPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        tabDeviceClass = new Tab("DeviceClass");
-        tabDeviceConfig = new Tab("DeviceConfig");
-        tabDeviceClass.setContent(deviceClassTreeTableView);
-        tabDeviceConfig.setContent(deviceConfigTreeTableView);
-        tabDeviceRegistryPane.getTabs().addAll(tabDeviceClass, tabDeviceConfig);
-        tabDeviceRegistry.setContent(tabDeviceRegistryPane);
-
-        locationConfigTreeTableView = new TreeTableView<>();
-        locationConfigTreeTableView.setEditable(true);
-        locationConfigTreeTableView.setShowRoot(false);
-//        locationConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new LocationConfigColumn(locationRemote));
-        locationConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(locationConfigTreeTableView, SendableType.LOCATION_CONFIG));
-
-        tabLocationRegistry.setContent(locationConfigTreeTableView);
-
-        sceneConfigTreeTableView = new TreeTableView<>();
-        sceneConfigTreeTableView.setEditable(true);
-        sceneConfigTreeTableView.setShowRoot(false);
-//        sceneConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new SceneConfigColumn(sceneRemote, locationRemote));
-        sceneConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(sceneConfigTreeTableView, SendableType.SCENE_CONFIG));
-
-        tabSceneRegistry.setContent(sceneConfigTreeTableView);
-
-        agentConfigTreeTableView = new TreeTableView<>();
-        agentConfigTreeTableView.setEditable(true);
-        agentConfigTreeTableView.setShowRoot(false);
-//        agentConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AgentConfigColumn(agentRemote, locationRemote));
-        agentConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(agentConfigTreeTableView, SendableType.AGENT_CONFIG));
-
-        tabAgentRegistry.setContent(agentConfigTreeTableView);
-
-        appConfigTreeTableView = new TreeTableView<>();
-        appConfigTreeTableView.setEditable(true);
-        appConfigTreeTableView.setShowRoot(false);
-//        appConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AppConfigColumn(appRemote, locationRemote));
-        appConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(appConfigTreeTableView, SendableType.APP_CONFIG));
-
-        tabAppRegistry.setContent(appConfigTreeTableView);
+        deviceRegistryTabPane = new TabPane();
+        deviceRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        deviceClassTab = new Tab("DeviceClass");
+        deviceConfigTab = new Tab("DeviceConfig");
+        deviceClassTab.setContent(deviceClassTreeTableView);
+        deviceConfigTab.setContent(deviceConfigTreeTableView);
+        deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        updateTabLocationRegistry();
-        updateTabDeviceRegistry();
-        updateTabSceneRegistry();
-        updateTabAgentRegistry();
-        updateTabAppRegistry();
+        for (RSBRemoteService remote : remotePool.getRemotes()) {
+            updateTab(remote);
+        }
 
         Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
         scene.getStylesheets().add("test.css");
@@ -193,254 +132,108 @@ public class RegistryEditor extends Application {
 
         logger.info(APP_NAME + " successfully started.");
 
+        registerObserver();
+    }
+
+    public void registerObserver() throws Exception {
         ExecutorService executerService = Executors.newFixedThreadPool(10);
 
-        executerService.submit(new Callable<Void>() {
+        for (RSBRemoteService remote : remotePool.getRemotes()) {
+            executerService.submit(new Callable<Void>() {
 
-            @Override
-            public Void call() throws Exception {
-                try {
-                    deviceRemote.activate();
-                    deviceRemote.addObserver((Observable<DeviceRegistry> source, DeviceRegistry data) -> {
-                        updateTabDeviceRegistry();
-                    });
-
+                @Override
+                public Void call() throws Exception {
                     try {
-                        deviceRemote.requestStatus();
-                    } catch (CouldNotPerformException ex) {
-                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                        remote.activate();
+                        remote.addObserver((Observable source, Object data) -> {
+                            updateTab(remote);
+                        });
+                        try {
+                            remote.requestStatus();
+                        } catch (CouldNotPerformException ex) {
+                            ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                        }
+                    } catch (Exception ex) {
+                        throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
                     }
-                } catch (Exception ex) {
-                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                    return null;
                 }
-                return null;
-            }
-        });
-
-        executerService.submit(new Callable<Void>() {
-
-            @Override
-            public Void call() throws Exception {
-                try {
-                    locationRemote.activate();
-                    locationRemote.addObserver((Observable<LocationRegistry> source, LocationRegistry data) -> {
-                        updateTabLocationRegistry();
-                    });
-
-                    try {
-                        locationRemote.requestStatus();
-                    } catch (CouldNotPerformException ex) {
-                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-                    }
-                } catch (Exception ex) {
-                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-                }
-                return null;
-            }
-        });
-
-        executerService.submit(new Callable<Void>() {
-
-            @Override
-            public Void call() throws Exception {
-                try {
-                    sceneRemote.activate();
-                    sceneRemote.addObserver((Observable<SceneRegistry> source, SceneRegistry data) -> {
-                        updateTabSceneRegistry();
-                    });
-
-                    try {
-                        sceneRemote.requestStatus();
-                    } catch (CouldNotPerformException ex) {
-                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-                    }
-                } catch (Exception ex) {
-                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-                }
-                return null;
-            }
-        });
-
-        executerService.submit(new Callable<Void>() {
-
-            @Override
-            public Void call() throws Exception {
-                try {
-                    agentRemote.activate();
-                    agentRemote.addObserver((Observable<AgentRegistry> source, AgentRegistry data) -> {
-                        updateTabAgentRegistry();
-                    });
-
-                    try {
-                        agentRemote.requestStatus();
-                    } catch (CouldNotPerformException ex) {
-                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-                    }
-                } catch (Exception ex) {
-                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-                }
-                return null;
-            }
-        });
-
-        executerService.submit(new Callable<Void>() {
-
-            @Override
-            public Void call() throws Exception {
-                try {
-                    appRemote.activate();
-                    appRemote.addObserver((Observable<AppRegistry> source, AppRegistry data) -> {
-                        updateTabAppRegistry();
-                    });
-
-                    try {
-                        appRemote.requestStatus();
-                    } catch (CouldNotPerformException ex) {
-                        ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-                    }
-                } catch (Exception ex) {
-                    throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-                }
-                return null;
-            }
-        });
+            });
+        }
     }
 
     @Override
     public void stop() throws Exception {
-        deviceRemote.shutdown();
-        locationRemote.shutdown();
-        sceneRemote.shutdown();
-        agentRemote.shutdown();
-        appRemote.shutdown();
+        remotePool.shutdown();
         super.stop();
     }
 
-    public DescriptorColumn getDescriptorColumn() {
-        return new DescriptorColumn(deviceRemote, locationRemote, sceneRemote, agentRemote, appRemote);
-
-    }
-
-    private void updateTabDeviceRegistry() {
+    private void updateTab(RSBRemoteService remote) {
         Platform.runLater(new Runnable() {
 
             @Override
             public void run() {
-                if (!deviceRemote.isConnected()) {
-                    tabDeviceRegistry.setContent(progressDeviceRegistryIndicator);
+                Tab tab = getRegistryTabByRemote(remote);
+                if (!remote.isConnected()) {
+                    tab.setContent(progressIndicator);
                     return;
                 }
                 try {
                     if (!modified) {
-                        DeviceRegistry data = deviceRemote.getData();
-                        deviceClassTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.DEVICE_CLASS_FIELD_NUMBER, data.toBuilder()));
-                        FieldGroup deviceClassId = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
-                        FieldGroup locationId = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
-                        Descriptors.FieldDescriptor field = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER);
-                        deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(field.getName(), field, data.toBuilder(), data.toBuilder().getDeviceConfigBuilderList(), deviceClassId, locationId));
-                        tabDeviceRegistry.setContent(tabDeviceRegistryPane);
+                        GeneratedMessage data = remote.getData();
+                        tab.setContent(fillTreeTableView(data));
                     }
 
                 } catch (CouldNotPerformException ex) {
-                    logger.error("Device registry not available!", ex);
-                    tabDeviceRegistry.setContent(new Label("Error: " + ex.getMessage()));
+                    logger.error("Registry not available!", ex);
+                    tab.setContent(new Label("Error: " + ex.getMessage()));
                 }
             }
         });
     }
 
-    private void updateTabLocationRegistry() {
-        Platform.runLater(new Runnable() {
-
-            @Override
-            public void run() {
-                if (!locationRemote.isConnected()) {
-                    tabLocationRegistry.setContent(progressLocationRegistryIndicator);
-                    return;
-                }
-                try {
-                    if (!modified) {
-                        LocationRegistry data = locationRemote.getData();
-                        locationConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, data.toBuilder()));
-                        tabLocationRegistry.setContent(locationConfigTreeTableView);
-                    }
-                } catch (CouldNotPerformException ex) {
-                    logger.error("Location registry not available!", ex);
-                    tabLocationRegistry.setContent(new Label("Error: " + ex.getMessage()));
-                }
-            }
-        });
+    private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException {
+        if (msg instanceof DeviceRegistry) {
+            DeviceRegistry data = (DeviceRegistry) msg;
+            deviceClassTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.DEVICE_CLASS_FIELD_NUMBER, data.toBuilder()));
+            FieldGroup deviceClassId = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
+            FieldGroup locationId = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+            Descriptors.FieldDescriptor field = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER);
+            deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(field.getName(), field, data.toBuilder(), data.toBuilder().getDeviceConfigBuilderList(), deviceClassId, locationId));
+            return deviceRegistryTabPane;
+        } else if (msg instanceof LocationRegistry) {
+            LocationRegistry data = (LocationRegistry) msg;
+            locationConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            return locationConfigTreeTableView;
+        } else if (msg instanceof SceneRegistry) {
+            SceneRegistry data = (SceneRegistry) msg;
+            sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            return sceneConfigTreeTableView;
+        } else if (msg instanceof AppRegistry) {
+            AppRegistry data = (AppRegistry) msg;
+            appConfigTreeTableView.setRoot(new GenericListContainer(AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            appRegistryTab.setContent(appConfigTreeTableView);
+        } else if (msg instanceof AgentRegistry) {
+            AgentRegistry data = (AgentRegistry) msg;
+            agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            return agentConfigTreeTableView;
+        }
+        return null;
     }
 
-    private void updateTabSceneRegistry() {
-        Platform.runLater(new Runnable() {
-
-            @Override
-            public void run() {
-                if (!sceneRemote.isConnected()) {
-                    tabSceneRegistry.setContent(progressSceneRegistryIndicator);
-                    return;
-                }
-                try {
-                    if (!modified) {
-                        SceneRegistry data = sceneRemote.getData();
-                        sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder()));
-                        tabSceneRegistry.setContent(sceneConfigTreeTableView);
-                    }
-                } catch (CouldNotPerformException ex) {
-                    logger.error("Scene registry not available!", ex);
-                    tabSceneRegistry.setContent(new Label("Error: " + ex.getMessage()));
-                }
-            }
-        });
-    }
-
-    private void updateTabAgentRegistry() {
-        Platform.runLater(new Runnable() {
-
-            @Override
-            public void run() {
-                if (!agentRemote.isConnected()) {
-                    tabAgentRegistry.setContent(progressAgentRegistryIndicator);
-                    return;
-                }
-                try {
-                    if (!modified) {
-                        AgentRegistry data = agentRemote.getData();
-                        agentConfigTreeTableView
-                                .setRoot(new GenericListContainer(AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-                        tabAgentRegistry.setContent(agentConfigTreeTableView);
-                    }
-                } catch (CouldNotPerformException ex) {
-                    logger.error("Agent registry not available!", ex);
-                    tabAgentRegistry.setContent(new Label("Error: " + ex.getMessage()));
-                }
-            }
-        });
-    }
-
-    private void updateTabAppRegistry() {
-        Platform.runLater(new Runnable() {
-
-            @Override
-            public void run() {
-                if (!appRemote.isConnected()) {
-                    tabAppRegistry.setContent(progressAppRegistryIndicator);
-                    return;
-                }
-                try {
-                    if (!modified) {
-                        AppRegistry data = appRemote.getData();
-                        appConfigTreeTableView
-                                .setRoot(new GenericListContainer(AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder()));
-                        tabAppRegistry.setContent(appConfigTreeTableView);
-                    }
-                } catch (CouldNotPerformException ex) {
-                    logger.error("App registry not available!", ex);
-                    tabAppRegistry.setContent(new Label("Error: " + ex.getMessage()));
-                }
-            }
-        });
+    private Tab getRegistryTabByRemote(RSBRemoteService remote) {
+        if (remote instanceof DeviceRegistryRemote) {
+            return deviceRegistryTab;
+        } else if (remote instanceof LocationRegistryRemote) {
+            return locationRegistryTab;
+        } else if (remote instanceof SceneRegistryRemote) {
+            return sceneRegistryTab;
+        } else if (remote instanceof AppRegistryRemote) {
+            return appRegistryTab;
+        } else if (remote instanceof AgentRegistryRemote) {
+            return agentRegistryTab;
+        }
+        return null;
     }
 
     public static void setModified(boolean value) {
