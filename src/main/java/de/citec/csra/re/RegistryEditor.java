@@ -80,7 +80,7 @@ public class RegistryEditor extends Application {
     private final AgentRegistryRemote agentRemote;
     private final AppRegistryRemote appRemote;
     private TabPane registryTabPane, tabDeviceRegistryPane;
-    private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig, tabAppRegistry;
+    private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig, tabAppRegistry, tabUnitTemplateRegistry;
     private ProgressIndicator progressDeviceRegistryIndicator;
     private ProgressIndicator progressLocationRegistryIndicator;
     private ProgressIndicator progressSceneRegistryIndicator;
@@ -92,6 +92,7 @@ public class RegistryEditor extends Application {
     private TreeTableView<Node> sceneConfigTreeTableView;
     private TreeTableView<Node> agentConfigTreeTableView;
     private TreeTableView<Node> appConfigTreeTableView;
+    private TreeTableView<Node> unitTemplateTreeTableView;
 
     public RegistryEditor() throws InstantiationException {
         this.deviceRemote = new DeviceRegistryRemote();
@@ -138,13 +139,20 @@ public class RegistryEditor extends Application {
         deviceConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceConfigColumn(deviceRemote, locationRemote));
         deviceConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceConfigTreeTableView, DeviceConfig.getDefaultInstance()));
 
+        unitTemplateTreeTableView = new TreeTableView<>();
+        unitTemplateTreeTableView.setEditable(true);
+        unitTemplateTreeTableView.setShowRoot(false);
+        unitTemplateTreeTableView.getColumns().addAll(getDescriptorColumn()/*TODO*/);
+
         tabDeviceRegistryPane = new TabPane();
         tabDeviceRegistryPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabDeviceClass = new Tab("DeviceClass");
         tabDeviceConfig = new Tab("DeviceConfig");
+        tabUnitTemplateRegistry = new Tab("UnitTemplate");
         tabDeviceClass.setContent(deviceClassTreeTableView);
         tabDeviceConfig.setContent(deviceConfigTreeTableView);
-        tabDeviceRegistryPane.getTabs().addAll(tabDeviceClass, tabDeviceConfig);
+        tabUnitTemplateRegistry.setContent(unitTemplateTreeTableView);
+        tabDeviceRegistryPane.getTabs().addAll(tabDeviceClass, tabDeviceConfig, tabUnitTemplateRegistry);
         tabDeviceRegistry.setContent(tabDeviceRegistryPane);
 
         locationConfigTreeTableView = new TreeTableView<>();

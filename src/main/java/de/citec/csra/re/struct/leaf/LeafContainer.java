@@ -7,17 +7,9 @@ package de.citec.csra.re.struct.leaf;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.ProtocolMessageEnum;
-import de.citec.csra.re.RSTDefaultInstances;
-import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.NodeContainer;
 import de.citec.csra.re.struct.node.RotationContainer;
-import de.citec.csra.re.struct.node.UnitConfigListContainer;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
-import rst.homeautomation.service.ServiceConfigType;
-import rst.homeautomation.service.ServiceTypeHolderType;
-import rst.homeautomation.unit.UnitConfigType;
-import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 
 /**
  *
