@@ -42,23 +42,18 @@ public class DeviceClassCell extends ValueCell {
                                 DeviceClassContainer container = (DeviceClassContainer) getItem();
 
                                 DeviceClass deviceClass = container.getBuilder().build();
-                                if (deviceClass.getUnitTemplateConfigList().isEmpty()) {
-                                    applyButton.setStyle("-fx-base: #333333;");
-                                    applyButton.setText("AddaUnitTemplate");
-                                } else {
-                                    applyButton.setStyle(defaultButtonStyle);
-                                    applyButton.setText("Apply");
-                                    try {
-                                        if (deviceRegistryRemote.containsDeviceClass(deviceClass)) {
-                                            deviceRegistryRemote.updateDeviceClass(deviceClass);
-                                        } else {
-                                            deviceRegistryRemote.registerDeviceClass(deviceClass);
-                                            container.setNewNode(false);
-                                        }
-                                        container.setChanged(false);
-                                    } catch (CouldNotPerformException ex) {
-                                        logger.warn("Could not register or update device class [" + deviceClass + "]", ex);
+                                applyButton.setStyle(defaultButtonStyle);
+                                applyButton.setText("Apply");
+                                try {
+                                    if (deviceRegistryRemote.containsDeviceClass(deviceClass)) {
+                                        deviceRegistryRemote.updateDeviceClass(deviceClass);
+                                    } else {
+                                        deviceRegistryRemote.registerDeviceClass(deviceClass);
+                                        container.setNewNode(false);
                                     }
+                                    container.setChanged(false);
+                                } catch (CouldNotPerformException ex) {
+                                    logger.warn("Could not register or update device class [" + deviceClass + "]", ex);
                                 }
                                 return true;
                             }

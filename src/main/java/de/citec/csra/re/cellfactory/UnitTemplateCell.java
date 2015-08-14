@@ -40,9 +40,9 @@ public class UnitTemplateCell extends ValueCell {
 
                                 UnitTemplateType.UnitTemplate unitTemplate = container.getBuilder().build();
                                 try {
-//                                    if (deviceRegistryRemote.containsUnitTemplateById(unitTemplate.getId())) {
-                                    deviceRegistryRemote.updateUnitTemplate(unitTemplate);
-//                                    }
+                                    if (deviceRegistryRemote.containsUnitTemplateById(unitTemplate.getId())) {
+                                        deviceRegistryRemote.updateUnitTemplate(unitTemplate);
+                                    }
                                     container.setChanged(false);
                                 } catch (CouldNotPerformException ex) {
                                     logger.warn("Could not register or update unit template [" + unitTemplate + "]", ex);
