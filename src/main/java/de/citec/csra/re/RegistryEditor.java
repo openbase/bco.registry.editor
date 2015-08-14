@@ -15,6 +15,7 @@ import de.citec.csra.re.column.DeviceConfigColumn;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.column.LocationConfigColumn;
 import de.citec.csra.re.column.SceneConfigColumn;
+import de.citec.csra.re.column.UnitTemplateColumn;
 import de.citec.csra.re.struct.node.AgentConfigContainer;
 import de.citec.csra.re.struct.node.AppConfigContainer;
 import de.citec.csra.re.struct.node.DeviceClassList;
@@ -144,7 +145,7 @@ public class RegistryEditor extends Application {
         unitTemplateTreeTableView = new TreeTableView<>();
         unitTemplateTreeTableView.setEditable(true);
         unitTemplateTreeTableView.setShowRoot(false);
-        unitTemplateTreeTableView.getColumns().addAll(getDescriptorColumn()/*TODO*/);
+        unitTemplateTreeTableView.getColumns().addAll(getDescriptorColumn(), new UnitTemplateColumn(deviceRemote));
 
         tabDeviceRegistryPane = new TabPane();
         tabDeviceRegistryPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -357,11 +358,6 @@ public class RegistryEditor extends Application {
                         deviceClassTreeTableView.setRoot(new DeviceClassList(data.toBuilder()));
                         deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
                         unitTemplateTreeTableView.setRoot(new UnitTemplateListContainer(data.toBuilder()));
-                        System.out.println("\n\n\n unit templates \n\n\n");
-                        for (UnitTemplate template : data.getUnitTemplateList()) {
-                            System.out.println("Type [" + template.getType() + "]");
-                            System.out.println("Id [" + template.getId() + "]");
-                        }
                         tabDeviceRegistry.setContent(tabDeviceRegistryPane);
                     }
 

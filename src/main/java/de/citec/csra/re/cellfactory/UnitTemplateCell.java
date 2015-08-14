@@ -40,13 +40,14 @@ public class UnitTemplateCell extends ValueCell {
 
                                 UnitTemplateType.UnitTemplate unitTemplate = container.getBuilder().build();
                                 try {
-                                    if (deviceRegistryRemote.containsUnitTemplate(unitTemplate)) {
-                                        deviceRegistryRemote.updateUnitTemplate(unitTemplate);
-                                    }
+//                                    if (deviceRegistryRemote.containsUnitTemplateById(unitTemplate.getId())) {
+                                    deviceRegistryRemote.updateUnitTemplate(unitTemplate);
+//                                    }
                                     container.setChanged(false);
                                 } catch (CouldNotPerformException ex) {
                                     logger.warn("Could not register or update unit template [" + unitTemplate + "]", ex);
                                 }
+                                System.out.println("Maybe did not contain?");
                                 return true;
                             }
                         });
@@ -105,9 +106,9 @@ public class UnitTemplateCell extends ValueCell {
 
                         @Override
                         public void run() {
-                            if (newValue && getGraphic() != buttonBox) {
+                            if (newValue) {
                                 setGraphic(buttonBox);
-                            } else if (getGraphic() != null) {
+                            } else {
                                 setGraphic(null);
                             }
                         }
