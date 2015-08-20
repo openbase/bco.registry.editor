@@ -36,9 +36,9 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         this.builder = builder;
         this.fieldDescriptor = fieldDescriptor;
         this.descriptor = descriptor;
-        this.setValue(this);
         changed = new SimpleObjectProperty<>(false);
         sendable = false;
+        this.setValue(this);
     }
 
     protected void add(LeafContainer leaf) {

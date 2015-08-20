@@ -6,6 +6,7 @@
 package de.citec.csra.re.struct;
 
 import com.google.protobuf.Descriptors;
+import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.re.util.FieldUtil;
 import de.citec.jul.exception.CouldNotPerformException;
@@ -35,8 +36,15 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
                 throw new NotAvailableException("repeatedFieldDescriptor");
             }
 
-            for (GeneratedMessage.Builder childBuilder : BuilderProcessor.extractRepeatedFieldBuilderList(repeatedFieldDescriptor, builder)) {
-                registerElement((RFMB) childBuilder);
+            if (repeatedFieldDescriptor.getType() == MESSAGE) {
+                for (GeneratedMessage.Builder childBuilder : BuilderProcessor.extractRepeatedFieldBuilderList(repeatedFieldDescriptor, builder)) {
+                    registerElement((RFMB) childBuilder);
+                }
+            } else {
+                List<Object> valueList = (List<Object>) builder.getField(fieldDescriptor);
+                for (int i = 0; i < valueList.size(); i++) {
+                    registerElement(valueList.get(i), i);
+                }
             }
         } catch (CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
@@ -57,30 +65,56 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
 
     public void addNewDefaultElement() throws CouldNotPerformException {
         try {
-            registerElement((RFMB) BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, getBuilder()));
+            switch (fieldDescriptor.getType()) {
+                case MESSAGE:
+                    registerElement((RFMB) BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, getBuilder()));
+                    break;
+                case STRING:
+                    addElement("");
+                    break;
+                case DOUBLE:
+                case FLOAT:
+                case INT32:
+                case INT64:
+                    addElement(0);
+                    break;
+                case BOOL:
+                    addElement(true);
+                    break;
+                case ENUM:
+                    addElement(builder.getField(fieldDescriptor).getClass().getEnumConstants()[0]);
+                    break;
+                default:
+                    registerElement(null);
+            }
             setExpanded(true);
             setSendableChanged();
         } catch (CouldNotPerformException ex) {
-            throw new CouldNotPerformException("Could not add Element!", ex);
+            throw new CouldNotPerformException("Could not add default element to field [" + fieldDescriptor.getName() + "]!", ex);
         }
     }
 
-    public void addElement(RFM element) throws CouldNotPerformException {
-        addElement((RFMB) element.toBuilder());
-    }
-
-    public void addElement(RFMB elementBuilder) throws CouldNotPerformException {
+    public void addElement(Object element) throws CouldNotPerformException {
         try {
-            BuilderProcessor.addMessageToRepeatedField(fieldDescriptor, elementBuilder, (GeneratedMessage.Builder) getBuilder());
-            registerElement(elementBuilder);
+            if (fieldDescriptor.getType() == MESSAGE) {
+                BuilderProcessor.addMessageToRepeatedField(fieldDescriptor, (RFMB) element, (GeneratedMessage.Builder) getBuilder());
+                registerElement(element);
+            } else {
+                builder.addRepeatedField(fieldDescriptor, element);
+                registerElement(element, builder.getRepeatedFieldCount(fieldDescriptor) - 1);
+            }
             setExpanded(true);
             setSendableChanged();
         } catch (CouldNotPerformException ex) {
-            throw new CouldNotPerformException("Could not add Element!", ex);
+            throw new CouldNotPerformException("Could not add element [" + element + "] to field [" + fieldDescriptor.getName() + "]!", ex);
         }
     }
 
-    private void registerElement(RFMB elementBuilder) throws CouldNotPerformException {
-        super.add(new GenericNodeContainer<>(fieldDescriptor, elementBuilder));
+    private void registerElement(Object element) throws CouldNotPerformException {
+        super.add(new GenericNodeContainer<>(fieldDescriptor, (RFMB) element));
+    }
+
+    private void registerElement(Object element, int index) {
+        super.add(new LeafContainer(element, fieldDescriptor, this, index));
     }
 }

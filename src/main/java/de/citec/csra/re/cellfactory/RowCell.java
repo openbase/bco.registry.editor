@@ -32,7 +32,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate.ServiceType;
 import rst.homeautomation.unit.UnitConfigType;
 import rst.spatial.PlacementConfigType;
 
@@ -77,24 +76,26 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
-        } else if (item instanceof NodeContainer && ((NodeContainer) item).getParent().getValue() instanceof GenericListContainer) {
+        } else if ((item instanceof NodeContainer && ((NodeContainer) item).getParent().getValue() instanceof GenericListContainer)
+                || (item instanceof LeafContainer && ((LeafContainer) item).getParent() instanceof GenericListContainer)) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(true);
             setContextMenu(contextMenu);
-        } else if (item instanceof Leaf) {
-            if (((Leaf) item).getValue() instanceof ServiceType) {
-                addMenuItem.setVisible(true);
-                removeMenuItem.setVisible(true);
-                setContextMenu(contextMenu);
-            } else if (item.getDescriptor().equals("unit_id")) {
-                addMenuItem.setVisible(true);
-                removeMenuItem.setVisible(true);
-                setContextMenu(contextMenu);
-            } else if (item.getDescriptor().equals("child_id")) {
-                removeMenuItem.setVisible(true);
-                addMenuItem.setVisible(false);
-                setContextMenu(contextMenu);
-            }
+            //TODO: maybe there are cases where lists cannot be edited, elements only removable or addable?
+//        } else if (item instanceof Leaf) {
+//            if (((Leaf) item).getValue() instanceof ServiceType) {
+//                addMenuItem.setVisible(true);
+//                removeMenuItem.setVisible(true);
+//                setContextMenu(contextMenu);
+//            } else if (item.getDescriptor().equals("unit_id")) {
+//                addMenuItem.setVisible(true);
+//                removeMenuItem.setVisible(true);
+//                setContextMenu(contextMenu);
+//            } else if (item.getDescriptor().equals("child_id")) {
+//                removeMenuItem.setVisible(true);
+//                addMenuItem.setVisible(false);
+//                setContextMenu(contextMenu);
+//            }
         } else {
             setContextMenu(null);
         }
@@ -132,13 +133,19 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
                     List<FieldGroup> groups = new ArrayList<>();
                     NodeContainer groupContainer = parent;
-                    while (groupContainer.getParent().getValue() instanceof GenericGroupContainer) {
+                    while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {
                         groupContainer = (GenericGroupContainer) groupContainer.getParent().getValue();
                         groups.add(((GenericGroupContainer) groupContainer).getFieldGroup());
                     }
 
-                    // TODO: get the builder type for the list to get a default instance
-//                    GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(parent.getBuilder().get
+                    GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(builder);
+                    for(FieldGroup group: groups) {
+                        group.setValue(addedBuilder, group);
+                    }
+                    parent.addElement(addedBuilder);
+                } else if(add instanceof LeafContainer) {
+                    GenericListContainer parentNode = (GenericListContainer) ((LeafContainer) add).getParent();
+                    parentNode.addNewDefaultElement();
                 }
 //                if (add instanceof DeviceClassContainer) {
 //                    NodeContainer parent = (NodeContainer) ((DeviceClassContainer) add).getParent().getValue();

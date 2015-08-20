@@ -28,6 +28,8 @@ import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
 import rst.homeautomation.unit.UnitConfigType;
 import rst.rsb.ScopeType;
+import rst.spatial.LocationConfigType;
+import rst.spatial.LocationRegistryType;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
@@ -129,18 +131,28 @@ public class GenericNodeContainerTest {
             }
         }
     }
-    
+
     @Test
     public void testSimpleName() {
         DeviceClassType.DeviceClass test = DeviceClassType.DeviceClass.getDefaultInstance();
         assertEquals("DeviceClass", print(test));
         System.out.println(print(test));
     }
+    
+    @Test
+    public void testListContainer() throws Exception {
+        LocationConfigType.LocationConfig.Builder location = LocationConfigType.LocationConfig.newBuilder();
+        location.setId("home");
+        location.setLabel("home");
+        location.addChildId("kitchen");
+        location.addChildId("bath");
+        GenericNodeContainer<LocationConfigType.LocationConfig.Builder> genericNodeContainer = new GenericNodeContainer<>(LocationRegistryType.LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, location);
+    }
 
     private String print(GeneratedMessage msg) {
         return msg.getClass().getSimpleName();
     }
-    
+
     @Test
     public void testBuilderforRepeared() {
     }

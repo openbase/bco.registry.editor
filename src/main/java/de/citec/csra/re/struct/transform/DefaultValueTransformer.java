@@ -12,12 +12,12 @@ package de.citec.csra.re.struct.transform;
 public class DefaultValueTransformer implements ValueTransformer{
 
     @Override
-    public Object getValue(Object object) {
+    public Object transformToVisual(Object object) {
         return object;
     }
 
     @Override
-    public Object setValue(Object object) {
+    public Object transformToInternal(Object object) {
         return object;
     }
     
