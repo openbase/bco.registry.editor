@@ -84,8 +84,8 @@
 	
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <global.version.jul>0.2-SNAPSHOT</global.version.jul>
-        <global.version.registry-manager>0.4-SNAPSHOT</global.version.registry-manager>
+        <global.jul.version>[0.2,0.3-SNAPSHOT)</global.jul.version>
+        <global.rm.version>[0.4,0.5-SNAPSHOT)</global.rm.version>
     </properties>
 	
     <scm>
@@ -115,51 +115,51 @@
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>jul.extension.rsb.com</artifactId>
-            <version>${global.version.jul}</version>
+            <version>${global.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>jul.storage</artifactId>
-            <version>${global.version.jul}</version>
+            <version>${global.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>jul.extension.rsb.scope</artifactId>
-            <version>${global.version.jul}</version>
+            <version>${global.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>jul.processing</artifactId>
-            <version>${global.version.jul}</version>
+            <version>${global.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>dm.remote</artifactId>
-            <version>${global.version.registry-manager}</version>
+            <version>${global.rm.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>lm.remote</artifactId>
-            <version>${global.version.registry-manager}</version>
+            <version>${global.rm.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>scm.remote</artifactId>
-            <version>${global.version.registry-manager}</version>
+            <version>${global.rm.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>agm.remote</artifactId>
-            <version>${global.version.registry-manager}</version>
+            <version>${global.rm.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>de.citec</groupId>
             <artifactId>apm.remote</artifactId>
-            <version>${global.version.registry-manager}</version>
+            <version>${global.rm.version}</version>
             <type>jar</type>
         </dependency>
     </dependencies>
