@@ -16,7 +16,7 @@ public class UnitTemplateConfigContainer extends VariableNode<UnitTemplateConfig
 
     public UnitTemplateConfigContainer(UnitTemplateConfig.Builder unitTemplateConfig) {
         super("unit_template_config", unitTemplateConfig);
-        super.add(unitTemplateConfig.getType(), "type", false);
+        super.add(unitTemplateConfig.getType(), "type");
 
         // TODO Tamino: implement global exception handling if gui elements are not able to init.
         try {
