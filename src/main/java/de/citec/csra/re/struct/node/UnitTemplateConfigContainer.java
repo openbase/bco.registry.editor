@@ -15,8 +15,8 @@ import rst.homeautomation.unit.UnitTemplateConfigType.UnitTemplateConfig;
 public class UnitTemplateConfigContainer extends VariableNode<UnitTemplateConfig.Builder> {
 
     public UnitTemplateConfigContainer(UnitTemplateConfig.Builder unitTemplateConfig) {
-        super("unit_template", unitTemplateConfig);
-        super.add(unitTemplateConfig.getType(), "type");
+        super("unit_template_config", unitTemplateConfig);
+        super.add(unitTemplateConfig.getType(), "type", false);
 
         // TODO Tamino: implement global exception handling if gui elements are not able to init.
         try {

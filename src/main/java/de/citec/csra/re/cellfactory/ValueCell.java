@@ -95,6 +95,7 @@ public abstract class ValueCell extends RowCell {
         });
 
         enumComboBox = new ComboBox();
+        enumComboBox.setVisibleRowCount(5);
         enumComboBox.setOnAction(new EventHandler() {
 
             @Override

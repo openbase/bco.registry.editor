@@ -16,7 +16,7 @@ public class ServiceTemplateContainer extends VariableNode<ServiceTemplate.Build
 
     public ServiceTemplateContainer(ServiceTemplate.Builder serviceTemplate) {
         super("service_template", serviceTemplate);
-        super.add(serviceTemplate.getServiceType(), "service_type");
+        super.add(serviceTemplate.getServiceType(), "service_type", false);
 
         // TODO Tamino: implement global exception handling if gui elements are not able to init.
         try {

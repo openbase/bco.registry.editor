@@ -99,6 +99,7 @@ public class AppConfigCell extends ValueCell {
         });
 
         locationIdComboBox = new ComboBox<>();
+        locationIdComboBox.setVisibleRowCount(5);
         locationIdComboBox.setButtonCell(new AppConfigCell.LocationConfigComboBoxCell());
         locationIdComboBox.setCellFactory(new Callback<ListView<LocationConfigType.LocationConfig>, ListCell<LocationConfigType.LocationConfig>>() {
 

@@ -100,6 +100,7 @@ public class SceneConfigCell extends ValueCell {
         });
 
         locationIdComboBox = new ComboBox<>();
+        locationIdComboBox.setVisibleRowCount(5);
         locationIdComboBox.setButtonCell(new SceneConfigCell.LocationConfigComboBoxCell());
         locationIdComboBox.setCellFactory(new Callback<ListView<LocationConfigType.LocationConfig>, ListCell<LocationConfigType.LocationConfig>>() {
 

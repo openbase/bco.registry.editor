@@ -101,6 +101,7 @@ public class DeviceConfigCell extends ValueCell {
         });
 
         deviceClassComboBox = new ComboBox();
+        deviceClassComboBox.setVisibleRowCount(5);
         deviceClassComboBox.setButtonCell(new DeviceClassComboBoxCell());
         deviceClassComboBox.setCellFactory(new Callback<ListView<DeviceClass>, ListCell<DeviceClass>>() {
 
@@ -122,6 +123,7 @@ public class DeviceConfigCell extends ValueCell {
         });
 
         locationIdComboBox = new ComboBox<>();
+        locationIdComboBox.setVisibleRowCount(5);
         locationIdComboBox.setButtonCell(new LocationConfigComboBoxCell());
         locationIdComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
 
@@ -143,6 +145,7 @@ public class DeviceConfigCell extends ValueCell {
         });
 
         locationConfigComboBox = new ComboBox<>();
+        locationConfigComboBox.setVisibleRowCount(5);
         locationConfigComboBox.setButtonCell(new LocationConfigComboBoxCell());
         locationConfigComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
 
