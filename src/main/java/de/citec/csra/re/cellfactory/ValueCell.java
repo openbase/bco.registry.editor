@@ -5,39 +5,20 @@
  */
 package de.citec.csra.re.cellfactory;
 
-import de.citec.agm.remote.AgentRegistryRemote;
-import de.citec.apm.remote.AppRegistryRemote;
-import de.citec.lm.remote.LocationRegistryRemote;
+import de.citec.csra.re.cellfactory.editing.DecimalTextField;
+import de.citec.csra.re.cellfactory.editing.EnumComboBox;
+import de.citec.csra.re.cellfactory.editing.LongDatePicker;
+import de.citec.csra.re.cellfactory.editing.StringTextField;
+import de.citec.csra.re.cellfactory.editing.ValueCheckBox;
 import de.citec.csra.re.struct.Leaf;
 import de.citec.csra.re.struct.LeafContainer;
 import de.citec.csra.re.struct.Node;
 import de.citec.csra.re.util.SelectableLabel;
-import de.citec.dm.remote.DeviceRegistryRemote;
-import de.citec.jul.exception.InstantiationException;
-import de.citec.scm.remote.SceneRegistryRemote;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.util.Date;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import rst.homeautomation.state.ActivationStateType;
+import rst.homeautomation.state.ActivationStateType.ActivationState;
 
 /**
  *
@@ -45,170 +26,17 @@ import rst.homeautomation.state.ActivationStateType;
  */
 public abstract class ValueCell extends RowCell {
 
-    public static final String VALID_DECIMAL_REGEX = "\\-{0,1}((\\.[0-9]+|[0-9]+\\.){0,1})([0-9]*){0,1}";
-    public static final String INPUT_CHAR_DECIMAL_REGEX = "(\\-{0,1}[0-9]*\\.{0,1}[0-9]*)";
+    protected final Button applyButton, cancelButton;
+    protected final HBox buttonLayout;
+    protected LeafContainer leaf;
 
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-    private final TextField stringTextField;
-    private final TextField decimalTextField;
-    private final ComboBox enumComboBox;
-    private final DatePicker longDatePicker;
-    private final DateFormat converter = new SimpleDateFormat("dd/MM/yyyy");
-    protected final Button applyButton;
-    protected final Button cancel;
-    protected final HBox buttonBox;
-    protected LeafContainer leaf;
-    private final CheckBox checkBox;
 
     public ValueCell() {
         super();
-        applyButton = new Button("Apply Changes");
-        cancel = new Button("Cancel");
-        buttonBox = new HBox(applyButton, cancel);
-        stringTextField = new TextField();
-        stringTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (!newValue && !leaf.getValue().equals(stringTextField.getText())) {
-                    leaf.setValue(stringTextField.getText());
-                    // even though commit is called the text property won't change fast enough without this line?!?
-                    setText(stringTextField.getText());
-                    commitEdit(leaf);
-                }
-            }
-        });
-        stringTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode().equals(KeyCode.ESCAPE)) {
-                    cancelEdit();
-                } else if (event.getCode().equals(KeyCode.ENTER)) {
-                    leaf.setValue(stringTextField.getText());
-                    commitEdit(leaf);
-                }
-            }
-        });
-
-        enumComboBox = new ComboBox();
-        enumComboBox.setOnAction(new EventHandler() {
-
-            @Override
-            public void handle(Event event) {
-                if (enumComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(enumComboBox.getSelectionModel().getSelectedItem())) {
-                    leaf.setValue(enumComboBox.getSelectionModel().getSelectedItem());
-                    commitEdit(leaf);
-                }
-            }
-        });
-
-        decimalTextField = new TextField() {
-
-            @Override
-            public void replaceText(int start, int end, String text) {
-                if (text.matches(INPUT_CHAR_DECIMAL_REGEX) || text.isEmpty()) {
-                    super.replaceText(start, end, text);
-                }
-                validateDecimalField();
-            }
-
-            @Override
-            public void replaceSelection(String text) {
-                if (text.matches(INPUT_CHAR_DECIMAL_REGEX) || text.isEmpty()) {
-                    super.replaceSelection(text);
-                }
-                validateDecimalField();
-            }
-        };
-
-        decimalTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode().equals(KeyCode.ESCAPE)) {
-                    cancelEdit();
-                } else if (event.getCode().equals(KeyCode.ENTER)) {
-
-                    if (!validateDecimalField()) {
-                        return;
-                    }
-
-                    if (leaf.getValue() instanceof Float) {
-                        float parsedValue = Float.parseFloat(decimalTextField.getText());
-                        leaf.setValue(parsedValue);
-                    } else if (leaf.getValue() instanceof Double) {
-                        double parsedValue = Double.parseDouble(decimalTextField.getText());
-                        leaf.setValue(parsedValue);
-                    }
-                    commitEdit(leaf);
-                }
-            }
-        });
-        decimalTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-
-                if (!validateDecimalField()) {
-                    return;
-                }
-
-                double parsedValue = 0;
-                if (leaf.getValue() instanceof Float) {
-                    parsedValue = Float.parseFloat(decimalTextField.getText());
-                } else if (leaf.getValue() instanceof Double) {
-                    parsedValue = Double.parseDouble(decimalTextField.getText());
-                }
-                if (!newValue && !leaf.getValue().equals(parsedValue)) {
-                    leaf.setValue(parsedValue);
-                    // even though commit is called the text property won't change fast enough without this line?!?
-                    setText(Double.toString(parsedValue));
-                    commitEdit(leaf);
-                }
-            }
-        });
-
-        longDatePicker = new DatePicker();
-        longDatePicker.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                if (longDatePicker.getValue() != null && longDatePicker.getValue().toEpochDay() != (Long) leaf.getValue()) {
-                    leaf.setValue(longDatePicker.getValue().toEpochDay() * 24 * 60 * 60 * 1000);
-                    setText(converter.format(new Date((Long) leaf.getValue())));
-                    commitEdit(leaf);
-                }
-            }
-        });
-
-        checkBox = new CheckBox();
-        checkBox.setVisible(true);
-        checkBox.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent t) {
-                ActivationStateType.ActivationState.State state;
-                if (checkBox.isSelected()) {
-                    state = ActivationStateType.ActivationState.State.ACTIVE;
-                } else {
-                    state = ActivationStateType.ActivationState.State.DEACTIVE;
-                }
-                leaf.setValue(state);
-                setText(state.toString());
-                commitEdit(leaf);
-            }
-        });
-    }
-
-    private boolean validateDecimalField() {
-        if (!decimalTextField.getText().matches(VALID_DECIMAL_REGEX)) {
-            decimalTextField.setStyle("-fx-text-inner-color: red;");
-            return false;
-        }
-
-        decimalTextField.setStyle("-fx-text-inner-color: black;");
-        return true;
+        applyButton = new Button("Apply");
+        cancelButton = new Button("Cancel");
+        buttonLayout = new HBox(applyButton, cancelButton);
     }
 
     @Override
@@ -218,44 +46,32 @@ public abstract class ValueCell extends RowCell {
         if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
 
-            if (leaf.getValue() instanceof String) {
-                stringTextField.setText((String) leaf.getValue());
-                setEditingGraphic(stringTextField);
-            } else if (leaf.getValue() instanceof Enum) {
-                if (leaf.getParent().getBuilder() instanceof ActivationStateType.ActivationState.Builder && leaf.getDescriptor().equals("value")) {
-                    checkBox.setSelected(leaf.getValue().equals(ActivationStateType.ActivationState.State.ACTIVE));
-                    setEditingGraphic(checkBox);
-                } else {
-                    enumComboBox.setItems(FXCollections.observableArrayList(leaf.getValue().getClass().getEnumConstants()));
-                    enumComboBox.setValue(leaf.getValue());
-                    setEditingGraphic(enumComboBox);
-                }
-            } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
-                decimalTextField.setText(leaf.getValue().toString());
-                setEditingGraphic(decimalTextField);
-            } else if (leaf.getValue() instanceof Long) {
-                Date date = new Date((Long) leaf.getValue());
-                longDatePicker.setValue(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                setEditingGraphic(longDatePicker);
+            setGraphic(getEditingGraphic());
+        }
+    }
+
+    private javafx.scene.Node getEditingGraphic() {
+        javafx.scene.Node graphic = null;
+        if (leaf.getValue() instanceof String) {
+            graphic = new StringTextField(this, (String) leaf.getValue());
+        } else if (leaf.getValue() instanceof Enum) {
+            if (leaf.getParent().getBuilder() instanceof ActivationState.Builder) {
+                graphic = new ValueCheckBox(this, ActivationState.State.ACTIVE, ActivationState.State.DEACTIVE);
+            } else {
+                graphic = new EnumComboBox(this, leaf.getValue().getClass());
             }
+        } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
+            graphic = new DecimalTextField(this, leaf.getValue().toString());
+        } else if (leaf.getValue() instanceof Long) {
+            graphic = new LongDatePicker(this, (Long) leaf.getValue());
         }
-    }
-
-    public void setEditingGraphic(javafx.scene.Node node) {
-        if (leaf.getEditable()) {
-            super.setGraphic(node);
-        }
-    }
-
-    @Override
-    public void commitEdit(Node newValue) {
-        super.commitEdit(newValue);
+        return graphic;
     }
 
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        graphicProperty().setValue(null);
+        setGraphic(null);
     }
 
     @Override
@@ -269,7 +85,7 @@ public abstract class ValueCell extends RowCell {
         } else if (item instanceof Leaf) {
             String text = "";
             if (((Leaf) item).getValue() instanceof Long) {
-                text = converter.format(new Date((Long) ((Leaf) item).getValue()));
+                text = LongDatePicker.DATE_CONVERTER.format(new Date((Long) ((Leaf) item).getValue()));
             } else if (((Leaf) item).getValue() instanceof Double) {
                 text = decimalFormat.format(((Double) ((Leaf) item).getValue()));
             } else if ((((Leaf) item).getValue() != null)) {
@@ -289,5 +105,13 @@ public abstract class ValueCell extends RowCell {
 //        } else if (item instanceof EntryContainer) {
 //            setText(((EntryContainer) item).getDescription());
 //        }
+    }
+
+    public LeafContainer getLeaf() {
+        return leaf;
+    }
+
+    public void commitEdit() {
+        super.commitEdit(leaf);
     }
 }

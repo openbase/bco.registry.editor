@@ -5,17 +5,11 @@
  */
 package de.citec.csra.re.cellfactory;
 
-import de.citec.csra.re.RegistryEditor;
-import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.Leaf;
+import de.citec.csra.re.struct.LeafContainer;
 import de.citec.csra.re.struct.Node;
-import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
@@ -23,7 +17,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
-import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -98,7 +91,6 @@ public class DeviceConfigCell extends ValueCell {
 //                thread.start();
 //            }
 //        });
-
         deviceClassComboBox = new ComboBox();
         deviceClassComboBox.setButtonCell(new DeviceClassComboBoxCell());
         deviceClassComboBox.setCellFactory(new Callback<ListView<DeviceClass>, ListCell<DeviceClass>>() {
@@ -167,25 +159,25 @@ public class DeviceConfigCell extends ValueCell {
     public void startEdit() {
         super.startEdit();
 
-        if (getItem() instanceof Leaf) {
+        if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             if (((Leaf) getItem()).getValue() instanceof DeviceClass) {
                 try {
                     deviceClassComboBox.setItems(FXCollections.observableArrayList(remotePool.getDeviceRemote().getData().getDeviceClassList()));
-                    super.setEditingGraphic(deviceClassComboBox);
+                    setGraphic(deviceClassComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the deviceClassComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getDescriptor().equals("location_id")) {
                 try {
                     locationIdComboBox.setItems(FXCollections.observableArrayList(remotePool.getLocationRemote().getData().getLocationConfigList()));
-                    super.setEditingGraphic(locationIdComboBox);
+                    setGraphic(locationIdComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
             } else if (((Leaf) getItem()).getDescriptor().equals("location_config")) {
                 try {
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(remotePool.getLocationRemote().getData().getLocationConfigList()));
-                    super.setEditingGraphic(locationConfigComboBox);
+                    setGraphic(locationConfigComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
@@ -227,7 +219,6 @@ public class DeviceConfigCell extends ValueCell {
 //                setGraphic(null);
 //            }
 //        }
-
         if (item instanceof Leaf) {
             if (((Leaf) item).getValue() instanceof DeviceClass) {
                 setText(((DeviceClass) ((Leaf) (item)).getValue()).getId());

@@ -29,6 +29,7 @@ import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -113,7 +114,7 @@ public class RemotePool {
         Method method;
         RSBRemoteService remote;
         try {
-            if (msg instanceof DeviceClass || msg instanceof DeviceConfig) {
+            if (msg instanceof DeviceClass || msg instanceof DeviceConfig || msg instanceof UnitTemplate) {
                 remote = deviceRemote;
             } else if (msg instanceof LocationConfig) {
                 remote = locationRemote;
