@@ -16,7 +16,7 @@ import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 public class UnitTemplateContainer extends SendableNode<UnitTemplate.Builder> {
 
     public UnitTemplateContainer(UnitTemplate.Builder value) {
-        super("unit_template", value);
+        super(value.getId(), value);
         super.add(value.getId(), "id", false);
         super.add(value.getType(), "type", false);
         super.add(new ServiceTypeListContainer(value));
