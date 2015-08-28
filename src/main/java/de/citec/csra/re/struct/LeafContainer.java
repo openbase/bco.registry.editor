@@ -7,10 +7,7 @@ package de.citec.csra.re.struct;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.ProtocolMessageEnum;
-import de.citec.csra.re.struct.transform.DefaultValueTransformer;
-import de.citec.csra.re.struct.transform.ValueTransformer;
-import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.csra.re.util.FieldUtil;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -23,49 +20,38 @@ public class LeafContainer implements Leaf {
 
     private Object value;
     private final boolean editable;
-    private final Descriptors.FieldDescriptor fieldDescriptor;
+    private final String fieldName;
     private final NodeContainer parent;
     private final int index;
-    private final ValueTransformer valueTransformer;
 
-    public LeafContainer(Object value, Descriptors.FieldDescriptor fieldDescriptor, NodeContainer parent) {
-        this(value, fieldDescriptor, parent, true, -1, new DefaultValueTransformer());
+    public LeafContainer(Object value, String fieldName, NodeContainer parent) {
+        this(value, fieldName, parent, true, -1);
     }
 
-    public LeafContainer(Object value, Descriptors.FieldDescriptor fieldDescriptor, NodeContainer parent, int index) {
-        this(value, fieldDescriptor, parent, true, index, new DefaultValueTransformer());
+    public LeafContainer(Object value, String fieldName, NodeContainer parent, int index) {
+        this(value, fieldName, parent, true, index);
     }
 
-    public LeafContainer(Object value, Descriptors.FieldDescriptor fieldDescriptor, NodeContainer parent, boolean editable) {
-        this(value, fieldDescriptor, parent, editable, -1, new DefaultValueTransformer());
+    public LeafContainer(Object value, String fieldName, NodeContainer parent, boolean editable) {
+        this(value, fieldName, parent, editable, -1);
     }
 
-    public LeafContainer(Object value, Descriptors.FieldDescriptor fieldDescriptor, NodeContainer parent, ValueTransformer valueTransformer) {
-        this(value, fieldDescriptor, parent, true, -1, valueTransformer);
-    }
-
-    public LeafContainer(Object value, Descriptors.FieldDescriptor fieldDescriptor, NodeContainer parent, boolean editable, int index, ValueTransformer valueTransformer) {
+    public LeafContainer(Object value, String fieldName, NodeContainer parent, boolean editable, int index) {
         this.value = value;
-        this.fieldDescriptor = fieldDescriptor;
+        this.fieldName = fieldName;
         this.parent = parent;
         this.index = index;
         this.editable = editable;
-        this.valueTransformer = valueTransformer;
     }
 
     @Override
     public Object getValue() {
-        try {
-            return valueTransformer.transformToVisual(value);
-        } catch (CouldNotPerformException ex) {
-            ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-            return value;
-        }
+        return value;
     }
 
     @Override
     public String getDescriptor() {
-        return fieldDescriptor.getName();
+        return fieldName;
     }
 
     public NodeContainer getParent() {
@@ -82,24 +68,19 @@ public class LeafContainer implements Leaf {
 
     @Override
     public void setValue(Object value) {
-        try {
-            this.value = valueTransformer.transformToInternal(value);
-        } catch (CouldNotPerformException ex) {
-            ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
-            this.value = value;
-        }
+        this.value = value;
 
-        if (value instanceof ProtocolMessageEnum) {
-            if (index == -1) {
-                parent.getBuilder().setField(fieldDescriptor, ((ProtocolMessageEnum) this.value).getValueDescriptor());
-            } else {
-                parent.getBuilder().setRepeatedField(fieldDescriptor, index, ((ProtocolMessageEnum) this.value).getValueDescriptor());
-            }
-        } else if (index == -1) {
-            parent.getBuilder().setField(fieldDescriptor, this.value);
-        } else {
-            parent.getBuilder().setRepeatedField(fieldDescriptor, index, this.value);
-        }
+//        if (value instanceof ProtocolMessageEnum) {
+//            if (index == -1) {
+//                parent.getBuilder().setField(fieldName, ((ProtocolMessageEnum) this.value).getValueDescriptor());
+//            } else {
+//                parent.getBuilder().setRepeatedField(fieldName, index, ((ProtocolMessageEnum) this.value).getValueDescriptor());
+//            }
+//        } else if (index == -1) {
+//            parent.getBuilder().setField(fieldName, this.value);
+//        } else {
+//            parent.getBuilder().setRepeatedField(fieldName, index, this.value);
+//        }
 
         parent.setSendableChanged();
     }
@@ -111,10 +92,6 @@ public class LeafContainer implements Leaf {
 
     @Override
     public Descriptors.FieldDescriptor getFieldDescriptor() {
-        return fieldDescriptor;
-    }
-
-    public ValueTransformer getValueTransformer() {
-        return valueTransformer;
+        return FieldUtil.getField(fieldName, parent.getBuilder());
     }
 }

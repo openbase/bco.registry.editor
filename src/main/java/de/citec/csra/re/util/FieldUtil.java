@@ -22,4 +22,8 @@ public class FieldUtil {
     public static Descriptors.FieldDescriptor getField(final int repeatedFieldNumber, final GeneratedMessage message) {
         return getField(repeatedFieldNumber, message.toBuilder());
     }
+    
+    public static Descriptors.FieldDescriptor getField(String fieldName, final Message.Builder builder) {
+        return builder.getDescriptorForType().findFieldByName(fieldName);
+    }
 }

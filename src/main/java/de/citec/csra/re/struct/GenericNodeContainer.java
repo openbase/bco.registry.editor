@@ -7,13 +7,12 @@ package de.citec.csra.re.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
+import de.citec.csra.re.struct.converter.Converter;
 import de.citec.csra.re.util.FieldUtil;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.NotAvailableException;
-import de.citec.jul.extension.rsb.scope.ScopeGenerator;
 import org.slf4j.LoggerFactory;
-import rst.rsb.ScopeType;
 
 /**
  *
@@ -58,11 +57,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
         if (field.isRepeated()) {
             super.add(new GenericListContainer<>(field, builder));
         } else if (field.getType().equals(FieldDescriptor.Type.MESSAGE)) {
-            if ("scope".equals(field.getName())) {
-                registerLeaf(field);
-            } else {
-                this.add(new GenericNodeContainer(field, (GeneratedMessage.Builder) builder.getFieldBuilder(field)));
-            }
+            super.add(new GenericNodeContainer(field, (GeneratedMessage.Builder) builder.getFieldBuilder(field)));
         } else {
             registerLeaf(field);
         }
@@ -72,13 +67,10 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
         if (null != field.getName()) {
             switch (field.getName()) {
                 case "id":
-                    super.add(new LeafContainer(builder.getField(field), field, this, false));
-                    break;
-                case "scope":
-                    super.add(new LeafContainer(ScopeGenerator.generateStringRep((ScopeType.Scope) builder.getField(field)), field, this, false));
+                    super.add(new LeafContainer(builder.getField(field), field.getName(), this, false));
                     break;
                 default:
-                    this.add(new LeafContainer(builder.getField(field), field, this));
+                    this.add(new LeafContainer(builder.getField(field), field.getName(), this));
                     break;
             }
         }

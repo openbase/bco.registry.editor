@@ -115,6 +115,6 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
     }
 
     private void registerElement(Object element, int index) {
-        super.add(new LeafContainer(element, fieldDescriptor, this, index));
+        super.add(new LeafContainer(element, fieldDescriptor.getName(), this, index));
     }
 }
