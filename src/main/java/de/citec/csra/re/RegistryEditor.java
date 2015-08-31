@@ -32,6 +32,7 @@ import de.citec.jp.JPDeviceRegistryScope;
 import de.citec.jp.JPLocationRegistryScope;
 import de.citec.jp.JPSceneRegistryScope;
 import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
@@ -61,7 +62,6 @@ import rst.homeautomation.control.scene.SceneRegistryType;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.device.DeviceRegistryType;
-import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.LocationConfigType.LocationConfig;
 import rst.spatial.LocationRegistryType;
 
@@ -476,6 +476,7 @@ public class RegistryEditor extends Application {
 
         /* Setup JPService */
         JPService.setApplicationName(APP_NAME);
+        JPService.registerProperty(JPReadOnly.class);
         JPService.registerProperty(JPDeviceRegistryScope.class);
         JPService.registerProperty(JPLocationRegistryScope.class);
         JPService.registerProperty(JPSceneRegistryScope.class);
