@@ -19,7 +19,7 @@ public class DeviceConfigContainer extends SendableNode<DeviceConfig.Builder> {
         super(deviceConfig.getLabel(), deviceConfig);
         super.add(deviceConfig.getId(), "id", false);
         super.add(deviceConfig.getLabel(), "label");
-        super.add(deviceConfig.getSerialNumber(), "serial_number");
+        super.add(deviceConfig.getSerialNumber(), "serial_number", deviceConfig.getSerialNumber().isEmpty());
         super.add(new PlacementConfigContainer(deviceConfig.getPlacementConfigBuilder()));
         super.add(ScopeGenerator.generateStringRep(deviceConfig.getScope()), "scope", false);
         super.add(new InventoryStateContainer(deviceConfig.getInventoryStateBuilder()));
