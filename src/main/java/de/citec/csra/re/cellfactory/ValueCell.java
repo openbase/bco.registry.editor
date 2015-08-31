@@ -64,6 +64,8 @@ public abstract class ValueCell extends RowCell {
             graphic = new DecimalTextField(this, leaf.getValue().toString());
         } else if (leaf.getValue() instanceof Long) {
             graphic = new LongDatePicker(this, (Long) leaf.getValue());
+        } else if (leaf.getValue() instanceof Boolean) {
+            graphic = new ValueCheckBox(this, true, false);
         }
         return graphic;
     }
@@ -78,6 +80,7 @@ public abstract class ValueCell extends RowCell {
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
+        logger.info("updatig item");
         if (empty) {
             setGraphic(null);
             setText("");
@@ -91,8 +94,11 @@ public abstract class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 text = ((Leaf) item).getValue().toString();
             }
-            setGraphic(new SelectableLabel(text));
+            setText(text);
+//            setGraphic(new SelectableLabel(text));
+            logger.info("Created selectable label");
         }
+        logger.info("updatig item finished");
 
 //        if (item instanceof DeviceClassContainer) {
 //            setText(((DeviceClassContainer) item).getBuilder().getDescription());

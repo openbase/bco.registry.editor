@@ -7,8 +7,8 @@ package de.citec.csra.re.struct.converter;
 
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.processing.QuaternionEulerTransform;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
 import rst.geometry.RotationType.Rotation;
@@ -17,7 +17,7 @@ import rst.geometry.RotationType.Rotation;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class QuaternionEulerConverter implements Converter {
+public class RotationConverter implements Converter {
 
     private final Rotation.Builder rotation;
     private final Vector3d euler;
@@ -26,7 +26,7 @@ public class QuaternionEulerConverter implements Converter {
     private static final String PITCH = "pitch";
     private static final String YAW = "yaw";
 
-    public QuaternionEulerConverter(Rotation.Builder rotation) {
+    public RotationConverter(Rotation.Builder rotation) {
         this.rotation = rotation;
         euler = QuaternionEulerTransform.transform(new Quat4d(rotation.getQw(), rotation.getQx(), rotation.getQy(), rotation.getQz()));
     }
@@ -58,11 +58,11 @@ public class QuaternionEulerConverter implements Converter {
     }
 
     @Override
-    public List<ValueTupel> getFields() {
-        List<ValueTupel> fields = new ArrayList<>();
-        fields.add(new ValueTupel(Math.toDegrees(euler.x), ROLL));
-        fields.add(new ValueTupel(Math.toDegrees(euler.y), PITCH));
-        fields.add(new ValueTupel(Math.toDegrees(euler.z), YAW));
-        return fields;
+    public Map<String, Object> getFields() {
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put(ROLL, Math.toDegrees(euler.x));
+        fieldMap.put(PITCH, Math.toDegrees(euler.y));
+        fieldMap.put(YAW, Math.toDegrees(euler.z));
+        return fieldMap;
     }
 }

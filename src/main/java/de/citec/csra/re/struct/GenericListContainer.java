@@ -8,7 +8,7 @@ package de.citec.csra.re.struct;
 import com.google.protobuf.Descriptors;
 import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
 import com.google.protobuf.GeneratedMessage;
-import de.citec.csra.re.util.FieldUtil;
+import de.citec.csra.re.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.NotAvailableException;
@@ -24,24 +24,27 @@ import java.util.List;
  */
 public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM extends GeneratedMessage, RFMB extends RFM.Builder<RFMB>> extends NodeContainer<MB> {
 
+    private final Descriptors.FieldDescriptor fieldDescriptor;
+
     public GenericListContainer(int repeatedFieldNumber, final MB builder) throws InstantiationException {
-        this(FieldUtil.getField(repeatedFieldNumber, builder), builder);
+        this(FieldDescriptorUtil.getField(repeatedFieldNumber, builder), builder);
     }
 
     public GenericListContainer(final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder) throws InstantiationException {
-        super(repeatedFieldDescriptor.getName(), repeatedFieldDescriptor, builder);
+        super(repeatedFieldDescriptor.getName(), builder);
 
         try {
             if (repeatedFieldDescriptor == null) {
                 throw new NotAvailableException("repeatedFieldDescriptor");
             }
+            this.fieldDescriptor = repeatedFieldDescriptor;
 
             if (repeatedFieldDescriptor.getType() == MESSAGE) {
                 for (GeneratedMessage.Builder childBuilder : BuilderProcessor.extractRepeatedFieldBuilderList(repeatedFieldDescriptor, builder)) {
                     registerElement((RFMB) childBuilder);
                 }
             } else {
-                List<Object> valueList = (List<Object>) builder.getField(fieldDescriptor);
+                List<Object> valueList = (List<Object>) builder.getField(repeatedFieldDescriptor);
                 for (int i = 0; i < valueList.size(); i++) {
                     registerElement(valueList.get(i), i);
                 }
@@ -52,9 +55,14 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
     }
 
     public GenericListContainer(final String descriptor, final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder, List<RFMB> childBuilderList) throws InstantiationException {
-        super(descriptor, repeatedFieldDescriptor, builder);
+        super(descriptor, builder);
 
         try {
+            if (repeatedFieldDescriptor == null) {
+                throw new NotAvailableException("repeatedFieldDescriptor");
+            }
+
+            this.fieldDescriptor = repeatedFieldDescriptor;
             for (GeneratedMessage.Builder childBuilder : childBuilderList) {
                 registerElement((RFMB) childBuilder);
             }

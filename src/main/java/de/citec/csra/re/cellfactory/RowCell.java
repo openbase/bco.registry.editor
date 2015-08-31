@@ -16,7 +16,8 @@ import de.citec.csra.re.struct.GenericListContainer;
 import de.citec.csra.re.struct.GenericNodeContainer;
 import de.citec.csra.re.struct.Node;
 import de.citec.csra.re.struct.NodeContainer;
-import de.citec.csra.re.util.FieldGroup;
+import de.citec.csra.re.util.FieldDescriptorGroup;
+import de.citec.csra.re.util.FieldDescriptorUtil;
 import de.citec.csra.re.util.RSTDefaultInstances;
 import de.citec.csra.re.util.RemotePool;
 import de.citec.jul.exception.CouldNotPerformException;
@@ -131,7 +132,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     GeneratedMessage.Builder builder = ((NodeContainer) add).getBuilder();
                     GenericListContainer parent = (GenericListContainer) ((NodeContainer) add).getParent().getValue();
 
-                    List<FieldGroup> groups = new ArrayList<>();
+                    List<FieldDescriptorGroup> groups = new ArrayList<>();
                     NodeContainer groupContainer = parent;
                     while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {
                         groupContainer = (GenericGroupContainer) groupContainer.getParent().getValue();
@@ -139,11 +140,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     }
 
                     GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(builder);
-                    for(FieldGroup group: groups) {
+                    for (FieldDescriptorGroup group : groups) {
                         group.setValue(addedBuilder, group);
                     }
                     parent.addElement(addedBuilder);
-                } else if(add instanceof LeafContainer) {
+                } else if (add instanceof LeafContainer) {
                     GenericListContainer parentNode = (GenericListContainer) ((LeafContainer) add).getParent();
                     parentNode.addNewDefaultElement();
                 }
@@ -240,7 +241,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     }
 
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
-        Descriptors.FieldDescriptor field = parent.getFieldDescriptor();
+        Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(parent.getDescriptor(), parent.getBuilder());
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));
         updatedList.remove(index);
         parent.getBuilder().clearField(field);

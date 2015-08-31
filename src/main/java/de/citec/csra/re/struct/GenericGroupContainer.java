@@ -7,8 +7,8 @@ package de.citec.csra.re.struct;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
-import de.citec.csra.re.util.FieldGroup;
-import de.citec.csra.re.util.FieldUtil;
+import de.citec.csra.re.util.FieldDescriptorGroup;
+import de.citec.csra.re.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import java.util.ArrayList;
@@ -26,16 +26,16 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
     /**
      * A group of field after which values the builder list will be grouped.
      */
-    private final FieldGroup fieldGroup;
+    private final FieldDescriptorGroup fieldGroup;
 
-    public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, FieldGroup... groups) throws InstantiationException {
-        this(descriptor, FieldUtil.getField(fieldNumber, builder), builder, builderList, groups);
+    public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, FieldDescriptorGroup... groups) throws InstantiationException {
+        this(descriptor, FieldDescriptorUtil.getField(fieldNumber, builder), builder, builderList, groups);
     }
 
-    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldGroup... groups) throws InstantiationException {
-        super(descriptor, fieldDescriptor, builder);
+    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldDescriptorGroup... groups) throws InstantiationException {
+        super(descriptor, builder);
         this.fieldGroup = groups[0];
-        FieldGroup childGroups[] = new FieldGroup[groups.length - 1];
+        FieldDescriptorGroup childGroups[] = new FieldDescriptorGroup[groups.length - 1];
         for (int i = 1; i < groups.length; i++) {
             childGroups[i - 1] = groups[i];
         }
@@ -61,8 +61,8 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
         }
     }
 
-    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldGroup group) throws InstantiationException {
-        super(descriptor, fieldDescriptor, builder);
+    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldDescriptorGroup group) throws InstantiationException {
+        super(descriptor, builder);
         this.fieldGroup = group;
         try {
             List<RFMB> groupBuilderList = new ArrayList<>();
@@ -82,7 +82,7 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
         this.setValue(this);
     }
 
-    public FieldGroup getFieldGroup() {
+    public FieldDescriptorGroup getFieldGroup() {
         return fieldGroup;
     }
 }

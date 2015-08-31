@@ -7,11 +7,12 @@ package de.citec.csra.re.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
-import de.citec.csra.re.struct.converter.Converter;
-import de.citec.csra.re.util.FieldUtil;
+import de.citec.csra.re.struct.converter.DefaultConverter;
+import de.citec.csra.re.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.NotAvailableException;
+import java.util.Map.Entry;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -24,10 +25,15 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
     public GenericNodeContainer(String descriptor, final MB builder) throws InstantiationException {
-        super(descriptor, null, builder);
+        super(descriptor, builder);
         try {
-            for (FieldDescriptor field : builder.getDescriptorForType().getFields()) {
-                registerElement(field);
+
+            for (Entry<String, Object> entry : converter.getFields().entrySet()) {
+                if (converter instanceof DefaultConverter) {
+                    registerElement(FieldDescriptorUtil.getField(entry.getKey(), builder));
+                } else {
+                    registerElement(entry.getKey(), entry.getValue());
+                }
             }
         } catch (InstantiationException ex) {
             throw new InstantiationException(this, ex);
@@ -35,18 +41,22 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
     }
 
     public GenericNodeContainer(final int fieldNumber, final MB builder) throws InstantiationException {
-        this(FieldUtil.getField(fieldNumber, builder), builder);
+        this(FieldDescriptorUtil.getField(fieldNumber, builder), builder);
     }
 
     public GenericNodeContainer(final FieldDescriptor fieldDescriptor, final MB builder) throws InstantiationException {
-        super(fieldDescriptor.getName(), fieldDescriptor, builder);
+        super(fieldDescriptor.getName(), builder);
         try {
             if (fieldDescriptor == null) {
                 throw new NotAvailableException("fieldDescriptor");
             }
 
-            for (FieldDescriptor field : builder.getDescriptorForType().getFields()) {
-                registerElement(field);
+            for (Entry<String, Object> entry : converter.getFields().entrySet()) {
+                if (converter instanceof DefaultConverter) {
+                    registerElement(FieldDescriptorUtil.getField(entry.getKey(), builder));
+                } else {
+                    registerElement(entry.getKey(), entry.getValue());
+                }
             }
         } catch (CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
@@ -61,6 +71,10 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
         } else {
             registerLeaf(field);
         }
+    }
+
+    private void registerElement(String fieldName, Object value) throws InstantiationException {
+        super.add(new LeafContainer(value, fieldName, this));
     }
 
     private void registerLeaf(FieldDescriptor field) {

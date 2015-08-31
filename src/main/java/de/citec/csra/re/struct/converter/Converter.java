@@ -6,7 +6,7 @@
 package de.citec.csra.re.struct.converter;
 
 import de.citec.jul.exception.CouldNotPerformException;
-import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -16,5 +16,5 @@ public interface Converter {
 
     public void updateBuilder(String fieldName, Object value) throws CouldNotPerformException;
 
-    public List<ValueTupel> getFields();
+    public Map<String, Object> getFields();
 }

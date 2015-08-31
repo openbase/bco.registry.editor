@@ -5,14 +5,18 @@
  */
 package de.citec.csra.re.struct;
 
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.re.RegistryEditor;
+import de.citec.csra.re.struct.converter.Converter;
+import de.citec.csra.re.struct.converter.ConverterSelector;
+import de.citec.csra.re.util.FieldDescriptorUtil;
+import de.citec.jul.exception.CouldNotPerformException;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.geometry.RotationType.Rotation;
 
 /**
  *
@@ -23,21 +27,23 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected final Descriptors.FieldDescriptor fieldDescriptor;
     protected final MB builder;
     protected final String descriptor;
+    protected final Converter converter;
+
     protected final boolean sendable;
     protected final SimpleObjectProperty<Boolean> changed;
 
-    public NodeContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder) {
-        assert fieldDescriptor != null;
+    public NodeContainer(String descriptor, MB builder) {
         assert builder != null;
         assert descriptor != null;
         this.builder = builder;
-        this.fieldDescriptor = fieldDescriptor;
         this.descriptor = descriptor;
+        this.converter = ConverterSelector.getConverter(builder);
+
         changed = new SimpleObjectProperty<>(false);
         sendable = false;
+
         this.setValue(this);
     }
 
@@ -88,8 +94,12 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         ((NodeContainer) sendableNode).setChanged(true);
     }
 
-    @Override
-    public Descriptors.FieldDescriptor getFieldDescriptor() {
-        return fieldDescriptor;
+    public void updateBuilder(String fieldName, Object value, int index) throws CouldNotPerformException {
+        if (index == -1) {
+            converter.updateBuilder(fieldName, value);
+        } else {
+            builder.setRepeatedField(FieldDescriptorUtil.getField(fieldName, builder), index, value);
+        }
+        setSendableChanged();
     }
 }

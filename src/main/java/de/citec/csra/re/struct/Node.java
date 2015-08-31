@@ -26,11 +26,4 @@ public interface Node {
      * @return itself
      */
     Node getContext();
-
-    /**
-     * Get the field descriptor for this value.
-     *
-     * @return the field descriptor
-     */
-    Descriptors.FieldDescriptor getFieldDescriptor();
 }

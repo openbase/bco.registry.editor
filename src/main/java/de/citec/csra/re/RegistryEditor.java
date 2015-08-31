@@ -15,7 +15,7 @@ import de.citec.csra.re.column.ValueColumn;
 import de.citec.csra.re.struct.GenericGroupContainer;
 import de.citec.csra.re.struct.GenericListContainer;
 import de.citec.csra.re.struct.Node;
-import de.citec.csra.re.util.FieldGroup;
+import de.citec.csra.re.util.FieldDescriptorGroup;
 import de.citec.csra.re.util.RemotePool;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jp.JPAgentRegistryScope;
@@ -108,11 +108,14 @@ public class RegistryEditor extends Application {
         deviceClassTab.setContent(deviceClassTreeTableView);
         deviceConfigTab.setContent(deviceConfigTreeTableView);
         deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab);
+
+        logger.info("Init finished");
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        logger.info("Starting");
         for (RSBRemoteService remote : remotePool.getRemotes()) {
             updateTab(remote);
         }
@@ -132,6 +135,7 @@ public class RegistryEditor extends Application {
 
         logger.info(APP_NAME + " successfully started.");
 
+        logger.info("Register observer");
         registerObserver();
     }
 
@@ -196,8 +200,8 @@ public class RegistryEditor extends Application {
         if (msg instanceof DeviceRegistry) {
             DeviceRegistry data = (DeviceRegistry) msg;
             deviceClassTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.DEVICE_CLASS_FIELD_NUMBER, data.toBuilder()));
-            FieldGroup deviceClassId = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
-            FieldGroup locationId = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+            FieldDescriptorGroup deviceClassId = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
+            FieldDescriptorGroup locationId = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
             Descriptors.FieldDescriptor field = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER);
             deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(field.getName(), field, data.toBuilder(), data.toBuilder().getDeviceConfigBuilderList(), deviceClassId, locationId));
             return deviceRegistryTabPane;

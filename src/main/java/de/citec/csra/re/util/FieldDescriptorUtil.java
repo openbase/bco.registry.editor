@@ -13,7 +13,7 @@ import com.google.protobuf.Message;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class FieldUtil {
+public class FieldDescriptorUtil {
 
     public static Descriptors.FieldDescriptor getField(final int repeatedFieldNumber, final Message.Builder builder) {
         return builder.getDescriptorForType().findFieldByNumber(repeatedFieldNumber);

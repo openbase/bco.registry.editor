@@ -24,7 +24,7 @@ import rst.spatial.PlacementConfigType.PlacementConfig;
  */
 public class FieldGroupTest {
 
-    private final FieldGroup group;
+    private final FieldDescriptorGroup group;
 
     private final String homeID = "home";
     private final String kitchenID = "kitchen";
@@ -37,7 +37,7 @@ public class FieldGroupTest {
     private final DeviceConfig.Builder device3;
 
     public FieldGroupTest() throws InstantiationException {
-        group = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+        group = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
 
         home = PlacementConfig.newBuilder().setLocationId(homeID).build();
         kitchen = PlacementConfig.newBuilder().setLocationId(kitchenID).build();

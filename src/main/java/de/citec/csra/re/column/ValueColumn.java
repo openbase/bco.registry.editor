@@ -16,17 +16,18 @@ import javafx.scene.control.TreeTableColumn;
  * @author thuxohl
  */
 public class ValueColumn extends Column {
-
+    
     public ValueColumn() {
         super("Value");
+        logger.info("Init value column");
         this.setEditable(true);
         this.setSortable(false);
         this.setOnEditCommit(new EventHandlerImpl());
         this.setPrefWidth(RegistryEditor.RESOLUTION_WIDTH * 3 / 4);
     }
-
+    
     private class EventHandlerImpl implements EventHandler<TreeTableColumn.CellEditEvent<Node, Node>> {
-
+        
         @Override
         public void handle(CellEditEvent<Node, Node> event) {
             if (event.getRowValue().getValue() instanceof Leaf) {

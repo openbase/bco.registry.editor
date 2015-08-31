@@ -13,8 +13,10 @@ import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.re.struct.GenericGroupContainer;
 import de.citec.csra.re.struct.GenericListContainer;
 import de.citec.csra.re.struct.Leaf;
-import de.citec.csra.re.util.FieldGroup;
-import de.citec.csra.re.util.FieldUtil;
+import de.citec.csra.re.util.FieldDescriptorGroup;
+import de.citec.csra.re.util.FieldDescriptorUtil;
+import de.citec.csra.re.util.RSTDefaultInstances;
+import de.citec.csra.re.util.RemotePool;
 import de.citec.jul.exception.InstantiationException;
 import javafx.scene.control.TreeItem;
 import org.junit.After;
@@ -109,9 +111,9 @@ public class GenericNodeContainerTest {
         DeviceConfig.Builder config2 = DeviceConfig.newBuilder().setId("device2").setDeviceClassId(cameraId).setPlacementConfig(home);
         DeviceConfig.Builder config3 = DeviceConfig.newBuilder().setId("device3").setDeviceClassId(motionSensorId).setPlacementConfig(bath);
         DeviceRegistry.Builder registry = DeviceRegistry.newBuilder().addDeviceConfig(config1).addDeviceConfig(config2).addDeviceConfig(config3);
-        FieldGroup deviceIdGroup = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
-        FieldGroup locationGroup = new FieldGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
-        Descriptors.FieldDescriptor field = FieldUtil.getField(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER, registry);
+        FieldDescriptorGroup deviceIdGroup = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
+        FieldDescriptorGroup locationGroup = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+        Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER, registry);
         GenericGroupContainer test = new GenericGroupContainer(field.getName(), field, registry, registry.getDeviceConfigBuilderList(), deviceIdGroup, locationGroup);
 
         for (Object child : test.getChildren()) {
@@ -138,7 +140,7 @@ public class GenericNodeContainerTest {
         assertEquals("DeviceClass", print(test));
         System.out.println(print(test));
     }
-    
+
     @Test
     public void testListContainer() throws Exception {
         LocationConfigType.LocationConfig.Builder location = LocationConfigType.LocationConfig.newBuilder();
@@ -147,6 +149,14 @@ public class GenericNodeContainerTest {
         location.addChildId("kitchen");
         location.addChildId("bath");
         GenericNodeContainer<LocationConfigType.LocationConfig.Builder> genericNodeContainer = new GenericNodeContainer<>(LocationRegistryType.LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, location);
+    }
+
+    @Test
+    public void testConverter() throws Exception {
+        DeviceConfig.Builder test = RSTDefaultInstances.getDefaultDeviceConfig();
+        test.getScopeBuilder().addComponent("paradise");
+        test.getScopeBuilder().addComponent("test");
+        new GenericNodeContainer<>("test", test);
     }
 
     private String print(GeneratedMessage msg) {

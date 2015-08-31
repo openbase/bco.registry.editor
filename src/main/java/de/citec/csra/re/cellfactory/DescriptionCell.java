@@ -7,7 +7,6 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.re.util.SelectableLabel;
 import de.citec.csra.re.struct.Node;
-import de.citec.jul.exception.InstantiationException;
 
 /**
  *

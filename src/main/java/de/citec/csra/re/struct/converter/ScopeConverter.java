@@ -7,8 +7,8 @@ package de.citec.csra.re.struct.converter;
 
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.extension.rsb.scope.ScopeGenerator;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import rst.rsb.ScopeType.Scope;
 
 /**
@@ -43,9 +43,9 @@ public class ScopeConverter implements Converter {
     }
 
     @Override
-    public List<ValueTupel> getFields() {
-        List<ValueTupel> fields = new ArrayList<>();
-        fields.add(new ValueTupel(ScopeGenerator.generateStringRep(scope.getComponentList()), SCOPE));
-        return fields;
+    public Map<String, Object> getFields() {
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put(SCOPE, ScopeGenerator.generateStringRep(scope.getComponentList()));
+        return fieldMap;
     }
 }

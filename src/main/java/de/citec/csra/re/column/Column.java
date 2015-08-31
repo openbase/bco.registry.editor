@@ -8,6 +8,8 @@ package de.citec.csra.re.column;
 import de.citec.csra.re.struct.Node;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,6 +17,8 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
  */
 public abstract class Column extends TreeTableColumn<Node, Node> {
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    
     public Column(String text) {
         super(text);
         this.setCellValueFactory(new TreeItemPropertyValueFactory<>("context"));

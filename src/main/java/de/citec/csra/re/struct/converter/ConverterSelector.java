@@ -19,9 +19,9 @@ public class ConverterSelector {
         if (builder instanceof Scope.Builder) {
             return new ScopeConverter((Scope.Builder) builder);
         } else if (builder instanceof Rotation.Builder) {
-            return new QuaternionEulerConverter((Rotation.Builder) builder);
+            return new RotationConverter((Rotation.Builder) builder);
         } else {
-            return null;
+            return new DefaultConverter(builder);
         }
     }
 }

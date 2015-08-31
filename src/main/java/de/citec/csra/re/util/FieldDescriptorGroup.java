@@ -16,7 +16,7 @@ import java.util.List;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  * @param <MB> the builder type that is grouped
  */
-public class FieldGroup<MB extends GeneratedMessage.Builder<MB>> {
+public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
 
     /**
      * An array of field descriptors whose values will be used for the group.
@@ -32,7 +32,7 @@ public class FieldGroup<MB extends GeneratedMessage.Builder<MB>> {
      * @param fieldDesciptors the descriptors after which the builders are
      * grouped
      */
-    public FieldGroup(Descriptors.FieldDescriptor... fieldDesciptors) {
+    public FieldDescriptorGroup(Descriptors.FieldDescriptor... fieldDesciptors) {
         this.fieldDescriptors = fieldDesciptors;
     }
 
@@ -48,14 +48,14 @@ public class FieldGroup<MB extends GeneratedMessage.Builder<MB>> {
      * @param descriptorNumbers the field numbers leading to the field value for
      * the grouping
      */
-    public FieldGroup(MB builder, int... descriptorNumbers) {
+    public FieldDescriptorGroup(MB builder, int... descriptorNumbers) {
         fieldDescriptors = new Descriptors.FieldDescriptor[descriptorNumbers.length];
         Message.Builder test = builder;
         for (int i = 0; i < descriptorNumbers.length - 1; i++) {
-            fieldDescriptors[i] = FieldUtil.getField(descriptorNumbers[i], test);
+            fieldDescriptors[i] = FieldDescriptorUtil.getField(descriptorNumbers[i], test);
             test = ((GeneratedMessage) test.getField(fieldDescriptors[i])).toBuilder();
         }
-        fieldDescriptors[descriptorNumbers.length - 1] = FieldUtil.getField(descriptorNumbers[descriptorNumbers.length - 1], test);
+        fieldDescriptors[descriptorNumbers.length - 1] = FieldDescriptorUtil.getField(descriptorNumbers[descriptorNumbers.length - 1], test);
     }
 
     /**
