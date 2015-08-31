@@ -47,10 +47,10 @@ import rst.homeautomation.state.ActivationStateType;
  * @author thuxohl
  */
 public abstract class ValueCell extends RowCell {
-
+    
     public static final String VALID_DECIMAL_REGEX = "\\-{0,1}((\\.[0-9]+|[0-9]+\\.){0,1})([0-9]*){0,1}";
     public static final String INPUT_CHAR_DECIMAL_REGEX = "(\\-{0,1}[0-9]*\\.{0,1}[0-9]*)";
-
+    
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
     private final TextField stringTextField;
     private final TextField decimalTextField;
@@ -62,7 +62,8 @@ public abstract class ValueCell extends RowCell {
     protected final HBox buttonBox;
     protected LeafContainer leaf;
     private final CheckBox checkBox;
-
+    private final CheckBox booleanCheckBox;
+    
     public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
         applyButton = new Button("Apply Changes");
@@ -70,7 +71,7 @@ public abstract class ValueCell extends RowCell {
         buttonBox = new HBox(applyButton, cancel);
         stringTextField = new TextField();
         stringTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-
+            
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (!newValue && !leaf.getValue().equals(stringTextField.getText())) {
@@ -82,7 +83,7 @@ public abstract class ValueCell extends RowCell {
             }
         });
         stringTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
+            
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode().equals(KeyCode.ESCAPE)) {
@@ -93,11 +94,11 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
-
+        
         enumComboBox = new ComboBox();
         enumComboBox.setVisibleRowCount(5);
         enumComboBox.setOnAction(new EventHandler() {
-
+            
             @Override
             public void handle(Event event) {
                 if (enumComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(enumComboBox.getSelectionModel().getSelectedItem())) {
@@ -106,9 +107,9 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
-
+        
         decimalTextField = new TextField() {
-
+            
             @Override
             public void replaceText(int start, int end, String text) {
                 if (text.matches(INPUT_CHAR_DECIMAL_REGEX) || text.isEmpty()) {
@@ -116,7 +117,7 @@ public abstract class ValueCell extends RowCell {
                 }
                 validateDecimalField();
             }
-
+            
             @Override
             public void replaceSelection(String text) {
                 if (text.matches(INPUT_CHAR_DECIMAL_REGEX) || text.isEmpty()) {
@@ -125,19 +126,19 @@ public abstract class ValueCell extends RowCell {
                 validateDecimalField();
             }
         };
-
+        
         decimalTextField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
+            
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode().equals(KeyCode.ESCAPE)) {
                     cancelEdit();
                 } else if (event.getCode().equals(KeyCode.ENTER)) {
-
+                    
                     if (!validateDecimalField()) {
                         return;
                     }
-
+                    
                     if (leaf.getValue() instanceof Float) {
                         float parsedValue = Float.parseFloat(decimalTextField.getText());
                         leaf.setValue(parsedValue);
@@ -150,14 +151,14 @@ public abstract class ValueCell extends RowCell {
             }
         });
         decimalTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-
+            
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-
+                
                 if (!validateDecimalField()) {
                     return;
                 }
-
+                
                 double parsedValue = 0;
                 if (leaf.getValue() instanceof Float) {
                     parsedValue = Float.parseFloat(decimalTextField.getText());
@@ -172,10 +173,10 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
-
+        
         longDatePicker = new DatePicker();
         longDatePicker.setOnAction(new EventHandler<ActionEvent>() {
-
+            
             @Override
             public void handle(ActionEvent event) {
                 if (longDatePicker.getValue() != null && longDatePicker.getValue().toEpochDay() != (Long) leaf.getValue()) {
@@ -185,11 +186,11 @@ public abstract class ValueCell extends RowCell {
                 }
             }
         });
-
+        
         checkBox = new CheckBox();
         checkBox.setVisible(true);
         checkBox.setOnAction(new EventHandler<ActionEvent>() {
-
+            
             @Override
             public void handle(ActionEvent t) {
                 ActivationStateType.ActivationState.State state;
@@ -199,29 +200,41 @@ public abstract class ValueCell extends RowCell {
                     state = ActivationStateType.ActivationState.State.DEACTIVE;
                 }
                 leaf.setValue(state);
-                    setText(state.toString());
-                    commitEdit(leaf);
+                setText(state.toString());
+                commitEdit(leaf);
+            }
+        });
+        
+        booleanCheckBox = new CheckBox();
+        booleanCheckBox.setVisible(true);
+        booleanCheckBox.setOnAction(new EventHandler<ActionEvent>() {
+            
+            @Override
+            public void handle(ActionEvent t) {
+                leaf.setValue(booleanCheckBox.isSelected());
+                setText(booleanCheckBox.isSelected() + "");
+                commitEdit(leaf);
             }
         });
     }
-
+    
     private boolean validateDecimalField() {
         if (!decimalTextField.getText().matches(VALID_DECIMAL_REGEX)) {
             decimalTextField.setStyle("-fx-text-inner-color: red;");
             return false;
         }
-
+        
         decimalTextField.setStyle("-fx-text-inner-color: black;");
         return true;
     }
-
+    
     @Override
     public void startEdit() {
         super.startEdit();
-
+        
         if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
-
+            
             if (leaf.getValue() instanceof String) {
                 stringTextField.setText((String) leaf.getValue());
                 setEditingGraphic(stringTextField);
@@ -241,31 +254,34 @@ public abstract class ValueCell extends RowCell {
                 Date date = new Date((Long) leaf.getValue());
                 longDatePicker.setValue(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 setEditingGraphic(longDatePicker);
+            } else if (leaf.getValue() instanceof Boolean) {
+                booleanCheckBox.setSelected((Boolean) leaf.getValue());
+                setEditingGraphic(booleanCheckBox);
             }
         }
     }
-
+    
     public void setEditingGraphic(javafx.scene.Node node) {
         if (leaf.getEditable()) {
             super.setGraphic(node);
         }
     }
-
+    
     @Override
     public void commitEdit(Node newValue) {
         super.commitEdit(newValue);
     }
-
+    
     @Override
     public void cancelEdit() {
         super.cancelEdit();
         graphicProperty().setValue(null);
     }
-
+    
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-
+        
         if (empty) {
             setGraphic(null);
             setText("");
@@ -279,14 +295,14 @@ public abstract class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 setText(((Leaf) item).getValue().toString());
             }
-
+            
             if ("scope".equals(item.getDescriptor()) || "id".equals(item.getDescriptor())) {
                 setText("");
                 String text = ((Leaf) item).getValue().toString();
                 setGraphic(makeSelectable(new Label(text)));
             }
         }
-
+        
         if (item instanceof DeviceClassContainer) {
             setText(((DeviceClassContainer) item).getBuilder().getDescription());
         } else if (item instanceof DeviceConfigContainer) {
@@ -299,7 +315,7 @@ public abstract class ValueCell extends RowCell {
             setText(((EntryContainer) item).getDescription());
         }
     }
-
+    
     private Label makeSelectable(Label label) {
         StackPane textStack = new StackPane();
         TextField textField = new TextField(label.getText());
@@ -315,7 +331,7 @@ public abstract class ValueCell extends RowCell {
         label.textProperty().bindBidirectional(textField.textProperty());
         label.setGraphic(textStack);
         label.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
+        
         return label;
     }
 }

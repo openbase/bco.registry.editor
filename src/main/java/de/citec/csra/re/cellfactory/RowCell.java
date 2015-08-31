@@ -282,6 +282,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setType(unitTemplateConfig.getType());
                 unitTemplateConfig.getServiceTemplateList().stream().forEach((serviceTemplate) -> {
                     unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceTemplate.getServiceType()));
+                    unitConfigBuilder.setBoundToDevice(true);
                 });
                 return unitConfigBuilder;
             }).forEach((unitConfigBuilder) -> {
