@@ -16,7 +16,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.geometry.RotationType.Rotation;
 
 /**
  *
@@ -82,7 +81,7 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         return changed.getValue();
     }
 
-    public Property<Boolean> getChanged() {
+    public SimpleObjectProperty<Boolean> getChanged() {
         return changed;
     }
 

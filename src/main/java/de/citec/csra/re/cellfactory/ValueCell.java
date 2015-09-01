@@ -5,17 +5,29 @@
  */
 package de.citec.csra.re.cellfactory;
 
+import com.google.protobuf.Message;
 import de.citec.csra.re.cellfactory.editing.DecimalTextField;
 import de.citec.csra.re.cellfactory.editing.EnumComboBox;
 import de.citec.csra.re.cellfactory.editing.LongDatePicker;
 import de.citec.csra.re.cellfactory.editing.StringTextField;
 import de.citec.csra.re.cellfactory.editing.ValueCheckBox;
+import de.citec.csra.re.struct.GenericNodeContainer;
 import de.citec.csra.re.struct.Leaf;
 import de.citec.csra.re.struct.LeafContainer;
 import de.citec.csra.re.struct.Node;
 import de.citec.csra.re.util.SelectableLabel;
+import de.citec.jul.exception.CouldNotPerformException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Date;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import rst.homeautomation.state.ActivationStateType.ActivationState;
@@ -30,13 +42,18 @@ public abstract class ValueCell extends RowCell {
     protected final HBox buttonLayout;
     protected LeafContainer leaf;
 
+    protected SimpleObjectProperty<Boolean> changed = null;
+    protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     public ValueCell() {
         super();
         applyButton = new Button("Apply");
+        applyButton.setOnAction(null);
         cancelButton = new Button("Cancel");
         buttonLayout = new HBox(applyButton, cancelButton);
+        this.changeListener = new ChangedListener();
+
     }
 
     @Override
@@ -45,7 +62,6 @@ public abstract class ValueCell extends RowCell {
 
         if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
-
             setGraphic(getEditingGraphic());
         }
     }
@@ -80,7 +96,6 @@ public abstract class ValueCell extends RowCell {
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        logger.info("updatig item");
         if (empty) {
             setGraphic(null);
             setText("");
@@ -94,20 +109,18 @@ public abstract class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 text = ((Leaf) item).getValue().toString();
             }
-            setText(text);
-//            setGraphic(new SelectableLabel(text));
-            logger.info("Created selectable label");
+//            setText(text);
+            setGraphic(new SelectableLabel(text));
+        } else if (item instanceof GenericNodeContainer && ((GenericNodeContainer) item).isSendable()) {
+            GenericNodeContainer container = (GenericNodeContainer) item;
+            try {
+                String text = getDescription(container.getBuilder());
+                setGraphic(new SelectableLabel(text));
+            } catch (CouldNotPerformException ex) {
+            }
+            updateButtonListener(container.getChanged());
         }
-        logger.info("updatig item finished");
-
-//        if (item instanceof DeviceClassContainer) {
-//            setText(((DeviceClassContainer) item).getBuilder().getDescription());
-//        } else if (item instanceof DeviceConfigContainer) {
-//            setText(((DeviceConfigContainer) item).getBuilder().getDescription());
-//        } else if (item instanceof UnitConfigContainer) {
-//            setText(((UnitConfigContainer) item).getBuilder().getDescription());
-//        } else if (item instanceof DeviceConfigGroupContainer) {
-//            setText(((DeviceConfigGroupContainer) item).getDeviceClass().getDescription());
+        //TODO
 //        } else if (item instanceof EntryContainer) {
 //            setText(((EntryContainer) item).getDescription());
 //        }
@@ -119,5 +132,108 @@ public abstract class ValueCell extends RowCell {
 
     public void commitEdit() {
         super.commitEdit(leaf);
+    }
+
+    private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
+        if (changed != null) {
+            changed.removeListener(changeListener);
+        }
+        changed = property;
+        changed.addListener(changeListener);
+    }
+
+    private class ApplyEventHandler implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent event) {
+            Thread thread = new Thread(
+                    new Task<Boolean>() {
+                        @Override
+                        protected Boolean call() throws Exception {
+//                            RegistryEditor.setModified(false);
+                            GenericNodeContainer container = (GenericNodeContainer) getItem();
+                            Message msg = container.getBuilder().build();
+                            try {
+                                if (remotePool.contains(msg)) {
+                                    remotePool.update(msg);
+                                } else {
+                                    remotePool.register(msg);
+//                                        container.setNewNode(false);
+                                }
+//                                    container.setChanged(false);
+                            } catch (CouldNotPerformException ex) {
+                                logger.warn("Could not register or update message [" + msg + "]", ex);
+                            }
+                            return true;
+                        }
+                    });
+            thread.setDaemon(true);
+            thread.start();
+        }
+    }
+
+    private class CancelEventHandler implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent event) {
+            Thread thread = new Thread(
+                    new Task<Boolean>() {
+                        @Override
+                        protected Boolean call() throws Exception {
+//                            RegistryEditor.setModified(false);
+                            GenericNodeContainer container = (GenericNodeContainer) getItem();
+                            Message msg = container.getBuilder().build();
+                            try {
+                                if (!remotePool.contains(msg)) {
+                                    container.getParent().getChildren().remove(container);
+                                } else {
+                                    int index = container.getParent().getChildren().indexOf(container);
+                                    container.getParent().getChildren().set(index, new GenericNodeContainer("", remotePool.getById(getId(msg), msg)));
+                                }
+                            } catch (CouldNotPerformException ex) {
+                                logger.warn("Could cancel update of [" + msg + "]", ex);
+                            }
+                            return true;
+                        }
+                    });
+            thread.setDaemon(true);
+            thread.start();
+        }
+    }
+
+    private class ChangedListener implements ChangeListener<Boolean> {
+
+        @Override
+        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+            Platform.runLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (newValue) {
+                        setGraphic(buttonLayout);
+                    } else {
+                        setGraphic(null);
+                    }
+                }
+            });
+        }
+    }
+
+    public String getId(Message msg) throws CouldNotPerformException {
+        try {
+            Method method = msg.getClass().getMethod("getId");
+            return (String) method.invoke(msg);
+        } catch (IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new CouldNotPerformException("Could not get id of [" + msg + "]", ex);
+        }
+    }
+
+    public String getDescription(Message.Builder msg) throws CouldNotPerformException {
+        try {
+            Method method = msg.getClass().getMethod("getDescription");
+            return (String) method.invoke(msg);
+        } catch (IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new CouldNotPerformException("Could not get description of [" + msg + "]", ex);
+        }
     }
 }

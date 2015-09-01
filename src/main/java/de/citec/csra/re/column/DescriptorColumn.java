@@ -21,7 +21,6 @@ public class DescriptorColumn extends Column {
     
     public DescriptorColumn() {
         super("Description");
-        logger.info("Init descriptor column");
         
         this.setPrefWidth(RegistryEditor.RESOLUTION_WIDTH / 4);
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {

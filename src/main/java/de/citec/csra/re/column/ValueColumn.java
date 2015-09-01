@@ -19,7 +19,6 @@ public class ValueColumn extends Column {
     
     public ValueColumn() {
         super("Value");
-        logger.info("Init value column");
         this.setEditable(true);
         this.setSortable(false);
         this.setOnEditCommit(new EventHandlerImpl());

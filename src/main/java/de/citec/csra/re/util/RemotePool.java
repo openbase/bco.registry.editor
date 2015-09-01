@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.util;
 
+import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
@@ -24,6 +25,8 @@ import de.citec.scm.remote.SceneRegistryRemote;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
@@ -129,6 +132,42 @@ public class RemotePool {
             }
             method = remote.getClass().getMethod(methodName, msg.getClass());
             return method.invoke(remote, msg);
+        } catch (Exception ex) {
+            throw new CouldNotPerformException(ex);
+        }
+    }
+
+    public boolean isSendableMessage(Message msg) {
+        for (RSBRemoteService remote : getRemotes()) {
+            try {
+                Method method = remote.getClass().getMethod("get" + msg.getClass().getSimpleName() + "s");
+                return true;
+            } catch (NoSuchMethodException | SecurityException ex) {
+            }
+        }
+        return false;
+    }
+
+    public GeneratedMessage.Builder getById(String id, Message type) throws CouldNotPerformException {
+        String methodName = "get" + type.getClass().getSimpleName() + "s";
+        Method method;
+        RSBRemoteService remote;
+        try {
+            if (type instanceof DeviceClass || type instanceof DeviceConfig || type instanceof UnitTemplate) {
+                remote = deviceRemote;
+            } else if (type instanceof LocationConfig) {
+                remote = locationRemote;
+            } else if (type instanceof AgentConfig) {
+                remote = agentRemote;
+            } else if (type instanceof SceneConfig) {
+                remote = sceneRemote;
+            } else if (type instanceof AppConfig) {
+                remote = appRemote;
+            } else {
+                throw new CouldNotPerformException("No matching remote found");
+            }
+            method = remote.getClass().getMethod(methodName, type.getClass());
+            return (GeneratedMessage.Builder) method.invoke(remote, type);
         } catch (Exception ex) {
             throw new CouldNotPerformException(ex);
         }
