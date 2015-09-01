@@ -7,8 +7,7 @@ package de.citec.csra.re.struct;
 
 import com.google.protobuf.ProtocolMessageEnum;
 import de.citec.jul.exception.CouldNotPerformException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import de.citec.jul.exception.ExceptionPrinter;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -38,7 +37,6 @@ public class LeafContainer implements Leaf {
     }
     
     public LeafContainer(Object value, String fieldName, NodeContainer parent, boolean editable, int index) {
-        logger.info("Init leaf [" + fieldName + "," + value + "," + editable + "," + index + "]");
         this.value = value;
         this.fieldName = fieldName;
         this.parent = parent;
@@ -79,7 +77,7 @@ public class LeafContainer implements Leaf {
                 parent.updateBuilder(getDescriptor(), value, index);
             }
         } catch (CouldNotPerformException ex) {
-            Logger.getLogger(LeafContainer.class.getName()).log(Level.SEVERE, null, ex);
+            ExceptionPrinter.printHistory(logger, ex);
         }
     }
     

@@ -148,6 +148,17 @@ public class RemotePool {
         return false;
     }
 
+    public boolean isSendableMessage(Message.Builder builder) {
+        for (RSBRemoteService remote : getRemotes()) {
+            try {
+                Method method = remote.getClass().getMethod("get" + builder.getClass().getName().split("\\$")[1] + "s");
+                return true;
+            } catch (NoSuchMethodException | SecurityException ex) {
+            }
+        }
+        return false;
+    }
+
     public GeneratedMessage.Builder getById(String id, Message type) throws CouldNotPerformException {
         String methodName = "get" + type.getClass().getSimpleName() + "s";
         Method method;

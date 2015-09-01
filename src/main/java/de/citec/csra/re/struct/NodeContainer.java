@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -10,8 +11,9 @@ import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.converter.Converter;
 import de.citec.csra.re.struct.converter.ConverterSelector;
 import de.citec.csra.re.util.FieldDescriptorUtil;
+import de.citec.csra.re.util.RemotePool;
 import de.citec.jul.exception.CouldNotPerformException;
-import javafx.beans.property.Property;
+import de.citec.jul.exception.InstantiationException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
 import org.slf4j.Logger;
@@ -33,7 +35,7 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
     protected final boolean sendable;
     protected final SimpleObjectProperty<Boolean> changed;
 
-    public NodeContainer(String descriptor, MB builder) {
+    public NodeContainer(String descriptor, MB builder) throws InstantiationException {
         assert builder != null;
         assert descriptor != null;
         this.builder = builder;
@@ -41,7 +43,7 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         this.converter = ConverterSelector.getConverter(builder);
 
         changed = new SimpleObjectProperty<>(false);
-        sendable = false;
+        sendable = RemotePool.getInstance().isSendableMessage(builder);
 
         this.setValue(this);
     }

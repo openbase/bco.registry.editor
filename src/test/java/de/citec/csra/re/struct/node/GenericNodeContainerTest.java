@@ -15,8 +15,6 @@ import de.citec.csra.re.struct.GenericListContainer;
 import de.citec.csra.re.struct.Leaf;
 import de.citec.csra.re.util.FieldDescriptorGroup;
 import de.citec.csra.re.util.FieldDescriptorUtil;
-import de.citec.csra.re.util.RSTDefaultInstances;
-import de.citec.csra.re.util.RemotePool;
 import de.citec.jul.exception.InstantiationException;
 import javafx.scene.control.TreeItem;
 import org.junit.After;
@@ -28,7 +26,6 @@ import org.junit.Test;
 import rst.homeautomation.device.DeviceClassType;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
-import rst.homeautomation.unit.UnitConfigType;
 import rst.rsb.ScopeType;
 import rst.spatial.LocationConfigType;
 import rst.spatial.LocationRegistryType;
@@ -144,21 +141,36 @@ public class GenericNodeContainerTest {
     @Test
     public void testListContainer() throws Exception {
         LocationConfigType.LocationConfig.Builder location = LocationConfigType.LocationConfig.newBuilder();
+        System.out.println(location.getClass().getSimpleName());
+        System.out.println(location.getClass().getName());
+        String[] test = location.getClass().getName().split("\\$");
+        System.out.println(test[0]);
+        System.out.println(test[0] + "\t" + test[1] + "\t" + test[2]);
         location.setId("home");
         location.setLabel("home");
         location.addChildId("kitchen");
         location.addChildId("bath");
         GenericNodeContainer<LocationConfigType.LocationConfig.Builder> genericNodeContainer = new GenericNodeContainer<>(LocationRegistryType.LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, location);
+        assertEquals(true, genericNodeContainer.isSendable());
     }
 
-    @Test
-    public void testConverter() throws Exception {
-        DeviceConfig.Builder test = RSTDefaultInstances.getDefaultDeviceConfig();
-        test.getScopeBuilder().addComponent("paradise");
-        test.getScopeBuilder().addComponent("test");
-        new GenericNodeContainer<>("test", test);
-    }
-
+//    @Test
+//    public void testLoadRegistry() throws Exception {
+//        RemotePool remotePool = RemotePool.getInstance();
+//        remotePool.init();
+//        remotePool.getDeviceRemote().activate();
+//        DeviceRegistry deviceRegistry = remotePool.getDeviceRemote().requestStatus();
+//        new GenericListContainer<>(DeviceRegistry.DEVICE_CLASS_FIELD_NUMBER, deviceRegistry.toBuilder());
+//        FieldDescriptorGroup deviceClassId = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
+//        FieldDescriptorGroup locationId = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+//        Descriptors.FieldDescriptor field = deviceRegistry.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER);
+//        new GenericGroupContainer<>(field.getName(), field, deviceRegistry.toBuilder(), deviceRegistry.toBuilder().getDeviceConfigBuilderList(), deviceClassId, locationId);
+//
+//        remotePool.getLocationRemote().activate();
+//        LocationRegistryType.LocationRegistry locationRegistry = remotePool.getLocationRemote().requestStatus();
+//        new GenericListContainer<>(LocationRegistryType.LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, locationRegistry.toBuilder());
+//        remotePool.shutdown();
+//    }
     private String print(GeneratedMessage msg) {
         return msg.getClass().getSimpleName();
     }

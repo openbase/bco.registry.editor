@@ -32,9 +32,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
-import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.homeautomation.unit.UnitConfigType;
-import rst.spatial.PlacementConfigType;
 
 /**
  * Cell factory to manage similar options for all cells in a row. Initializes
@@ -147,70 +144,13 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 } else if (add instanceof LeafContainer) {
                     GenericListContainer parentNode = (GenericListContainer) ((LeafContainer) add).getParent();
                     parentNode.addNewDefaultElement();
-                }
-//                if (add instanceof DeviceClassContainer) {
-//                    NodeContainer parent = (NodeContainer) ((DeviceClassContainer) add).getParent().getValue();
-//                    DeviceClassContainer addedNode = new DeviceClassContainer(DeviceClass.getDefaultInstance().toBuilder());
-//                    addedNode.setChanged(true);
-//                    addedNode.setNewNode(true);
-//                    addedNode.setExpanded(true);
-//                    parent.setExpanded(true);
-//                    parent.getChildren().add(addedNode);
-//                } else if (add instanceof DeviceConfigContainer) {
-//                    LocationGroupContainer parentNode = (LocationGroupContainer) ((DeviceConfigContainer) add).getParent();
-//                    DeviceClass deviceClass = ((DeviceConfigGroupContainer) parentNode.getParent()).getDeviceClass();
-//                    DeviceConfig.Builder deviceConfig = RSTDefaultInstances.getDefaultDeviceConfig();
-//                    deviceConfig.setDeviceClassId(deviceClass.getId());
-//                    addUnitConfigs(deviceConfig, deviceClass);
-//                    deviceConfig.getPlacementConfigBuilder().setLocationId(parentNode.getLocationId());
-//                    addLocationIDToAllUnits(deviceConfig, parentNode.getLocationId());
-//                    DeviceConfigContainer addedNode = new DeviceConfigContainer(deviceConfig);
-//                    addedNode.setChanged(true);
-//                    addedNode.setNewNode(true);
-//                    addedNode.setExpanded(true);
-//                    parentNode.setExpanded(true);
-//                    parentNode.getChildren().add(addedNode);
-//                } else if (add instanceof UnitTemplateConfigListContainer) {
-//                    UnitTemplateConfigListContainer listNode = ((UnitTemplateConfigListContainer) add);
-//                    UnitTemplateConfig.Builder unitTemplate = listNode.getBuilder().addUnitTemplateConfigBuilder();
-//                    listNode.add(new UnitTemplateConfigContainer(unitTemplate));
-//                    listNode.setExpanded(true);
-//                    listNode.setSendableChanged();
-//                } else if (add instanceof UnitTemplateConfigContainer) {
-//                    UnitTemplateConfigListContainer listNode = ((UnitTemplateConfigListContainer) ((NodeContainer) add).getParent().getValue());
-//                    UnitTemplateConfig.Builder unitTemplateConfig = listNode.getBuilder().addUnitTemplateConfigBuilder();
-//                    listNode.add(new UnitTemplateConfigContainer(unitTemplateConfig));
-//                    listNode.setExpande
-                if (add instanceof GenericListContainer) {
+                } else if (add instanceof GenericListContainer) {
                     GenericListContainer parentNode = (GenericListContainer) add;
                     parentNode.addNewDefaultElement();
                 }
             } catch (CouldNotPerformException ex) {
                 ExceptionPrinter.printHistory(logger, ex);
             }
-        }
-
-//        private void addUnitConfigs(DeviceConfig.Builder deviceConfig, DeviceClass deviceClass) {
-//            deviceConfig.clearUnitConfig();
-//            deviceClass.getUnitTemplateList().stream().map((unitTemplateConfig) -> {
-//                UnitConfigType.UnitConfig.Builder unitConfigBuilder = UnitConfigType.UnitConfig.newBuilder().setType(unitTemplateConfig.getType());
-//                unitTemplateConfig.getServiceTemplateList().stream().forEach((serviceTemplate) -> {
-//                    unitConfigBuilder.addServiceConfig(ServiceConfigType.ServiceConfig.newBuilder().setType(serviceTemplate.getServiceType()));
-//                });
-//                return unitConfigBuilder;
-//            }).forEach((unitConfigBuilder) -> {
-//                deviceConfig.addUnitConfig(RSTDefaultInstances.setDefaultPlacement(unitConfigBuilder).build());
-//            });
-//        }
-        private void addLocationIDToAllUnits(DeviceConfig.Builder deviceConfig, String locationId) {
-            List<UnitConfigType.UnitConfig.Builder> unitBuilder = deviceConfig.getUnitConfigBuilderList();
-            List<UnitConfigType.UnitConfig> units = new ArrayList<>();
-            for (UnitConfigType.UnitConfig.Builder unit : unitBuilder) {
-                PlacementConfigType.PlacementConfig placement = unit.getPlacementConfigBuilder().setLocationId(locationId).build();
-                units.add(unit.setPlacementConfig(placement).clone().build());
-            }
-            deviceConfig.clearUnitConfig();
-            deviceConfig.addAllUnitConfig(units);
         }
 
         private void removeAction(Node nodeToRemove) {

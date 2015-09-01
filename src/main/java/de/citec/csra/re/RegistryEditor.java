@@ -153,7 +153,7 @@ public class RegistryEditor extends Application {
                         try {
                             remote.requestStatus();
                         } catch (CouldNotPerformException ex) {
-                            ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                            throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
                         }
                     } catch (Exception ex) {
                         throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
