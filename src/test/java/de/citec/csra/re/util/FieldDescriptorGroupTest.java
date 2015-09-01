@@ -23,7 +23,7 @@ import rst.spatial.PlacementConfigType.PlacementConfig;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class FieldGroupTest {
+public class FieldDescriptorGroupTest {
 
     private final FieldDescriptorGroup group;
 
@@ -37,7 +37,7 @@ public class FieldGroupTest {
     private final DeviceConfig.Builder device2;
     private final DeviceConfig.Builder device3;
 
-    public FieldGroupTest() throws InstantiationException {
+    public FieldDescriptorGroupTest() throws InstantiationException {
         group = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
 
         home = PlacementConfig.newBuilder().setLocationId(homeID).build();

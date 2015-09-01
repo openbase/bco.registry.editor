@@ -25,7 +25,7 @@ import java.util.List;
 public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM extends GeneratedMessage, RFMB extends RFM.Builder<RFMB>> extends NodeContainer<MB> {
 
     private final Descriptors.FieldDescriptor fieldDescriptor;
-    // TODO: maybe compare to a list of fieldNames? or is the message also important?
+    // TODO: thuxohl maybe compare to a list of fieldNames? or is the message also important?
     private final boolean modifiable;
 
     public GenericListContainer(int repeatedFieldNumber, final MB builder) throws InstantiationException {

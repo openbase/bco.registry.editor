@@ -41,10 +41,8 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         this.builder = builder;
         this.descriptor = descriptor;
         this.converter = ConverterSelector.getConverter(builder);
-
         changed = new SimpleObjectProperty<>(false);
         sendable = RemotePool.getInstance().isSendableMessage(builder);
-
         this.setValue(this);
     }
 

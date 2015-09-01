@@ -70,7 +70,7 @@ public abstract class ValueCell extends RowCell {
 
     private javafx.scene.Node getEditingGraphic() {
 
-        // TODO: check for cases where a message combo box is needed, e.g. location_id fields
+        // TODO: thuxohl check for cases where a message combo box is needed, e.g. location_id fields
         javafx.scene.Node graphic = null;
         if (leaf.getValue() instanceof String) {
             graphic = new StringTextField(this, (String) leaf.getValue());
