@@ -12,10 +12,11 @@ import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -34,7 +35,7 @@ import rst.spatial.LocationConfigType.LocationConfig;
 public class DeviceConfigCell extends ValueCell {
 
     private final ComboBox<DeviceClass> deviceClassComboBox;
-    private final ComboBox<LocationConfig> locationIdComboBox;
+    private final ComboBox<String> locationIdComboBox;
     private final ComboBox<LocationConfig> locationConfigComboBox;
 
     public DeviceConfigCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
@@ -124,21 +125,13 @@ public class DeviceConfigCell extends ValueCell {
 
         locationIdComboBox = new ComboBox<>();
         locationIdComboBox.setVisibleRowCount(5);
-        locationIdComboBox.setButtonCell(new LocationConfigComboBoxCell());
-        locationIdComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
-
-            @Override
-            public ListCell<LocationConfig> call(ListView<LocationConfig> param) {
-                return new LocationConfigComboBoxCell();
-            }
-        });
         locationIdComboBox.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {
                 if (locationIdComboBox.getSelectionModel().getSelectedItem() != null && !leaf.getValue().equals(locationIdComboBox.getSelectionModel().getSelectedItem())) {
-                    leaf.setValue(locationIdComboBox.getSelectionModel().getSelectedItem().getId());
-                    setText(locationIdComboBox.getSelectionModel().getSelectedItem().getId());
+                    leaf.setValue(locationIdComboBox.getSelectionModel().getSelectedItem());
+                    setText(locationIdComboBox.getSelectionModel().getSelectedItem());
                     commitEdit(leaf);
                 }
             }
@@ -146,14 +139,6 @@ public class DeviceConfigCell extends ValueCell {
 
         locationConfigComboBox = new ComboBox<>();
         locationConfigComboBox.setVisibleRowCount(5);
-        locationConfigComboBox.setButtonCell(new LocationConfigComboBoxCell());
-        locationConfigComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
-
-            @Override
-            public ListCell<LocationConfig> call(ListView<LocationConfig> param) {
-                return new LocationConfigComboBoxCell();
-            }
-        });
         locationConfigComboBox.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -181,7 +166,7 @@ public class DeviceConfigCell extends ValueCell {
                 }
             } else if (((Leaf) getItem()).getDescriptor().equals("location_id")) {
                 try {
-                    locationIdComboBox.setItems(FXCollections.observableArrayList(locationRegistryRemote.getData().getLocationConfigList()));
+                    locationIdComboBox.setItems(sortedLocationConfigs());
                     super.setEditingGraphic(locationIdComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
@@ -195,6 +180,15 @@ public class DeviceConfigCell extends ValueCell {
                 }
             }
         }
+    }
+
+    private ObservableList<String> sortedLocationConfigs() throws CouldNotPerformException {
+        List<String> locationIds = new ArrayList<>();
+        for (LocationConfig location : locationRegistryRemote.getData().getLocationConfigList()) {
+            locationIds.add(location.getId());
+        }
+        Collections.sort(locationIds);
+        return FXCollections.observableArrayList(locationIds);
     }
 
     @Override
@@ -220,18 +214,6 @@ public class DeviceConfigCell extends ValueCell {
 
             if (item != null) {
                 setText(item.getId());
-            }
-        }
-    }
-
-    public class LocationConfigComboBoxCell extends ListCell<LocationConfig> {
-
-        @Override
-        public void updateItem(LocationConfig item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (item != null) {
-                setText(item.getLabel());
             }
         }
     }
