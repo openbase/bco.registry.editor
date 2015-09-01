@@ -86,39 +86,4 @@ public class UnitTemplateCell extends ValueCell {
             }
         });
     }
-
-    @Override
-    public void updateItem(Node item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (item instanceof UnitTemplateContainer) {
-            UnitTemplateContainer container = (UnitTemplateContainer) item;
-            if ((container.getNewNode() || container.hasChanged()) && getGraphic() != buttonBox) {
-                setGraphic(buttonBox);
-            } else if (!(container.getNewNode() || container.hasChanged()) && getGraphic() != null) {
-                setGraphic(null);
-            }
-            container.getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (newValue) {
-                                setGraphic(buttonBox);
-                            } else {
-                                setGraphic(null);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
-                setGraphic(null);
-            }
-        }
-    }
 }

@@ -201,37 +201,6 @@ public class DeviceConfigCell extends ValueCell {
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (item instanceof DeviceConfigContainer) {
-            DeviceConfigContainer container = (DeviceConfigContainer) item;
-            if (container.getNewNode() || container.hasChanged()) {
-                setGraphic(buttonBox);
-            } else {
-                setGraphic(null);
-            }
-
-            container.getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (newValue) {
-                                setGraphic(buttonBox);
-                            } else {
-                                setGraphic(null);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
-                setGraphic(null);
-            }
-        }
-
         if (item instanceof Leaf) {
             if (((Leaf) item).getValue() instanceof DeviceClass) {
                 setText(((Leaf<DeviceClass>) item).getValue().getId());

@@ -7,7 +7,6 @@ package de.citec.csra.re.struct.node;
 
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.re.RegistryEditor;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
@@ -16,7 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
  * @param <MB>
  */
 public abstract class SendableNode<MB extends GeneratedMessage.Builder> extends VariableNode<MB> {
-    
+
     private final SimpleObjectProperty<Boolean> changed;
     private boolean newNode;
 
@@ -35,7 +34,7 @@ public abstract class SendableNode<MB extends GeneratedMessage.Builder> extends 
         return changed.getValue();
     }
 
-    public Property<Boolean> getChanged() {
+    public SimpleObjectProperty<Boolean> getChanged() {
         return changed;
     }
 

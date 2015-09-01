@@ -10,14 +10,10 @@ import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
-import de.citec.csra.re.struct.node.Node;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -121,41 +117,6 @@ public class LocationConfigCell extends ValueCell {
                 }
             }
         });
-    }
-
-    @Override
-    public void updateItem(Node item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (item instanceof LocationConfigContainer) {
-            LocationConfigContainer container = (LocationConfigContainer) item;
-            if (container.getNewNode() || container.hasChanged()) {
-                setGraphic(buttonBox);
-            } else {
-                setGraphic(null);
-            }
-            container.getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (newValue) {
-                                setGraphic(buttonBox);
-                            } else {
-                                setGraphic(null);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
-                setGraphic(null);
-            }
-        }
     }
 
     @Override

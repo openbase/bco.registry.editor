@@ -7,14 +7,10 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.leaf.Leaf;
-import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.SceneConfigContainer;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -134,41 +130,6 @@ public class SceneConfigCell extends ValueCell {
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
-            }
-        }
-    }
-
-    @Override
-    public void updateItem(Node item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (item instanceof SceneConfigContainer) {
-            SceneConfigContainer container = (SceneConfigContainer) item;
-            if ((container.getNewNode() || container.hasChanged()) && getGraphic() != buttonBox) {
-                setGraphic(buttonBox);
-            } else if (!(container.getNewNode() || container.hasChanged()) && getGraphic() != null) {
-                setGraphic(null);
-            }
-            container.getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (newValue && getGraphic() != buttonBox) {
-                                setGraphic(buttonBox);
-                            } else if (getGraphic() != null) {
-                                setGraphic(null);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
-                setGraphic(null);
             }
         }
     }

@@ -7,13 +7,8 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.node.DeviceClassContainer;
-import de.citec.csra.re.struct.node.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
-import java.awt.Color;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -92,44 +87,5 @@ public class DeviceClassCell extends ValueCell {
                 thread.start();
             }
         });
-    }
-
-    @Override
-    public void updateItem(Node item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (item instanceof DeviceClassContainer) {
-            DeviceClassContainer container = (DeviceClassContainer) item;
-            if ((container.getNewNode() || container.hasChanged()) && getGraphic() != buttonBox) {
-                System.out.println("Setting buttons on [" + item.getDescriptor() + "] case1");
-                setGraphic(buttonBox);
-            } else if (!(container.getNewNode() || container.hasChanged()) && getGraphic() != null) {
-                setGraphic(null);
-                System.out.println("Resetting buttons on [" + item.getDescriptor() + "] case1");
-            }
-            container.getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (newValue && getGraphic() != buttonBox) {
-                                System.out.println("Setting buttons on [" + item.getDescriptor() + "] case2");
-                                setGraphic(buttonBox);
-                            } else if (getGraphic() != null) {
-                                System.out.println("Resetting buttons on [" + item.getDescriptor() + "] case2");
-                                setGraphic(null);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
-                setGraphic(null);
-            }
-        }
     }
 }
