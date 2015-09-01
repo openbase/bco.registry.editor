@@ -39,15 +39,15 @@ import rst.homeautomation.state.ActivationStateType.ActivationState;
  * @author thuxohl
  */
 public abstract class ValueCell extends RowCell {
-    
+
     protected final Button applyButton, cancelButton;
     protected final HBox buttonLayout;
     protected LeafContainer leaf;
-    
+
     protected SimpleObjectProperty<Boolean> changed = null;
     protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-    
+
     public ValueCell() {
         super();
         applyButton = new Button("Apply");
@@ -55,20 +55,22 @@ public abstract class ValueCell extends RowCell {
         cancelButton = new Button("Cancel");
         buttonLayout = new HBox(applyButton, cancelButton);
         this.changeListener = new ChangedListener();
-        
+
     }
-    
+
     @Override
     public void startEdit() {
         super.startEdit();
-        
+
         if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
             setGraphic(getEditingGraphic());
         }
     }
-    
+
     private javafx.scene.Node getEditingGraphic() {
+
+        // TODO: check for cases where a message combo box is needed, e.g. location_id fields
         javafx.scene.Node graphic = null;
         if (leaf.getValue() instanceof String) {
             graphic = new StringTextField(this, (String) leaf.getValue());
@@ -87,17 +89,17 @@ public abstract class ValueCell extends RowCell {
         }
         return graphic;
     }
-    
+
     @Override
     public void cancelEdit() {
         super.cancelEdit();
         setGraphic(null);
     }
-    
+
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         if (empty) {
             setGraphic(null);
             setText("");
@@ -114,7 +116,7 @@ public abstract class ValueCell extends RowCell {
 //            setText(text);
             setGraphic(new SelectableLabel(text));
         }
-        
+
         if (item instanceof GenericNodeContainer) {
             GenericNodeContainer container = (GenericNodeContainer) item;
             String text = getBuilderDescription(container.getBuilder());
@@ -131,12 +133,8 @@ public abstract class ValueCell extends RowCell {
         } else {
             updateButtonListener(null);
         }
-        //TODO
-//        } else if (item instanceof EntryContainer) {
-//            setText(((EntryContainer) item).getDescription());
-//        }
     }
-    
+
     public String getBuilderDescription(Message.Builder builder) {
         if (builder instanceof EntryType.Entry.Builder) {
             EntryType.Entry.Builder entry = (EntryType.Entry.Builder) builder;
@@ -149,15 +147,15 @@ public abstract class ValueCell extends RowCell {
         }
         return null;
     }
-    
+
     public LeafContainer getLeaf() {
         return leaf;
     }
-    
+
     public void commitEdit() {
         super.commitEdit(leaf);
     }
-    
+
     private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
         if (changed != null) {
             changed.removeListener(changeListener);
@@ -167,9 +165,9 @@ public abstract class ValueCell extends RowCell {
             changed.addListener(changeListener);
         }
     }
-    
+
     private class ApplyEventHandler implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
@@ -196,9 +194,9 @@ public abstract class ValueCell extends RowCell {
             thread.start();
         }
     }
-    
+
     private class CancelEventHandler implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
@@ -225,13 +223,13 @@ public abstract class ValueCell extends RowCell {
             thread.start();
         }
     }
-    
+
     private class ChangedListener implements ChangeListener<Boolean> {
-        
+
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
             Platform.runLater(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     if (newValue) {
@@ -243,7 +241,7 @@ public abstract class ValueCell extends RowCell {
             });
         }
     }
-    
+
     public String getId(Message msg) throws CouldNotPerformException {
         try {
             Method method = msg.getClass().getMethod("getId");
@@ -252,7 +250,7 @@ public abstract class ValueCell extends RowCell {
             throw new CouldNotPerformException("Could not get id of [" + msg + "]", ex);
         }
     }
-    
+
     public String getDescription(Message.Builder msg) throws CouldNotPerformException {
         try {
             Method method = msg.getClass().getMethod("getDescription");

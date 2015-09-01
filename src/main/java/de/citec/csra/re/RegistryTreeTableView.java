@@ -19,6 +19,8 @@ public class RegistryTreeTableView extends TreeTableView {
         this.setEditable(true);
         this.setShowRoot(false);
         this.getColumns().addAll(new DescriptorColumn(), new ValueColumn());
-        this.setContextMenu(new TreeTableViewContextMenu(this, type));
+        if (type != null) {
+            this.setContextMenu(new TreeTableViewContextMenu(this, type));
+        }
     }
 }

@@ -31,6 +31,7 @@ public class Adjuster {
     private final RemotePool remotePool;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    // TODO: wrap it up in a good structure and find a good namespace
     public Adjuster() throws InstantiationException {
         this.remotePool = RemotePool.getInstance();
     }

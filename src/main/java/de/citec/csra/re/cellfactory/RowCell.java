@@ -70,30 +70,19 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (item instanceof GenericListContainer) {
+        if (item instanceof GenericListContainer && ((GenericListContainer) item).isModifiable()) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
-        } else if ((item instanceof NodeContainer && ((NodeContainer) item).getParent().getValue() instanceof GenericListContainer)
-                || (item instanceof LeafContainer && ((LeafContainer) item).getParent() instanceof GenericListContainer)) {
+        } else if ((item instanceof NodeContainer
+                && ((NodeContainer) item).getParent().getValue() instanceof GenericListContainer
+                && ((GenericListContainer) ((NodeContainer) item).getParent().getValue()).isModifiable())
+                || (item instanceof LeafContainer
+                && ((LeafContainer) item).getParent() instanceof GenericListContainer)
+                && ((GenericListContainer) ((LeafContainer) item).getParent().getValue()).isModifiable()) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(true);
             setContextMenu(contextMenu);
-            //TODO: maybe there are cases where lists cannot be edited, elements only removable or addable?
-//        } else if (item instanceof Leaf) {
-//            if (((Leaf) item).getValue() instanceof ServiceType) {
-//                addMenuItem.setVisible(true);
-//                removeMenuItem.setVisible(true);
-//                setContextMenu(contextMenu);
-//            } else if (item.getDescriptor().equals("unit_id")) {
-//                addMenuItem.setVisible(true);
-//                removeMenuItem.setVisible(true);
-//                setContextMenu(contextMenu);
-//            } else if (item.getDescriptor().equals("child_id")) {
-//                removeMenuItem.setVisible(true);
-//                addMenuItem.setVisible(false);
-//                setContextMenu(contextMenu);
-//            }
         } else {
             setContextMenu(null);
         }
@@ -122,7 +111,6 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
         }
 
         private void addAction(Node add) {
-            // TODO Tamino: implement ExceptionHanlding
             try {
                 RegistryEditor.setModified(true);
                 if (add instanceof GenericNodeContainer) {

@@ -141,11 +141,7 @@ public class GenericNodeContainerTest {
     @Test
     public void testListContainer() throws Exception {
         LocationConfigType.LocationConfig.Builder location = LocationConfigType.LocationConfig.newBuilder();
-        System.out.println(location.getClass().getSimpleName());
-        System.out.println(location.getClass().getName());
-        String[] test = location.getClass().getName().split("\\$");
-        System.out.println(test[0]);
-        System.out.println(test[0] + "\t" + test[1] + "\t" + test[2]);
+        System.out.println(location.getClass().getTypeName());
         location.setId("home");
         location.setLabel("home");
         location.addChildId("kitchen");

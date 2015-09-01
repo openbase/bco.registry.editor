@@ -25,6 +25,8 @@ import java.util.List;
 public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM extends GeneratedMessage, RFMB extends RFM.Builder<RFMB>> extends NodeContainer<MB> {
 
     private final Descriptors.FieldDescriptor fieldDescriptor;
+    // TODO: maybe compare to a list of fieldNames? or is the message also important?
+    private final boolean modifiable;
 
     public GenericListContainer(int repeatedFieldNumber, final MB builder) throws InstantiationException {
         this(FieldDescriptorUtil.getField(repeatedFieldNumber, builder), builder);
@@ -32,7 +34,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
 
     public GenericListContainer(final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder) throws InstantiationException {
         super(repeatedFieldDescriptor.getName(), builder);
-
+        modifiable = true;
         try {
             if (repeatedFieldDescriptor == null) {
                 throw new NotAvailableException("repeatedFieldDescriptor");
@@ -56,7 +58,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
 
     public GenericListContainer(final String descriptor, final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder, List<RFMB> childBuilderList) throws InstantiationException {
         super(descriptor, builder);
-
+        modifiable = true;
         try {
             if (repeatedFieldDescriptor == null) {
                 throw new NotAvailableException("repeatedFieldDescriptor");
@@ -124,5 +126,9 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
 
     private void registerElement(Object element, int index) {
         super.add(new LeafContainer(element, fieldDescriptor.getName(), this, index));
+    }
+
+    public boolean isModifiable() {
+        return modifiable;
     }
 }

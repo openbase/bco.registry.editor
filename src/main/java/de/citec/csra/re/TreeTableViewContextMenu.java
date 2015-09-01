@@ -8,11 +8,14 @@ package de.citec.csra.re;
 import de.citec.csra.re.struct.GenericNodeContainer;
 import de.citec.csra.re.struct.Node;
 import de.citec.csra.re.util.RSTDefaultInstances;
+import de.citec.jul.exception.ExceptionPrinter;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 
 /**
@@ -20,6 +23,8 @@ import rst.homeautomation.device.DeviceClassType.DeviceClass;
  * @author thuxohl
  */
 public class TreeTableViewContextMenu extends ContextMenu {
+
+    private static final Logger logger = LoggerFactory.getLogger(TreeTableViewContextMenu.class);
 
     private final MenuItem addMenuItem;
     private final SendableType type;
@@ -56,12 +61,11 @@ public class TreeTableViewContextMenu extends ContextMenu {
 
                     if (newNode != null) {
                         newNode.setExpanded(true);
-//                    newNode.setChanged(true);
-//                    newNode.setNewNode(true);
+                        newNode.setChanged(true);
                         treeTableView.getRoot().getChildren().add(newNode);
                     }
                 } catch (de.citec.jul.exception.InstantiationException ex) {
-                    //TODO
+                    ExceptionPrinter.printHistory(logger, ex);
                 }
             }
         });

@@ -22,11 +22,10 @@ import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.extension.rsb.com.RSBRemoteService;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
@@ -80,17 +79,17 @@ public class RemotePool {
         appRemote.shutdown();
     }
 
-    public Object register(Message msg) throws CouldNotPerformException {
+    public <M extends Message> M register(Message msg) throws CouldNotPerformException {
         try {
-            return invokeMethod("register", msg);
+            return (M) invokeMethod("register", msg);
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not register [" + msg + "]", ex);
         }
     }
 
-    public Object update(Message msg) throws CouldNotPerformException {
+    public <M extends Message> M update(Message msg) throws CouldNotPerformException {
         try {
-            return invokeMethod("update", msg);
+            return (M) invokeMethod("update", msg);
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not update [" + msg + "]", ex);
         }
@@ -104,54 +103,29 @@ public class RemotePool {
         }
     }
 
-    public Object remove(Message msg) throws CouldNotPerformException {
+    public <M extends Message> M remove(Message msg) throws CouldNotPerformException {
         try {
-            return invokeMethod("remove", msg);
+            return (M) invokeMethod("remove", msg);
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not remove [" + msg + "]", ex);
         }
     }
 
     private Object invokeMethod(String methodPrefix, Message msg) throws CouldNotPerformException {
-        String methodName = methodPrefix + msg.getClass().getSimpleName();
-        Method method;
-        RSBRemoteService remote;
+        String methodName = getMethodName(methodPrefix, "", msg);
         try {
-            if (msg instanceof DeviceClass || msg instanceof DeviceConfig || msg instanceof UnitTemplate) {
-                remote = deviceRemote;
-            } else if (msg instanceof LocationConfig) {
-                remote = locationRemote;
-            } else if (msg instanceof AgentConfig) {
-                remote = agentRemote;
-            } else if (msg instanceof SceneConfig) {
-                remote = sceneRemote;
-            } else if (msg instanceof AppConfig) {
-                remote = appRemote;
-            } else {
-                throw new CouldNotPerformException("No matching remote found");
-            }
-            method = remote.getClass().getMethod(methodName, msg.getClass());
+            RSBRemoteService remote = getRemoteByMessage(msg);
+            Method method = remote.getClass().getMethod(methodName, msg.getClass());
             return method.invoke(remote, msg);
-        } catch (Exception ex) {
+        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new CouldNotPerformException(ex);
         }
-    }
-
-    public boolean isSendableMessage(Message msg) {
-        for (RSBRemoteService remote : getRemotes()) {
-            try {
-                Method method = remote.getClass().getMethod("get" + msg.getClass().getSimpleName() + "s");
-                return true;
-            } catch (NoSuchMethodException | SecurityException ex) {
-            }
-        }
-        return false;
     }
 
     public boolean isSendableMessage(Message.Builder builder) {
         for (RSBRemoteService remote : getRemotes()) {
             try {
-                Method method = remote.getClass().getMethod("get" + builder.getClass().getName().split("\\$")[1] + "s");
+                remote.getClass().getMethod(getMethodName("get", "s", builder));
                 return true;
             } catch (NoSuchMethodException | SecurityException ex) {
             }
@@ -159,28 +133,49 @@ public class RemotePool {
         return false;
     }
 
-    public GeneratedMessage.Builder getById(String id, Message type) throws CouldNotPerformException {
-        String methodName = "get" + type.getClass().getSimpleName() + "s";
-        Method method;
-        RSBRemoteService remote;
+    public GeneratedMessage.Builder getById(String id, Message msg) throws CouldNotPerformException {
+        String methodName = getMethodName("get", "ById", msg);
         try {
-            if (type instanceof DeviceClass || type instanceof DeviceConfig || type instanceof UnitTemplate) {
-                remote = deviceRemote;
-            } else if (type instanceof LocationConfig) {
-                remote = locationRemote;
-            } else if (type instanceof AgentConfig) {
-                remote = agentRemote;
-            } else if (type instanceof SceneConfig) {
-                remote = sceneRemote;
-            } else if (type instanceof AppConfig) {
-                remote = appRemote;
-            } else {
-                throw new CouldNotPerformException("No matching remote found");
-            }
-            method = remote.getClass().getMethod(methodName, type.getClass());
-            return (GeneratedMessage.Builder) method.invoke(remote, type);
-        } catch (Exception ex) {
+            RSBRemoteService remote = getRemoteByMessage(msg);
+            Method method = remote.getClass().getMethod(methodName, String.class);
+            return (GeneratedMessage.Builder) method.invoke(remote, id);
+        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new CouldNotPerformException(ex);
+        }
+    }
+
+    public <M extends Message> List<M> getMessageList(Message msg) throws CouldNotPerformException {
+        String methodName = getMethodName("get", "s", msg);
+        try {
+            RSBRemoteService remote = getRemoteByMessage(msg);
+            Method method = remote.getClass().getMethod(methodName);
+            return (List<M>) (GeneratedMessage.Builder) method.invoke(remote);
+        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new CouldNotPerformException(ex);
+        }
+    }
+
+    private String getMethodName(String prefix, String suffix, Message msg) {
+        return prefix + msg.getClass().getSimpleName() + suffix;
+    }
+
+    private String getMethodName(String prefix, String suffix, Message.Builder msg) {
+        return prefix + msg.getClass().getName().split("\\$")[1] + suffix;
+    }
+
+    public RSBRemoteService getRemoteByMessage(Message msg) throws CouldNotPerformException {
+        if (msg instanceof DeviceClass || msg instanceof DeviceConfig || msg instanceof UnitTemplate) {
+            return deviceRemote;
+        } else if (msg instanceof LocationConfig) {
+            return locationRemote;
+        } else if (msg instanceof AgentConfig) {
+            return agentRemote;
+        } else if (msg instanceof SceneConfig) {
+            return sceneRemote;
+        } else if (msg instanceof AppConfig) {
+            return appRemote;
+        } else {
+            throw new CouldNotPerformException("No matching remote found");
         }
     }
 
