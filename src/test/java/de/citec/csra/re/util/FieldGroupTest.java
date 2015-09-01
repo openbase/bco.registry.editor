@@ -5,6 +5,7 @@
  */
 package de.citec.csra.re.util;
 
+import de.citec.csra.regedit.util.FieldDescriptorGroup;
 import com.google.protobuf.Message;
 import de.citec.jul.exception.InstantiationException;
 import java.util.ArrayList;
