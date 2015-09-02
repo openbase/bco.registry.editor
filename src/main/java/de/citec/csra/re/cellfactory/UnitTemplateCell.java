@@ -9,10 +9,10 @@ import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.UnitTemplateContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import java.util.concurrent.ExecutionException;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -85,5 +85,31 @@ public class UnitTemplateCell extends ValueCell {
                 thread.start();
             }
         });
+    }
+
+    @Override
+    public void updateItem(Node item, boolean empty) {
+        super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+
+//        try {
+//            readOnly = deviceRegistryRemote.isUnitTemplateRegistryReadOnly().get() || JPService.getProperty(JPReadOnly.class).getValue();
+//            if (readOnly) {
+//                setContextMenu(null);
+//            }
+//        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+//            readOnly = false;
+//            logger.warn("Could not determine read only property for device classes", ex);
+//        }
+        if (readOnly) {
+            setContextMenu(null);
+        }
+    }
+
+    @Override
+    public void startEdit() {
+        if (readOnly) {
+            return;
+        }
+        super.startEdit(); //To change body of generated methods, choose Tools | Templates.
     }
 }

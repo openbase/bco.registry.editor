@@ -8,6 +8,7 @@ package de.citec.csra.re.column;
 import de.citec.csra.re.cellfactory.UnitTemplateCell;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
@@ -18,8 +19,8 @@ import javafx.util.Callback;
  */
 public class UnitTemplateColumn extends ValueColumn {
 
-    public UnitTemplateColumn(DeviceRegistryRemote deviceRegistryRemote) {
-        super();
+    public UnitTemplateColumn(DeviceRegistryRemote deviceRegistryRemote, ReadOnlyDoubleProperty windowWidthProperty) {
+        super(windowWidthProperty);
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
 
             @Override
@@ -28,5 +29,5 @@ public class UnitTemplateColumn extends ValueColumn {
             }
         });
     }
-    
+
 }

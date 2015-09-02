@@ -9,8 +9,12 @@ import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.AgentConfigContainer;
+import de.citec.csra.re.struct.node.Node;
+import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.lm.remote.LocationRegistryRemote;
+import java.util.concurrent.ExecutionException;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -29,7 +33,7 @@ import rst.spatial.LocationConfigType;
 public class AgentConfigCell extends ValueCell {
 
     private final ComboBox<LocationConfigType.LocationConfig> locationIdComboBox;
-    
+
     public AgentConfigCell(AgentRegistryRemote agentRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(null, locationRegistryRemote, null, agentRegistryRemote, null);
 
@@ -93,7 +97,7 @@ public class AgentConfigCell extends ValueCell {
                 thread.start();
             }
         });
-        
+
         locationIdComboBox = new ComboBox<>();
         locationIdComboBox.setVisibleRowCount(5);
         locationIdComboBox.setButtonCell(new AgentConfigCell.LocationConfigComboBoxCell());
@@ -115,11 +119,13 @@ public class AgentConfigCell extends ValueCell {
                 }
             }
         });
-
     }
 
     @Override
     public void startEdit() {
+        if (readOnly) {
+            return;
+        }
         super.startEdit();
 
         if (getItem() instanceof Leaf) {
@@ -133,7 +139,22 @@ public class AgentConfigCell extends ValueCell {
             }
         }
     }
-    
+
+    @Override
+    public void updateItem(Node item, boolean empty) {
+        super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+
+//        try {
+//            readOnly = agentRegistryRemote.isAgentConfigRegistryReadOnly().get() || JPService.getProperty(JPReadOnly.class).getValue();
+//        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+//            readOnly = true;
+//            logger.warn("Could not determine read only property for device classes", ex);
+//        }
+        if (readOnly) {
+            setContextMenu(null);
+        }
+    }
+
     public class LocationConfigComboBoxCell extends ListCell<LocationConfigType.LocationConfig> {
 
         @Override

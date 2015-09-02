@@ -7,10 +7,14 @@ package de.citec.csra.re.cellfactory;
 
 import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.leaf.Leaf;
+import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.SceneConfigContainer;
+import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
+import java.util.concurrent.ExecutionException;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -76,7 +80,7 @@ public class SceneConfigCell extends ValueCell {
                                 SceneConfigContainer container = (SceneConfigContainer) getItem();
 
                                 SceneConfigType.SceneConfig sceneConfig = container.getBuilder().build();
-                                System.out.println("Scene build ["+sceneConfig+"]");
+                                System.out.println("Scene build [" + sceneConfig + "]");
                                 try {
                                     if (container.getNewNode()) {
                                         container.getParent().getChildren().remove(container);
@@ -120,6 +124,9 @@ public class SceneConfigCell extends ValueCell {
 
     @Override
     public void startEdit() {
+        if (readOnly) {
+            return;
+        }
         super.startEdit();
 
         if (getItem() instanceof Leaf) {
@@ -131,6 +138,24 @@ public class SceneConfigCell extends ValueCell {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
             }
+        }
+    }
+
+    @Override
+    public void updateItem(Node item, boolean empty) {
+        super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+
+//        try {
+//            readOnly = sceneRegistryRemote.isSceneConfigRegistryReadOnly().get() || JPService.getProperty(JPReadOnly.class).getValue();
+//            if (readOnly) {
+//                setContextMenu(null);
+//            }
+//        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+//            readOnly = true;
+//            logger.warn("Could not determine read only property for device classes", ex);
+//        }
+        if (readOnly) {
+            setContextMenu(null);
         }
     }
 

@@ -11,10 +11,13 @@ import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -154,6 +157,9 @@ public class DeviceConfigCell extends ValueCell {
 
     @Override
     public void startEdit() {
+        if (readOnly) {
+            return;
+        }
         super.startEdit();
 
         if (getItem() instanceof Leaf) {
@@ -203,6 +209,19 @@ public class DeviceConfigCell extends ValueCell {
             } else if (((Leaf) item).getDescriptor().equals("location_config")) {
                 setText(((Leaf<LocationConfig>) item).getValue().getId());
             }
+        }
+
+//        try {
+//            readOnly = deviceRegistryRemote.isDeviceConfigRegistryReadOnly().get() || JPService.getProperty(JPReadOnly.class).getValue();
+//            if (readOnly) {
+//                setContextMenu(null);
+//            }
+//        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+//            readOnly = false;
+//            logger.warn("Could not determine read only property for device classes", ex);
+//        }
+        if (readOnly) {
+            setContextMenu(null);
         }
     }
 

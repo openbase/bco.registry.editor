@@ -69,6 +69,7 @@ public abstract class ValueCell extends RowCell {
 
     protected final ChangeListener<Boolean> listener;
     protected SimpleObjectProperty<Boolean> changed;
+    protected boolean readOnly = true;
 
     public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
@@ -309,7 +310,7 @@ public abstract class ValueCell extends RowCell {
                 setGraphic(makeSelectable(new Label(text)));
             }
         }
-        
+
         if (item instanceof SendableNode) {
             SendableNode container = (SendableNode) item;
             updateListener(container.getChanged());

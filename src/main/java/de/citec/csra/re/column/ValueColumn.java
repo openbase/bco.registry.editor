@@ -5,9 +5,11 @@
  */
 package de.citec.csra.re.column;
 
-import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.Node;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeTableColumn;
 
@@ -17,12 +19,20 @@ import javafx.scene.control.TreeTableColumn;
  */
 public abstract class ValueColumn extends Column {
 
-    public ValueColumn() {
-        super("Value");
+    public static final double VALUE_COLUMN_PROPORTEN = 0.75;
+
+    public ValueColumn(ReadOnlyDoubleProperty windowWidthProperty) {
+        super("Value", windowWidthProperty);
         this.setEditable(true);
         this.setSortable(false);
         this.setOnEditCommit(new EventHandlerImpl());
-        this.setPrefWidth(RegistryEditor.RESOLUTION_WIDTH - COLUMN_WIDTH);
+        windowWidthProperty.addListener(new ChangeListener<Number>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+                setPrefWidth(t1.doubleValue() * VALUE_COLUMN_PROPORTEN);
+            }
+        });
     }
 
     private class EventHandlerImpl implements EventHandler<TreeTableColumn.CellEditEvent<Node, Node>> {

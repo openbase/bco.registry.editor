@@ -9,6 +9,7 @@ import de.citec.csra.re.cellfactory.SceneConfigCell;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
@@ -19,8 +20,8 @@ import javafx.util.Callback;
  */
 public class SceneConfigColumn extends ValueColumn {
 
-    public SceneConfigColumn(SceneRegistryRemote sceneRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super();
+    public SceneConfigColumn(SceneRegistryRemote sceneRegistryRemote, LocationRegistryRemote locationRegistryRemote, ReadOnlyDoubleProperty windowWidthProperty) {
+        super(windowWidthProperty);
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
 
             @Override
@@ -29,5 +30,5 @@ public class SceneConfigColumn extends ValueColumn {
             }
         });
     }
-    
+
 }

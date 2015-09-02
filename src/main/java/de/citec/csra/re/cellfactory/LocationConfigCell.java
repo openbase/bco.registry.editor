@@ -10,10 +10,14 @@ import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
+import de.citec.csra.re.struct.node.Node;
+import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -121,6 +125,9 @@ public class LocationConfigCell extends ValueCell {
 
     @Override
     public void startEdit() {
+        if (readOnly) {
+            return;
+        }
         super.startEdit();
 
         if (getItem() instanceof LeafContainer) {
@@ -146,6 +153,26 @@ public class LocationConfigCell extends ValueCell {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
             }
+        }
+    }
+
+    @Override
+    public void updateItem(Node item, boolean empty) {
+        super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+
+//        logger.info("get location read only property");
+//        try {
+//            readOnly = locationRegistryRemote.isLocationConfigRegistryReadOnly().get() || JPService.getProperty(JPReadOnly.class).getValue();
+//            if (readOnly) {
+//                setContextMenu(null);
+//            }
+//        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+//            readOnly = true;
+//            logger.warn("Could not determine read only property for device classes", ex);
+//        }
+//        logger.info("got location read only property [" + readOnly + "]");
+        if (readOnly) {
+            setContextMenu(null);
         }
     }
 

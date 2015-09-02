@@ -9,8 +9,12 @@ import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.AppConfigContainer;
+import de.citec.csra.re.struct.node.Node;
+import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.lm.remote.LocationRegistryRemote;
+import java.util.concurrent.ExecutionException;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -29,10 +33,11 @@ import rst.spatial.LocationConfigType;
 public class AppConfigCell extends ValueCell {
 
     private final ComboBox<LocationConfigType.LocationConfig> locationIdComboBox;
-    
+
     public AppConfigCell(AppRegistryRemote appRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(null, locationRegistryRemote, null, null, appRegistryRemote);
 
+        
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -119,6 +124,9 @@ public class AppConfigCell extends ValueCell {
 
     @Override
     public void startEdit() {
+        if (readOnly) {
+            return;
+        }
         super.startEdit();
 
         if (getItem() instanceof Leaf) {
@@ -133,6 +141,24 @@ public class AppConfigCell extends ValueCell {
         }
     }
     
+    @Override
+    public void updateItem(Node item, boolean empty) {
+        super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+        
+//        try {
+//            readOnly = appRegistryRemote.isAppConfigRegistryReadOnly().get() || JPService.getProperty(JPReadOnly.class).getValue();
+//            if (readOnly) {
+//                setContextMenu(null);
+//            }
+//        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+//            readOnly = true;
+//            logger.warn("Could not determine read only property for device classes", ex);
+//        }
+        if(readOnly) {
+            setContextMenu(null);
+        }
+    }
+
     public class LocationConfigComboBoxCell extends ListCell<LocationConfigType.LocationConfig> {
 
         @Override

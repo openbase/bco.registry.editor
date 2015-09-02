@@ -11,8 +11,7 @@
 }
 
 .tree-table-row-cell:selected {
-   -fx-background-color: steelblue; 
-   -fx-text-background-color: black;
-   -fx-font-weight: bold;
+    -fx-background-color: steelblue; 
+    -fx-text-background-color: black;
+    -fx-font-weight: bold;
 }
-
