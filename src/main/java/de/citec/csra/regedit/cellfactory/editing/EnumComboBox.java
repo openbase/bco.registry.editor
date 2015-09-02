@@ -7,6 +7,7 @@ package de.citec.csra.regedit.cellfactory.editing;
 
 import de.citec.csra.regedit.cellfactory.ValueCell;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
@@ -20,7 +21,7 @@ public class EnumComboBox extends ComboBox {
     public EnumComboBox(ValueCell cell, Class clazz) {
         super();
         setVisibleRowCount(5);
-        setItems(FXCollections.observableArrayList(clazz.getEnumConstants()));
+        setItems(removeUnkownType(clazz));
         setValue(cell.getLeaf().getValue());
         setOnAction(new EventHandler() {
 
@@ -32,5 +33,14 @@ public class EnumComboBox extends ComboBox {
                 }
             }
         });
+    }
+
+    private ObservableList removeUnkownType(Class clazz) {
+        ObservableList list = FXCollections.observableArrayList(clazz.getEnumConstants());
+        try {
+            list.remove(Enum.valueOf(clazz, "UNKNOWN"));
+        } catch (Exception ex) {
+        }
+        return list;
     }
 }

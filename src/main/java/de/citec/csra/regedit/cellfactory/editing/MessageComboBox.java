@@ -5,6 +5,7 @@
  */
 package de.citec.csra.regedit.cellfactory.editing;
 
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.cellfactory.ValueCell;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
@@ -18,6 +19,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
+import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
  *
@@ -44,10 +46,17 @@ public class MessageComboBox extends ComboBox {
 
     private ObservableList sortedList(Message msg, String fieldName) throws InstantiationException {
         try {
+            FieldDescriptor field = FieldDescriptorUtil.getField(fieldName, msg.toBuilder());
             List<Comparable> list = new ArrayList<>();
             for (Message message : RemotePool.getInstance().getMessageList(msg)) {
-                list.add((Comparable) message.getField(FieldDescriptorUtil.getField(fieldName, msg.toBuilder())));
+                list.add((Comparable) message.getField(field));
             }
+//            if (list.contains((Comparable) msg.getField(field))) {
+//                list.remove((Comparable) msg.getField(field));
+//            }
+//            if (msg instanceof LocationConfig) {
+//                list.remove(((LocationConfig) msg).getId());
+//            }
             Collections.sort(list);
             return FXCollections.observableArrayList(list);
         } catch (Exception ex) {

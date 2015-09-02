@@ -8,6 +8,7 @@ package de.citec.csra.regedit.struct;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.regedit.struct.converter.DefaultConverter;
+import de.citec.csra.regedit.util.Configuration;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
@@ -69,24 +70,11 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
         } else if (field.getType().equals(FieldDescriptor.Type.MESSAGE)) {
             super.add(new GenericNodeContainer(field, (GeneratedMessage.Builder) builder.getFieldBuilder(field)));
         } else {
-            registerLeaf(field);
+            super.add(new LeafContainer(builder.getField(field), field.getName(), this, Configuration.isModifiableField(builder, field.getName())));
         }
     }
 
     private void registerElement(String fieldName, Object value) throws InstantiationException {
-        super.add(new LeafContainer(value, fieldName, this));
-    }
-
-    private void registerLeaf(FieldDescriptor field) {
-        if (null != field.getName()) {
-            switch (field.getName()) {
-                case "id":
-                    super.add(new LeafContainer(builder.getField(field), field.getName(), this, false));
-                    break;
-                default:
-                    this.add(new LeafContainer(builder.getField(field), field.getName(), this));
-                    break;
-            }
-        }
+        super.add(new LeafContainer(value, fieldName, this, Configuration.isModifiableField(builder, fieldName)));
     }
 }

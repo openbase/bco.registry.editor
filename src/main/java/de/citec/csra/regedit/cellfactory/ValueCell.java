@@ -75,11 +75,7 @@ public abstract class ValueCell extends RowCell {
         if (leaf.getValue() instanceof String) {
             graphic = new StringTextField(this, (String) leaf.getValue());
         } else if (leaf.getValue() instanceof Enum) {
-            if (leaf.getParent().getBuilder() instanceof ActivationState.Builder) {
-                graphic = new ValueCheckBox(this, ActivationState.State.ACTIVE, ActivationState.State.DEACTIVE);
-            } else {
-                graphic = new EnumComboBox(this, leaf.getValue().getClass());
-            }
+            graphic = new EnumComboBox(this, leaf.getValue().getClass());
         } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
             graphic = new DecimalTextField(this, leaf.getValue().toString());
         } else if (leaf.getValue() instanceof Long) {
