@@ -40,36 +40,36 @@ import org.slf4j.LoggerFactory;
  * @author thuxohl
  */
 public abstract class RowCell extends TreeTableCell<Node, Node> {
-
+    
     protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-
+    
     protected RemotePool remotePool;
     private final ContextMenu contextMenu;
     private final MenuItem addMenuItem, removeMenuItem;
-
+    
     public RowCell() {
         try {
             remotePool = RemotePool.getInstance();
         } catch (InstantiationException ex) {
             ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
         }
-
+        
         addMenuItem = new MenuItem("Add");
         removeMenuItem = new MenuItem("Remove");
         contextMenu = new ContextMenu(addMenuItem, removeMenuItem);
-
+        
         EventHandlerImpl eventHandler = new EventHandlerImpl();
         addMenuItem.setOnAction(eventHandler);
         removeMenuItem.setOnAction(eventHandler);
-
+        
         this.setFocused(true);
         this.setEditable(true);
     }
-
+    
     @Override
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-
+        
         if (item instanceof GenericListContainer && ((GenericListContainer) item).isModifiable()) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
@@ -87,14 +87,14 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             setContextMenu(null);
         }
     }
-
+    
     private class EventHandlerImpl implements EventHandler<ActionEvent> {
-
+        
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
                     new Task<Boolean>() {
-
+                        
                         @Override
                         protected Boolean call() throws Exception {
                             if (event.getSource().equals(addMenuItem)) {
@@ -104,26 +104,26 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                             }
                             return true;
                         }
-
+                        
                     });
             thread.setDaemon(true);
             thread.start();
         }
-
+        
         private void addAction(Node add) {
             try {
                 RegistryEditor.setModified(true);
                 if (add instanceof GenericNodeContainer) {
                     GeneratedMessage.Builder builder = ((NodeContainer) add).getBuilder();
                     GenericListContainer parent = (GenericListContainer) ((NodeContainer) add).getParent().getValue();
-
+                    
                     List<FieldDescriptorGroup> groups = new ArrayList<>();
                     NodeContainer groupContainer = parent;
                     while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {
                         groupContainer = (GenericGroupContainer) groupContainer.getParent().getValue();
                         groups.add(((GenericGroupContainer) groupContainer).getFieldGroup());
                     }
-
+                    
                     GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(builder);
                     for (FieldDescriptorGroup group : groups) {
                         group.setValue(addedBuilder, group);
@@ -140,7 +140,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 ExceptionPrinter.printHistory(logger, ex);
             }
         }
-
+        
         private void removeAction(Node nodeToRemove) {
             RegistryEditor.setModified(true);
             // check if the removed item is an instance of classes that have to be directly
@@ -159,17 +159,19 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             } else if (nodeToRemove instanceof Leaf) {
                 removeNodeFromRepeatedField(((LeafContainer) nodeToRemove).getParent(), ((LeafContainer) nodeToRemove).getIndex());
             } else {
+                logger.info("Removing [" + nodeToRemove.getDescriptor() + "] from repeated field");
                 removeNodeFromRepeatedField((NodeContainer) ((NodeContainer) nodeToRemove).getParent().getValue(), nodeToRemove);
             }
         }
     }
-
+    
     private void removeNodeFromRepeatedField(NodeContainer parent, Node nodeToRemove) {
         removeNodeFromRepeatedField(parent, parent.getChildren().indexOf(nodeToRemove));
     }
-
+    
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
         Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(parent.getDescriptor(), parent.getBuilder());
+        logger.info("Removing node with index[" + index + "] from reapeated field[" + field.getName() + "]");
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));
         updatedList.remove(index);
         parent.getBuilder().clearField(field);

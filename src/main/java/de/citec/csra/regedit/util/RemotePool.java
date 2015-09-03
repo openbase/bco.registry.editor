@@ -26,6 +26,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
@@ -39,6 +41,8 @@ import rst.spatial.LocationConfigType.LocationConfig;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class RemotePool {
+
+    private static final Logger logger = LoggerFactory.getLogger(RemotePool.class);
 
     private static RemotePool remotePool;
 
@@ -122,23 +126,14 @@ public class RemotePool {
         }
     }
 
-    public boolean isSendableMessage(Message.Builder builder) {
-        for (RSBRemoteService remote : getRemotes()) {
-            try {
-                remote.getClass().getMethod(getMethodName("get", "s", builder));
-                return true;
-            } catch (NoSuchMethodException | SecurityException ex) {
-            }
-        }
-        return false;
-    }
-
     public GeneratedMessage.Builder getById(String id, Message msg) throws CouldNotPerformException {
         String methodName = getMethodName("get", "ById", msg);
         try {
             RSBRemoteService remote = getRemoteByMessage(msg);
             Method method = remote.getClass().getMethod(methodName, String.class);
-            return (GeneratedMessage.Builder) method.invoke(remote, id);
+            Object result = method.invoke(remote, id);
+            Method toBuilder = result.getClass().getMethod("toBuilder");
+            return (GeneratedMessage.Builder) toBuilder.invoke(result);
         } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new CouldNotPerformException(ex);
         }
@@ -146,10 +141,13 @@ public class RemotePool {
 
     public <M extends Message> List<M> getMessageList(Message msg) throws CouldNotPerformException {
         String methodName = getMethodName("get", "s", msg);
+        if (msg instanceof DeviceClass) {
+            methodName = getMethodName("get", "es", msg);
+        }
         try {
             RSBRemoteService remote = getRemoteByMessage(msg);
             Method method = remote.getClass().getMethod(methodName);
-            return (List<M>) (GeneratedMessage.Builder) method.invoke(remote);
+            return (List<M>) method.invoke(remote);
         } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new CouldNotPerformException(ex);
         }

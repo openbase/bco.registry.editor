@@ -8,10 +8,11 @@ package de.citec.csra.regedit.struct;
 
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.regedit.RegistryEditor;
+import de.citec.csra.regedit.struct.consistency.Configuration;
+import de.citec.csra.regedit.struct.consistency.StructureConsistencyKeeper;
 import de.citec.csra.regedit.struct.converter.Converter;
 import de.citec.csra.regedit.struct.converter.ConverterSelector;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
-import de.citec.csra.regedit.util.RemotePool;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import javafx.beans.property.SimpleObjectProperty;
@@ -24,17 +25,17 @@ import org.slf4j.LoggerFactory;
  * @author thuxohl
  * @param <MB>
  */
-public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<Node> implements Node {
-
+public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<Node> implements Node {
+    
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
+    
     protected final MB builder;
     protected final String descriptor;
     protected final Converter converter;
-
+    
     protected final boolean sendable;
     protected final SimpleObjectProperty<Boolean> changed;
-
+    
     public NodeContainer(String descriptor, MB builder) throws InstantiationException {
         assert builder != null;
         assert descriptor != null;
@@ -42,49 +43,53 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         this.descriptor = descriptor;
         this.converter = ConverterSelector.getConverter(builder);
         changed = new SimpleObjectProperty<>(false);
-        sendable = RemotePool.getInstance().isSendableMessage(builder);
+        if (this instanceof GenericNodeContainer) {
+            sendable = Configuration.isSendable(builder);
+        } else {
+            sendable = false;
+        }
         this.setValue(this);
     }
-
+    
     protected void add(LeafContainer leaf) {
         this.getChildren().add(new TreeItem<>(leaf));
     }
-
+    
     public void add(TreeItem<Node> node) {
         this.getChildren().add(node);
     }
-
+    
     @Override
     public String getDescriptor() {
         return descriptor;
     }
-
+    
     @Override
     public NodeContainer getContext() {
         return this;
     }
-
+    
     public MB getBuilder() {
         return builder;
     }
-
+    
     public boolean isSendable() {
         return sendable;
     }
-
+    
     public void setChanged(boolean change) {
         changed.set(change);
         RegistryEditor.setModified(change);
     }
-
+    
     public boolean hasChanged() {
         return changed.getValue();
     }
-
+    
     public SimpleObjectProperty<Boolean> getChanged() {
         return changed;
     }
-
+    
     public void setSendableChanged() {
         NodeContainer sendableNode = this;
         while (!sendableNode.isSendable()) {
@@ -92,13 +97,14 @@ public class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem
         }
         ((NodeContainer) sendableNode).setChanged(true);
     }
-
+    
     public void updateBuilder(String fieldName, Object value, int index) throws CouldNotPerformException {
         if (index == -1) {
             converter.updateBuilder(fieldName, value);
         } else {
             builder.setRepeatedField(FieldDescriptorUtil.getField(fieldName, builder), index, value);
         }
+        StructureConsistencyKeeper.keepStructure(this, fieldName);
         setSendableChanged();
     }
 }

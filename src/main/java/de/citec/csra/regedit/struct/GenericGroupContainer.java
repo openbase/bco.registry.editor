@@ -61,26 +61,26 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
         }
     }
 
-    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldDescriptorGroup group) throws InstantiationException {
-        super(descriptor, builder);
-        this.fieldGroup = group;
-        try {
-            List<RFMB> groupBuilderList = new ArrayList<>();
-            List<Object> values = fieldGroup.getFieldValues(builderList);
-            for (Object value : values) {
-                for (RFMB messageBuilder : builderList) {
-                    if (fieldGroup.hasEqualValue(messageBuilder, value)) {
-                        groupBuilderList.add(messageBuilder);
-                    }
-                }
-                super.add(new GenericListContainer<>(value.toString(), fieldDescriptor, builder, groupBuilderList));
-                groupBuilderList.clear();
-            }
-        } catch (CouldNotPerformException ex) {
-            throw new de.citec.jul.exception.InstantiationException(this, ex);
-        }
-        this.setValue(this);
-    }
+//    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldDescriptorGroup group) throws InstantiationException {
+//        super(descriptor, builder);
+//        this.fieldGroup = group;
+//        try {
+//            List<RFMB> groupBuilderList = new ArrayList<>();
+//            List<Object> values = fieldGroup.getFieldValues(builderList);
+//            for (Object value : values) {
+//                for (RFMB messageBuilder : builderList) {
+//                    if (fieldGroup.hasEqualValue(messageBuilder, value)) {
+//                        groupBuilderList.add(messageBuilder);
+//                    }
+//                }
+//                super.add(new GenericListContainer<>(value.toString(), fieldDescriptor, builder, groupBuilderList));
+//                groupBuilderList.clear();
+//            }
+//        } catch (CouldNotPerformException ex) {
+//            throw new de.citec.jul.exception.InstantiationException(this, ex);
+//        }
+//        this.setValue(this);
+//    }
 
     public FieldDescriptorGroup getFieldGroup() {
         return fieldGroup;

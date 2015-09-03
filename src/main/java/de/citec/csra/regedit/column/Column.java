@@ -6,6 +6,7 @@
 package de.citec.csra.regedit.column;
 
 import de.citec.csra.regedit.struct.Node;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import org.slf4j.Logger;
@@ -18,9 +19,11 @@ import org.slf4j.LoggerFactory;
 public abstract class Column extends TreeTableColumn<Node, Node> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     public Column(String text) {
         super(text);
         this.setCellValueFactory(new TreeItemPropertyValueFactory<>("context"));
     }
+
+    public abstract void addWidthProperty(ReadOnlyDoubleProperty widthProperty);
 }

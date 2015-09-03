@@ -5,19 +5,24 @@
  */
 package de.citec.csra.regedit.cellfactory;
 
+import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.RegistryEditor;
 import de.citec.csra.regedit.cellfactory.editing.DecimalTextField;
 import de.citec.csra.regedit.cellfactory.editing.EnumComboBox;
 import de.citec.csra.regedit.cellfactory.editing.LongDatePicker;
+import de.citec.csra.regedit.cellfactory.editing.MessageComboBox;
 import de.citec.csra.regedit.cellfactory.editing.StringTextField;
 import de.citec.csra.regedit.cellfactory.editing.ValueCheckBox;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Leaf;
 import de.citec.csra.regedit.struct.LeafContainer;
 import de.citec.csra.regedit.struct.Node;
+import de.citec.csra.regedit.struct.consistency.Configuration;
 import de.citec.csra.regedit.util.SelectableLabel;
 import de.citec.jul.exception.CouldNotPerformException;
+import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.InstantiationException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
@@ -30,15 +35,15 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import rst.configuration.EntryType;
-import rst.homeautomation.state.ActivationStateType.ActivationState;
 
 /**
  *
  * @author thuxohl
  */
-public abstract class ValueCell extends RowCell {
+public class ValueCell extends RowCell {
 
     protected final Button applyButton, cancelButton;
     protected final HBox buttonLayout;
@@ -51,11 +56,11 @@ public abstract class ValueCell extends RowCell {
     public ValueCell() {
         super();
         applyButton = new Button("Apply");
-        applyButton.setOnAction(null);
+        applyButton.setOnAction(new ApplyEventHandler());
         cancelButton = new Button("Cancel");
+        cancelButton.setOnAction(new CancelEventHandler());
         buttonLayout = new HBox(applyButton, cancelButton);
         this.changeListener = new ChangedListener();
-
     }
 
     @Override
@@ -72,10 +77,17 @@ public abstract class ValueCell extends RowCell {
 
         // TODO: thuxohl check for cases where a message combo box is needed, e.g. location_id fields
         javafx.scene.Node graphic = null;
-        if (leaf.getValue() instanceof String) {
+        Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor());
+        if (type != null) {
+            try {
+                graphic = new MessageComboBox(this, leaf.getParent().getBuilder(), leaf.getDescriptor());
+            } catch (InstantiationException ex) {
+                ExceptionPrinter.printHistory(logger, ex);
+            }
+        } else if (leaf.getValue() instanceof String) {
             graphic = new StringTextField(this, (String) leaf.getValue());
-        } else if (leaf.getValue() instanceof Enum) {
-            graphic = new EnumComboBox(this, leaf.getValue().getClass());
+        } else if (leaf.getValue() instanceof EnumValueDescriptor) {
+            graphic = new EnumComboBox(this, (EnumValueDescriptor) leaf.getValue());
         } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
             graphic = new DecimalTextField(this, leaf.getValue().toString());
         } else if (leaf.getValue() instanceof Long) {
@@ -106,23 +118,34 @@ public abstract class ValueCell extends RowCell {
                 text = LongDatePicker.DATE_CONVERTER.format(new Date((Long) ((Leaf) item).getValue()));
             } else if (((Leaf) item).getValue() instanceof Double) {
                 text = decimalFormat.format(((Double) ((Leaf) item).getValue()));
+            } else if (((Leaf) item).getValue() instanceof EnumValueDescriptor) {
+                text = (((EnumValueDescriptor) ((Leaf) item).getValue()).getName());
             } else if ((((Leaf) item).getValue() != null)) {
                 text = ((Leaf) item).getValue().toString();
             }
-//            setText(text);
-            setGraphic(new SelectableLabel(text));
+
+            if (((LeafContainer) item).getEditable()) {
+                setText(text);
+                setGraphic(null);
+            } else {
+                setGraphic(SelectableLabel.makeSelectable(new Label(text)));
+            }
         }
 
         if (item instanceof GenericNodeContainer) {
             GenericNodeContainer container = (GenericNodeContainer) item;
             String text = getBuilderDescription(container.getBuilder());
             if (text != null) {
-                setGraphic(new SelectableLabel(text));
+                setGraphic(SelectableLabel.makeSelectable(new Label(text)));
             } else {
+                setText("");
                 setGraphic(null);
             }
             if (container.isSendable()) {
                 updateButtonListener(container.getChanged());
+                if (container.hasChanged()) {
+                    setGraphic(buttonLayout);
+                }
             } else {
                 updateButtonListener(null);
             }
@@ -135,7 +158,7 @@ public abstract class ValueCell extends RowCell {
         if (builder instanceof EntryType.Entry.Builder) {
             EntryType.Entry.Builder entry = (EntryType.Entry.Builder) builder;
             return entry.getKey() + " = " + entry.getValue();
-        } else if (remotePool.isSendableMessage(builder)) {
+        } else if (Configuration.isSendable(builder)) {
             try {
                 return getDescription(builder);
             } catch (CouldNotPerformException ex) {
@@ -146,10 +169,6 @@ public abstract class ValueCell extends RowCell {
 
     public LeafContainer getLeaf() {
         return leaf;
-    }
-
-    public void commitEdit() {
-        super.commitEdit(leaf);
     }
 
     private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
@@ -203,14 +222,14 @@ public abstract class ValueCell extends RowCell {
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
                             Message msg = container.getBuilder().build();
                             try {
-                                if (!remotePool.contains(msg)) {
+                                if ("".equals(getId(msg))) {
                                     container.getParent().getChildren().remove(container);
                                 } else {
                                     int index = container.getParent().getChildren().indexOf(container);
-                                    container.getParent().getChildren().set(index, new GenericNodeContainer("", remotePool.getById(getId(msg), msg)));
+                                    container.getParent().getChildren().set(index, new GenericNodeContainer(msg.getClass().getSimpleName(), remotePool.getById(getId(msg), msg)));
                                 }
                             } catch (CouldNotPerformException ex) {
-                                logger.warn("Could cancel update of [" + msg + "]", ex);
+                                logger.warn("Could not cancel update of [" + msg + "]", ex);
                             }
                             return true;
                         }

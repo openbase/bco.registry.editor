@@ -7,6 +7,7 @@ package de.citec.csra.regedit.cellfactory;
 
 import de.citec.csra.regedit.util.SelectableLabel;
 import de.citec.csra.regedit.struct.Node;
+import javafx.scene.control.Label;
 
 /**
  *
@@ -27,7 +28,7 @@ public class DescriptionCell extends RowCell {
             textProperty().setValue("");
             setContextMenu(null);
         } else if (item instanceof Node) {
-            setGraphic(new SelectableLabel(convertDescriptorToReadable(item.getDescriptor())));
+            setText(convertDescriptorToReadable(item.getDescriptor()));
         }
     }
 
@@ -42,7 +43,6 @@ public class DescriptionCell extends RowCell {
         for (int i = 0; i < split.length; i++) {
             result += Character.toUpperCase(split[i].charAt(0));
             result += split[i].substring(1);
-            result += " ";
         }
         return result;
     }

@@ -12,7 +12,6 @@ import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.csra.regedit.TreeTableViewContextMenu.SendableType;
 import de.citec.csra.regedit.struct.GenericGroupContainer;
 import de.citec.csra.regedit.struct.GenericListContainer;
-import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.util.FieldDescriptorGroup;
 import de.citec.csra.regedit.util.RemotePool;
 import de.citec.dm.remote.DeviceRegistryRemote;
@@ -39,7 +38,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -69,7 +67,7 @@ public class RegistryEditor extends Application {
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab;
     private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator;
-    private TreeTableView<Node> deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView;
+    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView;
 
     public RegistryEditor() throws InstantiationException {
         remotePool = RemotePool.getInstance();
@@ -112,7 +110,7 @@ public class RegistryEditor extends Application {
         deviceClassTab.setContent(deviceClassTreeTableView);
         deviceConfigTab.setContent(deviceConfigTreeTableView);
         unitTemplateTab.setContent(unitTemplateTreeTableView);
-        deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab);
+        deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab, unitTemplateTab);
 
         logger.info("Init finished");
     }
@@ -126,7 +124,16 @@ public class RegistryEditor extends Application {
         });
 
         Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
-        scene.getStylesheets().add("test.css");
+        scene.getStylesheets().add("default.css");
+
+        deviceClassTreeTableView.addWidthProperty(scene.widthProperty());
+        deviceConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        locationConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        sceneConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        agentConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        appConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
+
         primaryStage.setTitle("Registry Editor");
         try {
             logger.info("Try to load icon...");

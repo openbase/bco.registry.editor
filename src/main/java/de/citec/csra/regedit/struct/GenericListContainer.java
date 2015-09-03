@@ -6,15 +6,20 @@
 package de.citec.csra.regedit.struct;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Descriptors.EnumDescriptor;
 import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
 import com.google.protobuf.GeneratedMessage;
-import de.citec.csra.regedit.util.Configuration;
+import com.google.protobuf.ProtocolMessageEnum;
+import de.citec.csra.regedit.struct.consistency.Configuration;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.NotAvailableException;
 import de.citec.jul.extension.protobuf.BuilderProcessor;
 import java.util.List;
+import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate.ServiceType;
+import rst.homeautomation.unit.UnitTemplateType;
 
 /**
  *
@@ -92,7 +97,12 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
                     addElement(true);
                     break;
                 case ENUM:
-                    addElement(builder.getField(fieldDescriptor).getClass().getEnumConstants()[0]);
+                    if ("service_type".equals(descriptor)) {
+                        //TODO:thuxohl look if theres a way to get the enum type from the repeated field
+                        addElement(((ProtocolMessageEnum) ServiceType.BATTERY_PROVIDER).getValueDescriptor());
+                    } else {
+                        throw new CouldNotPerformException("Enum type unknown");
+                    }
                     break;
                 default:
                     registerElement(null);

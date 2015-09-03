@@ -13,6 +13,7 @@ import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.regedit.struct.GenericGroupContainer;
 import de.citec.csra.regedit.struct.GenericListContainer;
 import de.citec.csra.regedit.struct.Leaf;
+import de.citec.csra.regedit.struct.consistency.Configuration;
 import de.citec.csra.regedit.util.FieldDescriptorGroup;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.jul.exception.InstantiationException;
@@ -20,12 +21,14 @@ import javafx.scene.control.TreeItem;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import rst.homeautomation.device.DeviceClassType;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
+import rst.homeautomation.unit.UnitTemplateConfigType;
 import rst.rsb.ScopeType;
 import rst.spatial.LocationConfigType;
 import rst.spatial.LocationRegistryType;
@@ -96,7 +99,7 @@ public class GenericNodeContainerTest {
     /**
      * Test of getContext method, of class GenericNodeContainer.
      */
-//    @Test
+    @Test
     public void test() throws InstantiationException {
         String homeId = "home";
         String bathId = "bath";
@@ -169,5 +172,10 @@ public class GenericNodeContainerTest {
 //    }
     private String print(GeneratedMessage msg) {
         return msg.getClass().getSimpleName();
+    }
+
+    @Test
+    public void testest() throws Exception {
+        assertTrue(!Configuration.isSendable(UnitTemplateConfigType.UnitTemplateConfig.getDefaultInstance().toBuilder()));
     }
 }

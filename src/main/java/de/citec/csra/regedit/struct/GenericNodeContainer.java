@@ -8,7 +8,7 @@ package de.citec.csra.regedit.struct;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.regedit.struct.converter.DefaultConverter;
-import de.citec.csra.regedit.util.Configuration;
+import de.citec.csra.regedit.struct.consistency.Configuration;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;

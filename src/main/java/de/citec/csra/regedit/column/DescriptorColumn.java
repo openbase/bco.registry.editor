@@ -5,10 +5,13 @@
  */
 package de.citec.csra.regedit.column;
 
-import de.citec.csra.regedit.RegistryEditor;
 import de.citec.csra.regedit.cellfactory.DescriptionCell;
+import static de.citec.csra.regedit.column.ValueColumn.VALUE_COLUMN_PROPORTION;
 import de.citec.csra.regedit.struct.Node;
 import java.util.Comparator;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
@@ -18,25 +21,36 @@ import javafx.util.Callback;
  * @author thuxohl
  */
 public class DescriptorColumn extends Column {
-    
+
+    public static final double DESCRIPTOR_COLUMN_PROPORTION = 1 - VALUE_COLUMN_PROPORTION;
+
     public DescriptorColumn() {
         super("Description");
-        
-        this.setPrefWidth(RegistryEditor.RESOLUTION_WIDTH / 4);
+
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
-            
+
             @Override
             public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
                 return new DescriptionCell();
             }
         });
         setComparator(new Comparator<Node>() {
-            
+
             @Override
             public int compare(Node o1, Node o2) {
                 return o1.getDescriptor().compareTo(o2.getDescriptor());
             }
         });
     }
-    
+
+    @Override
+    public void addWidthProperty(ReadOnlyDoubleProperty widthProperty) {
+        widthProperty.addListener(new ChangeListener<Number>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                setPrefWidth(newValue.doubleValue() * DESCRIPTOR_COLUMN_PROPORTION);
+            }
+        });
+    }
 }

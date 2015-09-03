@@ -14,9 +14,9 @@ import javafx.scene.layout.StackPane;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class SelectableLabel extends Label {
+public class SelectableLabel {
 
-    public SelectableLabel(Label label) {
+    public static Label makeSelectable(Label label) {
         StackPane textStack = new StackPane();
         TextField textField = new TextField(label.getText());
         textField.setEditable(false);
@@ -31,9 +31,6 @@ public class SelectableLabel extends Label {
         label.textProperty().bindBidirectional(textField.textProperty());
         label.setGraphic(textStack);
         label.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-    }
-
-    public SelectableLabel(String text) {
-        this(new Label(text));
+        return label;
     }
 }

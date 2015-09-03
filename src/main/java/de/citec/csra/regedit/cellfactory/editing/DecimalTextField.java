@@ -45,7 +45,7 @@ public class DecimalTextField extends TextField {
                         double parsedValue = Double.parseDouble(getText());
                         cell.getLeaf().setValue(parsedValue);
                     }
-                    cell.commitEdit();
+                    cell.commitEdit(cell.getLeaf());
                 }
             }
         });
@@ -68,7 +68,7 @@ public class DecimalTextField extends TextField {
                     cell.getLeaf().setValue(parsedValue);
                     // even though commit is called the text property won't change fast enough without this line?!?
                     setText(Double.toString(parsedValue));
-                    cell.commitEdit();
+                    cell.commitEdit(cell.getLeaf());
                 }
             }
         });

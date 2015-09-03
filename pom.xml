@@ -84,8 +84,8 @@
 	
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <global.version.jul>0.2-SNAPSHOT</global.version.jul>
-        <global.version.registry-manager>0.4-SNAPSHOT</global.version.registry-manager>
+        <global.version.jul>0.3-SNAPSHOT</global.version.jul>
+        <global.version.registry-manager>0.5-SNAPSHOT</global.version.registry-manager>
     </properties>
 	
     <scm>

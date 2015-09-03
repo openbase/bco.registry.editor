@@ -6,6 +6,7 @@
 package de.citec.csra.regedit.cellfactory.editing;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.cellfactory.ValueCell;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
@@ -19,19 +20,20 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
+import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class MessageComboBox extends ComboBox {
+public class MessageComboBox extends ComboBox<String> {
 
-    public MessageComboBox(ValueCell cell, Message msg, String fieldName) throws InstantiationException {
+    public MessageComboBox(ValueCell cell, Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         super();
         setVisibleRowCount(5);
-        setItems(sortedList(msg, fieldName));
-        setValue(cell.getLeaf().getValue());
+        setItems(sortedList(parentBuilder, fieldName));
+        setValue((String) cell.getLeaf().getValue());
         setOnAction(new EventHandler() {
 
             @Override
@@ -44,23 +46,33 @@ public class MessageComboBox extends ComboBox {
         });
     }
 
-    private ObservableList sortedList(Message msg, String fieldName) throws InstantiationException {
+    private ObservableList<String> sortedList(Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         try {
-            FieldDescriptor field = FieldDescriptorUtil.getField(fieldName, msg.toBuilder());
-            List<Comparable> list = new ArrayList<>();
-            for (Message message : RemotePool.getInstance().getMessageList(msg)) {
-                list.add((Comparable) message.getField(field));
+            Message type = getMessageEnumBoxType(fieldName);
+            FieldDescriptor field = FieldDescriptorUtil.getField("id", type.toBuilder());
+            List<String> list = new ArrayList<>();
+            for (Message message : RemotePool.getInstance().getMessageList(type)) {
+                list.add((String) message.getField(field));
             }
-//            if (list.contains((Comparable) msg.getField(field))) {
-//                list.remove((Comparable) msg.getField(field));
-//            }
-//            if (msg instanceof LocationConfig) {
-//                list.remove(((LocationConfig) msg).getId());
-//            }
+            if (parentBuilder instanceof LocationConfig.Builder) {
+                list.remove(((LocationConfig.Builder) parentBuilder).getId());
+                for (String childId : ((LocationConfig.Builder) parentBuilder).getChildIdList()) {
+                    list.remove(childId);
+                }
+            }
             Collections.sort(list);
             return FXCollections.observableArrayList(list);
         } catch (Exception ex) {
             throw new InstantiationException(this, ex);
         }
+    }
+
+    public static GeneratedMessage getMessageEnumBoxType(String fieldName) {
+        if ("location_id".equals(fieldName) || "child_id".equals(fieldName) || "parent_id".equals(fieldName)) {
+            return LocationConfig.getDefaultInstance();
+        } else if ("device_class_id".equals(fieldName)) {
+            return DeviceClass.getDefaultInstance();
+        }
+        return null;
     }
 }
