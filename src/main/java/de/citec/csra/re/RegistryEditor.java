@@ -34,7 +34,7 @@ import de.citec.jp.JPSceneRegistryScope;
 import de.citec.jps.core.JPService;
 import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.pattern.Observable;
 import de.citec.scm.remote.SceneRegistryRemote;

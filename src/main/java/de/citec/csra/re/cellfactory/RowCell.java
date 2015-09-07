@@ -32,7 +32,7 @@ import de.citec.csra.re.struct.node.UnitTemplateConfigListContainer;
 import de.citec.csra.re.struct.node.VariableNode;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import de.citec.scm.remote.SceneRegistryRemote;
 import java.util.ArrayList;
 import java.util.List;

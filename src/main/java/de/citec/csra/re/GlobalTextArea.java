@@ -5,7 +5,7 @@
  */
 package de.citec.csra.re;
 
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import javafx.scene.control.TextArea;
 
 /**

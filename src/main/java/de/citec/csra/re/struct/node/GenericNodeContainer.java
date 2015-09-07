@@ -8,7 +8,7 @@ package de.citec.csra.re.struct.node;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.re.struct.leaf.LeafContainer;
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.extension.rsb.scope.ScopeGenerator;
 import javafx.scene.control.TreeItem;

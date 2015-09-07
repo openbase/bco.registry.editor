@@ -14,7 +14,7 @@ import de.citec.csra.re.struct.node.RotationContainer;
 import de.citec.csra.re.struct.node.ServiceTemplateContainer;
 import de.citec.csra.re.struct.node.UnitTemplateConfigContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.service.ServiceTemplateType;
