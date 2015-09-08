@@ -11,13 +11,13 @@ import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.leaf.LeafContainer;
 import de.citec.csra.re.struct.node.LocationConfigContainer;
 import de.citec.csra.re.struct.node.Node;
-import de.citec.dm.remote.DeviceRegistryRemote;
+import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import java.util.concurrent.ExecutionException;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -35,8 +35,7 @@ import rst.spatial.LocationConfigType.LocationConfig;
  */
 public class LocationConfigCell extends ValueCell {
 
-    private final ComboBox<LocationConfig> locationConfigComboBox;
-    private final ComboBox<UnitConfig> unitConfigComboBox;
+    private final ComboBox<String> locationConfigComboBox;
 
     public LocationConfigCell(LocationRegistryRemote locationRegistryRemote) {
         super(null, locationRegistryRemote, null, null, null);
@@ -102,11 +101,12 @@ public class LocationConfigCell extends ValueCell {
         });
 
         locationConfigComboBox = new ComboBox<>();
+        locationConfigComboBox.setVisibleRowCount(5);
         locationConfigComboBox.setButtonCell(new LocationConfigCell.LocationConfigComboBoxCell());
-        locationConfigComboBox.setCellFactory(new Callback<ListView<LocationConfig>, ListCell<LocationConfig>>() {
+        locationConfigComboBox.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
 
             @Override
-            public ListCell<LocationConfig> call(ListView<LocationConfig> param) {
+            public ListCell<String> call(ListView<String> p) {
                 return new LocationConfigCell.LocationConfigComboBoxCell();
             }
         });
@@ -115,103 +115,75 @@ public class LocationConfigCell extends ValueCell {
             @Override
             public void handle(ActionEvent event) {
                 if (locationConfigComboBox.getSelectionModel().getSelectedItem() != null) {
-                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
-                    setText(locationConfigComboBox.getSelectionModel().getSelectedItem().getId());
+                    leaf.setValue(locationConfigComboBox.getSelectionModel().getSelectedItem());
+                    setText(locationConfigComboBox.getSelectionModel().getSelectedItem());
                     commitEdit(leaf);
                 }
             }
         });
-
-        unitConfigComboBox = new ComboBox<>();
-        unitConfigComboBox.setButtonCell(new UnitConfigComboBoxCell());
-        unitConfigComboBox.setCellFactory(new Callback<ListView<UnitConfig>, ListCell<UnitConfig>>() {
-
-            @Override
-            public ListCell<UnitConfig> call(ListView<UnitConfig> param) {
-                return new LocationConfigCell.UnitConfigComboBoxCell();
-            }
-        });
-        unitConfigComboBox.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                if (unitConfigComboBox.getSelectionModel().getSelectedItem() != null) {
-                    leaf.setValue(unitConfigComboBox.getSelectionModel().getSelectedItem().getLabel());
-                    setText(unitConfigComboBox.getSelectionModel().getSelectedItem().getLabel());
-                    commitEdit(leaf);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void updateItem(Node item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (item instanceof LocationConfigContainer && ((LocationConfigContainer) item).getBuilder().getRoot()) {
-            LocationConfigContainer container = (LocationConfigContainer) item;
-            if (container.getNewNode() || container.hasChanged()) {
-                setGraphic(buttonBox);
-            } else {
-                setGraphic(null);
-            }
-            container.getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (newValue) {
-                                setGraphic(buttonBox);
-                            } else {
-                                setGraphic(null);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
-                setGraphic(null);
-            }
-        }
     }
 
     @Override
     public void startEdit() {
+        if (readOnly) {
+            return;
+        }
         super.startEdit();
 
         if (getItem() instanceof LeafContainer) {
-            if (((Leaf) getItem()).getDescriptor().equals("parent_id")) {
+            String descriptor = ((Leaf) getItem()).getDescriptor();
+            if (descriptor.equals("parent_id") || descriptor.equals("child_id")) {
                 try {
-                    List<LocationConfig> comboBoxList = new ArrayList(locationRegistryRemote.getData().getLocationConfigList());
-                    comboBoxList.remove((LocationConfig) ((LeafContainer) getItem()).getParent().getBuilder().build());
+                    List<String> comboBoxList = new ArrayList();
+                    for (LocationConfig locationConfig : locationRegistryRemote.getLocationConfigs()) {
+                        comboBoxList.add(locationConfig.getId());
+                    }
+                    LocationConfig config = ((LocationConfig) ((LeafContainer) getItem()).getParent().getBuilder().build());
+                    comboBoxList.remove(config.getId());
+                    if (config.hasParentId()) {
+                        comboBoxList.remove(config.getParentId());
+                    }
+                    for (String childId : config.getChildIdList()) {
+                        comboBoxList.remove(childId);
+                    }
+                    Collections.sort(comboBoxList);
                     locationConfigComboBox.setItems(FXCollections.observableArrayList(comboBoxList));
                     super.setEditingGraphic(locationConfigComboBox);
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not receive data to fill the locationConfigComboBox", ex);
                 }
-            } else if (((Leaf) getItem()).getDescriptor().equals("unit_id")) {
-                try {
-                    unitConfigComboBox.setItems(FXCollections.observableArrayList(deviceRegistryRemote.getUnitConfigs()));
-                    super.setEditingGraphic(unitConfigComboBox);
-                } catch (CouldNotPerformException ex) {
-                    logger.warn("Could not receive data to fill the unitConfigComboBox", ex);
-                }
             }
         }
     }
 
-    private class LocationConfigComboBoxCell extends ListCell<LocationConfig> {
+    @Override
+    public void updateItem(Node item, boolean empty) {
+        super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+
+//        logger.info("get location read only property");
+//        try {
+//            readOnly = locationRegistryRemote.isLocationConfigRegistryReadOnly().get() || JPService.getProperty(JPReadOnly.class).getValue();
+//            if (readOnly) {
+//                setContextMenu(null);
+//            }
+//        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+//            readOnly = true;
+//            logger.warn("Could not determine read only property for device classes", ex);
+//        }
+//        logger.info("got location read only property [" + readOnly + "]");
+        if (readOnly) {
+            setContextMenu(null);
+        }
+    }
+
+    private class LocationConfigComboBoxCell extends ListCell<String> {
 
         @Override
-        public void updateItem(LocationConfig item, boolean empty) {
+        public void updateItem(String item, boolean empty) {
             super.updateItem(item, empty);
 
             if (item != null) {
-                setText(item.getLabel());
+                setText(item);
             }
         }
     }

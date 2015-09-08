@@ -10,11 +10,11 @@ import de.citec.csra.re.RegistryEditor;
 import de.citec.csra.re.struct.leaf.Leaf;
 import de.citec.csra.re.struct.node.AppConfigContainer;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.lm.remote.LocationRegistryRemote;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import java.util.concurrent.ExecutionException;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -33,10 +33,11 @@ import rst.spatial.LocationConfigType;
 public class AppConfigCell extends ValueCell {
 
     private final ComboBox<LocationConfigType.LocationConfig> locationIdComboBox;
-    
+
     public AppConfigCell(AppRegistryRemote appRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
         super(null, locationRegistryRemote, null, null, appRegistryRemote);
 
+        
         applyButton.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -99,6 +100,7 @@ public class AppConfigCell extends ValueCell {
         });
 
         locationIdComboBox = new ComboBox<>();
+        locationIdComboBox.setVisibleRowCount(5);
         locationIdComboBox.setButtonCell(new AppConfigCell.LocationConfigComboBoxCell());
         locationIdComboBox.setCellFactory(new Callback<ListView<LocationConfigType.LocationConfig>, ListCell<LocationConfigType.LocationConfig>>() {
 
@@ -122,6 +124,9 @@ public class AppConfigCell extends ValueCell {
 
     @Override
     public void startEdit() {
+        if (readOnly) {
+            return;
+        }
         super.startEdit();
 
         if (getItem() instanceof Leaf) {
@@ -138,39 +143,22 @@ public class AppConfigCell extends ValueCell {
     
     @Override
     public void updateItem(Node item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (item instanceof AppConfigContainer) {
-            AppConfigContainer container = (AppConfigContainer) item;
-            if ((container.getNewNode() || container.hasChanged()) && getGraphic() != buttonBox) {
-                setGraphic(buttonBox);
-            } else if (!(container.getNewNode() || container.hasChanged()) && getGraphic() != null) {
-                setGraphic(null);
-            }
-            container.getChanged().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (newValue && getGraphic() != buttonBox) {
-                                setGraphic(buttonBox);
-                            } else if (getGraphic() != null) {
-                                setGraphic(null);
-                            }
-                        }
-                    });
-                }
-            });
-        } else {
-            if (item != null && ((!"scope".equals(item.getDescriptor()) && (!"id".equals(item.getDescriptor()))))) {
-                setGraphic(null);
-            }
+        super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+        
+//        try {
+//            readOnly = appRegistryRemote.isAppConfigRegistryReadOnly().get() || JPService.getProperty(JPReadOnly.class).getValue();
+//            if (readOnly) {
+//                setContextMenu(null);
+//            }
+//        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+//            readOnly = true;
+//            logger.warn("Could not determine read only property for device classes", ex);
+//        }
+        if(readOnly) {
+            setContextMenu(null);
         }
     }
-    
+
     public class LocationConfigComboBoxCell extends ListCell<LocationConfigType.LocationConfig> {
 
         @Override

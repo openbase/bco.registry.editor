@@ -9,6 +9,7 @@ import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.csra.re.cellfactory.AppConfigCell;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.lm.remote.LocationRegistryRemote;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
@@ -19,8 +20,8 @@ import javafx.util.Callback;
  */
 public class AppConfigColumn extends ValueColumn {
 
-    public AppConfigColumn(AppRegistryRemote appRegistryRemote, LocationRegistryRemote locationRegistryRemote) {
-        super();
+    public AppConfigColumn(AppRegistryRemote appRegistryRemote, LocationRegistryRemote locationRegistryRemote, ReadOnlyDoubleProperty windowWidthProperty) {
+        super(windowWidthProperty);
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
 
             @Override

@@ -5,26 +5,26 @@
  */
 package de.citec.csra.re.struct.node;
 
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
+import de.citec.jul.exception.InstantiationException;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 
 /**
  *
- * @author thuxohl
+ * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class UnitTemplateContainer extends VariableNode<UnitTemplate.Builder>{
+public class UnitTemplateContainer extends SendableNode<UnitTemplate.Builder> {
 
-    public UnitTemplateContainer(UnitTemplate.Builder unitTemplate) {
-        super("unit_template", unitTemplate);
-        super.add(unitTemplate.getType(), "type");
-        super.add(new ServiceTypeListContainer(unitTemplate));
-
-        // TODO Tamino: implement global exception handling if gui elements are not able to init.
+    public UnitTemplateContainer(UnitTemplate.Builder value) {
+        super(value.getId(), value);
+        super.add(value.getId(), "id", false);
+        super.add(value.getType(), "type", false);
+        super.add(new ServiceTypeListContainer(value));
         try {
-            super.add(new GenericListContainer(UnitTemplate.SERVICE_TEMPLATE_FIELD_NUMBER, builder, ServiceTemplateContainer.class));
-        } catch (de.citec.jul.exception.InstantiationException ex) {
-            ExceptionPrinter.printHistory(logger, ex);
+            super.add(new MetaConfigContainer(value.getMetaConfigBuilder()));
+        } catch (InstantiationException ex) {
+            ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
         }
     }
-    
+
 }

@@ -5,7 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import de.citec.jul.extension.rsb.scope.ScopeGenerator;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 
@@ -19,7 +19,8 @@ public class UnitConfigContainer extends NodeContainer<UnitConfig.Builder> {
         super(unitConfig.getLabel(), unitConfig);
         super.add(unitConfig.getId(), "id", false);
         super.add(unitConfig.getLabel(), "label");
-        super.add(unitConfig.getTemplate().getType(), "type", false);
+        super.add(unitConfig.getType(), "type", false);
+        super.add(unitConfig.getBoundToDevice(), "bound_to_device");
         super.add(new PlacementConfigContainer(unitConfig.getPlacementConfigBuilder()));
         super.add(new ServiceConfigListContainer(unitConfig));
         super.add(ScopeGenerator.generateStringRep(unitConfig.getScope()), "scope", false);

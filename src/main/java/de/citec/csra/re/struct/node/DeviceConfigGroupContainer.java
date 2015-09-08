@@ -18,20 +18,20 @@ import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
 public class DeviceConfigGroupContainer extends NodeContainer<DeviceRegistry.Builder> {
 
     private final DeviceClass deviceClass;
-    
+
     public DeviceConfigGroupContainer(final DeviceRegistry.Builder deviceRegistry, DeviceClass deviceClass) {
         super(deviceClass.getId(), deviceRegistry);
         this.deviceClass = deviceClass;
         List<DeviceConfigType.DeviceConfig.Builder> deviceConfigs = new ArrayList<>();
         deviceRegistry.getDeviceConfigBuilderList().stream().forEach((deviceConfigBuilder) -> {
-            if (deviceConfigBuilder.getDeviceClass().getId().equals(deviceClass.getId())) {
+            if (deviceConfigBuilder.getDeviceClassId().equals(deviceClass.getId())) {
                 deviceConfigs.add(deviceConfigBuilder);
             }
         });
 
         List<String> locationIds = new ArrayList<>();
         for (DeviceConfigType.DeviceConfig.Builder deviceConfig : deviceConfigs) {
-            if(!locationIds.contains(deviceConfig.getPlacementConfig().getLocationId())) {
+            if (!locationIds.contains(deviceConfig.getPlacementConfig().getLocationId())) {
                 locationIds.add(deviceConfig.getPlacementConfig().getLocationId());
             }
         }

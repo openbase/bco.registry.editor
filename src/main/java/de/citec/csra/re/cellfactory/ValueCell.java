@@ -15,6 +15,7 @@ import de.citec.csra.re.struct.node.DeviceConfigContainer;
 import de.citec.csra.re.struct.node.DeviceConfigGroupContainer;
 import de.citec.csra.re.struct.node.EntryContainer;
 import de.citec.csra.re.struct.node.Node;
+import de.citec.csra.re.struct.node.SendableNode;
 import de.citec.csra.re.struct.node.UnitConfigContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
@@ -23,6 +24,8 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Date;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -62,12 +65,18 @@ public abstract class ValueCell extends RowCell {
     protected final HBox buttonBox;
     protected LeafContainer leaf;
     private final CheckBox checkBox;
+    private final CheckBox booleanCheckBox;
+
+    protected final ChangeListener<Boolean> listener;
+    protected SimpleObjectProperty<Boolean> changed;
+    protected boolean readOnly = true;
 
     public ValueCell(DeviceRegistryRemote deviceRegistryRemote, LocationRegistryRemote locationRegistryRemote, SceneRegistryRemote sceneRegistryRemote, AgentRegistryRemote agentRegistryRemote, AppRegistryRemote appRegistryRemote) {
         super(deviceRegistryRemote, locationRegistryRemote, sceneRegistryRemote, agentRegistryRemote, appRegistryRemote);
         applyButton = new Button("Apply Changes");
         cancel = new Button("Cancel");
         buttonBox = new HBox(applyButton, cancel);
+        this.listener = new ChangedListener();
         stringTextField = new TextField();
         stringTextField.focusedProperty().addListener(new ChangeListener<Boolean>() {
 
@@ -95,6 +104,7 @@ public abstract class ValueCell extends RowCell {
         });
 
         enumComboBox = new ComboBox();
+        enumComboBox.setVisibleRowCount(5);
         enumComboBox.setOnAction(new EventHandler() {
 
             @Override
@@ -198,8 +208,20 @@ public abstract class ValueCell extends RowCell {
                     state = ActivationStateType.ActivationState.State.DEACTIVE;
                 }
                 leaf.setValue(state);
-                    setText(state.toString());
-                    commitEdit(leaf);
+                setText(state.toString());
+                commitEdit(leaf);
+            }
+        });
+
+        booleanCheckBox = new CheckBox();
+        booleanCheckBox.setVisible(true);
+        booleanCheckBox.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent t) {
+                leaf.setValue(booleanCheckBox.isSelected());
+                setText(booleanCheckBox.isSelected() + "");
+                commitEdit(leaf);
             }
         });
     }
@@ -240,6 +262,9 @@ public abstract class ValueCell extends RowCell {
                 Date date = new Date((Long) leaf.getValue());
                 longDatePicker.setValue(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 setEditingGraphic(longDatePicker);
+            } else if (leaf.getValue() instanceof Boolean) {
+                booleanCheckBox.setSelected((Boolean) leaf.getValue());
+                setEditingGraphic(booleanCheckBox);
             }
         }
     }
@@ -286,6 +311,13 @@ public abstract class ValueCell extends RowCell {
             }
         }
 
+        if (item instanceof SendableNode) {
+            SendableNode container = (SendableNode) item;
+            updateListener(container.getChanged());
+        } else {
+            updateListener(null);
+        }
+
         if (item instanceof DeviceClassContainer) {
             setText(((DeviceClassContainer) item).getBuilder().getDescription());
         } else if (item instanceof DeviceConfigContainer) {
@@ -316,5 +348,34 @@ public abstract class ValueCell extends RowCell {
         label.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
         return label;
+    }
+
+    private class ChangedListener implements ChangeListener<Boolean> {
+
+        @Override
+        public void changed(ObservableValue<? extends Boolean> ov, Boolean oldValue, Boolean newValue) {
+            Platform.runLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (newValue) {
+                        setGraphic(buttonBox);
+                    } else {
+                        setGraphic(null);
+                    }
+                }
+            });
+        }
+
+    }
+
+    protected void updateListener(SimpleObjectProperty<Boolean> property) {
+        if (changed != null) {
+            changed.removeListener(listener);
+        }
+        changed = property;
+        if (changed != null) {
+            changed.addListener(listener);
+        }
     }
 }

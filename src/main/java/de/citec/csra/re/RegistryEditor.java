@@ -15,6 +15,7 @@ import de.citec.csra.re.column.DeviceConfigColumn;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.csra.re.column.LocationConfigColumn;
 import de.citec.csra.re.column.SceneConfigColumn;
+import de.citec.csra.re.column.UnitTemplateColumn;
 import de.citec.csra.re.struct.node.AgentConfigContainer;
 import de.citec.csra.re.struct.node.AppConfigContainer;
 import de.citec.csra.re.struct.node.DeviceClassList;
@@ -23,6 +24,7 @@ import de.citec.csra.re.struct.node.GenericListContainer;
 import de.citec.csra.re.struct.node.LocationConfigListContainer;
 import de.citec.csra.re.struct.node.Node;
 import de.citec.csra.re.struct.node.SceneConfigContainer;
+import de.citec.csra.re.struct.node.UnitTemplateListContainer;
 import de.citec.dm.remote.DeviceRegistryRemote;
 import de.citec.jp.JPAgentRegistryScope;
 import de.citec.jp.JPAppRegistryScope;
@@ -30,16 +32,22 @@ import de.citec.jp.JPDeviceRegistryScope;
 import de.citec.jp.JPLocationRegistryScope;
 import de.citec.jp.JPSceneRegistryScope;
 import de.citec.jps.core.JPService;
+import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.pattern.Observable;
 import de.citec.scm.remote.SceneRegistryRemote;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -47,6 +55,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +90,7 @@ public class RegistryEditor extends Application {
     private final AgentRegistryRemote agentRemote;
     private final AppRegistryRemote appRemote;
     private TabPane registryTabPane, tabDeviceRegistryPane;
-    private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig, tabAppRegistry;
+    private Tab tabDeviceRegistry, tabLocationRegistry, tabSceneRegistry, tabAgentRegistry, tabDeviceClass, tabDeviceConfig, tabAppRegistry, tabUnitTemplateRegistry;
     private ProgressIndicator progressDeviceRegistryIndicator;
     private ProgressIndicator progressLocationRegistryIndicator;
     private ProgressIndicator progressSceneRegistryIndicator;
@@ -92,6 +102,9 @@ public class RegistryEditor extends Application {
     private TreeTableView<Node> sceneConfigTreeTableView;
     private TreeTableView<Node> agentConfigTreeTableView;
     private TreeTableView<Node> appConfigTreeTableView;
+    private TreeTableView<Node> unitTemplateTreeTableView;
+
+    private final GlobalTextArea globalTextArea = GlobalTextArea.getInstance();
 
     public RegistryEditor() throws InstantiationException {
         this.deviceRemote = new DeviceRegistryRemote();
@@ -129,28 +142,31 @@ public class RegistryEditor extends Application {
         deviceClassTreeTableView = new TreeTableView<>();
         deviceClassTreeTableView.setEditable(true);
         deviceClassTreeTableView.setShowRoot(false);
-        deviceClassTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceClassColumn(deviceRemote));
         deviceClassTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceClassTreeTableView, DeviceClass.getDefaultInstance()));
 
         deviceConfigTreeTableView = new TreeTableView<>();
         deviceConfigTreeTableView.setEditable(true);
         deviceConfigTreeTableView.setShowRoot(false);
-        deviceConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new DeviceConfigColumn(deviceRemote, locationRemote));
         deviceConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(deviceConfigTreeTableView, DeviceConfig.getDefaultInstance()));
+
+        unitTemplateTreeTableView = new TreeTableView<>();
+        unitTemplateTreeTableView.setEditable(true);
+        unitTemplateTreeTableView.setShowRoot(false);
 
         tabDeviceRegistryPane = new TabPane();
         tabDeviceRegistryPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabDeviceClass = new Tab("DeviceClass");
         tabDeviceConfig = new Tab("DeviceConfig");
+        tabUnitTemplateRegistry = new Tab("UnitTemplate");
         tabDeviceClass.setContent(deviceClassTreeTableView);
         tabDeviceConfig.setContent(deviceConfigTreeTableView);
-        tabDeviceRegistryPane.getTabs().addAll(tabDeviceClass, tabDeviceConfig);
+        tabUnitTemplateRegistry.setContent(unitTemplateTreeTableView);
+        tabDeviceRegistryPane.getTabs().addAll(tabDeviceClass, tabDeviceConfig, tabUnitTemplateRegistry);
         tabDeviceRegistry.setContent(tabDeviceRegistryPane);
 
         locationConfigTreeTableView = new TreeTableView<>();
         locationConfigTreeTableView.setEditable(true);
         locationConfigTreeTableView.setShowRoot(false);
-        locationConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new LocationConfigColumn(locationRemote));
         locationConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(locationConfigTreeTableView, LocationConfig.getDefaultInstance()));
 
         tabLocationRegistry.setContent(locationConfigTreeTableView);
@@ -158,7 +174,6 @@ public class RegistryEditor extends Application {
         sceneConfigTreeTableView = new TreeTableView<>();
         sceneConfigTreeTableView.setEditable(true);
         sceneConfigTreeTableView.setShowRoot(false);
-        sceneConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new SceneConfigColumn(sceneRemote, locationRemote));
         sceneConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(sceneConfigTreeTableView, SceneConfigType.SceneConfig.getDefaultInstance()));
 
         tabSceneRegistry.setContent(sceneConfigTreeTableView);
@@ -166,7 +181,6 @@ public class RegistryEditor extends Application {
         agentConfigTreeTableView = new TreeTableView<>();
         agentConfigTreeTableView.setEditable(true);
         agentConfigTreeTableView.setShowRoot(false);
-        agentConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AgentConfigColumn(agentRemote, locationRemote));
         agentConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(agentConfigTreeTableView, AgentConfigType.AgentConfig.getDefaultInstance()));
 
         tabAgentRegistry.setContent(agentConfigTreeTableView);
@@ -174,23 +188,46 @@ public class RegistryEditor extends Application {
         appConfigTreeTableView = new TreeTableView<>();
         appConfigTreeTableView.setEditable(true);
         appConfigTreeTableView.setShowRoot(false);
-        appConfigTreeTableView.getColumns().addAll(getDescriptorColumn(), new AppConfigColumn(appRemote, locationRemote));
         appConfigTreeTableView.setContextMenu(new TreeTableViewContextMenu(appConfigTreeTableView, AppConfigType.AppConfig.getDefaultInstance()));
 
         tabAppRegistry.setContent(appConfigTreeTableView);
     }
 
+    private void makeReadOnly(TreeTableView view) {
+        view.setContextMenu(null);
+//        view.setStyle("default.css");
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         updateTabLocationRegistry();
         updateTabDeviceRegistry();
         updateTabSceneRegistry();
         updateTabAgentRegistry();
         updateTabAppRegistry();
 
-        Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
-        scene.getStylesheets().add("test.css");
+        VBox verticalLayout = new VBox();
+        VBox.setVgrow(verticalLayout, Priority.ALWAYS);
+        verticalLayout.getChildren().addAll(registryTabPane, globalTextArea);
+        Scene scene = new Scene(verticalLayout, RESOLUTION_WIDTH, 576);
+
+        deviceClassTreeTableView.getColumns().addAll(getDescriptorColumn(scene.widthProperty(), "device_class"), new DeviceClassColumn(deviceRemote, scene.widthProperty()));
+        deviceConfigTreeTableView.getColumns().addAll(getDescriptorColumn(scene.widthProperty(), "device_config"), new DeviceConfigColumn(deviceRemote, locationRemote, scene.widthProperty()));
+        unitTemplateTreeTableView.getColumns().addAll(getDescriptorColumn(scene.widthProperty(), "unit_template"), new UnitTemplateColumn(deviceRemote, scene.widthProperty()));
+        locationConfigTreeTableView.getColumns().addAll(getDescriptorColumn(scene.widthProperty(), "location"), new LocationConfigColumn(locationRemote, scene.widthProperty()));
+        sceneConfigTreeTableView.getColumns().addAll(getDescriptorColumn(scene.widthProperty(), "scene"), new SceneConfigColumn(sceneRemote, locationRemote, scene.widthProperty()));
+        agentConfigTreeTableView.getColumns().addAll(getDescriptorColumn(scene.widthProperty(), "agent"), new AgentConfigColumn(agentRemote, locationRemote, scene.widthProperty()));
+        appConfigTreeTableView.getColumns().addAll(getDescriptorColumn(scene.widthProperty(), "app"), new AppConfigColumn(appRemote, locationRemote, scene.widthProperty()));
+
+        scene.getStylesheets().add("default.css");
+        scene.heightProperty().addListener(new ChangeListener<Number>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
+                registryTabPane.setPrefHeight(scene.getHeight() * 4 / 5);
+                globalTextArea.setPrefHeight(scene.getHeight() * 1 / 5);
+            }
+        });
         primaryStage.setTitle("Registry Editor");
         try {
             logger.info("Try to load icon...");
@@ -202,9 +239,11 @@ public class RegistryEditor extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        
         logger.info(APP_NAME + " successfully started.");
 
+        for (int i = 0; i < 20; i++) {
+            globalTextArea.setText(globalTextArea.getText() + "test\n");
+        }
         ExecutorService executerService = Executors.newFixedThreadPool(10);
 
         executerService.submit(new Callable<Void>() {
@@ -316,6 +355,46 @@ public class RegistryEditor extends Application {
                 return null;
             }
         });
+
+        if (JPService.getProperty(JPReadOnly.class).getValue()) {
+            makeReadOnly(deviceClassTreeTableView);
+            makeReadOnly(deviceConfigTreeTableView);
+            makeReadOnly(unitTemplateTreeTableView);
+            makeReadOnly(locationConfigTreeTableView);
+            makeReadOnly(sceneConfigTreeTableView);
+            makeReadOnly(agentConfigTreeTableView);
+            makeReadOnly(appConfigTreeTableView);
+        } else {
+            logger.info("Trying to get read only property from remotes");
+            if (deviceRemote.isDeviceClassRegistryReadOnly().get()) {
+                makeReadOnly(deviceClassTreeTableView);
+            }
+            logger.info("DeviceClass readonly property [" + deviceRemote.isDeviceClassRegistryReadOnly().get() + "]");
+            if (deviceRemote.isDeviceConfigRegistryReadOnly().get()) {
+                makeReadOnly(deviceConfigTreeTableView);
+            }
+            logger.info("DeviceConfig readonly property [" + deviceRemote.isDeviceConfigRegistryReadOnly().get() + "]");
+            if (deviceRemote.isUnitTemplateRegistryReadOnly().get()) {
+                makeReadOnly(unitTemplateTreeTableView);
+            }
+            logger.info("UnitTemplate readonly property [" + deviceRemote.isUnitTemplateRegistryReadOnly().get() + "]");
+//            if (locationRemote.isLocationConfigRegistryReadOnly().get()) {
+//                makeReadOnly(locationConfigTreeTableView);
+//            }
+//            logger.info("LocationConfig readonly property [" + locationRemote.isLocationConfigRegistryReadOnly().get() + "]");
+//            if (agentRemote.isAgentConfigRegistryReadOnly().get()) {
+//                makeReadOnly(agentConfigTreeTableView);
+//            }
+//            logger.info("AgentConfig readonly property [" + agentRemote.isAgentConfigRegistryReadOnly().get() + "]");
+//            if (appRemote.isAppConfigRegistryReadOnly().get()) {
+//                makeReadOnly(appConfigTreeTableView);
+//            }
+//            logger.info("AppConfig readonly property [" + appRemote.isAppConfigRegistryReadOnly().get() + "]");
+//            if (sceneRemote.isSceneConfigRegistryReadOnly().get()) {
+//                makeReadOnly(sceneConfigTreeTableView);
+//            }
+//            logger.info("SceneConfig readonly property [" + sceneRemote.isSceneConfigRegistryReadOnly().get() + "]");
+        }
     }
 
     @Override
@@ -328,8 +407,8 @@ public class RegistryEditor extends Application {
         super.stop();
     }
 
-    public DescriptorColumn getDescriptorColumn() {
-        return new DescriptorColumn(deviceRemote, locationRemote, sceneRemote, agentRemote, appRemote);
+    public DescriptorColumn getDescriptorColumn(ReadOnlyDoubleProperty windowWidthProperty, String type) {
+        return new DescriptorColumn(deviceRemote, locationRemote, sceneRemote, agentRemote, appRemote, windowWidthProperty, type);
 
     }
 
@@ -347,6 +426,7 @@ public class RegistryEditor extends Application {
                         DeviceRegistryType.DeviceRegistry data = deviceRemote.getData();
                         deviceClassTreeTableView.setRoot(new DeviceClassList(data.toBuilder()));
                         deviceConfigTreeTableView.setRoot(new DeviceConfigList(data.toBuilder()));
+                        unitTemplateTreeTableView.setRoot(new UnitTemplateListContainer(data.toBuilder()));
                         tabDeviceRegistry.setContent(tabDeviceRegistryPane);
                     }
 
@@ -370,13 +450,7 @@ public class RegistryEditor extends Application {
                 try {
                     if (!modified) {
                         LocationRegistryType.LocationRegistry data = locationRemote.getData();
-                        LocationRegistryType.LocationRegistry.Builder rootLocations = LocationRegistryType.LocationRegistry.newBuilder();
-                        for (LocationConfig locationConfig : data.getLocationConfigList()) {
-                            if (locationConfig.getRoot()) {
-                                rootLocations.addLocationConfig(locationConfig);
-                            }
-                        }
-                        locationConfigTreeTableView.setRoot(new LocationConfigListContainer(rootLocations));
+                        locationConfigTreeTableView.setRoot(new LocationConfigListContainer(data.toBuilder()));
                         tabLocationRegistry.setContent(locationConfigTreeTableView);
                     }
                 } catch (CouldNotPerformException ex) {
@@ -471,6 +545,7 @@ public class RegistryEditor extends Application {
 
         /* Setup JPService */
         JPService.setApplicationName(APP_NAME);
+        JPService.registerProperty(JPReadOnly.class);
         JPService.registerProperty(JPDeviceRegistryScope.class);
         JPService.registerProperty(JPLocationRegistryScope.class);
         JPService.registerProperty(JPSceneRegistryScope.class);

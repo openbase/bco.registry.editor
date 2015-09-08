@@ -5,7 +5,7 @@
  */
 package de.citec.csra.re.struct.node;
 
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
 
 /**

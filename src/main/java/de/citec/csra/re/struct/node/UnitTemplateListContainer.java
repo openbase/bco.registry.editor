@@ -5,17 +5,17 @@
  */
 package de.citec.csra.re.struct.node;
 
-import rst.homeautomation.device.DeviceClassType;
+import rst.homeautomation.device.DeviceRegistryType;
 
 /**
  *
- * @author thuxohl
+ * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class UnitTemplateListContainer extends NodeContainer<DeviceClassType.DeviceClass.Builder> {
+public class UnitTemplateListContainer extends NodeContainer<DeviceRegistryType.DeviceRegistry.Builder> {
 
-    public UnitTemplateListContainer(final DeviceClassType.DeviceClass.Builder deviceClass) {
-        super("unit_templates", deviceClass);
-        deviceClass.getUnitTemplateBuilderList().stream().forEach((unitTemplateBuilder) -> {
+    public UnitTemplateListContainer(final DeviceRegistryType.DeviceRegistry.Builder deviceRegistry) {
+        super("Unit Templates", deviceRegistry);
+        deviceRegistry.getUnitTemplateBuilderList().stream().forEach((unitTemplateBuilder) -> {
             super.add(new UnitTemplateContainer(unitTemplateBuilder));
         });
     }

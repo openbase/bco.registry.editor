@@ -6,6 +6,7 @@
 package de.citec.csra.re.column;
 
 import de.citec.csra.re.struct.node.Node;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 
@@ -16,9 +17,12 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 public abstract class Column extends TreeTableColumn<Node, Node> {
 
     public static final int COLUMN_WIDTH = 400;
+    
+    protected final ReadOnlyDoubleProperty windowWidthProperty;
 
-    public Column(String text) {
+    public Column(String text, ReadOnlyDoubleProperty windowWidthProperty) {
         super(text);
         this.setCellValueFactory(new TreeItemPropertyValueFactory<>("context"));
+        this.windowWidthProperty = windowWidthProperty;
     }
 }

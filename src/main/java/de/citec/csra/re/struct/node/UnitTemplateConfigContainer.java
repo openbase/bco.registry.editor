@@ -6,23 +6,24 @@
 package de.citec.csra.re.struct.node;
 
 import de.citec.jul.exception.printer.ExceptionPrinter;
-import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
+import rst.homeautomation.unit.UnitTemplateConfigType.UnitTemplateConfig;
 
 /**
  *
  * @author thuxohl
  */
-public class ServiceTemplateContainer extends VariableNode<ServiceTemplate.Builder> {
+public class UnitTemplateConfigContainer extends VariableNode<UnitTemplateConfig.Builder> {
 
-    public ServiceTemplateContainer(ServiceTemplate.Builder serviceTemplate) {
-        super("service_template", serviceTemplate);
-        super.add(serviceTemplate.getServiceType(), "service_type", false);
+    public UnitTemplateConfigContainer(UnitTemplateConfig.Builder unitTemplateConfig) {
+        super("unit_template_config", unitTemplateConfig);
+        super.add(unitTemplateConfig.getType(), "type");
 
         // TODO Tamino: implement global exception handling if gui elements are not able to init.
         try {
-            super.add(new MetaConfigContainer(builder.getMetaConfigBuilder()));
+            super.add(new GenericListContainer(UnitTemplateConfig.SERVICE_TEMPLATE_FIELD_NUMBER, builder, ServiceTemplateContainer.class));
         } catch (de.citec.jul.exception.InstantiationException ex) {
             ExceptionPrinter.printHistory(logger, ex);
         }
     }
+
 }
