@@ -68,11 +68,11 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
                 return o1.getName().compareTo(o2.getName());
             }
         });
-        for (int i = 0; i < values.size(); i++) {
-            if ("unknown".equalsIgnoreCase(values.get(i).getName())) {
-                values.remove(i);
-            }
-        }
+//        for (int i = 0; i < values.size(); i++) {
+//            if ("unknown".equalsIgnoreCase(values.get(i).getName())) {
+//                values.remove(i);
+//            }
+//        }
         return FXCollections.observableArrayList(values);
     }
 
