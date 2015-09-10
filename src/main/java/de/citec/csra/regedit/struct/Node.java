@@ -5,8 +5,6 @@
  */
 package de.citec.csra.regedit.struct;
 
-import com.google.protobuf.Descriptors;
-
 /**
  *
  * @author thuxohl

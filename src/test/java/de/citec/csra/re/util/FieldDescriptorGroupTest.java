@@ -17,6 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.spatial.LocationConfigType;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
@@ -119,6 +120,20 @@ public class FieldDescriptorGroupTest {
         expResult = true;
         result = group.hasEqualValue(device2, value);
         assertEquals(expResult, result);
+    }
+
+    /**
+     * Test of setValue method, of class FieldGroup.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testsetValue() throws Exception {
+        System.out.println("setValue");
+
+        DeviceConfig.Builder builder = DeviceConfig.newBuilder();
+        group.setValue(builder, homeID);
+        assertEquals(homeID, builder.getPlacementConfig().getLocationId());
     }
 
 }

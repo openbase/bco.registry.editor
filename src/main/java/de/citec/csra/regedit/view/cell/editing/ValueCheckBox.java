@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.cellfactory.editing;
+package de.citec.csra.regedit.view.cell.editing;
 
-import de.citec.csra.regedit.cellfactory.ValueCell;
+import de.citec.csra.regedit.view.cell.ValueCell;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -18,7 +19,8 @@ public class ValueCheckBox extends CheckBox {
 
     private final Object selected;
     private final Object unselected;
-    
+    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+
     public ValueCheckBox(ValueCell cell) {
         this(cell, true, false);
     }
@@ -27,6 +29,7 @@ public class ValueCheckBox extends CheckBox {
         super();
         this.selected = selected;
         this.unselected = unselected;
+        setSelected(cell.getLeaf().getValue().equals(selected));
         setVisible(true);
         setOnAction(new EventHandler<ActionEvent>() {
 

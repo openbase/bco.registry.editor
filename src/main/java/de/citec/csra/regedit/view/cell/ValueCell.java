@@ -3,30 +3,33 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.cellfactory;
+package de.citec.csra.regedit.view.cell;
 
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.RegistryEditor;
-import de.citec.csra.regedit.cellfactory.editing.DecimalTextField;
-import de.citec.csra.regedit.cellfactory.editing.EnumComboBox;
-import de.citec.csra.regedit.cellfactory.editing.LongDatePicker;
-import de.citec.csra.regedit.cellfactory.editing.MessageComboBox;
-import de.citec.csra.regedit.cellfactory.editing.StringTextField;
-import de.citec.csra.regedit.cellfactory.editing.ValueCheckBox;
+import de.citec.csra.regedit.view.cell.editing.DecimalTextField;
+import de.citec.csra.regedit.view.cell.editing.EnumComboBox;
+import de.citec.csra.regedit.view.cell.editing.LongDatePicker;
+import de.citec.csra.regedit.view.cell.editing.MessageComboBox;
+import de.citec.csra.regedit.view.cell.editing.StringTextField;
+import de.citec.csra.regedit.view.cell.editing.ValueCheckBox;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Leaf;
 import de.citec.csra.regedit.struct.LeafContainer;
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.struct.consistency.Configuration;
+import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.SelectableLabel;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
+import de.citec.jul.exception.printer.LogLevel;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -75,14 +78,13 @@ public class ValueCell extends RowCell {
 
     private javafx.scene.Node getEditingGraphic() {
 
-        // TODO: thuxohl check for cases where a message combo box is needed, e.g. location_id fields
         javafx.scene.Node graphic = null;
         Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor());
         if (type != null) {
             try {
                 graphic = new MessageComboBox(this, leaf.getParent().getBuilder(), leaf.getDescriptor());
             } catch (InstantiationException ex) {
-                ExceptionPrinter.printHistory(logger, ex);
+                RegistryEditor.printException(ex, logger, LogLevel.ERROR);
             }
         } else if (leaf.getValue() instanceof String) {
             graphic = new StringTextField(this, (String) leaf.getValue());
@@ -146,6 +148,14 @@ public class ValueCell extends RowCell {
                 if (container.hasChanged()) {
                     setGraphic(buttonLayout);
                 }
+
+                try {
+                    if ("".equals(FieldDescriptorUtil.getId(container.getBuilder().build()))) {
+                        container.setChanged(true);
+                    }
+                } catch (CouldNotPerformException ex) {
+                    RegistryEditor.printException(ex, logger, LogLevel.WARN);
+                }
             } else {
                 updateButtonListener(null);
             }
@@ -160,7 +170,7 @@ public class ValueCell extends RowCell {
             return entry.getKey() + " = " + entry.getValue();
         } else if (Configuration.isSendable(builder)) {
             try {
-                return getDescription(builder);
+                return FieldDescriptorUtil.getDescription(builder);
             } catch (CouldNotPerformException ex) {
             }
         }
@@ -222,11 +232,11 @@ public class ValueCell extends RowCell {
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
                             Message msg = container.getBuilder().build();
                             try {
-                                if ("".equals(getId(msg))) {
+                                if ("".equals(FieldDescriptorUtil.getId(msg))) {
                                     container.getParent().getChildren().remove(container);
                                 } else {
                                     int index = container.getParent().getChildren().indexOf(container);
-                                    container.getParent().getChildren().set(index, new GenericNodeContainer(msg.getClass().getSimpleName(), remotePool.getById(getId(msg), msg)));
+                                    container.getParent().getChildren().set(index, new GenericNodeContainer(msg.getClass().getSimpleName(), remotePool.getById(FieldDescriptorUtil.getId(msg), msg)));
                                 }
                             } catch (CouldNotPerformException ex) {
                                 logger.warn("Could not cancel update of [" + msg + "]", ex);
@@ -254,24 +264,6 @@ public class ValueCell extends RowCell {
                     }
                 }
             });
-        }
-    }
-
-    public String getId(Message msg) throws CouldNotPerformException {
-        try {
-            Method method = msg.getClass().getMethod("getId");
-            return (String) method.invoke(msg);
-        } catch (IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new CouldNotPerformException("Could not get id of [" + msg + "]", ex);
-        }
-    }
-
-    public String getDescription(Message.Builder msg) throws CouldNotPerformException {
-        try {
-            Method method = msg.getClass().getMethod("getDescription");
-            return (String) method.invoke(msg);
-        } catch (IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new CouldNotPerformException("Could not get description of [" + msg + "]", ex);
         }
     }
 }

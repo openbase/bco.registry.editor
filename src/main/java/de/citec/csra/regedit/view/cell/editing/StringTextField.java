@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.cellfactory.editing;
+package de.citec.csra.regedit.view.cell.editing;
 
-import de.citec.csra.regedit.cellfactory.ValueCell;
+import de.citec.csra.regedit.view.cell.ValueCell;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;

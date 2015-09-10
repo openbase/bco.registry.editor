@@ -1,0 +1,22 @@
+.tree-table-cell:even {
+    -fx-background-color: #FFFFFF;
+}
+
+.tree-table-cell:odd {
+    -fx-background-color: rgb(230,230,230);
+}
+
+.tree-table-cell:hover {
+    -fx-background-color: rgb(230,230,250);
+}
+
+.tree-table-row-cell:selected {
+    -fx-background-color: steelblue; 
+    -fx-text-background-color: grey;
+    -fx-font-weight: bold;
+}
+
+.tree-table-row-cell {
+    -fx-text-background-color: grey;
+}
+

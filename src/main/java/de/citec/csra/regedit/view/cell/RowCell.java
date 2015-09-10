@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.cellfactory;
+package de.citec.csra.regedit.view.cell;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
@@ -21,8 +21,9 @@ import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.RSTDefaultInstances;
 import de.citec.csra.regedit.util.RemotePool;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
+import de.citec.jul.exception.printer.LogLevel;
+import de.citec.jul.extension.protobuf.BuilderProcessor;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.concurrent.Task;
@@ -40,37 +41,38 @@ import org.slf4j.LoggerFactory;
  * @author thuxohl
  */
 public abstract class RowCell extends TreeTableCell<Node, Node> {
-    
+
     protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     protected RemotePool remotePool;
     private final ContextMenu contextMenu;
     private final MenuItem addMenuItem, removeMenuItem;
-    
+
     public RowCell() {
         try {
             remotePool = RemotePool.getInstance();
         } catch (InstantiationException ex) {
-            ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+            RegistryEditor.printException(ex, logger, LogLevel.WARN);
         }
-        
+
         addMenuItem = new MenuItem("Add");
         removeMenuItem = new MenuItem("Remove");
         contextMenu = new ContextMenu(addMenuItem, removeMenuItem);
-        
+
         EventHandlerImpl eventHandler = new EventHandlerImpl();
         addMenuItem.setOnAction(eventHandler);
         removeMenuItem.setOnAction(eventHandler);
-        
+
         this.setFocused(true);
         this.setEditable(true);
     }
-    
+
     @Override
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
-        if (item instanceof GenericListContainer && ((GenericListContainer) item).isModifiable()) {
+
+        if ((item instanceof GenericListContainer && ((GenericListContainer) item).isModifiable())
+                || item instanceof GenericGroupContainer) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
@@ -87,14 +89,14 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             setContextMenu(null);
         }
     }
-    
+
     private class EventHandlerImpl implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
                     new Task<Boolean>() {
-                        
+
                         @Override
                         protected Boolean call() throws Exception {
                             if (event.getSource().equals(addMenuItem)) {
@@ -104,43 +106,51 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                             }
                             return true;
                         }
-                        
+
                     });
             thread.setDaemon(true);
             thread.start();
         }
-        
+
         private void addAction(Node add) {
             try {
                 RegistryEditor.setModified(true);
                 if (add instanceof GenericNodeContainer) {
                     GeneratedMessage.Builder builder = ((NodeContainer) add).getBuilder();
                     GenericListContainer parent = (GenericListContainer) ((NodeContainer) add).getParent().getValue();
-                    
-                    List<FieldDescriptorGroup> groups = new ArrayList<>();
-                    NodeContainer groupContainer = parent;
-                    while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {
-                        groupContainer = (GenericGroupContainer) groupContainer.getParent().getValue();
-                        groups.add(((GenericGroupContainer) groupContainer).getFieldGroup());
-                    }
-                    
+
                     GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(builder);
-                    for (FieldDescriptorGroup group : groups) {
-                        group.setValue(addedBuilder, group);
-                    }
+                    addGroupValues(parent, addedBuilder);
                     parent.addElement(addedBuilder);
                 } else if (add instanceof LeafContainer) {
                     GenericListContainer parentNode = (GenericListContainer) ((LeafContainer) add).getParent();
                     parentNode.addNewDefaultElement();
                 } else if (add instanceof GenericListContainer) {
                     GenericListContainer parentNode = (GenericListContainer) add;
-                    parentNode.addNewDefaultElement();
+                    GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(parentNode.getFieldDescriptor(), parentNode.getBuilder()));
+                    addGroupValues(parentNode, addedBuilder);
+                    parentNode.add(new GenericNodeContainer("", addedBuilder));
+                } else if (add instanceof GenericGroupContainer) {
+                    GenericGroupContainer container = (GenericGroupContainer) add;
+                    GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(container.getFieldDescriptor(), container.getBuilder()));
+                    addGroupValues(container, addedBuilder);
+                    container.add(new GenericNodeContainer("", addedBuilder));
                 }
             } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistory(logger, ex);
+                RegistryEditor.printException(ex, logger, LogLevel.ERROR);
             }
         }
-        
+
+        private void addGroupValues(NodeContainer startingContainer, GeneratedMessage.Builder builder) {
+            NodeContainer groupContainer = startingContainer;
+            GenericGroupContainer parent;
+            while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {
+                parent = (GenericGroupContainer) groupContainer.getParent().getValue();
+                parent.getFieldGroup().setValue(builder, parent.getValues().get(parent.getChildren().indexOf(groupContainer)));
+                groupContainer = parent;
+            }
+        }
+
         private void removeAction(Node nodeToRemove) {
             RegistryEditor.setModified(true);
             // check if the removed item is an instance of classes that have to be directly
@@ -149,29 +159,28 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 NodeContainer removed = (NodeContainer) nodeToRemove;
                 try {
                     Message message = removed.getBuilder().build();
-                    if (remotePool.contains(message)) {
+                    logger.info("Removing message with Id [" + FieldDescriptorUtil.getId(message) + "]");
+                    if (!"".equals(FieldDescriptorUtil.getId(message)) && remotePool.contains(message)) {
                         remotePool.remove(message);
                     }
                 } catch (CouldNotPerformException ex) {
-                    ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                    RegistryEditor.printException(ex, logger, LogLevel.WARN);
                 }
                 removed.getParent().getChildren().remove(removed);
             } else if (nodeToRemove instanceof Leaf) {
                 removeNodeFromRepeatedField(((LeafContainer) nodeToRemove).getParent(), ((LeafContainer) nodeToRemove).getIndex());
             } else {
-                logger.info("Removing [" + nodeToRemove.getDescriptor() + "] from repeated field");
                 removeNodeFromRepeatedField((NodeContainer) ((NodeContainer) nodeToRemove).getParent().getValue(), nodeToRemove);
             }
         }
     }
-    
+
     private void removeNodeFromRepeatedField(NodeContainer parent, Node nodeToRemove) {
         removeNodeFromRepeatedField(parent, parent.getChildren().indexOf(nodeToRemove));
     }
-    
+
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
         Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(parent.getDescriptor(), parent.getBuilder());
-        logger.info("Removing node with index[" + index + "] from reapeated field[" + field.getName() + "]");
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));
         updatedList.remove(index);
         parent.getBuilder().clearField(field);

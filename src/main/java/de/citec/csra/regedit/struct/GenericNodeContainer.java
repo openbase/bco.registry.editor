@@ -14,7 +14,6 @@ import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.NotAvailableException;
 import java.util.Map.Entry;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -22,8 +21,6 @@ import org.slf4j.LoggerFactory;
  * @param <MB>
  */
 public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends NodeContainer<MB> {
-
-    private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
     public GenericNodeContainer(String descriptor, final MB builder) throws InstantiationException {
         super(descriptor, builder);

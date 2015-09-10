@@ -22,6 +22,7 @@ import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.homeautomation.unit.UnitTemplateConfigType.UnitTemplateConfig;
+import rst.person.PersonType;
 import rst.timing.TimestampType.Timestamp;
 
 /**
@@ -32,8 +33,9 @@ public class StructureConsistencyKeeper {
 
     public static void keepStructure(NodeContainer<? extends GeneratedMessage.Builder> container, String fieldName) throws CouldNotPerformException {
         if (container.getBuilder() instanceof InventoryState.Builder) {
-            //TODO:thuxohl only works if the field is an immediate child but could also be the owner field in this case
             keepInventoryStateStructure((NodeContainer<InventoryState.Builder>) container);
+        } else if (container.getBuilder() instanceof PersonType.Person.Builder && ((NodeContainer<GeneratedMessage.Builder>) container.getParent().getValue()).getBuilder() instanceof InventoryState.Builder) {
+            keepInventoryStateStructure((NodeContainer<InventoryState.Builder>) container.getParent().getValue());
         } else if (container.getBuilder() instanceof DeviceConfig.Builder) {
             keepDeviceConfigStructure((NodeContainer<DeviceConfig.Builder>) container, fieldName);
         } else if (container.getBuilder() instanceof UnitTemplateConfig.Builder) {
@@ -50,24 +52,24 @@ public class StructureConsistencyKeeper {
                 i--;
             }
         }
-        System.out.println("Fieldname [" + fieldName + "]");
         builder.clearField(FieldDescriptorUtil.getField(fieldName, builder));
     }
 
     private static void keepDeviceConfigStructure(NodeContainer<DeviceConfig.Builder> container, String changedField) throws CouldNotPerformException {
-        if ("device_class".equals(changedField)) {
+        if ("device_class_id".equals(changedField)) {
             // clear the field in the builder and remove all child tree items representing these
             StructureConsistencyKeeper.clearField(container, "unit_config");
 
             // create the new values for the field and add them to the builder  
-            List<UnitConfig> builderList = new ArrayList<>();
+            List<UnitConfig.Builder> builderList = new ArrayList<>();
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(container.getBuilder().getDeviceClassId()).getUnitTemplateConfigList()) {
                 UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToDevice(true);
                 unitConfig.setPlacementConfig(container.getBuilder().getPlacementConfig());
-                for (ServiceTemplate serviceTemplate : unitTemplate.getServiceTemplateList()) {
+                unitTemplate.getServiceTemplateList().stream().forEach((serviceTemplate) -> {
                     unitConfig.addServiceConfig(ServiceConfig.newBuilder().setType(serviceTemplate.getServiceType()));
-                }
+                });
                 container.getBuilder().addUnitConfig(unitConfig);
+                builderList.add(unitConfig);
             }
 
             // create and add a new child node container representing these children
@@ -106,5 +108,25 @@ public class StructureConsistencyKeeper {
         // create and add a new child node container representing these children
         Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
         container.add(new GenericNodeContainer<>(field, container.getBuilder().getTimestampBuilder()));
+    }
+
+    public static void keepStructure(GeneratedMessage.Builder builder, String fieldName) throws CouldNotPerformException {
+        if (builder instanceof DeviceConfig.Builder) {
+            keepDeviceConfigStructure((DeviceConfig.Builder) builder, fieldName);
+        }
+    }
+
+    private static void keepDeviceConfigStructure(DeviceConfig.Builder builder, String changedField) throws CouldNotPerformException {
+        if ("device_class_id".equals(changedField)) {
+
+            for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(builder.getDeviceClassId()).getUnitTemplateConfigList()) {
+                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToDevice(true);
+                unitConfig.setPlacementConfig(builder.getPlacementConfig());
+                unitTemplate.getServiceTemplateList().stream().forEach((serviceTemplate) -> {
+                    unitConfig.addServiceConfig(ServiceConfig.newBuilder().setType(serviceTemplate.getServiceType()));
+                });
+                builder.addUnitConfig(unitConfig);
+            }
+        }
     }
 }

@@ -5,11 +5,13 @@
  */
 package de.citec.csra.regedit;
 
+import de.citec.csra.regedit.util.SendableType;
+import de.citec.csra.regedit.view.RegistryTreeTableView;
+import de.citec.csra.regedit.view.GlobalTextArea;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
-import de.citec.csra.regedit.TreeTableViewContextMenu.SendableType;
 import de.citec.csra.regedit.struct.GenericGroupContainer;
 import de.citec.csra.regedit.struct.GenericListContainer;
 import de.citec.csra.regedit.util.FieldDescriptorGroup;
@@ -22,23 +24,29 @@ import de.citec.jp.JPLocationRegistryScope;
 import de.citec.jp.JPSceneRegistryScope;
 import de.citec.jps.core.JPService;
 import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.ExceptionPrinter;
 import de.citec.jul.exception.InstantiationException;
+import de.citec.jul.exception.printer.LogLevel;
 import de.citec.jul.extension.rsb.com.RSBRemoteService;
 import de.citec.jul.pattern.Observable;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +69,8 @@ public class RegistryEditor extends Application {
     public static final String APP_NAME = "RegistryView";
     public static final int RESOLUTION_WIDTH = 1024;
     private static boolean modified = false;
+    private final Map<SendableType, Boolean> READ_ONLY_MAP = new HashMap<>();
+    private final GlobalTextArea globalTextArea = GlobalTextArea.getInstance();
 
     private final RemotePool remotePool;
     private TabPane registryTabPane, deviceRegistryTabPane;
@@ -123,8 +133,16 @@ public class RegistryEditor extends Application {
             updateTab(remote);
         });
 
-        Scene scene = new Scene(registryTabPane, RESOLUTION_WIDTH, 576);
-        scene.getStylesheets().add("default.css");
+        VBox vBox = new VBox(registryTabPane, globalTextArea);
+        Scene scene = new Scene(vBox, RESOLUTION_WIDTH, 576);
+        scene.heightProperty().addListener(new ChangeListener<Number>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                registryTabPane.setPrefHeight(newValue.doubleValue() * 0.80);
+                globalTextArea.setPrefHeight(newValue.doubleValue() * 0.20);
+            }
+        });
 
         deviceClassTreeTableView.addWidthProperty(scene.widthProperty());
         deviceConfigTreeTableView.addWidthProperty(scene.widthProperty());
@@ -140,7 +158,7 @@ public class RegistryEditor extends Application {
             primaryStage.getIcons().add(new Image("registry-editor.png"));
             logger.info("App icon loaded...");
         } catch (Exception ex) {
-            ExceptionPrinter.printHistory(logger, new CouldNotPerformException("Could not load app icon!", ex));
+            printException(ex, logger, LogLevel.WARN);
         }
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -167,10 +185,10 @@ public class RegistryEditor extends Application {
                         try {
                             remote.requestStatus();
                         } catch (CouldNotPerformException ex) {
-                            throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                            printException(ex, logger, LogLevel.WARN);
                         }
                     } catch (InterruptedException | CouldNotPerformException ex) {
-                        throw ExceptionPrinter.printHistoryAndReturnThrowable(logger, ex);
+                        printException(ex, logger, LogLevel.ERROR);
                     }
                     return null;
                 }
@@ -199,7 +217,6 @@ public class RegistryEditor extends Application {
                         GeneratedMessage data = remote.getData();
                         tab.setContent(fillTreeTableView(data));
                     }
-
                 } catch (CouldNotPerformException ex) {
                     logger.error("Registry not available!", ex);
                     tab.setContent(new Label("Error: " + ex.getMessage()));
@@ -208,33 +225,47 @@ public class RegistryEditor extends Application {
         });
     }
 
-    private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException {
+    private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException {
         if (msg instanceof DeviceRegistry) {
             DeviceRegistry data = (DeviceRegistry) msg;
+            READ_ONLY_MAP.put(SendableType.DEVICE_CLASS, data.getDeviceClassRegistryReadOnly());
+            READ_ONLY_MAP.put(SendableType.DEVICE_CONFIG, data.getDeviceConfigRegistryReadOnly());
+            READ_ONLY_MAP.put(SendableType.UNIT_TEMPLATE_CONFIG, data.getUnitTemplateRegistryReadOnly());
             deviceClassTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.DEVICE_CLASS_FIELD_NUMBER, data.toBuilder()));
+            setReadOnlyMode(deviceClassTreeTableView, SendableType.DEVICE_CLASS);
 
             FieldDescriptorGroup deviceClassId = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
             FieldDescriptorGroup locationId = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
             Descriptors.FieldDescriptor field = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER);
             deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(field.getName(), field, data.toBuilder(), data.toBuilder().getDeviceConfigBuilderList(), deviceClassId, locationId));
+            setReadOnlyMode(deviceConfigTreeTableView, SendableType.DEVICE_CONFIG);
 
             unitTemplateTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.UNIT_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
+            setReadOnlyMode(unitTemplateTreeTableView, SendableType.UNIT_TEMPLATE_CONFIG);
             return deviceRegistryTabPane;
         } else if (msg instanceof LocationRegistry) {
             LocationRegistry data = (LocationRegistry) msg;
+            READ_ONLY_MAP.put(SendableType.LOCATION_CONFIG, data.getLocationConfigRegistryReadOnly());
             locationConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            setReadOnlyMode(locationConfigTreeTableView, SendableType.LOCATION_CONFIG);
             return locationConfigTreeTableView;
         } else if (msg instanceof SceneRegistry) {
             SceneRegistry data = (SceneRegistry) msg;
+            READ_ONLY_MAP.put(SendableType.SCENE_CONFIG, data.getSceneConfigRegistryReadOnly());
             sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            setReadOnlyMode(sceneConfigTreeTableView, SendableType.SCENE_CONFIG);
             return sceneConfigTreeTableView;
         } else if (msg instanceof AppRegistry) {
             AppRegistry data = (AppRegistry) msg;
+            READ_ONLY_MAP.put(SendableType.APP_CONFIG, data.getAppConfigRegistryReadOnly());
             appConfigTreeTableView.setRoot(new GenericListContainer(AppRegistry.APP_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            setReadOnlyMode(appConfigTreeTableView, SendableType.APP_CONFIG);
             appRegistryTab.setContent(appConfigTreeTableView);
         } else if (msg instanceof AgentRegistry) {
             AgentRegistry data = (AgentRegistry) msg;
+            READ_ONLY_MAP.put(SendableType.AGENT_CONFIG, data.getAgentConfigRegistryReadOnly());
             agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistry.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            setReadOnlyMode(agentConfigTreeTableView, SendableType.AGENT_CONFIG);
             return agentConfigTreeTableView;
         }
         return null;
@@ -274,6 +305,15 @@ public class RegistryEditor extends Application {
         modified = value;
     }
 
+    private void setReadOnlyMode(RegistryTreeTableView treeTableView, SendableType type) {
+        if (READ_ONLY_MAP.get(type)) {
+            treeTableView.getStylesheets().add("read_only.css");
+        } else {
+            treeTableView.getStylesheets().add("default.css");
+        }
+        treeTableView.setEditable(!READ_ONLY_MAP.get(type));
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -290,5 +330,10 @@ public class RegistryEditor extends Application {
         JPService.parseAndExitOnError(args);
 
         launch(args);
+    }
+
+    public static void printException(Throwable th, Logger logger, LogLevel logLevel) {
+        GlobalTextArea.getInstance().printException(th);
+        ExceptionPrinter.printHistory(th, logger, logLevel);
     }
 }

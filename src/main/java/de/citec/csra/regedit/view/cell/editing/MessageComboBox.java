@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.cellfactory.editing;
+package de.citec.csra.regedit.view.cell.editing;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import de.citec.csra.regedit.cellfactory.ValueCell;
+import de.citec.csra.regedit.view.cell.ValueCell;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.RemotePool;
 import de.citec.jul.exception.InstantiationException;
@@ -68,10 +68,15 @@ public class MessageComboBox extends ComboBox<String> {
     }
 
     public static GeneratedMessage getMessageEnumBoxType(String fieldName) {
-        if ("location_id".equals(fieldName) || "child_id".equals(fieldName) || "parent_id".equals(fieldName)) {
-            return LocationConfig.getDefaultInstance();
-        } else if ("device_class_id".equals(fieldName)) {
-            return DeviceClass.getDefaultInstance();
+        if (null != fieldName) {
+            switch (fieldName) {
+                case "location_id":
+                case "child_id":
+                case "parent_id":
+                    return LocationConfig.getDefaultInstance();
+                case "device_class_id":
+                    return DeviceClass.getDefaultInstance();
+            }
         }
         return null;
     }

@@ -8,8 +8,13 @@ package de.citec.csra.regedit.util;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
+import de.citec.csra.regedit.RegistryEditor;
+import de.citec.csra.regedit.struct.consistency.StructureConsistencyKeeper;
+import de.citec.jul.exception.CouldNotPerformException;
+import de.citec.jul.exception.printer.LogLevel;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -17,6 +22,8 @@ import java.util.List;
  * @param <MB> the builder type that is grouped
  */
 public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FieldDescriptorGroup.class);
 
     /**
      * An array of field descriptors whose values will be used for the group.
@@ -101,9 +108,14 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
     public void setValue(MB builder, Object value) {
         Message.Builder mBuilder = builder;
         for (int i = 0; i < fieldDescriptors.length - 1; i++) {
-            mBuilder = ((GeneratedMessage) mBuilder.getField(fieldDescriptors[i])).toBuilder();
+            mBuilder = mBuilder.getFieldBuilder(fieldDescriptors[i]);
         }
         mBuilder.setField(fieldDescriptors[fieldDescriptors.length - 1], value);
+        try {
+            StructureConsistencyKeeper.keepStructure(builder, fieldDescriptors[fieldDescriptors.length - 1].getName());
+        } catch (CouldNotPerformException ex) {
+            RegistryEditor.printException(ex, logger, LogLevel.WARN);
+        }
     }
 
     /**

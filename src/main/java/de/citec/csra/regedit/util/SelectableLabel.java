@@ -21,7 +21,7 @@ public class SelectableLabel {
         TextField textField = new TextField(label.getText());
         textField.setEditable(false);
         textField.setStyle(
-                "-fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0;"
+                "-fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0; -fx-text-inner-color: gray;"
         );
         // the invisible label is a hack to get the textField to size like a label.
         Label invisibleLabel = new Label();

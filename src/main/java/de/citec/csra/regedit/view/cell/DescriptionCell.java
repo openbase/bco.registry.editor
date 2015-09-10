@@ -3,11 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.cellfactory;
+package de.citec.csra.regedit.view.cell;
 
-import de.citec.csra.regedit.util.SelectableLabel;
 import de.citec.csra.regedit.struct.Node;
-import javafx.scene.control.Label;
 
 /**
  *

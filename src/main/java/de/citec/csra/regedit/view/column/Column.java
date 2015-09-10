@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.column;
+package de.citec.csra.regedit.view.column;
 
 import de.citec.csra.regedit.struct.Node;
 import javafx.beans.property.ReadOnlyDoubleProperty;

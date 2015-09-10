@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit;
+package de.citec.csra.regedit.view;
 
+import de.citec.csra.regedit.RegistryEditor;
+import de.citec.csra.regedit.util.SendableType;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.util.RSTDefaultInstances;
-import de.citec.jul.exception.ExceptionPrinter;
+import de.citec.jul.exception.printer.LogLevel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
@@ -65,20 +67,11 @@ public class TreeTableViewContextMenu extends ContextMenu {
                         treeTableView.getRoot().getChildren().add(newNode);
                     }
                 } catch (de.citec.jul.exception.InstantiationException ex) {
-                    ExceptionPrinter.printHistory(logger, ex);
+                    RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                 }
             }
         });
         this.getItems().add(addMenuItem);
     }
 
-    public enum SendableType {
-
-        AGENT_CONFIG,
-        APP_CONFIG,
-        DEVICE_CLASS,
-        DEVICE_CONFIG,
-        LOCATION_CONFIG,
-        SCENE_CONFIG;
-    }
 }

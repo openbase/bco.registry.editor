@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.cellfactory.editing;
+package de.citec.csra.regedit.view.cell.editing;
 
 import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
-import de.citec.csra.regedit.cellfactory.ValueCell;
+import de.citec.csra.regedit.view.cell.ValueCell;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

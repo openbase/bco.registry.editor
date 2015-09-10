@@ -27,6 +27,11 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
      * A group of field after which values the builder list will be grouped.
      */
     private final FieldDescriptorGroup fieldGroup;
+    /**
+     * A list for all the values in the group.
+     */
+    private final List values;
+    private final Descriptors.FieldDescriptor fieldDescriptor;
 
     public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, FieldDescriptorGroup... groups) throws InstantiationException {
         this(descriptor, FieldDescriptorUtil.getField(fieldNumber, builder), builder, builderList, groups);
@@ -35,14 +40,14 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
     public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldDescriptorGroup... groups) throws InstantiationException {
         super(descriptor, builder);
         this.fieldGroup = groups[0];
+        this.fieldDescriptor = fieldDescriptor;
         FieldDescriptorGroup childGroups[] = new FieldDescriptorGroup[groups.length - 1];
         for (int i = 1; i < groups.length; i++) {
             childGroups[i - 1] = groups[i];
         }
-
         try {
             List<RFMB> groupBuilderList = new ArrayList<>();
-            List<Object> values = fieldGroup.getFieldValues(builderList);
+            values = fieldGroup.getFieldValues(builderList);
             for (Object value : values) {
                 for (RFMB messageBuilder : builderList) {
                     if (fieldGroup.hasEqualValue(messageBuilder, value)) {
@@ -61,28 +66,15 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
         }
     }
 
-//    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldDescriptorGroup group) throws InstantiationException {
-//        super(descriptor, builder);
-//        this.fieldGroup = group;
-//        try {
-//            List<RFMB> groupBuilderList = new ArrayList<>();
-//            List<Object> values = fieldGroup.getFieldValues(builderList);
-//            for (Object value : values) {
-//                for (RFMB messageBuilder : builderList) {
-//                    if (fieldGroup.hasEqualValue(messageBuilder, value)) {
-//                        groupBuilderList.add(messageBuilder);
-//                    }
-//                }
-//                super.add(new GenericListContainer<>(value.toString(), fieldDescriptor, builder, groupBuilderList));
-//                groupBuilderList.clear();
-//            }
-//        } catch (CouldNotPerformException ex) {
-//            throw new de.citec.jul.exception.InstantiationException(this, ex);
-//        }
-//        this.setValue(this);
-//    }
-
     public FieldDescriptorGroup getFieldGroup() {
         return fieldGroup;
+    }
+
+    public List getValues() {
+        return values;
+    }
+
+    public Descriptors.FieldDescriptor getFieldDescriptor() {
+        return fieldDescriptor;
     }
 }
