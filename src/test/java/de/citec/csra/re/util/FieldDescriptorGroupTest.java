@@ -17,7 +17,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.spatial.LocationConfigType;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
