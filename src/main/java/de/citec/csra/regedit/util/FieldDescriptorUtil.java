@@ -47,4 +47,13 @@ public class FieldDescriptorUtil {
             throw new CouldNotPerformException("Could not get description of [" + msg + "]", ex);
         }
     }
+
+    public static String getLabel(Message.Builder msg) throws CouldNotPerformException {
+        try {
+            Method method = msg.getClass().getMethod("getLabel");
+            return (String) method.invoke(msg);
+        } catch (IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new CouldNotPerformException("Could not get description of [" + msg + "]", ex);
+        }
+    }
 }

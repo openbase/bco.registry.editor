@@ -5,7 +5,9 @@
  */
 package de.citec.csra.regedit.view.cell;
 
+import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
+import de.citec.csra.regedit.util.FieldDescriptorUtil;
 
 /**
  *
@@ -27,6 +29,17 @@ public class DescriptionCell extends RowCell {
             setContextMenu(null);
         } else if (item instanceof Node) {
             setText(convertDescriptorToReadable(item.getDescriptor()));
+            if (item instanceof GenericNodeContainer) {
+                GenericNodeContainer container = (GenericNodeContainer) item;
+                try {
+                    setText(FieldDescriptorUtil.getId(container.getBuilder().build()));
+                } catch (Exception ex) {
+                    try {
+                        setText(FieldDescriptorUtil.getLabel(container.getBuilder()));
+                    } catch (Exception exc) {
+                    }
+                }
+            }
         }
     }
 

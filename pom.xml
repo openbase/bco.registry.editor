@@ -34,7 +34,7 @@
                 <configuration>
                     <programs>
                         <program>
-                            <mainClass>de.citec.csra.re.RegistryEditor</mainClass>
+                            <mainClass>de.citec.csra.regedit.RegistryEditor</mainClass>
                             <id>registry-editor</id>
                             <platforms>
                                 <platform>unix</platform>
@@ -50,7 +50,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.citec.csra.re.RegistryEditor</mainClass>
+                            <mainClass>de.citec.csra.regedit.RegistryEditor</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

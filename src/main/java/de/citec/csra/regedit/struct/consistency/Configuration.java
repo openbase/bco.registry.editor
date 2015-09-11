@@ -51,7 +51,8 @@ public class Configuration {
             }
             return !("id".equals(fieldName));
         } else if (builder instanceof ServiceTemplate.Builder) {
-            return !("service_type".equals(fieldName));
+//            return !("service_type".equals(fieldName));
+            return true;
         } else if (builder instanceof DeviceConfig.Builder) {
             if ("serial_number".equals(fieldName)) {
                 return ((DeviceConfig.Builder) builder).getSerialNumber().isEmpty();
