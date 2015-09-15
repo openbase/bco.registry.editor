@@ -42,6 +42,7 @@ public class StringTextField extends TextField {
                     cell.cancelEdit();
                 } else if (event.getCode().equals(KeyCode.ENTER)) {
                     cell.getLeaf().setValue(getText());
+                    cell.setText(getText());
                     cell.commitEdit(cell.getLeaf());
                 }
             }

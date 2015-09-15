@@ -5,7 +5,10 @@
  */
 package de.citec.csra.regedit.view.cell;
 
+import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
+import de.citec.csra.regedit.util.FieldDescriptorUtil;
+import de.citec.jul.exception.CouldNotPerformException;
 
 /**
  *
@@ -27,6 +30,25 @@ public class DescriptionCell extends RowCell {
             setContextMenu(null);
         } else if (item instanceof Node) {
             setText(convertDescriptorToReadable(item.getDescriptor()));
+            if (item instanceof GenericNodeContainer) {
+                GenericNodeContainer container = (GenericNodeContainer) item;
+                try {
+                    String id = FieldDescriptorUtil.getId(container.getBuilder().build());
+                    if (!id.isEmpty()) {
+                        setText(FieldDescriptorUtil.getId(container.getBuilder().build()));
+                    } else {
+                        throw new CouldNotPerformException("Id is empty and therefor not good as a descriptor");
+                    }
+                } catch (Exception ex) {
+                    try {
+                        String label = FieldDescriptorUtil.getLabel(container.getBuilder());
+                        if (!label.isEmpty()) {
+                            setText(FieldDescriptorUtil.getLabel(container.getBuilder()));
+                        }
+                    } catch (Exception exc) {
+                    }
+                }
+            }
         }
     }
 
