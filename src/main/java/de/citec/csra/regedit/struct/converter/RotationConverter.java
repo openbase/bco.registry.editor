@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
+import org.slf4j.LoggerFactory;
 import rst.geometry.RotationType.Rotation;
 
 /**
@@ -19,6 +20,8 @@ import rst.geometry.RotationType.Rotation;
  */
 public class RotationConverter implements Converter {
 
+    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    
     private final Rotation.Builder rotation;
     private final Vector3d euler;
 
