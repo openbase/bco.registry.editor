@@ -128,4 +128,11 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
     public boolean hasEqualValue(MB builder, Object value) {
         return value.equals(getValue(builder));
     }
+
+    public FieldDescriptorGroup() {
+    }
+
+    public Descriptors.FieldDescriptor[] getFieldDescriptors() {
+        return fieldDescriptors;
+    }
 }

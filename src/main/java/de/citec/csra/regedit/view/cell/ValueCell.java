@@ -5,9 +5,11 @@
  */
 package de.citec.csra.regedit.view.cell;
 
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.RegistryEditor;
+import de.citec.csra.regedit.struct.GenericGroupContainer;
 import de.citec.csra.regedit.view.cell.editing.DecimalTextField;
 import de.citec.csra.regedit.view.cell.editing.EnumComboBox;
 import de.citec.csra.regedit.view.cell.editing.LongDatePicker;
@@ -24,8 +26,6 @@ import de.citec.csra.regedit.util.SelectableLabel;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.printer.LogLevel;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.logging.Level;
@@ -41,6 +41,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import rst.configuration.EntryType;
+import rst.homeautomation.device.DeviceConfigType;
 
 /**
  *
@@ -161,6 +162,23 @@ public class ValueCell extends RowCell {
             }
         } else {
             updateButtonListener(null);
+        }
+
+        if (item instanceof GenericGroupContainer) {
+            Descriptors.FieldDescriptor groupedField = null;
+            if (((GenericGroupContainer) item).getParent().getValue() instanceof GenericGroupContainer) {
+                GenericGroupContainer parent = (GenericGroupContainer) ((GenericGroupContainer) item).getParent().getValue();
+                groupedField = parent.getFieldGroup().getFieldDescriptors()[0];
+            }
+            Descriptors.FieldDescriptor deviceClassIdfield = FieldDescriptorUtil.getField(DeviceConfigType.DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER, DeviceConfigType.DeviceConfig.getDefaultInstance());
+            if (deviceClassIdfield.equals(groupedField)) {
+                try {
+                    String text = remotePool.getDeviceRemote().getDeviceClassById(item.getDescriptor()).getDescription();
+                    setGraphic(SelectableLabel.makeSelectable(new Label(text)));
+                } catch (CouldNotPerformException ex) {
+                    RegistryEditor.printException(ex, logger, LogLevel.DEBUG);
+                }
+            }
         }
     }
 
