@@ -170,7 +170,7 @@ public class ValueCell extends RowCell {
                 GenericGroupContainer parent = (GenericGroupContainer) ((GenericGroupContainer) item).getParent().getValue();
                 groupedField = parent.getFieldGroup().getFieldDescriptors()[0];
             }
-            Descriptors.FieldDescriptor deviceClassIdfield = FieldDescriptorUtil.getField(DeviceConfigType.DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER, DeviceConfigType.DeviceConfig.getDefaultInstance());
+            Descriptors.FieldDescriptor deviceClassIdfield = FieldDescriptorUtil.getFieldDescriptor(DeviceConfigType.DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER, DeviceConfigType.DeviceConfig.getDefaultInstance());
             if (deviceClassIdfield.equals(groupedField)) {
                 try {
                     String text = remotePool.getDeviceRemote().getDeviceClassById(item.getDescriptor()).getDescription();

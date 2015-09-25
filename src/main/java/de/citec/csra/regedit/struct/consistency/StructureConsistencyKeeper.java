@@ -52,7 +52,7 @@ public class StructureConsistencyKeeper {
                 i--;
             }
         }
-        builder.clearField(FieldDescriptorUtil.getField(fieldName, builder));
+        builder.clearField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder));
     }
 
     private static void keepDeviceConfigStructure(NodeContainer<DeviceConfig.Builder> container, String changedField) throws CouldNotPerformException {
@@ -73,7 +73,7 @@ public class StructureConsistencyKeeper {
             }
 
             // create and add a new child node container representing these children
-            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(DeviceConfig.UNIT_CONFIG_FIELD_NUMBER, container.getBuilder());
+            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(DeviceConfig.UNIT_CONFIG_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer(field.getName(), field, container.getBuilder(), builderList));
         }
     }
@@ -93,7 +93,7 @@ public class StructureConsistencyKeeper {
             }
 
             // create and add a new child node container representing these children
-            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(UnitTemplateConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
+            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(UnitTemplateConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer(field.getName(), field, container.getBuilder(), builderList));
         }
     }
@@ -106,7 +106,7 @@ public class StructureConsistencyKeeper {
         container.getBuilder().setTimestamp(Timestamp.newBuilder().setTime(System.currentTimeMillis()));
 
         // create and add a new child node container representing these children
-        Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
+        Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
         container.add(new GenericNodeContainer<>(field, container.getBuilder().getTimestampBuilder()));
     }
 

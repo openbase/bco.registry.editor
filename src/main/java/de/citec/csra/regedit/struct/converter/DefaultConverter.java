@@ -27,7 +27,7 @@ public class DefaultConverter implements Converter {
     @Override
     public void updateBuilder(String fieldName, Object value) throws CouldNotPerformException {
         try {
-            builder.setField(FieldDescriptorUtil.getField(fieldName, builder), value);
+            builder.setField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder), value);
         } catch (Exception ex) {
             throw new CouldNotPerformException("Could not update field [" + fieldName + "," + value + "]", ex);
         }

@@ -102,7 +102,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         if (index == -1) {
             converter.updateBuilder(fieldName, value);
         } else {
-            builder.setRepeatedField(FieldDescriptorUtil.getField(fieldName, builder), index, value);
+            builder.setRepeatedField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder), index, value);
         }
         StructureConsistencyKeeper.keepStructure(this, fieldName);
         setSendableChanged();

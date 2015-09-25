@@ -29,7 +29,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
     private final boolean modifiable;
 
     public GenericListContainer(int repeatedFieldNumber, final MB builder) throws InstantiationException {
-        this(FieldDescriptorUtil.getField(repeatedFieldNumber, builder), builder);
+        this(FieldDescriptorUtil.getFieldDescriptor(repeatedFieldNumber, builder), builder);
     }
 
     public GenericListContainer(final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder) throws InstantiationException {

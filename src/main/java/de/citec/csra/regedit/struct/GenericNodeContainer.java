@@ -28,7 +28,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
 
             for (Entry<String, Object> entry : converter.getFields().entrySet()) {
                 if (converter instanceof DefaultConverter) {
-                    registerElement(FieldDescriptorUtil.getField(entry.getKey(), builder));
+                    registerElement(FieldDescriptorUtil.getFieldDescriptor(entry.getKey(), builder));
                 } else {
                     registerElement(entry.getKey(), entry.getValue());
                 }
@@ -39,7 +39,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
     }
 
     public GenericNodeContainer(final int fieldNumber, final MB builder) throws InstantiationException {
-        this(FieldDescriptorUtil.getField(fieldNumber, builder), builder);
+        this(FieldDescriptorUtil.getFieldDescriptor(fieldNumber, builder), builder);
     }
 
     public GenericNodeContainer(final FieldDescriptor fieldDescriptor, final MB builder) throws InstantiationException {
@@ -51,7 +51,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
 
             for (Entry<String, Object> entry : converter.getFields().entrySet()) {
                 if (converter instanceof DefaultConverter) {
-                    registerElement(FieldDescriptorUtil.getField(entry.getKey(), builder));
+                    registerElement(FieldDescriptorUtil.getFieldDescriptor(entry.getKey(), builder));
                 } else {
                     registerElement(entry.getKey(), entry.getValue());
                 }

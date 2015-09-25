@@ -59,10 +59,10 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
         fieldDescriptors = new Descriptors.FieldDescriptor[descriptorNumbers.length];
         Message.Builder test = builder;
         for (int i = 0; i < descriptorNumbers.length - 1; i++) {
-            fieldDescriptors[i] = FieldDescriptorUtil.getField(descriptorNumbers[i], test);
+            fieldDescriptors[i] = FieldDescriptorUtil.getFieldDescriptor(descriptorNumbers[i], test);
             test = ((GeneratedMessage) test.getField(fieldDescriptors[i])).toBuilder();
         }
-        fieldDescriptors[descriptorNumbers.length - 1] = FieldDescriptorUtil.getField(descriptorNumbers[descriptorNumbers.length - 1], test);
+        fieldDescriptors[descriptorNumbers.length - 1] = FieldDescriptorUtil.getFieldDescriptor(descriptorNumbers[descriptorNumbers.length - 1], test);
     }
 
     /**

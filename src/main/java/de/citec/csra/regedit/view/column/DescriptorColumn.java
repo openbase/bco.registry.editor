@@ -12,6 +12,7 @@ import de.citec.csra.regedit.struct.NodeContainer;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
 import java.util.Comparator;
+import java.util.Map;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -26,6 +27,7 @@ import javafx.util.Callback;
 public class DescriptorColumn extends Column {
 
     public static final double DESCRIPTOR_COLUMN_PROPORTION = 1 - VALUE_COLUMN_PROPORTION;
+    private final Map<String, Integer> fieldPriorityMap = new FieldPriorityMap();
 
     public DescriptorColumn() {
         super("Description");
@@ -49,7 +51,15 @@ public class DescriptorColumn extends Column {
                         return o1LabelOrId.compareTo(o2LabelOrId);
                     }
                 }
-                return o1.getDescriptor().compareTo(o2.getDescriptor());
+                if (fieldPriorityMap.get(o1.getDescriptor()) != null && fieldPriorityMap.get(o2.getDescriptor()) == null) {
+                    return 1;
+                } else if (fieldPriorityMap.get(o1.getDescriptor()) == null && fieldPriorityMap.get(o2.getDescriptor()) != null) {
+                    return -1;
+                } else if (fieldPriorityMap.get(o1.getDescriptor()) != null && fieldPriorityMap.get(o2.getDescriptor()) != null) {
+                    return fieldPriorityMap.get(o1.getDescriptor()) - fieldPriorityMap.get(o2.getDescriptor());
+                } else {
+                    return o1.getDescriptor().compareTo(o2.getDescriptor());
+                }
             }
         });
     }
