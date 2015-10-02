@@ -37,13 +37,15 @@ public class DecimalTextField extends TextField {
                         return;
                     }
 
+                    double parsedValue = 0;
                     if (cell.getLeaf().getValue() instanceof Float) {
-                        float parsedValue = Float.parseFloat(getText());
+                        parsedValue = Float.parseFloat(getText());
                         cell.getLeaf().setValue(parsedValue);
                     } else if (cell.getLeaf().getValue() instanceof Double) {
-                        double parsedValue = Double.parseDouble(getText());
+                        parsedValue = Double.parseDouble(getText());
                         cell.getLeaf().setValue(parsedValue);
                     }
+                    cell.setText(Double.toString(parsedValue));
                     cell.commitEdit(cell.getLeaf());
                 }
             }
@@ -66,7 +68,7 @@ public class DecimalTextField extends TextField {
                 if (!newValue && !cell.getLeaf().getValue().equals(parsedValue)) {
                     cell.getLeaf().setValue(parsedValue);
                     // even though commit is called the text property won't change fast enough without this line?!?
-                    setText(Double.toString(parsedValue));
+                    cell.setText(Double.toString(parsedValue));
                     cell.commitEdit(cell.getLeaf());
                 }
             }

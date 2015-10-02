@@ -5,9 +5,14 @@
  */
 package de.citec.csra.re.util;
 
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.regedit.util.FieldDescriptorGroup;
 import com.google.protobuf.Message;
+import de.citec.csra.regedit.util.FieldDescriptorUtil;
+import de.citec.csra.regedit.util.RSTDefaultInstances;
 import de.citec.jul.exception.InstantiationException;
+import de.citec.jul.extension.protobuf.BuilderProcessor;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -16,6 +21,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import rst.configuration.EntryType.Entry;
+import rst.configuration.MetaConfigType.MetaConfig;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
@@ -134,5 +141,4 @@ public class FieldDescriptorGroupTest {
         group.setValue(builder, homeID);
         assertEquals(homeID, builder.getPlacementConfig().getLocationId());
     }
-
 }

@@ -128,9 +128,10 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 } else if (add instanceof GenericListContainer) {
                     GenericListContainer parentNode = (GenericListContainer) add;
                     if (parentNode.getFieldDescriptor().getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
-                        GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(parentNode.getFieldDescriptor(), parentNode.getBuilder()));
+                        GeneratedMessage.Builder clone = parentNode.getBuilder().clone();
+                        GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(parentNode.getFieldDescriptor(), clone));
                         addGroupValues(parentNode, addedBuilder);
-                        parentNode.add(new GenericNodeContainer("", addedBuilder));
+                        parentNode.addElement(addedBuilder);
                     } else {
                         parentNode.addNewDefaultElement();
                     }
