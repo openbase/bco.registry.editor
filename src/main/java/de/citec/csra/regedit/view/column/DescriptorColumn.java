@@ -52,9 +52,9 @@ public class DescriptorColumn extends Column {
                     }
                 }
                 if (fieldPriorityMap.get(o1.getDescriptor()) != null && fieldPriorityMap.get(o2.getDescriptor()) == null) {
-                    return 1;
-                } else if (fieldPriorityMap.get(o1.getDescriptor()) == null && fieldPriorityMap.get(o2.getDescriptor()) != null) {
                     return -1;
+                } else if (fieldPriorityMap.get(o1.getDescriptor()) == null && fieldPriorityMap.get(o2.getDescriptor()) != null) {
+                    return 1;
                 } else if (fieldPriorityMap.get(o1.getDescriptor()) != null && fieldPriorityMap.get(o2.getDescriptor()) != null) {
                     return fieldPriorityMap.get(o1.getDescriptor()) - fieldPriorityMap.get(o2.getDescriptor());
                 } else {

@@ -21,7 +21,7 @@ import rst.geometry.RotationType.Rotation;
 public class RotationConverter implements Converter {
 
     protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     private final Rotation.Builder rotation;
     private final Vector3d euler;
 
@@ -31,7 +31,7 @@ public class RotationConverter implements Converter {
 
     public RotationConverter(Rotation.Builder rotation) {
         this.rotation = rotation;
-        euler = QuaternionEulerTransform.transform(new Quat4d(rotation.getQw(), rotation.getQx(), rotation.getQy(), rotation.getQz()));
+        euler = QuaternionEulerTransform.transform(new Quat4d(rotation.getQx(), rotation.getQy(), rotation.getQz(), rotation.getQw()));
     }
 
     @Override

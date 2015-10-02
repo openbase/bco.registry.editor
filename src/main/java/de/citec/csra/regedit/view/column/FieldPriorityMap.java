@@ -14,11 +14,10 @@ import java.util.HashMap;
 public class FieldPriorityMap extends HashMap<String, Integer> {
 
     public FieldPriorityMap() {
-        this.put("id", 1000);
-        this.put("label", 500);
-        this.put("serial_number", 700);
-        this.put("product_number", 700);
-        this.put("scope", 300);
-        this.put("device_class_id", 400);
+        this.put("id", -1000);
+        this.put("label", -500);
+        this.put("serial_number", -700);
+        this.put("product_number", -700);
+        this.put("device_class_id", -400);
     }
 }
