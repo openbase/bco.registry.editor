@@ -62,7 +62,7 @@ public class Configuration {
         } else if (builder instanceof Scope.Builder) {
             return !("scope".equals(fieldName));
         } else if (builder instanceof UnitConfig.Builder) {
-            return !("id".equals(fieldName) || "device_id".equals(fieldName) || "type".equals(fieldName));
+            return !("id".equals(fieldName) || "device_id".equals(fieldName) || "type".equals(fieldName) || "unit_template_config_id".equals(fieldName));
         } else if (builder instanceof ServiceConfig.Builder) {
             return !("type".equals(fieldName) || "unit_id".equals(fieldName));
         } else if (builder instanceof LocationConfig.Builder) {
@@ -72,6 +72,8 @@ public class Configuration {
         } else if (builder instanceof AgentConfig.Builder) {
             return !("id".equals(fieldName));
         } else if (builder instanceof AppConfig.Builder) {
+            return !("id".equals(fieldName));
+        } else if (builder instanceof UnitTemplateConfig.Builder) {
             return !("id".equals(fieldName));
         }
         return true;

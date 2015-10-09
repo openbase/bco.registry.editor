@@ -14,6 +14,7 @@ import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.csra.regedit.struct.GenericGroupContainer;
 import de.citec.csra.regedit.struct.GenericListContainer;
+import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.util.FieldDescriptorGroup;
 import de.citec.csra.regedit.util.RemotePool;
 import de.citec.dm.remote.DeviceRegistryRemote;
@@ -40,11 +41,18 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SortEvent;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -73,6 +81,9 @@ public class RegistryEditor extends Application {
     private final GlobalTextArea globalTextArea = GlobalTextArea.getInstance();
 
     private final RemotePool remotePool;
+    private MenuBar menuBar;
+    private Menu fileMenu;
+    private MenuItem sortMenuItem;
     private TabPane registryTabPane, deviceRegistryTabPane;
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab;
@@ -122,6 +133,25 @@ public class RegistryEditor extends Application {
         unitTemplateTab.setContent(unitTemplateTreeTableView);
         deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab, unitTemplateTab);
 
+        sortMenuItem = new MenuItem("Sort");
+        sortMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+//                agentConfigTreeTableView.sort();
+//                appConfigTreeTableView.sort();
+//                deviceClassTreeTableView.sort();
+//                deviceConfigTreeTableView.sort();
+//                locationConfigTreeTableView.sort();
+//                sceneConfigTreeTableView.sort();
+                logger.info("Sorting unitTemplateTreeTableView");
+                unitTemplateTreeTableView.sort();
+            }
+        });
+        fileMenu = new Menu("File");
+        fileMenu.getItems().add(sortMenuItem);
+        menuBar = new MenuBar(fileMenu);
+
         logger.info("Init finished");
     }
 
@@ -133,7 +163,7 @@ public class RegistryEditor extends Application {
             updateTab(remote);
         });
 
-        VBox vBox = new VBox(registryTabPane, globalTextArea);
+        VBox vBox = new VBox(menuBar, registryTabPane, globalTextArea);
         Scene scene = new Scene(vBox, RESOLUTION_WIDTH, 576);
         scene.heightProperty().addListener(new ChangeListener<Number>() {
 
@@ -242,6 +272,7 @@ public class RegistryEditor extends Application {
 
             unitTemplateTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.UNIT_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
             setReadOnlyMode(unitTemplateTreeTableView, SendableType.UNIT_TEMPLATE_CONFIG);
+            unitTemplateTreeTableView.sort();
             return deviceRegistryTabPane;
         } else if (msg instanceof LocationRegistry) {
             LocationRegistry data = (LocationRegistry) msg;

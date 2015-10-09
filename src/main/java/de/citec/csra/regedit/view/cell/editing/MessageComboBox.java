@@ -49,7 +49,7 @@ public class MessageComboBox extends ComboBox<String> {
     private ObservableList<String> sortedList(Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         try {
             Message type = getMessageEnumBoxType(fieldName);
-            FieldDescriptor field = FieldDescriptorUtil.getField("id", type.toBuilder());
+            FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor("id", type.toBuilder());
             List<String> list = new ArrayList<>();
             for (Message message : RemotePool.getInstance().getMessageList(type)) {
                 list.add((String) message.getField(field));

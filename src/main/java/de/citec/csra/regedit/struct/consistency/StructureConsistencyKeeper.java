@@ -14,8 +14,7 @@ import de.citec.csra.regedit.struct.NodeContainer;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.RemotePool;
 import de.citec.jul.exception.CouldNotPerformException;
-import java.util.ArrayList;
-import java.util.List;
+import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
 import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
@@ -30,6 +29,8 @@ import rst.timing.TimestampType.Timestamp;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class StructureConsistencyKeeper {
+
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(StructureConsistencyKeeper.class);
 
     public static void keepStructure(NodeContainer<? extends GeneratedMessage.Builder> container, String fieldName) throws CouldNotPerformException {
         if (container.getBuilder() instanceof InventoryState.Builder) {
@@ -52,7 +53,7 @@ public class StructureConsistencyKeeper {
                 i--;
             }
         }
-        builder.clearField(FieldDescriptorUtil.getField(fieldName, builder));
+        builder.clearField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder));
     }
 
     private static void keepDeviceConfigStructure(NodeContainer<DeviceConfig.Builder> container, String changedField) throws CouldNotPerformException {
@@ -61,7 +62,6 @@ public class StructureConsistencyKeeper {
             StructureConsistencyKeeper.clearField(container, "unit_config");
 
             // create the new values for the field and add them to the builder  
-            List<UnitConfig.Builder> builderList = new ArrayList<>();
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(container.getBuilder().getDeviceClassId()).getUnitTemplateConfigList()) {
                 UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToDevice(true);
                 unitConfig.setPlacementConfig(container.getBuilder().getPlacementConfig());
@@ -69,12 +69,11 @@ public class StructureConsistencyKeeper {
                     unitConfig.addServiceConfig(ServiceConfig.newBuilder().setType(serviceTemplate.getServiceType()));
                 });
                 container.getBuilder().addUnitConfig(unitConfig);
-                builderList.add(unitConfig);
             }
 
             // create and add a new child node container representing these children
-            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(DeviceConfig.UNIT_CONFIG_FIELD_NUMBER, container.getBuilder());
-            container.add(new GenericListContainer(field.getName(), field, container.getBuilder(), builderList));
+            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(DeviceConfig.UNIT_CONFIG_FIELD_NUMBER, container.getBuilder());
+            container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
 
@@ -85,16 +84,14 @@ public class StructureConsistencyKeeper {
             StructureConsistencyKeeper.clearField(container, "service_template");
 
             // create the new values for the field and add them to the builder  
-            List<ServiceTemplate.Builder> builderList = new ArrayList<>();
             for (ServiceTemplate.ServiceType serviceType : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceTypeList()) {
                 ServiceTemplate.Builder serviceTemplateBuilder = ServiceTemplate.newBuilder().setServiceType(serviceType);
                 container.getBuilder().addServiceTemplate(serviceTemplateBuilder);
-                builderList.add(serviceTemplateBuilder);
             }
 
             // create and add a new child node container representing these children
-            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(UnitTemplateConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
-            container.add(new GenericListContainer(field.getName(), field, container.getBuilder(), builderList));
+            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(UnitTemplateConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
+            container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
 
@@ -106,7 +103,7 @@ public class StructureConsistencyKeeper {
         container.getBuilder().setTimestamp(Timestamp.newBuilder().setTime(System.currentTimeMillis()));
 
         // create and add a new child node container representing these children
-        Descriptors.FieldDescriptor field = FieldDescriptorUtil.getField(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
+        Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
         container.add(new GenericNodeContainer<>(field, container.getBuilder().getTimestampBuilder()));
     }
 

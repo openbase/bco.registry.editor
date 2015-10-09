@@ -11,6 +11,7 @@ import de.citec.csra.regedit.view.column.DescriptorColumn;
 import de.citec.csra.regedit.view.column.ValueColumn;
 import de.citec.csra.regedit.struct.Node;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
 
 /**
@@ -19,18 +20,27 @@ import javafx.scene.control.TreeTableView;
  */
 public class RegistryTreeTableView extends TreeTableView<Node> {
 
+    private final DescriptorColumn descriptorColumn;
+
     public RegistryTreeTableView(SendableType type) {
         this.setEditable(true);
         this.setShowRoot(false);
-        this.getColumns().addAll(new DescriptorColumn(), new ValueColumn());
+        this.descriptorColumn = new DescriptorColumn();
+        this.getColumns().addAll(descriptorColumn, new ValueColumn());
         if (type != null) {
             this.setContextMenu(new TreeTableViewContextMenu(this, type));
         }
+        setSortMode(TreeSortMode.ALL_DESCENDANTS);
+        getSortOrder().add(descriptorColumn);
     }
 
     public void addWidthProperty(ReadOnlyDoubleProperty widthProperty) {
         for (Object column : getColumns()) {
             ((Column) column).addWidthProperty(widthProperty);
         }
+    }
+
+    public DescriptorColumn getDescriptorColumn() {
+        return descriptorColumn;
     }
 }

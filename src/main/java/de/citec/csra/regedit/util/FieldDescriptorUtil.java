@@ -18,42 +18,45 @@ import java.lang.reflect.Method;
  */
 public class FieldDescriptorUtil {
 
-    public static Descriptors.FieldDescriptor getField(final int repeatedFieldNumber, final Message.Builder builder) {
+    public static Descriptors.FieldDescriptor getFieldDescriptor(final int repeatedFieldNumber, final Message.Builder builder) {
         return builder.getDescriptorForType().findFieldByNumber(repeatedFieldNumber);
     }
 
-    public static Descriptors.FieldDescriptor getField(final int repeatedFieldNumber, final GeneratedMessage message) {
-        return getField(repeatedFieldNumber, message.toBuilder());
+    public static Descriptors.FieldDescriptor getFieldDescriptor(final int repeatedFieldNumber, final GeneratedMessage message) {
+        return FieldDescriptorUtil.getFieldDescriptor(repeatedFieldNumber, message.toBuilder());
     }
 
-    public static Descriptors.FieldDescriptor getField(String fieldName, final Message.Builder builder) {
+    public static Descriptors.FieldDescriptor getFieldDescriptor(String fieldName, final Message.Builder builder) {
         return builder.getDescriptorForType().findFieldByName(fieldName);
     }
 
     public static String getId(Message msg) throws CouldNotPerformException {
         try {
-            Method method = msg.getClass().getMethod("getId");
-            return (String) method.invoke(msg);
-        } catch (IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
+//            Method method = msg.getClass().getMethod("getId");
+            return (String) msg.getField(getFieldDescriptor("id", msg.toBuilder()));
+//            return (String) method.invoke(msg);
+        } catch (Exception ex) {
             throw new CouldNotPerformException("Could not get id of [" + msg + "]", ex);
         }
     }
 
     public static String getDescription(Message.Builder msg) throws CouldNotPerformException {
         try {
-            Method method = msg.getClass().getMethod("getDescription");
-            return (String) method.invoke(msg);
-        } catch (IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
+//            Method method = msg.getClass().getMethod("getDescription");
+            return (String) msg.getField(getFieldDescriptor("description", msg));
+//            return (String) method.invoke(msg);
+        } catch (Exception ex) {
             throw new CouldNotPerformException("Could not get description of [" + msg + "]", ex);
         }
     }
 
     public static String getLabel(Message.Builder msg) throws CouldNotPerformException {
         try {
-            Method method = msg.getClass().getMethod("getLabel");
-            return (String) method.invoke(msg);
-        } catch (IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new CouldNotPerformException("Could not get description of [" + msg + "]", ex);
+//            Method method = msg.getClass().getMethod("getLabel");
+            return (String) msg.getField(getFieldDescriptor("label", msg));
+//            return (String) method.invoke(msg);
+        } catch (Exception ex) {
+            throw new CouldNotPerformException("Could not get label of [" + msg + "]", ex);
         }
     }
 }

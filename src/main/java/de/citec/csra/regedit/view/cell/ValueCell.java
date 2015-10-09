@@ -5,9 +5,11 @@
  */
 package de.citec.csra.regedit.view.cell;
 
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.RegistryEditor;
+import de.citec.csra.regedit.struct.GenericGroupContainer;
 import de.citec.csra.regedit.view.cell.editing.DecimalTextField;
 import de.citec.csra.regedit.view.cell.editing.EnumComboBox;
 import de.citec.csra.regedit.view.cell.editing.LongDatePicker;
@@ -24,8 +26,6 @@ import de.citec.csra.regedit.util.SelectableLabel;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.printer.LogLevel;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.logging.Level;
@@ -41,21 +41,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import rst.configuration.EntryType;
+import rst.homeautomation.device.DeviceConfigType;
 
 /**
  *
  * @author thuxohl
  */
 public class ValueCell extends RowCell {
-
+    
     protected final Button applyButton, cancelButton;
     protected final HBox buttonLayout;
     protected LeafContainer leaf;
-
+    
     protected SimpleObjectProperty<Boolean> changed = null;
     protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-
+    
     public ValueCell() {
         super();
         applyButton = new Button("Apply");
@@ -65,19 +66,19 @@ public class ValueCell extends RowCell {
         buttonLayout = new HBox(applyButton, cancelButton);
         this.changeListener = new ChangedListener();
     }
-
+    
     @Override
     public void startEdit() {
         super.startEdit();
-
+        
         if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
             setGraphic(getEditingGraphic());
         }
     }
-
+    
     private javafx.scene.Node getEditingGraphic() {
-
+        
         javafx.scene.Node graphic = null;
         Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor());
         if (type != null) {
@@ -99,17 +100,17 @@ public class ValueCell extends RowCell {
         }
         return graphic;
     }
-
+    
     @Override
     public void cancelEdit() {
         super.cancelEdit();
         setGraphic(null);
     }
-
+    
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-
+        
         if (empty) {
             setGraphic(null);
             setText("");
@@ -125,7 +126,7 @@ public class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 text = ((Leaf) item).getValue().toString();
             }
-
+            
             if (((LeafContainer) item).getEditable()) {
                 setText(text);
                 setGraphic(null);
@@ -133,7 +134,7 @@ public class ValueCell extends RowCell {
                 setGraphic(SelectableLabel.makeSelectable(new Label(text)));
             }
         }
-
+        
         if (item instanceof GenericNodeContainer) {
             GenericNodeContainer container = (GenericNodeContainer) item;
             String text = getBuilderDescription(container.getBuilder());
@@ -148,7 +149,7 @@ public class ValueCell extends RowCell {
                 if (container.hasChanged()) {
                     setGraphic(buttonLayout);
                 }
-
+                
                 try {
                     if ("".equals(FieldDescriptorUtil.getId(container.getBuilder().build()))) {
                         container.setChanged(true);
@@ -162,8 +163,25 @@ public class ValueCell extends RowCell {
         } else {
             updateButtonListener(null);
         }
+        
+        if (item instanceof GenericGroupContainer) {
+            Descriptors.FieldDescriptor groupedField = null;
+            if (((GenericGroupContainer) item).getParent().getValue() instanceof GenericGroupContainer) {
+                GenericGroupContainer parent = (GenericGroupContainer) ((GenericGroupContainer) item).getParent().getValue();
+                groupedField = parent.getFieldGroup().getFieldDescriptors()[0];
+            }
+            Descriptors.FieldDescriptor deviceClassIdfield = FieldDescriptorUtil.getFieldDescriptor(DeviceConfigType.DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER, DeviceConfigType.DeviceConfig.getDefaultInstance());
+            if (deviceClassIdfield.equals(groupedField)) {
+                try {
+                    String text = remotePool.getDeviceRemote().getDeviceClassById(item.getDescriptor()).getDescription();
+                    setGraphic(SelectableLabel.makeSelectable(new Label(text)));
+                } catch (CouldNotPerformException ex) {
+                    RegistryEditor.printException(ex, logger, LogLevel.DEBUG);
+                }
+            }
+        }
     }
-
+    
     public String getBuilderDescription(Message.Builder builder) {
         if (builder instanceof EntryType.Entry.Builder) {
             EntryType.Entry.Builder entry = (EntryType.Entry.Builder) builder;
@@ -176,11 +194,11 @@ public class ValueCell extends RowCell {
         }
         return null;
     }
-
+    
     public LeafContainer getLeaf() {
         return leaf;
     }
-
+    
     private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
         if (changed != null) {
             changed.removeListener(changeListener);
@@ -190,9 +208,9 @@ public class ValueCell extends RowCell {
             changed.addListener(changeListener);
         }
     }
-
+    
     private class ApplyEventHandler implements EventHandler<ActionEvent> {
-
+        
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
@@ -202,6 +220,7 @@ public class ValueCell extends RowCell {
                             RegistryEditor.setModified(false);
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
                             Message msg = container.getBuilder().build();
+                            logger.info("Now registering/updating msg [" + msg + "]");
                             try {
                                 if (remotePool.contains(msg)) {
                                     remotePool.update(msg);
@@ -210,6 +229,7 @@ public class ValueCell extends RowCell {
                                 }
                                 container.setChanged(false);
                             } catch (CouldNotPerformException ex) {
+                                RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                                 logger.warn("Could not register or update message [" + msg + "]", ex);
                             }
                             return true;
@@ -219,9 +239,9 @@ public class ValueCell extends RowCell {
             thread.start();
         }
     }
-
+    
     private class CancelEventHandler implements EventHandler<ActionEvent> {
-
+        
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
@@ -239,6 +259,7 @@ public class ValueCell extends RowCell {
                                     container.getParent().getChildren().set(index, new GenericNodeContainer(msg.getClass().getSimpleName(), remotePool.getById(FieldDescriptorUtil.getId(msg), msg)));
                                 }
                             } catch (CouldNotPerformException ex) {
+                                RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                                 logger.warn("Could not cancel update of [" + msg + "]", ex);
                             }
                             return true;
@@ -248,13 +269,13 @@ public class ValueCell extends RowCell {
             thread.start();
         }
     }
-
+    
     private class ChangedListener implements ChangeListener<Boolean> {
-
+        
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
             Platform.runLater(new Runnable() {
-
+                
                 @Override
                 public void run() {
                     if (newValue) {

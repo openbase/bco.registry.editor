@@ -15,6 +15,7 @@ import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.NotAvailableException;
 import de.citec.jul.extension.protobuf.BuilderProcessor;
 import java.util.List;
+import rst.configuration.EntryType;
 
 /**
  *
@@ -29,7 +30,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
     private final boolean modifiable;
 
     public GenericListContainer(int repeatedFieldNumber, final MB builder) throws InstantiationException {
-        this(FieldDescriptorUtil.getField(repeatedFieldNumber, builder), builder);
+        this(FieldDescriptorUtil.getFieldDescriptor(repeatedFieldNumber, builder), builder);
     }
 
     public GenericListContainer(final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder) throws InstantiationException {
@@ -108,7 +109,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
         try {
             if (fieldDescriptor.getType() == MESSAGE) {
                 BuilderProcessor.addMessageToRepeatedField(fieldDescriptor, (RFMB) element, (GeneratedMessage.Builder) getBuilder());
-                registerElement(element);
+                registerElement(BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, builder).get(builder.getRepeatedFieldCount(fieldDescriptor) - 1));
             } else {
                 builder.addRepeatedField(fieldDescriptor, element);
                 registerElement(element, builder.getRepeatedFieldCount(fieldDescriptor) - 1);

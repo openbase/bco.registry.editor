@@ -34,7 +34,7 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
     private final Descriptors.FieldDescriptor fieldDescriptor;
 
     public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, FieldDescriptorGroup... groups) throws InstantiationException {
-        this(descriptor, FieldDescriptorUtil.getField(fieldNumber, builder), builder, builderList, groups);
+        this(descriptor, FieldDescriptorUtil.getFieldDescriptor(fieldNumber, builder), builder, builderList, groups);
     }
 
     public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldDescriptorGroup... groups) throws InstantiationException {

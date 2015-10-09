@@ -7,6 +7,7 @@ package de.citec.csra.regedit.view;
 
 import de.citec.jul.exception.printer.ExceptionPrinter;
 import javafx.scene.control.TextArea;
+import javafx.scene.text.Font;
 
 /**
  *
@@ -25,6 +26,7 @@ public class GlobalTextArea extends TextArea {
     
     public GlobalTextArea() {
         this.setEditable(false);
+        this.setFont(Font.font("Monospaced"));
     }
     
     public void printException(Throwable th) {
