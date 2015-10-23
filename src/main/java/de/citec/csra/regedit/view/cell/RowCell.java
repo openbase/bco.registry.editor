@@ -16,7 +16,6 @@ import de.citec.csra.regedit.struct.GenericListContainer;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.struct.NodeContainer;
-import de.citec.csra.regedit.util.FieldDescriptorGroup;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.RSTDefaultInstances;
 import de.citec.csra.regedit.util.RemotePool;
@@ -118,7 +117,6 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 if (add instanceof GenericNodeContainer) {
                     GeneratedMessage.Builder builder = ((NodeContainer) add).getBuilder();
                     GenericListContainer parent = (GenericListContainer) ((NodeContainer) add).getParent().getValue();
-
                     GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(builder);
                     addGroupValues(parent, addedBuilder);
                     parent.addElement(addedBuilder);
@@ -151,7 +149,13 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             GenericGroupContainer parent;
             while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {
                 parent = (GenericGroupContainer) groupContainer.getParent().getValue();
-                parent.getFieldGroup().setValue(builder, parent.getValues().get(parent.getChildren().indexOf(groupContainer)));
+                Object targetValue = null;
+                for (Object value : parent.getValues()) {
+                    if (value.toString().equals(groupContainer.getDescriptor())) {
+                        targetValue = value;
+                    }
+                }
+                parent.getFieldGroup().setValue(builder, targetValue);
                 groupContainer = parent;
             }
         }

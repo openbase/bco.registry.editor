@@ -27,6 +27,7 @@ import rst.spatial.LocationConfigType.LocationConfig;
  */
 public class Configuration {
 
+    //TODO:tamino redesign
     public static boolean isModifiableList(GeneratedMessage.Builder builder, String fieldName) {
         if (builder instanceof UnitTemplateConfig.Builder && "service_template".equals(fieldName)) {
             return false;

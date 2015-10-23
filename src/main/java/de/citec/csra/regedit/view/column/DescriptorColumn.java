@@ -32,6 +32,7 @@ public class DescriptorColumn extends Column {
     public DescriptorColumn() {
         super("Description");
 
+        this.setSortable(true);
         this.setSortType(SortType.ASCENDING);
         this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
 

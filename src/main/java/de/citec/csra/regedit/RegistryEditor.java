@@ -289,7 +289,6 @@ public class RegistryEditor extends Application {
             
             unitTemplateTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.UNIT_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
             setReadOnlyMode(unitTemplateTreeTableView, SendableType.UNIT_TEMPLATE_CONFIG);
-            unitTemplateTreeTableView.sort();
             return deviceRegistryTabPane;
         } else if (msg instanceof LocationRegistry) {
             LocationRegistry data = (LocationRegistry) msg;

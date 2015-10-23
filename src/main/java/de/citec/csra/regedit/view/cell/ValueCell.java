@@ -164,6 +164,7 @@ public class ValueCell extends RowCell {
             updateButtonListener(null);
         }
         
+        // ==================== TODO:tamino redesign
         if (item instanceof GenericGroupContainer) {
             Descriptors.FieldDescriptor groupedField = null;
             if (((GenericGroupContainer) item).getParent().getValue() instanceof GenericGroupContainer) {
@@ -180,6 +181,7 @@ public class ValueCell extends RowCell {
                 }
             }
         }
+        // ============================================
     }
     
     public String getBuilderDescription(Message.Builder builder) {
