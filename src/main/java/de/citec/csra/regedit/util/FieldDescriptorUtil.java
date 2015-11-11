@@ -31,10 +31,12 @@ public class FieldDescriptorUtil {
     }
 
     public static String getId(Message msg) throws CouldNotPerformException {
+        return getId(msg.toBuilder());
+    }
+
+    public static String getId(Message.Builder msg) throws CouldNotPerformException {
         try {
-//            Method method = msg.getClass().getMethod("getId");
-            return (String) msg.getField(getFieldDescriptor("id", msg.toBuilder()));
-//            return (String) method.invoke(msg);
+            return (String) msg.getField(getFieldDescriptor("id", msg));
         } catch (Exception ex) {
             throw new CouldNotPerformException("Could not get id of [" + msg + "]", ex);
         }
@@ -42,9 +44,7 @@ public class FieldDescriptorUtil {
 
     public static String getDescription(Message.Builder msg) throws CouldNotPerformException {
         try {
-//            Method method = msg.getClass().getMethod("getDescription");
             return (String) msg.getField(getFieldDescriptor("description", msg));
-//            return (String) method.invoke(msg);
         } catch (Exception ex) {
             throw new CouldNotPerformException("Could not get description of [" + msg + "]", ex);
         }
@@ -52,9 +52,7 @@ public class FieldDescriptorUtil {
 
     public static String getLabel(Message.Builder msg) throws CouldNotPerformException {
         try {
-//            Method method = msg.getClass().getMethod("getLabel");
             return (String) msg.getField(getFieldDescriptor("label", msg));
-//            return (String) method.invoke(msg);
         } catch (Exception ex) {
             throw new CouldNotPerformException("Could not get label of [" + msg + "]", ex);
         }

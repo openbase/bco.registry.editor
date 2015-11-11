@@ -48,15 +48,15 @@ import rst.homeautomation.device.DeviceConfigType;
  * @author thuxohl
  */
 public class ValueCell extends RowCell {
-    
+
     protected final Button applyButton, cancelButton;
     protected final HBox buttonLayout;
     protected LeafContainer leaf;
-    
+
     protected SimpleObjectProperty<Boolean> changed = null;
     protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-    
+
     public ValueCell() {
         super();
         applyButton = new Button("Apply");
@@ -66,19 +66,19 @@ public class ValueCell extends RowCell {
         buttonLayout = new HBox(applyButton, cancelButton);
         this.changeListener = new ChangedListener();
     }
-    
+
     @Override
     public void startEdit() {
         super.startEdit();
-        
+
         if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
             setGraphic(getEditingGraphic());
         }
     }
-    
+
     private javafx.scene.Node getEditingGraphic() {
-        
+
         javafx.scene.Node graphic = null;
         Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor());
         if (type != null) {
@@ -100,17 +100,17 @@ public class ValueCell extends RowCell {
         }
         return graphic;
     }
-    
+
     @Override
     public void cancelEdit() {
         super.cancelEdit();
         setGraphic(null);
     }
-    
+
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         if (empty) {
             setGraphic(null);
             setText("");
@@ -126,7 +126,7 @@ public class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 text = ((Leaf) item).getValue().toString();
             }
-            
+
             if (((LeafContainer) item).getEditable()) {
                 setText(text);
                 setGraphic(null);
@@ -134,7 +134,7 @@ public class ValueCell extends RowCell {
                 setGraphic(SelectableLabel.makeSelectable(new Label(text)));
             }
         }
-        
+
         if (item instanceof GenericNodeContainer) {
             GenericNodeContainer container = (GenericNodeContainer) item;
             String text = getBuilderDescription(container.getBuilder());
@@ -149,9 +149,9 @@ public class ValueCell extends RowCell {
                 if (container.hasChanged()) {
                     setGraphic(buttonLayout);
                 }
-                
+
                 try {
-                    if ("".equals(FieldDescriptorUtil.getId(container.getBuilder().build()))) {
+                    if ("".equals(FieldDescriptorUtil.getId(container.getBuilder()))) {
                         container.setChanged(true);
                     }
                 } catch (CouldNotPerformException ex) {
@@ -163,7 +163,7 @@ public class ValueCell extends RowCell {
         } else {
             updateButtonListener(null);
         }
-        
+
         // ==================== TODO:tamino redesign
         if (item instanceof GenericGroupContainer) {
             Descriptors.FieldDescriptor groupedField = null;
@@ -183,7 +183,7 @@ public class ValueCell extends RowCell {
         }
         // ============================================
     }
-    
+
     public String getBuilderDescription(Message.Builder builder) {
         if (builder instanceof EntryType.Entry.Builder) {
             EntryType.Entry.Builder entry = (EntryType.Entry.Builder) builder;
@@ -196,11 +196,11 @@ public class ValueCell extends RowCell {
         }
         return null;
     }
-    
+
     public LeafContainer getLeaf() {
         return leaf;
     }
-    
+
     private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
         if (changed != null) {
             changed.removeListener(changeListener);
@@ -210,9 +210,9 @@ public class ValueCell extends RowCell {
             changed.addListener(changeListener);
         }
     }
-    
+
     private class ApplyEventHandler implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
@@ -241,9 +241,9 @@ public class ValueCell extends RowCell {
             thread.start();
         }
     }
-    
+
     private class CancelEventHandler implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
@@ -271,13 +271,13 @@ public class ValueCell extends RowCell {
             thread.start();
         }
     }
-    
+
     private class ChangedListener implements ChangeListener<Boolean> {
-        
+
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
             Platform.runLater(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     if (newValue) {
