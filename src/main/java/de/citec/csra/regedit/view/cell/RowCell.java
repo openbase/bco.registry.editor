@@ -32,6 +32,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
+import rst.math.Vec3DDoubleType;
 
 /**
  * Cell factory to manage similar options for all cells in a row. Initializes
@@ -127,7 +128,9 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     GenericListContainer parentNode = (GenericListContainer) add;
                     if (parentNode.getFieldDescriptor().getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
                         GeneratedMessage.Builder clone = parentNode.getBuilder().clone();
-                        GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(parentNode.getFieldDescriptor(), clone));
+//                        GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(parentNode.getFieldDescriptor(), clone));
+                        GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder((GeneratedMessage.Builder) parentNode.getBuilder().newBuilderForField(parentNode.getFieldDescriptor()));
+
                         addGroupValues(parentNode, addedBuilder);
                         parentNode.addElement(addedBuilder);
                     } else {

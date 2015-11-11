@@ -17,6 +17,7 @@ import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.state.ActivationStateType.ActivationState;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.math.Vec3DDoubleType.Vec3DDouble;
 import rst.spatial.LocationConfigType.LocationConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 import rst.timing.TimestampType.Timestamp;
@@ -64,6 +65,10 @@ public class RSTDefaultInstances {
         return AppConfig.newBuilder().setActivationState(getDefaultActivationState());
     }
 
+    public static Vec3DDouble.Builder getDefaultVec3DDouble() {
+        return Vec3DDouble.newBuilder().setX(0).setY(0).setZ(0);
+    }
+
     public static Builder getDefaultBuilder(Builder builderType) {
         if (builderType instanceof DeviceConfig.Builder) {
             return getDefaultDeviceConfig();
@@ -75,6 +80,8 @@ public class RSTDefaultInstances {
             return getDefaultAgentConfig();
         } else if (builderType instanceof AppConfig.Builder) {
             return getDefaultAppConfig();
+        } else if (builderType instanceof Vec3DDouble.Builder) {
+            return getDefaultVec3DDouble();
         } else {
             return (Builder) builderType.build().getDefaultInstanceForType().toBuilder();
         }
