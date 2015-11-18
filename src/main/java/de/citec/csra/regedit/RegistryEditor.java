@@ -202,7 +202,7 @@ public class RegistryEditor extends Application {
         agentConfigTreeTableView.addWidthProperty(scene.widthProperty());
         appConfigTreeTableView.addWidthProperty(scene.widthProperty());
         unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
-        
+
         deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
         deviceConfigTreeTableView.addHeightProperty(scene.heightProperty());
         locationConfigTreeTableView.addHeightProperty(scene.heightProperty());
@@ -241,8 +241,9 @@ public class RegistryEditor extends Application {
         registerObserver();
     }
 
+    private final ExecutorService executerService = Executors.newCachedThreadPool();
+
     public void registerObserver() throws Exception {
-        ExecutorService executerService = Executors.newFixedThreadPool(10);
 
         for (RSBRemoteService remote : remotePool.getRemotes()) {
             executerService.submit(new Callable<Void>() {
@@ -250,15 +251,10 @@ public class RegistryEditor extends Application {
                 @Override
                 public Void call() throws Exception {
                     try {
-                        remote.activate();
                         remote.addObserver((Observable source, Object data) -> {
                             updateTab(remote);
                         });
-                        try {
-                            remote.requestStatus();
-                        } catch (CouldNotPerformException ex) {
-                            printException(ex, logger, LogLevel.WARN);
-                        }
+                        remote.activate();
                     } catch (InterruptedException | CouldNotPerformException ex) {
                         printException(ex, logger, LogLevel.ERROR);
                     }
@@ -270,9 +266,9 @@ public class RegistryEditor extends Application {
 
     @Override
     public void stop() throws Exception {
-        remotePool.shutdown();
         super.stop();
-        int i = 0;
+        remotePool.shutdown();
+        executerService.shutdown();
         //TODO: search why it will not shutdown without system exit
         System.exit(0);
     }
