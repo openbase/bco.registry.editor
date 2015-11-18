@@ -98,6 +98,14 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         ((NodeContainer) sendableNode).setChanged(true);
     }
 
+    public GeneratedMessage.Builder getSendableType() {
+        NodeContainer sendableNode = this;
+        while (!sendableNode.isSendable()) {
+            sendableNode = (NodeContainer) sendableNode.getParent().getValue();
+        }
+        return ((NodeContainer) sendableNode).getBuilder();
+    }
+
     public void updateBuilder(String fieldName, Object value, int index) throws CouldNotPerformException {
         if (index == -1) {
             converter.updateBuilder(fieldName, value);

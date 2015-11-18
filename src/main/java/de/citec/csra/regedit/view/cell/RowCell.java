@@ -19,12 +19,15 @@ import de.citec.csra.regedit.struct.NodeContainer;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.RSTDefaultInstances;
 import de.citec.csra.regedit.util.RemotePool;
+import de.citec.csra.regedit.util.SendableType;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.printer.LogLevel;
 import de.citec.jul.extension.protobuf.BuilderProcessor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -71,12 +74,15 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
 
-        if ((item instanceof GenericListContainer && ((GenericListContainer) item).isModifiable())
+        if (getTableColumn().getTreeTableView().isEditable()
+                && (item instanceof GenericListContainer
+                && ((GenericListContainer) item).isModifiable())
                 || item instanceof GenericGroupContainer) {
             addMenuItem.setVisible(true);
             removeMenuItem.setVisible(false);
             setContextMenu(contextMenu);
-        } else if ((item instanceof NodeContainer
+        } else if (getTableColumn().getTreeTableView().isEditable()
+                && (item instanceof NodeContainer
                 && ((NodeContainer) item).getParent().getValue() instanceof GenericListContainer
                 && ((GenericListContainer) ((NodeContainer) item).getParent().getValue()).isModifiable())
                 || (item instanceof LeafContainer

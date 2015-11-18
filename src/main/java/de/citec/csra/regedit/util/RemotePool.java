@@ -26,6 +26,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
@@ -153,6 +155,17 @@ public class RemotePool {
         }
     }
 
+    public boolean isReadOnly(SendableType type) throws CouldNotPerformException {
+        String methodName = getMethodName("is", "RegistryReadOnly", type.getDefaultInstanceForType());
+        try {
+            RSBRemoteService remote = getRemoteByMessage(type.getDefaultInstanceForType());
+            Method method = remote.getClass().getMethod(methodName);
+            return ((Future<Boolean>) method.invoke(remote)).get();
+        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InterruptedException | ExecutionException ex) {
+            throw new CouldNotPerformException(ex);
+        }
+    }
+
     private String getMethodName(String prefix, String suffix, Message msg) {
         return prefix + msg.getClass().getSimpleName() + suffix;
     }
@@ -173,7 +186,7 @@ public class RemotePool {
         } else if (msg instanceof AppConfig) {
             return appRemote;
         } else {
-            throw new CouldNotPerformException("No matching remote found");
+            throw new CouldNotPerformException("No matching remote for type [" + msg.getClass().getSimpleName() + "]found");
         }
     }
 

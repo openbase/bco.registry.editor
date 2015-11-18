@@ -21,8 +21,10 @@ import javafx.scene.control.TreeTableView;
 public class RegistryTreeTableView extends TreeTableView<Node> {
 
     private final DescriptorColumn descriptorColumn;
+    private final SendableType type;
 
     public RegistryTreeTableView(SendableType type) {
+        this.type = type;
         this.setEditable(true);
         this.setShowRoot(false);
         this.descriptorColumn = new DescriptorColumn();
@@ -42,5 +44,9 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
 
     public DescriptorColumn getDescriptorColumn() {
         return descriptorColumn;
+    }
+
+    public SendableType getSendableType() {
+        return type;
     }
 }
