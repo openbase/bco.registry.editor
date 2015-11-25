@@ -42,7 +42,7 @@ public class Configuration {
         }
         return true;
     }
-
+    
     public static boolean isModifiableField(GeneratedMessage.Builder builder, String fieldName) {
         if (builder instanceof UnitTemplate.Builder) {
             return !("type".equals(fieldName) || "id".equals(fieldName));
@@ -67,7 +67,7 @@ public class Configuration {
         } else if (builder instanceof ServiceConfig.Builder) {
             return !("type".equals(fieldName) || "unit_id".equals(fieldName));
         } else if (builder instanceof LocationConfig.Builder) {
-            return !("id".equals(fieldName) || "root".equals(fieldName));
+            return !("id".equals(fieldName) || "root".equals(fieldName) || "unit_id".equals(fieldName));
         } else if (builder instanceof SceneConfig.Builder) {
             return !("id".equals(fieldName));
         } else if (builder instanceof AgentConfig.Builder) {
@@ -79,7 +79,7 @@ public class Configuration {
         }
         return true;
     }
-
+    
     public static boolean isSendable(Message.Builder builder) {
         return ((builder instanceof DeviceClass.Builder)
                 || (builder instanceof DeviceConfig.Builder)

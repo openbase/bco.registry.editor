@@ -122,7 +122,7 @@ public class RegistryEditor extends Application {
         sceneConfigTreeTableView = new VBoxWithLabelAndTreeTable(SendableType.SCENE_CONFIG);
         agentConfigTreeTableView = new VBoxWithLabelAndTreeTable(SendableType.AGENT_CONFIG);
         appConfigTreeTableView = new VBoxWithLabelAndTreeTable(SendableType.APP_CONFIG);
-        unitTemplateTreeTableView = new VBoxWithLabelAndTreeTable(null);
+        unitTemplateTreeTableView = new VBoxWithLabelAndTreeTable(SendableType.UNIT_TEMPLATE);
 
         deviceRegistryTabPane = new TabPane();
         deviceRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -381,8 +381,8 @@ public class RegistryEditor extends Application {
         } else {
             treeTableView.getRegistryTreeTableView().getStylesheets().add("default.css");
         }
+        treeTableView.setContextMenu(!readOnly);
         treeTableView.setEditable(!readOnly);
-        treeTableView.getRegistryTreeTableView().setContextMenu(null);
     }
 
     /**

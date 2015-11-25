@@ -14,6 +14,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -21,16 +23,22 @@ import javafx.scene.layout.VBox;
  */
 public class VBoxWithLabelAndTreeTable extends VBox {
     
+    private static final Logger logger = LoggerFactory.getLogger(VBoxWithLabelAndTreeTable.class);
+    
     private final Label readOnlyLabel;
     private final RegistryTreeTableView registryTreeTableView;
+    private final SendableType type;
     
     public VBoxWithLabelAndTreeTable(SendableType type) {
+        this.type = type;
+        
         this.setAlignment(Pos.CENTER);
         readOnlyLabel = new Label("Read-Only-Mode");
         readOnlyLabel.setAlignment(Pos.CENTER);
         readOnlyLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
         
         registryTreeTableView = new RegistryTreeTableView(type);
+        registryTreeTableView.setContextMenu(new TreeTableViewContextMenu(registryTreeTableView, type));
         
         this.getChildren().addAll(registryTreeTableView);
     }
@@ -69,5 +77,15 @@ public class VBoxWithLabelAndTreeTable extends VBox {
                 registryTreeTableView.setPrefHeight(newValue.doubleValue());
             }
         });
+    }
+    
+    public void setContextMenu(boolean visible) {
+        if (visible) {
+            logger.info("added context menu to [" + type + "]");
+            registryTreeTableView.setContextMenu(new TreeTableViewContextMenu(registryTreeTableView, type));
+        } else {
+            logger.info("removed context menu to [" + type + "]");
+            registryTreeTableView.setContextMenu(null);
+        }
     }
 }

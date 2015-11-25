@@ -20,6 +20,7 @@ import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.math.Vec3DDoubleType.Vec3DDouble;
 import rst.spatial.LocationConfigType.LocationConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
+import rst.spatial.ShapeType;
 import rst.timing.TimestampType.Timestamp;
 
 /**
@@ -27,48 +28,52 @@ import rst.timing.TimestampType.Timestamp;
  * @author thuxohl
  */
 public class RSTDefaultInstances {
-
+    
     public static DeviceConfig.Builder getDefaultDeviceConfig() {
         PlacementConfig placementConfig = PlacementConfig.newBuilder().setPosition(getDefaultPose()).build();
         InventoryState inventoryState = InventoryState.newBuilder().setTimestamp(Timestamp.newBuilder().setTime((new Date()).toInstant().toEpochMilli()).build()).build();
         return DeviceConfig.newBuilder().setPlacementConfig(placementConfig).setInventoryState(inventoryState);
     }
-
+    
     public static UnitConfig.Builder setDefaultPlacement(UnitConfig.Builder unitBuilder) {
         PlacementConfig placementConfig = PlacementConfig.newBuilder().setPosition(getDefaultPose()).build();
         return unitBuilder.setPlacementConfig(placementConfig);
     }
-
+    
     public static Pose getDefaultPose() {
         Rotation rotation = Rotation.newBuilder().setQw(1).setQx(0).setQy(0).setQz(0).build();
         Translation translation = Translation.newBuilder().setX(0).setY(0).setZ(0).build();
         return Pose.newBuilder().setRotation(rotation).setTranslation(translation).build();
     }
-
+    
     public static LocationConfig.Builder getDefaultLocationConfig() {
-        return LocationConfig.newBuilder().setPosition(getDefaultPose());
+        return LocationConfig.newBuilder().setPosition(getDefaultPose()).setPlacementConfig(PlacementConfig.newBuilder().setPosition(getDefaultPose()));
     }
-
+    
+    public static ShapeType.Shape getDefaultShape() {
+        return null;
+    }
+    
     public static ActivationState getDefaultActivationState() {
         return ActivationState.newBuilder().setValue(ActivationState.State.ACTIVE).build();
     }
-
+    
     public static SceneConfig.Builder getDefaultSceneConfig() {
         return SceneConfig.newBuilder().setActivationState(getDefaultActivationState());
     }
-
+    
     public static AgentConfig.Builder getDefaultAgentConfig() {
         return AgentConfig.newBuilder().setActivationState(getDefaultActivationState());
     }
-
+    
     public static AppConfig.Builder getDefaultAppConfig() {
         return AppConfig.newBuilder().setActivationState(getDefaultActivationState());
     }
-
+    
     public static Vec3DDouble.Builder getDefaultVec3DDouble() {
         return Vec3DDouble.newBuilder().setX(0).setY(0).setZ(0);
     }
-
+    
     public static Builder getDefaultBuilder(Builder builderType) {
         if (builderType instanceof DeviceConfig.Builder) {
             return getDefaultDeviceConfig();

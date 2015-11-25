@@ -79,7 +79,7 @@ public class FieldDescriptorGroupTest {
     @Test
     public void testGetFieldValues() throws Exception {
         System.out.println("getFieldValues");
-
+        
         List<Message.Builder> builderList = new ArrayList<>();
         builderList.add(device1);
         builderList.add(device2);

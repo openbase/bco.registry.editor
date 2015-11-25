@@ -141,6 +141,19 @@ public class RemotePool {
         }
     }
 
+    public GeneratedMessage.Builder getById(String id, Message.Builder builder) throws CouldNotPerformException {
+        String methodName = getMethodName("get", "ById", builder);
+        try {
+            RSBRemoteService remote = getRemoteByMessageBuilder(builder);
+            Method method = remote.getClass().getMethod(methodName, String.class);
+            Object result = method.invoke(remote, id);
+            Method toBuilder = result.getClass().getMethod("toBuilder");
+            return (GeneratedMessage.Builder) toBuilder.invoke(result);
+        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new CouldNotPerformException(ex);
+        }
+    }
+
     public <M extends Message> List<M> getMessageList(Message msg) throws CouldNotPerformException {
         String methodName = getMethodName("get", "s", msg);
         if (msg instanceof DeviceClass) {
@@ -171,7 +184,7 @@ public class RemotePool {
     }
 
     private String getMethodName(String prefix, String suffix, Message.Builder msg) {
-        return prefix + msg.getClass().getName().split("\\$")[1] + suffix;
+        return prefix + msg.getDescriptorForType().getName() + suffix;
     }
 
     public RSBRemoteService getRemoteByMessage(Message msg) throws CouldNotPerformException {
@@ -187,6 +200,22 @@ public class RemotePool {
             return appRemote;
         } else {
             throw new CouldNotPerformException("No matching remote for type [" + msg.getClass().getSimpleName() + "]found");
+        }
+    }
+
+    public RSBRemoteService getRemoteByMessageBuilder(Message.Builder builder) throws CouldNotPerformException {
+        if (builder instanceof DeviceClass.Builder || builder instanceof DeviceConfig.Builder || builder instanceof UnitTemplate.Builder) {
+            return deviceRemote;
+        } else if (builder instanceof LocationConfig.Builder) {
+            return locationRemote;
+        } else if (builder instanceof AgentConfig.Builder) {
+            return agentRemote;
+        } else if (builder instanceof SceneConfig.Builder) {
+            return sceneRemote;
+        } else if (builder instanceof AppConfig.Builder) {
+            return appRemote;
+        } else {
+            throw new CouldNotPerformException("No matching remote for type [" + builder.getDescriptorForType().getName() + "]found");
         }
     }
 

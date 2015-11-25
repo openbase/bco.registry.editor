@@ -19,15 +19,12 @@ import de.citec.csra.regedit.struct.NodeContainer;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.RSTDefaultInstances;
 import de.citec.csra.regedit.util.RemotePool;
-import de.citec.csra.regedit.util.SendableType;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.printer.LogLevel;
 import de.citec.jul.extension.protobuf.BuilderProcessor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -35,7 +32,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
-import rst.math.Vec3DDoubleType;
 
 /**
  * Cell factory to manage similar options for all cells in a row. Initializes

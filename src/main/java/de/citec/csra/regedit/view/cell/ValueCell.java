@@ -22,14 +22,13 @@ import de.citec.csra.regedit.struct.LeafContainer;
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.struct.consistency.Configuration;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
+import de.citec.csra.regedit.util.RSTDefaultInstances;
 import de.citec.csra.regedit.util.SelectableLabel;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.printer.LogLevel;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -42,6 +41,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import rst.configuration.EntryType;
 import rst.homeautomation.device.DeviceConfigType;
+import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
  *
@@ -215,22 +215,23 @@ public class ValueCell extends RowCell {
 
         @Override
         public void handle(ActionEvent event) {
+            logger.info("new apply event");
             Thread thread = new Thread(
                     new Task<Boolean>() {
                         @Override
                         protected Boolean call() throws Exception {
                             RegistryEditor.setModified(false);
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
-                            Message msg = container.getBuilder().build();
-                            logger.info("Now registering/updating msg [" + msg + "]");
+                            Message msg = null;
                             try {
+                                msg = container.getBuilder().build();
                                 if (remotePool.contains(msg)) {
                                     remotePool.update(msg);
                                 } else {
                                     remotePool.register(msg);
                                 }
                                 container.setChanged(false);
-                            } catch (CouldNotPerformException ex) {
+                            } catch (Exception ex) {
                                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                                 logger.warn("Could not register or update message [" + msg + "]", ex);
                             }
@@ -252,17 +253,16 @@ public class ValueCell extends RowCell {
                         protected Boolean call() throws Exception {
                             RegistryEditor.setModified(false);
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
-                            Message msg = container.getBuilder().build();
                             try {
-                                if ("".equals(FieldDescriptorUtil.getId(msg))) {
+                                if ("".equals(FieldDescriptorUtil.getId(container.getBuilder()))) {
                                     container.getParent().getChildren().remove(container);
                                 } else {
                                     int index = container.getParent().getChildren().indexOf(container);
-                                    container.getParent().getChildren().set(index, new GenericNodeContainer(msg.getClass().getSimpleName(), remotePool.getById(FieldDescriptorUtil.getId(msg), msg)));
+                                    container.getParent().getChildren().set(index, new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), remotePool.getById(FieldDescriptorUtil.getId(container.getBuilder()), container.getBuilder())));
                                 }
-                            } catch (CouldNotPerformException ex) {
+                            } catch (Exception ex) {
                                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
-                                logger.warn("Could not cancel update of [" + msg + "]", ex);
+                                logger.warn("Could not cancel update of [" + container.getBuilder() + "]", ex);
                             }
                             return true;
                         }

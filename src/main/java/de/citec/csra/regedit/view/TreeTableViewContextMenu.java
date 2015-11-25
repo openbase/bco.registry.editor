@@ -71,6 +71,7 @@ public class TreeTableViewContextMenu extends ContextMenu {
                 }
             }
         });
+        this.getItems().add(addMenuItem);
     }
 
 }
