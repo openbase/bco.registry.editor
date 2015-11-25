@@ -29,11 +29,10 @@ public class TreeTableViewContextMenu extends ContextMenu {
     private static final Logger logger = LoggerFactory.getLogger(TreeTableViewContextMenu.class);
 
     private final MenuItem addMenuItem;
-    private final SendableType type;
 
     public TreeTableViewContextMenu(TreeTableView<Node> treeTableView, SendableType type) {
         addMenuItem = new MenuItem("Add");
-        this.type = type;
+        this.getItems().add(addMenuItem);
         addMenuItem.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -59,6 +58,8 @@ public class TreeTableViewContextMenu extends ContextMenu {
                         case APP_CONFIG:
                             newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultAppConfig());
                             break;
+                        default:
+                            TreeTableViewContextMenu.this.getItems().clear();
                     }
 
                     if (newNode != null) {
@@ -71,7 +72,6 @@ public class TreeTableViewContextMenu extends ContextMenu {
                 }
             }
         });
-        this.getItems().add(addMenuItem);
     }
 
 }

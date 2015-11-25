@@ -79,7 +79,6 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
 
     public void setChanged(boolean change) {
         changed.set(change);
-        RegistryEditor.setModified(change);
     }
 
     public boolean hasChanged() {

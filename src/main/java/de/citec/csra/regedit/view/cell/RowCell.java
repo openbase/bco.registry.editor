@@ -116,7 +116,6 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
         private void addAction(Node add) {
             try {
-                RegistryEditor.setModified(true);
                 if (add instanceof GenericNodeContainer) {
                     GeneratedMessage.Builder builder = ((NodeContainer) add).getBuilder();
                     GenericListContainer parent = (GenericListContainer) ((NodeContainer) add).getParent().getValue();
@@ -166,7 +165,6 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
         }
 
         private void removeAction(Node nodeToRemove) {
-            RegistryEditor.setModified(true);
             // check if the removed item is an instance of classes that have to be directly
             // removed in the registry [deviceClass, deviceConfig, locationConfig]
             if (nodeToRemove instanceof NodeContainer && ((NodeContainer) nodeToRemove).isSendable()) {

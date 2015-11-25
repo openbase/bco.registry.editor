@@ -220,7 +220,6 @@ public class ValueCell extends RowCell {
                     new Task<Boolean>() {
                         @Override
                         protected Boolean call() throws Exception {
-                            RegistryEditor.setModified(false);
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
                             Message msg = null;
                             try {
@@ -228,6 +227,7 @@ public class ValueCell extends RowCell {
                                 if (remotePool.contains(msg)) {
                                     remotePool.update(msg);
                                 } else {
+                                    container.getParent().getChildren().remove(container);
                                     remotePool.register(msg);
                                 }
                                 container.setChanged(false);
@@ -251,7 +251,6 @@ public class ValueCell extends RowCell {
                     new Task<Boolean>() {
                         @Override
                         protected Boolean call() throws Exception {
-                            RegistryEditor.setModified(false);
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
                             try {
                                 if ("".equals(FieldDescriptorUtil.getId(container.getBuilder()))) {

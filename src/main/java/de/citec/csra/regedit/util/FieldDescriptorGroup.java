@@ -135,4 +135,14 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
     public Descriptors.FieldDescriptor[] getFieldDescriptors() {
         return fieldDescriptors;
     }
+
+    public Object getValue(GeneratedMessage msg) {
+        Message.Builder mBuilder = msg.toBuilder();
+        Object value;
+        for (int i = 0; i < fieldDescriptors.length - 1; i++) {
+            mBuilder = ((GeneratedMessage) mBuilder.getField(fieldDescriptors[i])).toBuilder();
+        }
+        value = mBuilder.getField(fieldDescriptors[fieldDescriptors.length - 1]);
+        return value;
+    }
 }
