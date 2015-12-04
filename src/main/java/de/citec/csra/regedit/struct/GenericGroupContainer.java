@@ -7,8 +7,9 @@ package de.citec.csra.regedit.struct;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
-import de.citec.csra.regedit.util.FieldDescriptorGroup;
+import com.google.protobuf.Message;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
+import de.citec.csra.regedit.view.provider.TreeItemDescriptorProvider;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import java.util.ArrayList;
@@ -26,38 +27,38 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
     /**
      * A group of field after which values the builder list will be grouped.
      */
-    private final FieldDescriptorGroup fieldGroup;
+    private final TreeItemDescriptorProvider treeItemDescriptorProvider;
     /**
      * A list for all the values in the group.
      */
     private final List values;
     private final Descriptors.FieldDescriptor fieldDescriptor;
 
-    public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, FieldDescriptorGroup... groups) throws InstantiationException {
+    public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException {
         this(descriptor, FieldDescriptorUtil.getFieldDescriptor(fieldNumber, builder), builder, builderList, groups);
     }
 
-    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, FieldDescriptorGroup... groups) throws InstantiationException {
+    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException {
         super(descriptor, builder);
-        this.fieldGroup = groups[0];
+        this.treeItemDescriptorProvider = groups[0];
         this.fieldDescriptor = fieldDescriptor;
-        FieldDescriptorGroup childGroups[] = new FieldDescriptorGroup[groups.length - 1];
+        TreeItemDescriptorProvider childGroups[] = new TreeItemDescriptorProvider[groups.length - 1];
         for (int i = 1; i < groups.length; i++) {
             childGroups[i - 1] = groups[i];
         }
         try {
             List<RFMB> groupBuilderList = new ArrayList<>();
-            values = fieldGroup.getFieldValues(builderList);
+            values = treeItemDescriptorProvider.getValueList(new ArrayList<>(builderList));
             for (Object value : values) {
                 for (RFMB messageBuilder : builderList) {
-                    if (fieldGroup.hasEqualValue(messageBuilder, value)) {
+                    if (treeItemDescriptorProvider.hasEqualValue(messageBuilder, value)) {
                         groupBuilderList.add(messageBuilder);
                     }
                 }
-                if (groups.length == 1) {
-                    super.add(new GenericListContainer<>(value.toString(), fieldDescriptor, builder, groupBuilderList));
+                if (groups.length == 1 && !groupBuilderList.isEmpty()) {
+                    super.add(new GenericListContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList));
                 } else {
-                    super.add(new GenericGroupContainer<>(value.toString(), fieldDescriptor, builder, groupBuilderList, childGroups));
+                    super.add(new GenericGroupContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList, childGroups));
                 }
                 groupBuilderList.clear();
             }
@@ -66,8 +67,8 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
         }
     }
 
-    public FieldDescriptorGroup getFieldGroup() {
-        return fieldGroup;
+    public TreeItemDescriptorProvider getFieldGroup() {
+        return treeItemDescriptorProvider;
     }
 
     public List getValues() {

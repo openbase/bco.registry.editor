@@ -148,7 +148,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             }
         }
 
-        private void addGroupValues(NodeContainer startingContainer, GeneratedMessage.Builder builder) {
+        private void addGroupValues(NodeContainer startingContainer, GeneratedMessage.Builder builder) throws CouldNotPerformException {
             NodeContainer groupContainer = startingContainer;
             GenericGroupContainer parent;
             while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {

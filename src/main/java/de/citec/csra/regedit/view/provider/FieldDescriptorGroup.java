@@ -3,27 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.citec.csra.regedit.util;
+package de.citec.csra.regedit.view.provider;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.RegistryEditor;
 import de.citec.csra.regedit.struct.consistency.StructureConsistencyKeeper;
+import de.citec.csra.regedit.util.FieldDescriptorUtil;
+import de.citec.csra.regedit.view.provider.AbstractTreeItemDescriptorProvider;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.printer.LogLevel;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
- * @param <MB> the builder type that is grouped
  */
-public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
-
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FieldDescriptorGroup.class);
+public class FieldDescriptorGroup extends AbstractTreeItemDescriptorProvider {
 
     /**
      * An array of field descriptors whose values will be used for the group.
@@ -55,7 +53,7 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
      * @param descriptorNumbers the field numbers leading to the field value for
      * the grouping
      */
-    public FieldDescriptorGroup(MB builder, int... descriptorNumbers) {
+    public FieldDescriptorGroup(Message.Builder builder, int... descriptorNumbers) {
         fieldDescriptors = new Descriptors.FieldDescriptor[descriptorNumbers.length];
         Message.Builder test = builder;
         for (int i = 0; i < descriptorNumbers.length - 1; i++) {
@@ -65,23 +63,23 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
         fieldDescriptors[descriptorNumbers.length - 1] = FieldDescriptorUtil.getFieldDescriptor(descriptorNumbers[descriptorNumbers.length - 1], test);
     }
 
-    /**
-     * Get all values for the group.
-     *
-     * @param builderList the builders from which the values are tested
-     * @return all values for the group
-     */
-    public List<Object> getFieldValues(List<MB> builderList) {
-        List<Object> values = new ArrayList<>();
-        Object value;
-        for (MB messageBuilder : builderList) {
-            value = getValue(messageBuilder);
-            if (!values.contains(value)) {
-                values.add(getValue(messageBuilder));
-            }
-        }
-        return values;
-    }
+//    /**
+//     * Get all values for the group.
+//     *
+//     * @param builderList the builders from which the values are tested
+//     * @return all values for the group
+//     */
+//    public List<Object> getFieldValues(List<Message.Builder> builderList) {
+//        List<Object> values = new ArrayList<>();
+//        Object value;
+//        for (Message.Builder messageBuilder : builderList) {
+//            value = getValue(messageBuilder);
+//            if (!values.contains(value)) {
+//                values.add(getValue(messageBuilder));
+//            }
+//        }
+//        return values;
+//    }
 
     /**
      * Get the value for the group from one builder.
@@ -89,7 +87,8 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
      * @param builder the builder from which the value is extracted
      * @return the value for the group in that builder
      */
-    public Object getValue(MB builder) {
+    @Override
+    public Object getValue(Message.Builder builder) {
         Message.Builder mBuilder = builder;
         Object value;
         for (int i = 0; i < fieldDescriptors.length - 1; i++) {
@@ -105,7 +104,8 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
      * @param builder the builder from which the value is set
      * @param value the value set for that field
      */
-    public void setValue(MB builder, Object value) {
+    @Override
+    public void setValue(Message.Builder builder, Object value) {
         Message.Builder mBuilder = builder;
         for (int i = 0; i < fieldDescriptors.length - 1; i++) {
             mBuilder = mBuilder.getFieldBuilder(fieldDescriptors[i]);
@@ -125,24 +125,17 @@ public class FieldDescriptorGroup<MB extends GeneratedMessage.Builder<MB>> {
      * @param value the tested value
      * @return if the grouping value for the builder equals value
      */
-    public boolean hasEqualValue(MB builder, Object value) {
+    @Override
+    public boolean hasEqualValue(Message.Builder builder, Object value) {
         return value.equals(getValue(builder));
     }
 
-    public FieldDescriptorGroup() {
+    @Override
+    public String getDescriptor(Message.Builder msg) throws CouldNotPerformException {
+        return getValue(msg).toString();
     }
 
     public Descriptors.FieldDescriptor[] getFieldDescriptors() {
         return fieldDescriptors;
-    }
-
-    public Object getValue(GeneratedMessage msg) {
-        Message.Builder mBuilder = msg.toBuilder();
-        Object value;
-        for (int i = 0; i < fieldDescriptors.length - 1; i++) {
-            mBuilder = ((GeneratedMessage) mBuilder.getField(fieldDescriptors[i])).toBuilder();
-        }
-        value = mBuilder.getField(fieldDescriptors[fieldDescriptors.length - 1]);
-        return value;
     }
 }

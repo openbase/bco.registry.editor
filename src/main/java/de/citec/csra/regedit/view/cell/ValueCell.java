@@ -24,6 +24,7 @@ import de.citec.csra.regedit.struct.consistency.Configuration;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.RSTDefaultInstances;
 import de.citec.csra.regedit.util.SelectableLabel;
+import de.citec.csra.regedit.view.provider.DeviceClassItemDescriptorProvider;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.exception.printer.LogLevel;
@@ -166,18 +167,15 @@ public class ValueCell extends RowCell {
 
         // ==================== TODO:tamino redesign
         if (item instanceof GenericGroupContainer) {
-            Descriptors.FieldDescriptor groupedField = null;
             if (((GenericGroupContainer) item).getParent().getValue() instanceof GenericGroupContainer) {
                 GenericGroupContainer parent = (GenericGroupContainer) ((GenericGroupContainer) item).getParent().getValue();
-                groupedField = parent.getFieldGroup().getFieldDescriptors()[0];
-            }
-            Descriptors.FieldDescriptor deviceClassIdfield = FieldDescriptorUtil.getFieldDescriptor(DeviceConfigType.DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER, DeviceConfigType.DeviceConfig.getDefaultInstance());
-            if (deviceClassIdfield.equals(groupedField)) {
-                try {
-                    String text = remotePool.getDeviceRemote().getDeviceClassById(item.getDescriptor()).getDescription();
-                    setGraphic(SelectableLabel.makeSelectable(new Label(text)));
-                } catch (CouldNotPerformException ex) {
-                    RegistryEditor.printException(ex, logger, LogLevel.DEBUG);
+                if (parent.getFieldGroup() instanceof DeviceClassItemDescriptorProvider) {
+                    try {
+                        String text = remotePool.getDeviceRemote().getDeviceClassById((String) parent.getFieldGroup().getValue(((GenericGroupContainer) item).getBuilder())).getDescription();
+                        setGraphic(SelectableLabel.makeSelectable(new Label(text)));
+                    } catch (CouldNotPerformException ex) {
+                        RegistryEditor.printException(ex, logger, LogLevel.DEBUG);
+                    }
                 }
             }
         }

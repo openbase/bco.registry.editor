@@ -7,6 +7,7 @@ package de.citec.csra.regedit.struct.consistency;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 import de.citec.csra.regedit.struct.GenericListContainer;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
@@ -32,7 +33,7 @@ public class StructureConsistencyKeeper {
 
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(StructureConsistencyKeeper.class);
 
-    public static void keepStructure(NodeContainer<? extends GeneratedMessage.Builder> container, String fieldName) throws CouldNotPerformException {
+    public static void keepStructure(NodeContainer<? extends Message.Builder> container, String fieldName) throws CouldNotPerformException {
         if (container.getBuilder() instanceof InventoryState.Builder) {
             keepInventoryStateStructure((NodeContainer<InventoryState.Builder>) container);
         } else if (container.getBuilder() instanceof PersonType.Person.Builder && ((NodeContainer<GeneratedMessage.Builder>) container.getParent().getValue()).getBuilder() instanceof InventoryState.Builder) {
@@ -44,7 +45,7 @@ public class StructureConsistencyKeeper {
         }
     }
 
-    public static void clearField(NodeContainer<? extends GeneratedMessage.Builder> container, String fieldName) {
+    public static void clearField(NodeContainer<? extends Message.Builder> container, String fieldName) {
         GeneratedMessage.Builder builder = container.getBuilder();
         for (int i = 0; i < container.getChildren().size(); i++) {
             Node item = container.getChildren().get(i).getValue();
@@ -107,7 +108,7 @@ public class StructureConsistencyKeeper {
         container.add(new GenericNodeContainer<>(field, container.getBuilder().getTimestampBuilder()));
     }
 
-    public static void keepStructure(GeneratedMessage.Builder builder, String fieldName) throws CouldNotPerformException {
+    public static void keepStructure(Message.Builder builder, String fieldName) throws CouldNotPerformException {
         if (builder instanceof DeviceConfig.Builder) {
             keepDeviceConfigStructure((DeviceConfig.Builder) builder, fieldName);
         }

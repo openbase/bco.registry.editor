@@ -162,7 +162,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
     }
 
-    private GenericListContainer getAccordingParent(List<TreeItem<Node>> nodes, GeneratedMessage msg) {
+    private GenericListContainer getAccordingParent(List<TreeItem<Node>> nodes, GeneratedMessage msg) throws CouldNotPerformException {
         if (nodes.isEmpty()) {
             return null;
         }
