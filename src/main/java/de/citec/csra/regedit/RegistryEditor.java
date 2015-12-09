@@ -13,7 +13,6 @@ import de.citec.agm.remote.AgentRegistryRemote;
 import de.citec.apm.remote.AppRegistryRemote;
 import de.citec.csra.regedit.struct.GenericGroupContainer;
 import de.citec.csra.regedit.struct.GenericListContainer;
-import de.citec.csra.regedit.view.provider.FieldDescriptorGroup;
 import de.citec.csra.regedit.util.RemotePool;
 import de.citec.csra.regedit.view.RegistryTreeTableView;
 import de.citec.csra.regedit.view.provider.DeviceClassItemDescriptorProvider;
@@ -35,11 +34,14 @@ import de.citec.jul.extension.rsb.com.RSBRemoteService;
 import de.citec.jul.pattern.Observable;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -64,10 +66,8 @@ import org.slf4j.LoggerFactory;
 import rst.homeautomation.control.agent.AgentRegistryType.AgentRegistry;
 import rst.homeautomation.control.app.AppRegistryType.AppRegistry;
 import rst.homeautomation.control.scene.SceneRegistryType.SceneRegistry;
-import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
 import rst.spatial.LocationRegistryType.LocationRegistry;
-import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
  *
@@ -248,11 +248,13 @@ public class RegistryEditor extends Application {
     }
 
     private final ExecutorService executerService = Executors.newCachedThreadPool();
-
+    
     public void registerObserver() throws Exception {
 
+        final List<Future<Void>> registrationFutures = new ArrayList<>();
+        
         for (RSBRemoteService remote : remotePool.getRemotes()) {
-            executerService.submit(new Callable<Void>() {
+            registrationFutures.add(executerService.submit(new Callable<Void>() {
 
                 @Override
                 public Void call() throws Exception {
@@ -266,7 +268,11 @@ public class RegistryEditor extends Application {
                     }
                     return null;
                 }
-            });
+            }));
+        }
+        
+        for(Future future : registrationFutures) {
+            future.get();
         }
     }
 
@@ -285,7 +291,7 @@ public class RegistryEditor extends Application {
             @Override
             public void run() {
                 Tab tab = getRegistryTabByRemote(remote);
-                if (!remote.isConnected()) {
+                if (!remote.isConnected() || !remote.isActive()) {
                     tab.setContent(getProgressindicatorByRemote(remote));
                     return;
                 }
@@ -377,7 +383,7 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof AppRegistry) {
             AppRegistry data = (AppRegistry) msg;
             appConfigTreeTableView.update(data.getAppConfigList());
-            return agentConfigTreeTableView;
+            return appConfigTreeTableView;
         } else if (msg instanceof AgentRegistry) {
             AgentRegistry data = (AgentRegistry) msg;
             agentConfigTreeTableView.update(data.getAgentConfigList());

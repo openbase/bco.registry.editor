@@ -30,6 +30,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +121,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     GeneratedMessage.Builder builder = ((NodeContainer) add).getBuilder();
                     GenericListContainer parent = (GenericListContainer) ((NodeContainer) add).getParent().getValue();
                     GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(builder);
-                    addGroupValues(parent, addedBuilder);
+                    addGroupValues(parent, addedBuilder, ((NodeContainer) add).getBuilder());
                     parent.addElement(addedBuilder);
                 } else if (add instanceof LeafContainer) {
                     GenericListContainer parentNode = (GenericListContainer) ((LeafContainer) add).getParent();
@@ -132,7 +133,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 //                        GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(parentNode.getFieldDescriptor(), clone));
                         GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder((GeneratedMessage.Builder) parentNode.getBuilder().newBuilderForField(parentNode.getFieldDescriptor()));
 
-                        addGroupValues(parentNode, addedBuilder);
+                        addGroupValues(parentNode, addedBuilder, ((NodeContainer) ((GenericListContainer) add).getChildren().get(0)).getBuilder());
                         parentNode.addElement(addedBuilder);
                     } else {
                         parentNode.addNewDefaultElement();
@@ -140,7 +141,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 } else if (add instanceof GenericGroupContainer) {
                     GenericGroupContainer container = (GenericGroupContainer) add;
                     GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(container.getFieldDescriptor(), container.getBuilder()));
-                    addGroupValues(container, addedBuilder);
+                    NodeContainer child = (NodeContainer) container.getChildren().get(0);
+                    while (child instanceof GenericGroupContainer || child instanceof GenericListContainer) {
+                        child = (NodeContainer) child.getChildren().get(0);
+                    }
+                    addGroupValues(container, addedBuilder, child.getBuilder());
                     container.add(new GenericNodeContainer("", addedBuilder));
                 }
             } catch (CouldNotPerformException ex) {
@@ -148,18 +153,12 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             }
         }
 
-        private void addGroupValues(NodeContainer startingContainer, GeneratedMessage.Builder builder) throws CouldNotPerformException {
+        private void addGroupValues(NodeContainer startingContainer, GeneratedMessage.Builder builder, GeneratedMessage.Builder groupExample) throws CouldNotPerformException {
             NodeContainer groupContainer = startingContainer;
             GenericGroupContainer parent;
             while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {
                 parent = (GenericGroupContainer) groupContainer.getParent().getValue();
-                Object targetValue = null;
-                for (Object value : parent.getValues()) {
-                    if (value.toString().equals(groupContainer.getDescriptor())) {
-                        targetValue = value;
-                    }
-                }
-                parent.getFieldGroup().setValue(builder, targetValue);
+                parent.getFieldGroup().setValue(builder, parent.getFieldGroup().getValue(groupExample));
                 groupContainer = parent;
             }
         }
@@ -178,7 +177,13 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 } catch (CouldNotPerformException ex) {
                     RegistryEditor.printException(ex, logger, LogLevel.WARN);
                 }
+                NodeContainer parent = (NodeContainer) removed.getParent();
                 removed.getParent().getChildren().remove(removed);
+                while (parent.getChildren().isEmpty() && parent.getParent() != null) {
+                    removed = parent;
+                    parent = (NodeContainer) parent.getParent();
+                    parent.getChildren().remove(removed);
+                }
             } else if (nodeToRemove instanceof Leaf) {
                 removeNodeFromRepeatedField(((LeafContainer) nodeToRemove).getParent(), ((LeafContainer) nodeToRemove).getIndex());
             } else {

@@ -171,7 +171,8 @@ public class ValueCell extends RowCell {
                 GenericGroupContainer parent = (GenericGroupContainer) ((GenericGroupContainer) item).getParent().getValue();
                 if (parent.getFieldGroup() instanceof DeviceClassItemDescriptorProvider) {
                     try {
-                        String text = remotePool.getDeviceRemote().getDeviceClassById((String) parent.getFieldGroup().getValue(((GenericGroupContainer) item).getBuilder())).getDescription();
+                        int index = parent.getChildren().indexOf(item);
+                        String text = remotePool.getDeviceRemote().getDeviceClassById((String) parent.getValues().get(index)).getDescription();
                         setGraphic(SelectableLabel.makeSelectable(new Label(text)));
                     } catch (CouldNotPerformException ex) {
                         RegistryEditor.printException(ex, logger, LogLevel.DEBUG);
