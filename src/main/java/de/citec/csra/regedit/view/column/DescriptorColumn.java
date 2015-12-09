@@ -30,7 +30,7 @@ public class DescriptorColumn extends Column {
     private final Map<String, Integer> fieldPriorityMap = new FieldPriorityMap();
 
     public DescriptorColumn() {
-        super("Description");
+        super("");
 
         this.setSortable(true);
         this.setSortType(SortType.ASCENDING);

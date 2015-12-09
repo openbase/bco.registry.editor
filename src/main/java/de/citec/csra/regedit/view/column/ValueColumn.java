@@ -25,7 +25,7 @@ public class ValueColumn extends Column {
     public static final double VALUE_COLUMN_PROPORTION = 0.75;
 
     public ValueColumn() {
-        super("Value");
+        super("");
         this.setEditable(true);
         this.setSortable(false);
         this.setOnEditCommit(new EventHandlerImpl());

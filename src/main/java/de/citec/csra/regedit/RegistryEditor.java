@@ -16,6 +16,7 @@ import de.citec.csra.regedit.struct.GenericListContainer;
 import de.citec.csra.regedit.util.RemotePool;
 import de.citec.csra.regedit.view.RegistryTreeTableView;
 import de.citec.csra.regedit.view.provider.DeviceClassItemDescriptorProvider;
+import de.citec.csra.regedit.view.provider.FieldDescriptorGroup;
 import de.citec.csra.regedit.view.provider.LocationItemDescriptorProvider;
 import de.citec.csra.regedit.view.provider.TreeItemDescriptorProvider;
 import de.citec.dm.remote.DeviceRegistryRemote;
@@ -66,6 +67,7 @@ import org.slf4j.LoggerFactory;
 import rst.homeautomation.control.agent.AgentRegistryType.AgentRegistry;
 import rst.homeautomation.control.app.AppRegistryType.AppRegistry;
 import rst.homeautomation.control.scene.SceneRegistryType.SceneRegistry;
+import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
 import rst.spatial.LocationRegistryType.LocationRegistry;
 
@@ -248,11 +250,11 @@ public class RegistryEditor extends Application {
     }
 
     private final ExecutorService executerService = Executors.newCachedThreadPool();
-    
+
     public void registerObserver() throws Exception {
 
         final List<Future<Void>> registrationFutures = new ArrayList<>();
-        
+
         for (RSBRemoteService remote : remotePool.getRemotes()) {
             registrationFutures.add(executerService.submit(new Callable<Void>() {
 
@@ -270,8 +272,8 @@ public class RegistryEditor extends Application {
                 }
             }));
         }
-        
-        for(Future future : registrationFutures) {
+
+        for (Future future : registrationFutures) {
             future.get();
         }
     }
@@ -315,14 +317,16 @@ public class RegistryEditor extends Application {
     private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException {
         if (msg instanceof DeviceRegistry) {
             DeviceRegistry data = (DeviceRegistry) msg;
-            deviceClassTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.DEVICE_CLASS_FIELD_NUMBER, data.toBuilder()));
+            TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);
+            Descriptors.FieldDescriptor deviceClassfield = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CLASS_FIELD_NUMBER);
+            deviceClassTreeTableView.setRoot(new GenericGroupContainer<>(deviceClassfield.getName(), deviceClassfield, data.toBuilder(), data.toBuilder().getDeviceClassBuilderList(), company));
             deviceClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CLASS));
             deviceClassTreeTableView.getListDiff().diff(data.getDeviceClassList());
 
             TreeItemDescriptorProvider deviceClassId = new DeviceClassItemDescriptorProvider();
             TreeItemDescriptorProvider locationId = new LocationItemDescriptorProvider();
-            Descriptors.FieldDescriptor field = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER);
-            deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(field.getName(), field, data.toBuilder(), data.toBuilder().getDeviceConfigBuilderList(), deviceClassId, locationId));
+            Descriptors.FieldDescriptor deviceConfigfield = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistry.DEVICE_CONFIG_FIELD_NUMBER);
+            deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(deviceConfigfield.getName(), deviceConfigfield, data.toBuilder(), data.toBuilder().getDeviceConfigBuilderList(), deviceClassId, locationId));
             deviceConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CONFIG));
             deviceConfigTreeTableView.getListDiff().diff(data.getDeviceConfigList());
 
