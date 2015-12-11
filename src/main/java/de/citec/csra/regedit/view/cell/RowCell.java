@@ -41,36 +41,36 @@ import org.slf4j.LoggerFactory;
  * @author thuxohl
  */
 public abstract class RowCell extends TreeTableCell<Node, Node> {
-    
+
     protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     protected RemotePool remotePool;
     private final ContextMenu contextMenu;
     private final MenuItem addMenuItem, removeMenuItem;
-    
+
     public RowCell() {
         try {
             remotePool = RemotePool.getInstance();
         } catch (InstantiationException ex) {
             RegistryEditor.printException(ex, logger, LogLevel.WARN);
         }
-        
+
         addMenuItem = new MenuItem("Add");
         removeMenuItem = new MenuItem("Remove");
         contextMenu = new ContextMenu(addMenuItem, removeMenuItem);
-        
+
         EventHandlerImpl eventHandler = new EventHandlerImpl();
         addMenuItem.setOnAction(eventHandler);
         removeMenuItem.setOnAction(eventHandler);
-        
+
         this.setFocused(true);
         this.setEditable(true);
     }
-    
+
     @Override
     protected void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         if (getTableColumn().getTreeTableView().isEditable()
                 && (item instanceof GenericListContainer
                 && ((GenericListContainer) item).isModifiable())
@@ -92,14 +92,14 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             setContextMenu(null);
         }
     }
-    
+
     private class EventHandlerImpl implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
                     new Task<Boolean>() {
-                        
+
                         @Override
                         protected Boolean call() throws Exception {
                             if (event.getSource().equals(addMenuItem)) {
@@ -109,12 +109,12 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                             }
                             return true;
                         }
-                        
+
                     });
             thread.setDaemon(true);
             thread.start();
         }
-        
+
         private void addAction(Node add) {
             try {
                 if (add instanceof GenericNodeContainer) {
@@ -129,11 +129,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 } else if (add instanceof GenericListContainer) {
                     GenericListContainer parentNode = (GenericListContainer) add;
                     if (parentNode.getFieldDescriptor().getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
-                        GeneratedMessage.Builder clone = parentNode.getBuilder().clone();
-//                        GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(parentNode.getFieldDescriptor(), clone));
                         GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder((GeneratedMessage.Builder) parentNode.getBuilder().newBuilderForField(parentNode.getFieldDescriptor()));
-                        
-                        addGroupValues(parentNode, addedBuilder, ((NodeContainer) ((GenericListContainer) add).getChildren().get(0)).getBuilder());
+
+                        if (!parentNode.getChildren().isEmpty()) {
+                            addGroupValues(parentNode, addedBuilder, ((NodeContainer) parentNode.getChildren().get(0)).getBuilder());
+                        }
                         parentNode.addElement(addedBuilder);
                     } else {
                         parentNode.addNewDefaultElement();
@@ -153,7 +153,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
             }
         }
-        
+
         private void addGroupValues(NodeContainer startingContainer, GeneratedMessage.Builder builder, GeneratedMessage.Builder groupExample) throws CouldNotPerformException {
             NodeContainer groupContainer = startingContainer;
             GenericGroupContainer parent;
@@ -163,7 +163,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 groupContainer = parent;
             }
         }
-        
+
         private void removeAction(Node nodeToRemove) {
             // check if the removed item is an instance of classes that have to be directly
             // removed in the registry [deviceClass, deviceConfig, locationConfig]
@@ -178,13 +178,6 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 } catch (CouldNotPerformException ex) {
                     RegistryEditor.printException(ex, logger, LogLevel.WARN);
                 }
-                NodeContainer parent = (NodeContainer) removed.getParent();
-                removed.getParent().getChildren().remove(removed);
-                while (parent.getChildren().isEmpty() && parent.getParent() != null) {
-                    removed = parent;
-                    parent = (NodeContainer) parent.getParent();
-                    parent.getChildren().remove(removed);
-                }
             } else if (nodeToRemove instanceof Leaf) {
                 removeNodeFromRepeatedField(((LeafContainer) nodeToRemove).getParent(), ((LeafContainer) nodeToRemove).getIndex());
             } else {
@@ -192,11 +185,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             }
         }
     }
-    
+
     private void removeNodeFromRepeatedField(NodeContainer parent, Node nodeToRemove) {
         removeNodeFromRepeatedField(parent, parent.getChildren().indexOf(nodeToRemove));
     }
-    
+
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
         Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(parent.getDescriptor(), parent.getBuilder());
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));

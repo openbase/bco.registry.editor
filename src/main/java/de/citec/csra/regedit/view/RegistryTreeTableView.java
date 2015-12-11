@@ -31,6 +31,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.VBox;
+import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +113,16 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
                 GlobalTextArea.getInstance().setText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been removed from the global database!");
                 continue;
             }
-            nodeToRemove.getParent().getChildren().remove(nodeToRemove);
+            TreeItem<Node> parent = nodeToRemove.getParent();
+            parent.getChildren().remove(nodeToRemove);
+            if (SendableType.getTypeToMessage(msg) != null) {
+                TreeItem<Node> removed;
+                while (parent.getChildren().isEmpty() && parent.getParent() != null) {
+                    removed = parent;
+                    parent = (NodeContainer) parent.getParent();
+                    parent.getChildren().remove(removed);
+                }
+            }
         }
         for (Object message : listDiff.getUpdatedMessageMap().getMessages()) {
             logger.info("Updated message [" + message + "]");
@@ -150,14 +160,14 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
                 logger.info("Found node to remove with id [" + FieldDescriptorUtil.getId(((NodeContainer) nodes.get(0)).getBuilder()) + "]");
                 return (NodeContainer) nodes.get(0);
             } else {
-                nodes.remove(0);
                 nodes.addAll(nodes.get(0).getChildren());
+                nodes.remove(0);
                 return getNodeByMessage(nodes, msg);
             }
         } catch (CouldNotPerformException ex) {
             // all searched messages must have an id field... else this method will run over all treeitems and then return null
-            nodes.remove(0);
             nodes.addAll(nodes.get(0).getChildren());
+            nodes.remove(0);
             return getNodeByMessage(nodes, msg);
         }
     }
