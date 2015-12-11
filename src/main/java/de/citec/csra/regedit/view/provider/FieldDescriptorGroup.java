@@ -11,11 +11,8 @@ import com.google.protobuf.Message;
 import de.citec.csra.regedit.RegistryEditor;
 import de.citec.csra.regedit.struct.consistency.StructureConsistencyKeeper;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
-import de.citec.csra.regedit.view.provider.AbstractTreeItemDescriptorProvider;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.printer.LogLevel;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *

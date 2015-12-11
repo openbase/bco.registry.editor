@@ -81,6 +81,15 @@ public class MessageComboBox extends ComboBox<Message> {
                     list.remove(RemotePool.getInstance().getById(childId, parentBuilder).build());
                 }
             }
+            if ("tile_id".equals(fieldName)) {
+                for (int i = 0; i < list.size(); i++) {
+                    LocationConfig location = (LocationConfig) list.get(i);
+                    if (location.getType() != LocationConfig.LocationType.TILE) {
+                        list.remove(i);
+                        i--;
+                    }
+                }
+            }
             Collections.sort(list, new Comparator<Message>() {
 
                 @Override
@@ -108,6 +117,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 case "location_id":
                 case "child_id":
                 case "parent_id":
+                case "tile_id":
                     return LocationConfig.getDefaultInstance();
                 case "device_class_id":
                     return DeviceClass.getDefaultInstance();

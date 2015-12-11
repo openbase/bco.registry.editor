@@ -36,6 +36,7 @@ import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
+import rst.spatial.ConnectionConfigType.ConnectionConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -188,25 +189,13 @@ public class RemotePool {
     }
 
     public RSBRemoteService getRemoteByMessage(Message msg) throws CouldNotPerformException {
-        if (msg instanceof DeviceClass || msg instanceof DeviceConfig || msg instanceof UnitTemplate) {
-            return deviceRemote;
-        } else if (msg instanceof LocationConfig) {
-            return locationRemote;
-        } else if (msg instanceof AgentConfig) {
-            return agentRemote;
-        } else if (msg instanceof SceneConfig) {
-            return sceneRemote;
-        } else if (msg instanceof AppConfig) {
-            return appRemote;
-        } else {
-            throw new CouldNotPerformException("No matching remote for type [" + msg.getClass().getSimpleName() + "]found");
-        }
+        return getRemoteByMessageBuilder(msg.toBuilder());
     }
 
     public RSBRemoteService getRemoteByMessageBuilder(Message.Builder builder) throws CouldNotPerformException {
         if (builder instanceof DeviceClass.Builder || builder instanceof DeviceConfig.Builder || builder instanceof UnitTemplate.Builder) {
             return deviceRemote;
-        } else if (builder instanceof LocationConfig.Builder) {
+        } else if (builder instanceof LocationConfig.Builder || builder instanceof ConnectionConfig.Builder) {
             return locationRemote;
         } else if (builder instanceof AgentConfig.Builder) {
             return agentRemote;

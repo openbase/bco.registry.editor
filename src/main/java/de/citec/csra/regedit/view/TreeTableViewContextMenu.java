@@ -58,6 +58,9 @@ public class TreeTableViewContextMenu extends ContextMenu {
                         case APP_CONFIG:
                             newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultAppConfig());
                             break;
+                        case CONNECTION_CONFIG:
+                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultConnectionConfig());
+                            break;
                         default:
                             TreeTableViewContextMenu.this.getItems().clear();
                     }

@@ -87,11 +87,12 @@ public class RegistryEditor extends Application {
     private MenuBar menuBar;
     private Menu fileMenu;
     private MenuItem sortMenuItem, resyncMenuItem;
-    private TabPane registryTabPane, deviceRegistryTabPane;
+    private TabPane registryTabPane, deviceRegistryTabPane, locationRegistryTabPane;
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab;
+    private Tab locationConfigTab, connectionConfigTab;
     private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator;
-    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView;
+    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView;
     private final Map<String, Boolean> intialized;
 
     public RegistryEditor() throws InstantiationException {
@@ -128,6 +129,7 @@ public class RegistryEditor extends Application {
         deviceClassTreeTableView = new RegistryTreeTableView(SendableType.DEVICE_CLASS);
         deviceConfigTreeTableView = new RegistryTreeTableView(SendableType.DEVICE_CONFIG);
         locationConfigTreeTableView = new RegistryTreeTableView(SendableType.LOCATION_CONFIG);
+        connectionConfigTreeTableView = new RegistryTreeTableView(SendableType.CONNECTION_CONFIG);
         sceneConfigTreeTableView = new RegistryTreeTableView(SendableType.SCENE_CONFIG);
         agentConfigTreeTableView = new RegistryTreeTableView(SendableType.AGENT_CONFIG);
         appConfigTreeTableView = new RegistryTreeTableView(SendableType.APP_CONFIG);
@@ -142,6 +144,14 @@ public class RegistryEditor extends Application {
         deviceConfigTab.setContent(deviceConfigTreeTableView.getVBox());
         unitTemplateTab.setContent(unitTemplateTreeTableView.getVBox());
         deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab, unitTemplateTab);
+
+        locationRegistryTabPane = new TabPane();
+        locationRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        locationConfigTab = new Tab("LocationConfig");
+        locationConfigTab.setContent(locationConfigTreeTableView.getVBox());
+        connectionConfigTab = new Tab("ConnectionConfig");
+        connectionConfigTab.setContent(connectionConfigTreeTableView.getVBox());
+        locationRegistryTabPane.getTabs().addAll(connectionConfigTab, locationConfigTab);
 
         sortMenuItem = new MenuItem("Sort");
         sortMenuItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -206,6 +216,7 @@ public class RegistryEditor extends Application {
         deviceClassTreeTableView.addWidthProperty(scene.widthProperty());
         deviceConfigTreeTableView.addWidthProperty(scene.widthProperty());
         locationConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        connectionConfigTreeTableView.addWidthProperty(scene.widthProperty());
         sceneConfigTreeTableView.addWidthProperty(scene.widthProperty());
         agentConfigTreeTableView.addWidthProperty(scene.widthProperty());
         appConfigTreeTableView.addWidthProperty(scene.widthProperty());
@@ -214,6 +225,7 @@ public class RegistryEditor extends Application {
         deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
         deviceConfigTreeTableView.addHeightProperty(scene.heightProperty());
         locationConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        connectionConfigTreeTableView.addHeightProperty(scene.heightProperty());
         sceneConfigTreeTableView.addHeightProperty(scene.heightProperty());
         agentConfigTreeTableView.addHeightProperty(scene.heightProperty());
         appConfigTreeTableView.addHeightProperty(scene.heightProperty());
@@ -293,6 +305,9 @@ public class RegistryEditor extends Application {
             @Override
             public void run() {
                 Tab tab = getRegistryTabByRemote(remote);
+                if (tab.equals(locationRegistryTab)) {
+                    int i = 0;
+                }
                 if (!remote.isConnected() || !remote.isActive()) {
                     tab.setContent(getProgressindicatorByRemote(remote));
                     return;
@@ -300,10 +315,10 @@ public class RegistryEditor extends Application {
                 try {
                     GeneratedMessage data = remote.getData();
                     if (!intialized.get(data.getClass().getSimpleName())) {
-                        logger.info(data.getClass().getSimpleName() + " is not yet initialized");
+//                        logger.info(data.getClass().getSimpleName() + " is not yet initialized");
                         tab.setContent(fillTreeTableView(data));
                     } else {
-                        logger.info("Updating " + data.getClass().getSimpleName());
+//                        logger.info("Updating " + data.getClass().getSimpleName());
                         tab.setContent(updateTreeTableView(data));
                     }
                 } catch (CouldNotPerformException ex) {
@@ -341,8 +356,13 @@ public class RegistryEditor extends Application {
             locationConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistry.LOCATION_CONFIG_FIELD_NUMBER, data.toBuilder()));
             locationConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.LOCATION_CONFIG));
             locationConfigTreeTableView.getListDiff().diff(data.getLocationConfigList());
+
+            connectionConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistry.CONNECTION_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            connectionConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.CONNECTION_CONFIG));
+            connectionConfigTreeTableView.getListDiff().diff(data.getConnectionConfigList());
+
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return locationConfigTreeTableView;
+            return locationRegistryTabPane;
         } else if (msg instanceof SceneRegistry) {
             SceneRegistry data = (SceneRegistry) msg;
             sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistry.SCENE_CONFIG_FIELD_NUMBER, data.toBuilder()));
@@ -379,7 +399,8 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof LocationRegistry) {
             LocationRegistry data = (LocationRegistry) msg;
             locationConfigTreeTableView.update(data.getLocationConfigList());
-            return locationConfigTreeTableView;
+            connectionConfigTreeTableView.update(data.getConnectionConfigList());
+            return locationRegistryTabPane;
         } else if (msg instanceof SceneRegistry) {
             SceneRegistry data = (SceneRegistry) msg;
             sceneConfigTreeTableView.update(data.getSceneConfigList());

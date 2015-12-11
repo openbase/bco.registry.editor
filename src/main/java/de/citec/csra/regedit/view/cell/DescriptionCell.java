@@ -5,12 +5,10 @@
  */
 package de.citec.csra.regedit.view.cell;
 
-import de.citec.csra.regedit.struct.GenericGroupContainer;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
-import rst.homeautomation.device.DeviceConfigType;
 
 /**
  *

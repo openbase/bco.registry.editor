@@ -14,6 +14,7 @@ import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.LocationConfigType.LocationConfig;
+import rst.spatial.ConnectionConfigType.ConnectionConfig;
 
 /**
  *
@@ -26,6 +27,7 @@ public enum SendableType {
     DEVICE_CLASS(DeviceClass.getDefaultInstance()),
     DEVICE_CONFIG(DeviceConfig.getDefaultInstance()),
     LOCATION_CONFIG(LocationConfig.getDefaultInstance()),
+    CONNECTION_CONFIG(ConnectionConfig.getDefaultInstance()),
     SCENE_CONFIG(SceneConfig.getDefaultInstance()),
     UNIT_TEMPLATE(UnitTemplate.getDefaultInstance());
 
@@ -50,6 +52,8 @@ public enum SendableType {
             return DEVICE_CONFIG;
         } else if (builder instanceof LocationConfig.Builder) {
             return LOCATION_CONFIG;
+        } else if (builder instanceof ConnectionConfig.Builder) {
+            return CONNECTION_CONFIG;
         } else if (builder instanceof SceneConfig.Builder) {
             return SCENE_CONFIG;
         } else if (builder instanceof UnitTemplate.Builder) {

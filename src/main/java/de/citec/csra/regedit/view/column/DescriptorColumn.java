@@ -27,10 +27,11 @@ import javafx.util.Callback;
 public class DescriptorColumn extends Column {
 
     public static final double DESCRIPTOR_COLUMN_PROPORTION = 1 - VALUE_COLUMN_PROPORTION;
-    private final Map<String, Integer> fieldPriorityMap = new FieldPriorityMap();
+    private final Map<String, Integer> fieldPriorityMap;
 
     public DescriptorColumn() {
         super("");
+        this.fieldPriorityMap = new FieldPriorityMap();
 
         this.setSortable(true);
         this.setSortType(SortType.ASCENDING);

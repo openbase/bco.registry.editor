@@ -31,7 +31,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.VBox;
-import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +104,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
 
         // Remove all removed messages
         for (Object message : listDiff.getRemovedMessageMap().getMessages()) {
-            logger.info("Removed message [" + message + "]");
+//            logger.info("Removed message [" + message + "]");
             GeneratedMessage msg = (GeneratedMessage) message;
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
@@ -125,10 +124,10 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
             }
         }
         for (Object message : listDiff.getUpdatedMessageMap().getMessages()) {
-            logger.info("Updated message [" + message + "]");
+//            logger.info("Updated message [" + message + "]");
             GeneratedMessage msg = (GeneratedMessage) message;
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
-            logger.info("Found old node to remove to update [" + nodeToRemove.getBuilder().build() + "]");
+//            logger.info("Found old node to remove to update [" + nodeToRemove.getBuilder().build() + "]");
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
                 GlobalTextArea.getInstance().setText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cance'\nTo overwrite the global changes with yours press 'Apply'");
@@ -138,7 +137,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
             parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder()));
         }
         for (Object message : listDiff.getNewMessageMap().getMessages()) {
-            logger.info("New message [" + message + "]");
+//            logger.info("New message [" + message + "]");
             GeneratedMessage msg = (GeneratedMessage) message;
             if (this.getRoot() instanceof GenericGroupContainer) {
                 getAccordingParent(this.getRoot().getChildren(), msg).registerElement(msg.toBuilder());
@@ -157,7 +156,6 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
 
         try {
             if (FieldDescriptorUtil.getId(msg).equals(FieldDescriptorUtil.getId(((NodeContainer) nodes.get(0)).getBuilder()))) {
-                logger.info("Found node to remove with id [" + FieldDescriptorUtil.getId(((NodeContainer) nodes.get(0)).getBuilder()) + "]");
                 return (NodeContainer) nodes.get(0);
             } else {
                 nodes.addAll(nodes.get(0).getChildren());
