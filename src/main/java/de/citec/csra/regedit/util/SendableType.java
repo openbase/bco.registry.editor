@@ -7,6 +7,8 @@ package de.citec.csra.regedit.util;
 
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
+import rst.authorization.UserConfigType.UserConfig;
+import rst.authorization.GroupConfigType.GroupConfig;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
@@ -29,7 +31,9 @@ public enum SendableType {
     LOCATION_CONFIG(LocationConfig.getDefaultInstance()),
     CONNECTION_CONFIG(ConnectionConfig.getDefaultInstance()),
     SCENE_CONFIG(SceneConfig.getDefaultInstance()),
-    UNIT_TEMPLATE(UnitTemplate.getDefaultInstance());
+    UNIT_TEMPLATE(UnitTemplate.getDefaultInstance()),
+    USER_CONFIG(UserConfig.getDefaultInstance()),
+    GROUP_CONFIG(GroupConfig.getDefaultInstance());
 
     private final GeneratedMessage defaultInstanceForType;
 
@@ -58,6 +62,10 @@ public enum SendableType {
             return SCENE_CONFIG;
         } else if (builder instanceof UnitTemplate.Builder) {
             return UNIT_TEMPLATE;
+        } else if (builder instanceof UserConfig.Builder) {
+            return USER_CONFIG;
+        } else if (builder instanceof GroupConfig.Builder) {
+            return GROUP_CONFIG;
         } else {
             return null;
         }

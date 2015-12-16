@@ -150,5 +150,11 @@
             <version>${global.rm.version}</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>de.citec</groupId>
+            <artifactId>rem.usr.remote</artifactId>
+            <version>${global.rm.version}</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

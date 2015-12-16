@@ -22,6 +22,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
+import rst.authorization.GroupConfigType;
+import rst.authorization.UserConfigType.UserConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.spatial.LocationConfigType.LocationConfig;
 
@@ -90,6 +92,14 @@ public class MessageComboBox extends ComboBox<Message> {
                     }
                 }
             }
+            if (parentBuilder instanceof GroupConfigType.GroupConfig.Builder) {
+                for (String memberId : ((GroupConfigType.GroupConfig.Builder) parentBuilder).getMemberIdList()) {
+                    if (memberId.equals(leafValue)) {
+                        continue;
+                    }
+                    list.remove(RemotePool.getInstance().getById(memberId, UserConfig.newBuilder()).build());
+                }
+            }
             Collections.sort(list, new Comparator<Message>() {
 
                 @Override
@@ -121,6 +131,8 @@ public class MessageComboBox extends ComboBox<Message> {
                     return LocationConfig.getDefaultInstance();
                 case "device_class_id":
                     return DeviceClass.getDefaultInstance();
+                case "member_id":
+                    return UserConfig.getDefaultInstance();
             }
         }
         return null;
@@ -132,6 +144,8 @@ public class MessageComboBox extends ComboBox<Message> {
             return new LocationConfigComboBoxConverter();
         } else if (msg instanceof DeviceClass) {
             return new DefaultMessageComboBoxConverter();
+        } else if (msg instanceof UserConfig) {
+            return new UserConfigComboBoxConverter();
         }
         return null;
     }

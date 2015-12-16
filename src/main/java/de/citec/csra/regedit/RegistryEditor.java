@@ -25,6 +25,7 @@ import de.citec.jp.JPAppRegistryScope;
 import de.citec.jp.JPDeviceRegistryScope;
 import de.citec.jp.JPLocationRegistryScope;
 import de.citec.jp.JPSceneRegistryScope;
+import de.citec.jp.JPUserRegistryScope;
 import de.citec.jps.core.JPService;
 import de.citec.jps.preset.JPReadOnly;
 import de.citec.jul.exception.CouldNotPerformException;
@@ -34,6 +35,7 @@ import de.citec.jul.exception.printer.LogLevel;
 import de.citec.jul.extension.rsb.com.RSBRemoteService;
 import de.citec.jul.pattern.Observable;
 import de.citec.lm.remote.LocationRegistryRemote;
+import de.citec.pem.remote.UserRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +66,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.authorization.UserRegistryType.UserRegistry;
 import rst.homeautomation.control.agent.AgentRegistryType.AgentRegistry;
 import rst.homeautomation.control.app.AppRegistryType.AppRegistry;
 import rst.homeautomation.control.scene.SceneRegistryType.SceneRegistry;
@@ -87,12 +90,13 @@ public class RegistryEditor extends Application {
     private MenuBar menuBar;
     private Menu fileMenu;
     private MenuItem sortMenuItem, resyncMenuItem;
-    private TabPane registryTabPane, deviceRegistryTabPane, locationRegistryTabPane;
-    private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab;
+    private TabPane registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane;
+    private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab;
     private Tab locationConfigTab, connectionConfigTab;
-    private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator;
-    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView;
+    private Tab userConfigTab, groupConfigTab;
+    private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator, userRegistryProgessInidicator;
+    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView, userConfigTreeTableview, groupConfigTreeTableView;
     private final Map<String, Boolean> intialized;
 
     public RegistryEditor() throws InstantiationException {
@@ -103,6 +107,7 @@ public class RegistryEditor extends Application {
         intialized.put(AgentRegistry.class.getSimpleName(), Boolean.FALSE);
         intialized.put(AppRegistry.class.getSimpleName(), Boolean.FALSE);
         intialized.put(SceneRegistry.class.getSimpleName(), Boolean.FALSE);
+        intialized.put(UserRegistry.class.getSimpleName(), Boolean.FALSE);
     }
 
     @Override
@@ -118,13 +123,15 @@ public class RegistryEditor extends Application {
         sceneRegistryTab = new Tab("SceneRegistry");
         agentRegistryTab = new Tab("AgentRegistry");
         appRegistryTab = new Tab("AppRegistry");
-        registryTabPane.getTabs().addAll(deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab);
+        userRegistryTab = new Tab("UserRegistry");
+        registryTabPane.getTabs().addAll(deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab);
 
         deviceRegistryProgressIndicator = new ProgressIndicator();
         locationRegistryprogressIndicator = new ProgressIndicator();
         appRegistryprogressIndicator = new ProgressIndicator();
         agentRegistryProgressIndicator = new ProgressIndicator();
         sceneRegistryprogressIndicator = new ProgressIndicator();
+        userRegistryProgessInidicator = new ProgressIndicator();
 
         deviceClassTreeTableView = new RegistryTreeTableView(SendableType.DEVICE_CLASS);
         deviceConfigTreeTableView = new RegistryTreeTableView(SendableType.DEVICE_CONFIG);
@@ -134,6 +141,8 @@ public class RegistryEditor extends Application {
         agentConfigTreeTableView = new RegistryTreeTableView(SendableType.AGENT_CONFIG);
         appConfigTreeTableView = new RegistryTreeTableView(SendableType.APP_CONFIG);
         unitTemplateTreeTableView = new RegistryTreeTableView(SendableType.UNIT_TEMPLATE);
+        userConfigTreeTableview = new RegistryTreeTableView(SendableType.USER_CONFIG);
+        groupConfigTreeTableView = new RegistryTreeTableView(SendableType.GROUP_CONFIG);
 
         deviceRegistryTabPane = new TabPane();
         deviceRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -152,6 +161,14 @@ public class RegistryEditor extends Application {
         connectionConfigTab = new Tab("ConnectionConfig");
         connectionConfigTab.setContent(connectionConfigTreeTableView.getVBox());
         locationRegistryTabPane.getTabs().addAll(connectionConfigTab, locationConfigTab);
+
+        userRegistryTabPane = new TabPane();
+        userRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        userConfigTab = new Tab("UserConfig");
+        userConfigTab.setContent(userConfigTreeTableview.getVBox());
+        groupConfigTab = new Tab("GroupConfig");
+        groupConfigTab.setContent(groupConfigTreeTableView.getVBox());
+        userRegistryTabPane.getTabs().addAll(userConfigTab, groupConfigTab);
 
         sortMenuItem = new MenuItem("Sort");
         sortMenuItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -221,6 +238,8 @@ public class RegistryEditor extends Application {
         agentConfigTreeTableView.addWidthProperty(scene.widthProperty());
         appConfigTreeTableView.addWidthProperty(scene.widthProperty());
         unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
+        userConfigTreeTableview.addWidthProperty(scene.widthProperty());
+        groupConfigTreeTableView.addWidthProperty(scene.widthProperty());
 
         deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
         deviceConfigTreeTableView.addHeightProperty(scene.heightProperty());
@@ -228,8 +247,8 @@ public class RegistryEditor extends Application {
         connectionConfigTreeTableView.addHeightProperty(scene.heightProperty());
         sceneConfigTreeTableView.addHeightProperty(scene.heightProperty());
         agentConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        appConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        unitTemplateTreeTableView.addHeightProperty(scene.heightProperty());
+        userConfigTreeTableview.addHeightProperty(scene.heightProperty());
+        groupConfigTreeTableView.addHeightProperty(scene.heightProperty());
 
         primaryStage.setTitle("Registry Editor");
         try {
@@ -305,9 +324,6 @@ public class RegistryEditor extends Application {
             @Override
             public void run() {
                 Tab tab = getRegistryTabByRemote(remote);
-                if (tab.equals(locationRegistryTab)) {
-                    int i = 0;
-                }
                 if (!remote.isConnected() || !remote.isActive()) {
                     tab.setContent(getProgressindicatorByRemote(remote));
                     return;
@@ -384,6 +400,18 @@ public class RegistryEditor extends Application {
             agentConfigTreeTableView.getListDiff().diff(data.getAgentConfigList());
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
             return agentConfigTreeTableView;
+        } else if (msg instanceof UserRegistry) {
+            UserRegistry data = (UserRegistry) msg;
+            userConfigTreeTableview.setRoot(new GenericListContainer<>(UserRegistry.USER_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            userConfigTreeTableview.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_CONFIG));
+            userConfigTreeTableview.getListDiff().diff(data.getUserConfigList());
+
+            groupConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistry.GROUP_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            groupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.GROUP_CONFIG));
+            groupConfigTreeTableView.getListDiff().diff(data.getGroupConfigList());
+
+            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
+            return userRegistryTabPane;
         }
 
         return null;
@@ -413,6 +441,11 @@ public class RegistryEditor extends Application {
             AgentRegistry data = (AgentRegistry) msg;
             agentConfigTreeTableView.update(data.getAgentConfigList());
             return agentConfigTreeTableView;
+        } else if (msg instanceof UserRegistry) {
+            UserRegistry data = (UserRegistry) msg;
+            userConfigTreeTableview.update(data.getUserConfigList());
+            groupConfigTreeTableView.update(data.getGroupConfigList());
+            return userRegistryTabPane;
         }
         return null;
     }
@@ -428,6 +461,8 @@ public class RegistryEditor extends Application {
             return appRegistryTab;
         } else if (remote instanceof AgentRegistryRemote) {
             return agentRegistryTab;
+        } else if (remote instanceof UserRegistryRemote) {
+            return userRegistryTab;
         }
         return null;
     }
@@ -443,6 +478,8 @@ public class RegistryEditor extends Application {
             return appRegistryprogressIndicator;
         } else if (remote instanceof AgentRegistryRemote) {
             return agentRegistryProgressIndicator;
+        } else if (remote instanceof UserRegistryRemote) {
+            return userRegistryProgessInidicator;
         }
         return null;
     }
@@ -461,6 +498,7 @@ public class RegistryEditor extends Application {
         JPService.registerProperty(JPSceneRegistryScope.class);
         JPService.registerProperty(JPAgentRegistryScope.class);
         JPService.registerProperty(JPAppRegistryScope.class);
+        JPService.registerProperty(JPUserRegistryScope.class);
         JPService.parseAndExitOnError(args);
 
         launch(args);

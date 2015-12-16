@@ -5,6 +5,7 @@
  */
 package de.citec.csra.regedit.view;
 
+import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.regedit.RegistryEditor;
 import de.citec.csra.regedit.util.SendableType;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
@@ -62,14 +63,12 @@ public class TreeTableViewContextMenu extends ContextMenu {
                             newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultConnectionConfig());
                             break;
                         default:
-                            TreeTableViewContextMenu.this.getItems().clear();
+                            newNode = new GenericNodeContainer("", (GeneratedMessage.Builder) type.getDefaultInstanceForType().toBuilder());
                     }
 
-                    if (newNode != null) {
-                        newNode.setExpanded(true);
-                        newNode.setChanged(true);
-                        treeTableView.getRoot().getChildren().add(newNode);
-                    }
+                    newNode.setExpanded(true);
+                    newNode.setChanged(true);
+                    treeTableView.getRoot().getChildren().add(newNode);
                 } catch (de.citec.jul.exception.InstantiationException ex) {
                     RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                 }

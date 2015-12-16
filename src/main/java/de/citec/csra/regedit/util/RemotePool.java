@@ -15,12 +15,14 @@ import de.citec.jp.JPAppRegistryScope;
 import de.citec.jp.JPDeviceRegistryScope;
 import de.citec.jp.JPLocationRegistryScope;
 import de.citec.jp.JPSceneRegistryScope;
+import de.citec.jp.JPUserRegistryScope;
 import de.citec.jps.core.JPService;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InitializationException;
 import de.citec.jul.exception.InstantiationException;
 import de.citec.jul.extension.rsb.com.RSBRemoteService;
 import de.citec.lm.remote.LocationRegistryRemote;
+import de.citec.pem.remote.UserRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,6 +32,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.authorization.GroupConfigType.GroupConfig;
+import rst.authorization.UserConfigType.UserConfig;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
@@ -54,6 +58,7 @@ public class RemotePool {
     private final SceneRegistryRemote sceneRemote;
     private final AgentRegistryRemote agentRemote;
     private final AppRegistryRemote appRemote;
+    private final UserRegistryRemote userRemote;
 
     public static RemotePool getInstance() throws InstantiationException {
         if (remotePool == null) {
@@ -68,6 +73,7 @@ public class RemotePool {
         this.sceneRemote = new SceneRegistryRemote();
         this.agentRemote = new AgentRegistryRemote();
         this.appRemote = new AppRegistryRemote();
+        this.userRemote = new UserRegistryRemote();
     }
 
     public void init() throws InitializationException {
@@ -76,6 +82,7 @@ public class RemotePool {
         sceneRemote.init(JPService.getProperty(JPSceneRegistryScope.class).getValue());
         agentRemote.init(JPService.getProperty(JPAgentRegistryScope.class).getValue());
         appRemote.init(JPService.getProperty(JPAppRegistryScope.class).getValue());
+        userRemote.init(JPService.getProperty(JPUserRegistryScope.class).getValue());
     }
 
     public void shutdown() {
@@ -84,6 +91,7 @@ public class RemotePool {
         sceneRemote.shutdown();
         agentRemote.shutdown();
         appRemote.shutdown();
+        userRemote.shutdown();
     }
 
     public <M extends Message> M register(Message msg) throws CouldNotPerformException {
@@ -203,6 +211,8 @@ public class RemotePool {
             return sceneRemote;
         } else if (builder instanceof AppConfig.Builder) {
             return appRemote;
+        } else if (builder instanceof UserConfig.Builder || builder instanceof GroupConfig.Builder) {
+            return userRemote;
         } else {
             throw new CouldNotPerformException("No matching remote for type [" + builder.getDescriptorForType().getName() + "]found");
         }
@@ -228,6 +238,10 @@ public class RemotePool {
         return appRemote;
     }
 
+    public UserRegistryRemote getUserRemote() {
+        return userRemote;
+    }
+
     public List<RSBRemoteService> getRemotes() {
         List<RSBRemoteService> remotes = new ArrayList<>();
         remotes.add(appRemote);
@@ -235,6 +249,7 @@ public class RemotePool {
         remotes.add(deviceRemote);
         remotes.add(locationRemote);
         remotes.add(sceneRemote);
+        remotes.add(userRemote);
         return remotes;
     }
 }

@@ -9,6 +9,7 @@ import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.jul.exception.CouldNotPerformException;
+import rst.authorization.UserConfigType.UserConfig;
 
 /**
  *
@@ -30,6 +31,7 @@ public class DescriptionCell extends RowCell {
             setContextMenu(null);
         } else if (item instanceof Node) {
             setText(convertDescriptorToReadable(item.getDescriptor()));
+            //TODO: thuxohl change this part
             if (item instanceof GenericNodeContainer) {
                 GenericNodeContainer container = (GenericNodeContainer) item;
                 try {
@@ -48,7 +50,12 @@ public class DescriptionCell extends RowCell {
                     } catch (Exception exc) {
                     }
                 }
+                if (((GenericNodeContainer) item).getBuilder() instanceof UserConfig.Builder) {
+                    UserConfig.Builder user = (UserConfig.Builder) ((GenericNodeContainer) item).getBuilder();
+                    setText(user.getUserName() + " (" + user.getFirstName() + " " + user.getLastName() + ")");
+                }
             }
+
         }
     }
 
