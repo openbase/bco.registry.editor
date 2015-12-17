@@ -16,7 +16,6 @@ import de.citec.jp.JPDeviceRegistryScope;
 import de.citec.jp.JPLocationRegistryScope;
 import de.citec.jp.JPSceneRegistryScope;
 import de.citec.jp.JPUserRegistryScope;
-import de.citec.jps.core.JPService;
 import de.citec.jul.exception.CouldNotPerformException;
 import de.citec.jul.exception.InitializationException;
 import de.citec.jul.exception.InstantiationException;
@@ -30,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.dc.jps.core.JPService;
+import org.dc.jps.exception.JPServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.authorization.GroupConfigType.GroupConfig;
@@ -77,12 +78,16 @@ public class RemotePool {
     }
 
     public void init() throws InitializationException {
-        deviceRemote.init(JPService.getProperty(JPDeviceRegistryScope.class).getValue());
-        locationRemote.init(JPService.getProperty(JPLocationRegistryScope.class).getValue());
-        sceneRemote.init(JPService.getProperty(JPSceneRegistryScope.class).getValue());
-        agentRemote.init(JPService.getProperty(JPAgentRegistryScope.class).getValue());
-        appRemote.init(JPService.getProperty(JPAppRegistryScope.class).getValue());
-        userRemote.init(JPService.getProperty(JPUserRegistryScope.class).getValue());
+        try {
+            deviceRemote.init(JPService.getProperty(JPDeviceRegistryScope.class).getValue());
+            locationRemote.init(JPService.getProperty(JPLocationRegistryScope.class).getValue());
+            sceneRemote.init(JPService.getProperty(JPSceneRegistryScope.class).getValue());
+            agentRemote.init(JPService.getProperty(JPAgentRegistryScope.class).getValue());
+            appRemote.init(JPService.getProperty(JPAppRegistryScope.class).getValue());
+            userRemote.init(JPService.getProperty(JPUserRegistryScope.class).getValue());
+        } catch (JPServiceException ex) {
+            throw new InitializationException(this, ex);
+        }
     }
 
     public void shutdown() {
