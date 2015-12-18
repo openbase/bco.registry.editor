@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -284,10 +285,10 @@ public class RegistryEditor extends Application {
 
     public void registerObserver() throws Exception {
 
-        final List<Future<Void>> registrationFutures = new ArrayList<>();
+        final Map<RSBRemoteService, Future<Void>> registrationFutureMap = new HashMap<>();
 
         for (RSBRemoteService remote : remotePool.getRemotes()) {
-            registrationFutures.add(executerService.submit(new Callable<Void>() {
+            registrationFutureMap.put(remote, executerService.submit(new Callable<Void>() {
 
                 @Override
                 public Void call() throws Exception {
@@ -295,6 +296,13 @@ public class RegistryEditor extends Application {
                         remote.addObserver((Observable source, Object data) -> {
                             updateTab(remote);
                         });
+                        if (remote.equals(remotePool.getDeviceRemote())) {
+//                            logger.info("Device tree cannot be created without activated location remote. Waiting for its activation...");
+                            while (!registrationFutureMap.containsKey(remotePool.getLocationRemote())) {
+                                Thread.yield();
+                            }
+                            registrationFutureMap.get(remotePool.getLocationRemote()).get();
+                        }
                         remote.activate();
                     } catch (InterruptedException | CouldNotPerformException ex) {
                         printException(ex, logger, LogLevel.ERROR);
@@ -304,9 +312,11 @@ public class RegistryEditor extends Application {
             }));
         }
 
-        for (Future future : registrationFutures) {
-            future.get();
-        }
+//        remotePool.getAgentRemote().isActive();
+//        for(Map.Entry<RSBRemoteService, Future<Void>> entry : registrationFutureMap.entrySet()) {
+//            entry.getValue().get();
+//        }
+//        registrationFutureMap.get(remotePool.getLocationRemote()).get();
     }
 
     @Override

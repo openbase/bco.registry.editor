@@ -251,8 +251,8 @@ public class RemotePool {
         List<RSBRemoteService> remotes = new ArrayList<>();
         remotes.add(appRemote);
         remotes.add(agentRemote);
-        remotes.add(deviceRemote);
         remotes.add(locationRemote);
+        remotes.add(deviceRemote);
         remotes.add(sceneRemote);
         remotes.add(userRemote);
         return remotes;
