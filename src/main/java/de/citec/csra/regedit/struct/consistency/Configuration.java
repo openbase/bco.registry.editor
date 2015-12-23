@@ -18,6 +18,7 @@ import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
 import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.homeautomation.unit.UnitTemplateConfigType.UnitTemplateConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.rsb.ScopeType.Scope;
@@ -87,6 +88,8 @@ public class Configuration {
             return !("id".equals(fieldName));
         } else if (builder instanceof UserGroupConfig.Builder) {
             return !("id".equals(fieldName));
+        } else if (builder instanceof UnitGroupConfig.Builder) {
+            return !("id".equals(fieldName));
         }
         return true;
     }
@@ -101,6 +104,7 @@ public class Configuration {
                 || (builder instanceof SceneConfig.Builder)
                 || (builder instanceof ConnectionConfig.Builder)
                 || (builder instanceof UserConfig.Builder)
-                || (builder instanceof UserGroupConfig.Builder));
+                || (builder instanceof UserGroupConfig.Builder)
+                || (builder instanceof UnitGroupConfig.Builder));
     }
 }

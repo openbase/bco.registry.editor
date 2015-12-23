@@ -25,6 +25,8 @@ import javafx.util.Callback;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
+import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
@@ -39,7 +41,7 @@ public class MessageComboBox extends ComboBox<Message> {
     public MessageComboBox(ValueCell cell, Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         super();
         this.setVisibleRowCount(DEFAULT_VISIBLE_ROW_COUNT);
-        this.converter = getConverterByMessageType(fieldName);
+        this.converter = getConverterByMessageType(fieldName, parentBuilder);
         this.setCellFactory(new Callback<ListView<Message>, ListCell<Message>>() {
 
             @Override
@@ -73,7 +75,7 @@ public class MessageComboBox extends ComboBox<Message> {
 
     private ObservableList<Message> sortedList(Message.Builder parentBuilder, String fieldName, Object leafValue) throws InstantiationException {
         try {
-            List<Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName));
+            List<? extends Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
             if (parentBuilder instanceof LocationConfig.Builder) {
                 list.remove(RemotePool.getInstance().getById(FieldDescriptorUtil.getId(parentBuilder), parentBuilder).build());
                 for (String childId : ((LocationConfig.Builder) parentBuilder).getChildIdList()) {
@@ -100,6 +102,15 @@ public class MessageComboBox extends ComboBox<Message> {
                     list.remove(RemotePool.getInstance().getById(memberId, UserConfig.newBuilder()).build());
                 }
             }
+            if (parentBuilder instanceof UnitGroupConfig.Builder) {
+                list = RemotePool.getInstance().getDeviceRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), ((UnitGroupConfig.Builder) parentBuilder).getServiceTypeList());
+                for (String memberId : ((UnitGroupConfig.Builder) parentBuilder).getMemberIdList()) {
+                    if (memberId.equals(leafValue)) {
+                        continue;
+                    }
+                    list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()).build());
+                }
+            }
             Collections.sort(list, new Comparator<Message>() {
 
                 @Override
@@ -121,7 +132,7 @@ public class MessageComboBox extends ComboBox<Message> {
         }
     }
 
-    public static GeneratedMessage getMessageEnumBoxType(String fieldName) {
+    public static GeneratedMessage getMessageEnumBoxType(String fieldName, Message.Builder parentBuilder) {
         if (null != fieldName) {
             switch (fieldName) {
                 case "location_id":
@@ -132,22 +143,25 @@ public class MessageComboBox extends ComboBox<Message> {
                 case "device_class_id":
                     return DeviceClass.getDefaultInstance();
                 case "member_id":
-                    return UserConfig.getDefaultInstance();
+                    if (parentBuilder instanceof UserConfig.Builder) {
+                        return UserConfig.getDefaultInstance();
+                    } else if (parentBuilder instanceof UnitGroupConfig.Builder) {
+                        return UnitConfig.getDefaultInstance();
+                    }
             }
         }
         return null;
     }
 
-    public MessageComboBoxConverterInterface getConverterByMessageType(String fieldName) {
-        GeneratedMessage msg = getMessageEnumBoxType(fieldName);
+    public MessageComboBoxConverterInterface getConverterByMessageType(String fieldName, Message.Builder parentBuilder) {
+        GeneratedMessage msg = getMessageEnumBoxType(fieldName, parentBuilder);
         if (msg instanceof LocationConfig) {
             return new LocationConfigComboBoxConverter();
-        } else if (msg instanceof DeviceClass) {
-            return new DefaultMessageComboBoxConverter();
         } else if (msg instanceof UserConfig) {
             return new UserConfigComboBoxConverter();
+        } else {
+            return new DefaultMessageComboBoxConverter();
         }
-        return null;
     }
 
     private class MessageComboBoxCell extends ListCell<Message> {

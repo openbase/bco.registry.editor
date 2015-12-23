@@ -90,11 +90,11 @@ public class RegistryEditor extends Application {
     private MenuItem sortMenuItem, resyncMenuItem;
     private TabPane registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane;
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab;
-    private Tab deviceClassTab, deviceConfigTab, unitTemplateTab;
+    private Tab deviceClassTab, deviceConfigTab, unitTemplateTab, unitGroupTab;
     private Tab locationConfigTab, connectionConfigTab;
     private Tab userConfigTab, userGroupConfigTab;
     private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator, userRegistryProgessInidicator;
-    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView, userConfigTreeTableview, userGroupConfigTreeTableView;
+    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView, userConfigTreeTableview, userGroupConfigTreeTableView, unitGroupConfigTreeTableView;
     private final Map<String, Boolean> intialized;
 
     public RegistryEditor() throws InstantiationException {
@@ -140,17 +140,20 @@ public class RegistryEditor extends Application {
         appConfigTreeTableView = new RegistryTreeTableView(SendableType.APP_CONFIG);
         unitTemplateTreeTableView = new RegistryTreeTableView(SendableType.UNIT_TEMPLATE);
         userConfigTreeTableview = new RegistryTreeTableView(SendableType.USER_CONFIG);
-        userGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.GROUP_CONFIG);
+        userGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.USER_GROUP_CONFIG);
+        unitGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_GROUP_CONFIG);
 
         deviceRegistryTabPane = new TabPane();
         deviceRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         deviceClassTab = new Tab("DeviceClass");
         deviceConfigTab = new Tab("DeviceConfig");
         unitTemplateTab = new Tab("UnitTemplate");
+        unitGroupTab = new Tab("UnitGroup");
         deviceClassTab.setContent(deviceClassTreeTableView.getVBox());
         deviceConfigTab.setContent(deviceConfigTreeTableView.getVBox());
         unitTemplateTab.setContent(unitTemplateTreeTableView.getVBox());
-        deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab, unitTemplateTab);
+        unitGroupTab.setContent(unitGroupConfigTreeTableView.getVBox());
+        deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab, unitTemplateTab, unitGroupTab);
 
         locationRegistryTabPane = new TabPane();
         locationRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -238,6 +241,7 @@ public class RegistryEditor extends Application {
         unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
         userConfigTreeTableview.addWidthProperty(scene.widthProperty());
         userGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        unitGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
 
         deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
         deviceConfigTreeTableView.addHeightProperty(scene.heightProperty());
@@ -247,6 +251,7 @@ public class RegistryEditor extends Application {
         agentConfigTreeTableView.addHeightProperty(scene.heightProperty());
         userConfigTreeTableview.addHeightProperty(scene.heightProperty());
         userGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        unitGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
 
         primaryStage.setTitle("Registry Editor");
         try {
@@ -372,6 +377,10 @@ public class RegistryEditor extends Application {
             unitTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_TEMPLATE));
             unitTemplateTreeTableView.getListDiff().diff(data.getUnitTemplateList());
 
+            unitGroupConfigTreeTableView.setRoot(new GenericListContainer<>(DeviceRegistry.UNIT_GROUP_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG));
+            unitGroupConfigTreeTableView.getListDiff().diff(data.getUnitGroupConfigList());
+
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
             return deviceRegistryTabPane;
         } else if (msg instanceof LocationRegistry) {
@@ -414,7 +423,7 @@ public class RegistryEditor extends Application {
             userConfigTreeTableview.getListDiff().diff(data.getUserConfigList());
 
             userGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistry.USER_GROUP_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            userGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.GROUP_CONFIG));
+            userGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_GROUP_CONFIG));
             userGroupConfigTreeTableView.getListDiff().diff(data.getUserGroupConfigList());
 
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
@@ -430,6 +439,7 @@ public class RegistryEditor extends Application {
             deviceClassTreeTableView.update(data.getDeviceClassList());
             deviceConfigTreeTableView.update(data.getDeviceConfigList());
             unitTemplateTreeTableView.update(data.getUnitTemplateList());
+            unitGroupConfigTreeTableView.update(data.getUnitGroupConfigList());
             return deviceRegistryTabPane;
         } else if (msg instanceof LocationRegistry) {
             LocationRegistry data = (LocationRegistry) msg;

@@ -40,6 +40,8 @@ import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.ConnectionConfigType.ConnectionConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
@@ -206,7 +208,7 @@ public class RemotePool {
     }
 
     public RSBRemoteService getRemoteByMessageBuilder(Message.Builder builder) throws CouldNotPerformException {
-        if (builder instanceof DeviceClass.Builder || builder instanceof DeviceConfig.Builder || builder instanceof UnitTemplate.Builder) {
+        if (builder instanceof DeviceClass.Builder || builder instanceof DeviceConfig.Builder || builder instanceof UnitTemplate.Builder || builder instanceof UnitGroupConfig.Builder || builder instanceof UnitConfig.Builder) {
             return deviceRemote;
         } else if (builder instanceof LocationConfig.Builder || builder instanceof ConnectionConfig.Builder) {
             return locationRemote;

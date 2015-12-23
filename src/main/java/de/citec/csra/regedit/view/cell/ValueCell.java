@@ -81,7 +81,7 @@ public class ValueCell extends RowCell {
     private javafx.scene.Node getEditingGraphic() {
 
         javafx.scene.Node graphic = null;
-        Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor());
+        Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor(), leaf.getParent().getBuilder());
         if (type != null) {
             try {
                 graphic = new MessageComboBox(this, leaf.getParent().getBuilder(), leaf.getDescriptor());
