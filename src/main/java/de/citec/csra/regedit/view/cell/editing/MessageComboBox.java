@@ -22,7 +22,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
-import rst.authorization.GroupConfigType;
+import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.spatial.LocationConfigType.LocationConfig;
@@ -92,8 +92,8 @@ public class MessageComboBox extends ComboBox<Message> {
                     }
                 }
             }
-            if (parentBuilder instanceof GroupConfigType.GroupConfig.Builder) {
-                for (String memberId : ((GroupConfigType.GroupConfig.Builder) parentBuilder).getMemberIdList()) {
+            if (parentBuilder instanceof UserGroupConfig.Builder) {
+                for (String memberId : ((UserGroupConfig.Builder) parentBuilder).getMemberIdList()) {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }

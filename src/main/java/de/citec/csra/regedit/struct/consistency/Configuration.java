@@ -7,7 +7,7 @@ package de.citec.csra.regedit.struct.consistency;
 
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import rst.authorization.GroupConfigType.GroupConfig;
+import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
@@ -85,7 +85,7 @@ public class Configuration {
             return !("id".equals(fieldName));
         } else if (builder instanceof UserConfig.Builder) {
             return !("id".equals(fieldName));
-        } else if (builder instanceof GroupConfig.Builder) {
+        } else if (builder instanceof UserGroupConfig.Builder) {
             return !("id".equals(fieldName));
         }
         return true;
@@ -101,6 +101,6 @@ public class Configuration {
                 || (builder instanceof SceneConfig.Builder)
                 || (builder instanceof ConnectionConfig.Builder)
                 || (builder instanceof UserConfig.Builder)
-                || (builder instanceof GroupConfig.Builder));
+                || (builder instanceof UserGroupConfig.Builder));
     }
 }

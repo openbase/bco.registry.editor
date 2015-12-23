@@ -33,7 +33,7 @@ import org.dc.jps.core.JPService;
 import org.dc.jps.exception.JPServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.authorization.GroupConfigType.GroupConfig;
+import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
@@ -216,7 +216,7 @@ public class RemotePool {
             return sceneRemote;
         } else if (builder instanceof AppConfig.Builder) {
             return appRemote;
-        } else if (builder instanceof UserConfig.Builder || builder instanceof GroupConfig.Builder) {
+        } else if (builder instanceof UserConfig.Builder || builder instanceof UserGroupConfig.Builder) {
             return userRemote;
         } else {
             throw new CouldNotPerformException("No matching remote for type [" + builder.getDescriptorForType().getName() + "]found");

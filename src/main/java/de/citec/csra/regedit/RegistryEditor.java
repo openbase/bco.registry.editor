@@ -37,11 +37,8 @@ import de.citec.jul.pattern.Observable;
 import de.citec.lm.remote.LocationRegistryRemote;
 import de.citec.pem.remote.UserRegistryRemote;
 import de.citec.scm.remote.SceneRegistryRemote;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -95,9 +92,9 @@ public class RegistryEditor extends Application {
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab;
     private Tab locationConfigTab, connectionConfigTab;
-    private Tab userConfigTab, groupConfigTab;
+    private Tab userConfigTab, userGroupConfigTab;
     private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator, userRegistryProgessInidicator;
-    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView, userConfigTreeTableview, groupConfigTreeTableView;
+    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView, userConfigTreeTableview, userGroupConfigTreeTableView;
     private final Map<String, Boolean> intialized;
 
     public RegistryEditor() throws InstantiationException {
@@ -143,7 +140,7 @@ public class RegistryEditor extends Application {
         appConfigTreeTableView = new RegistryTreeTableView(SendableType.APP_CONFIG);
         unitTemplateTreeTableView = new RegistryTreeTableView(SendableType.UNIT_TEMPLATE);
         userConfigTreeTableview = new RegistryTreeTableView(SendableType.USER_CONFIG);
-        groupConfigTreeTableView = new RegistryTreeTableView(SendableType.GROUP_CONFIG);
+        userGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.GROUP_CONFIG);
 
         deviceRegistryTabPane = new TabPane();
         deviceRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -167,9 +164,9 @@ public class RegistryEditor extends Application {
         userRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         userConfigTab = new Tab("UserConfig");
         userConfigTab.setContent(userConfigTreeTableview.getVBox());
-        groupConfigTab = new Tab("GroupConfig");
-        groupConfigTab.setContent(groupConfigTreeTableView.getVBox());
-        userRegistryTabPane.getTabs().addAll(userConfigTab, groupConfigTab);
+        userGroupConfigTab = new Tab("UserGroupConfig");
+        userGroupConfigTab.setContent(userGroupConfigTreeTableView.getVBox());
+        userRegistryTabPane.getTabs().addAll(userConfigTab, userGroupConfigTab);
 
         sortMenuItem = new MenuItem("Sort");
         sortMenuItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -240,7 +237,7 @@ public class RegistryEditor extends Application {
         appConfigTreeTableView.addWidthProperty(scene.widthProperty());
         unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
         userConfigTreeTableview.addWidthProperty(scene.widthProperty());
-        groupConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        userGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
 
         deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
         deviceConfigTreeTableView.addHeightProperty(scene.heightProperty());
@@ -249,7 +246,7 @@ public class RegistryEditor extends Application {
         sceneConfigTreeTableView.addHeightProperty(scene.heightProperty());
         agentConfigTreeTableView.addHeightProperty(scene.heightProperty());
         userConfigTreeTableview.addHeightProperty(scene.heightProperty());
-        groupConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        userGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
 
         primaryStage.setTitle("Registry Editor");
         try {
@@ -416,9 +413,9 @@ public class RegistryEditor extends Application {
             userConfigTreeTableview.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_CONFIG));
             userConfigTreeTableview.getListDiff().diff(data.getUserConfigList());
 
-            groupConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistry.GROUP_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            groupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.GROUP_CONFIG));
-            groupConfigTreeTableView.getListDiff().diff(data.getGroupConfigList());
+            userGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistry.USER_GROUP_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            userGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.GROUP_CONFIG));
+            userGroupConfigTreeTableView.getListDiff().diff(data.getUserGroupConfigList());
 
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
             return userRegistryTabPane;
@@ -454,7 +451,7 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof UserRegistry) {
             UserRegistry data = (UserRegistry) msg;
             userConfigTreeTableview.update(data.getUserConfigList());
-            groupConfigTreeTableView.update(data.getGroupConfigList());
+            userGroupConfigTreeTableView.update(data.getUserGroupConfigList());
             return userRegistryTabPane;
         }
         return null;
