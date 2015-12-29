@@ -8,7 +8,7 @@ package de.citec.csra.regedit.view.cell;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
-import de.citec.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.CouldNotPerformException;
 import rst.authorization.UserConfigType.UserConfig;
 
 /**

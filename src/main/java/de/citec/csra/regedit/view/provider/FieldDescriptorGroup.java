@@ -11,8 +11,8 @@ import com.google.protobuf.Message;
 import de.citec.csra.regedit.RegistryEditor;
 import de.citec.csra.regedit.struct.consistency.StructureConsistencyKeeper;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
-import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.printer.LogLevel;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.printer.LogLevel;
 
 /**
  *

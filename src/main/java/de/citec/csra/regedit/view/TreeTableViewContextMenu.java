@@ -11,7 +11,7 @@ import de.citec.csra.regedit.util.SendableType;
 import de.citec.csra.regedit.struct.GenericNodeContainer;
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.util.RSTDefaultInstances;
-import de.citec.jul.exception.printer.LogLevel;
+import org.dc.jul.exception.printer.LogLevel;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
@@ -69,7 +69,7 @@ public class TreeTableViewContextMenu extends ContextMenu {
                     newNode.setExpanded(true);
                     newNode.setChanged(true);
                     treeTableView.getRoot().getChildren().add(newNode);
-                } catch (de.citec.jul.exception.InstantiationException ex) {
+                } catch (org.dc.jul.exception.InstantiationException ex) {
                     RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                 }
             }

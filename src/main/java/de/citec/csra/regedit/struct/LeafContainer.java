@@ -7,8 +7,8 @@ package de.citec.csra.regedit.struct;
 
 import com.google.protobuf.ProtocolMessageEnum;
 import de.citec.csra.regedit.RegistryEditor;
-import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.printer.LogLevel;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.printer.LogLevel;
 import org.slf4j.LoggerFactory;
 
 /**

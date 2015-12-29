@@ -7,7 +7,7 @@ package de.citec.csra.regedit.view.cell.editing;
 
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
-import de.citec.jul.extension.rsb.scope.ScopeGenerator;
+import org.dc.jul.extension.rsb.scope.ScopeGenerator;
 import rst.rsb.ScopeType.Scope;
 import rst.spatial.LocationConfigType.LocationConfig;
 

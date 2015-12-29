@@ -5,7 +5,7 @@
  */
 package de.citec.csra.regedit.view;
 
-import de.citec.jul.exception.printer.ExceptionPrinter;
+import org.dc.jul.exception.printer.ExceptionPrinter;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Font;
 

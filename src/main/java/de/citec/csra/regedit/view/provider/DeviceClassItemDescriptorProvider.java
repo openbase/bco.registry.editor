@@ -7,7 +7,7 @@ package de.citec.csra.regedit.view.provider;
 
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.util.RemotePool;
-import de.citec.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.CouldNotPerformException;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 

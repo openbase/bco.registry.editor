@@ -10,7 +10,7 @@ import com.google.protobuf.Message;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.view.cell.ValueCell;
 import de.citec.csra.regedit.util.RemotePool;
-import de.citec.jul.exception.InstantiationException;
+import org.dc.jul.exception.InstantiationException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;

@@ -6,7 +6,7 @@
 package de.citec.csra.regedit.view.provider;
 
 import com.google.protobuf.Message;
-import de.citec.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.CouldNotPerformException;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.LoggerFactory;

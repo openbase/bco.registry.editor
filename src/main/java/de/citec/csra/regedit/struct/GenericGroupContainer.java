@@ -10,8 +10,8 @@ import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.view.provider.TreeItemDescriptorProvider;
-import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.InstantiationException;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.InstantiationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +63,7 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
                 groupBuilderList.clear();
             }
         } catch (CouldNotPerformException ex) {
-            throw new de.citec.jul.exception.InstantiationException(this, ex);
+            throw new org.dc.jul.exception.InstantiationException(this, ex);
         }
     }
 

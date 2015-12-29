@@ -14,7 +14,7 @@ import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.struct.NodeContainer;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
 import de.citec.csra.regedit.util.RemotePool;
-import de.citec.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.CouldNotPerformException;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;

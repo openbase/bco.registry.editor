@@ -7,8 +7,8 @@ package de.citec.csra.regedit.view.provider;
 
 import com.google.protobuf.Message;
 import de.citec.csra.regedit.util.RemotePool;
-import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.extension.rsb.scope.ScopeGenerator;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.extension.rsb.scope.ScopeGenerator;
 import rst.homeautomation.device.DeviceConfigType;
 import rst.spatial.LocationConfigType.LocationConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;

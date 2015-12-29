@@ -8,7 +8,7 @@ package de.citec.csra.regedit.struct.converter;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
-import de.citec.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.CouldNotPerformException;
 import java.util.HashMap;
 import java.util.Map;
 

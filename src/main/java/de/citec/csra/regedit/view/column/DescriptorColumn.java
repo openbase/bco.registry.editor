@@ -10,7 +10,7 @@ import static de.citec.csra.regedit.view.column.ValueColumn.VALUE_COLUMN_PROPORT
 import de.citec.csra.regedit.struct.Node;
 import de.citec.csra.regedit.struct.NodeContainer;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
-import de.citec.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.CouldNotPerformException;
 import java.util.Comparator;
 import java.util.Map;
 import javafx.beans.property.ReadOnlyDoubleProperty;

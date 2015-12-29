@@ -10,10 +10,10 @@ import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
 import com.google.protobuf.GeneratedMessage;
 import de.citec.csra.regedit.struct.consistency.Configuration;
 import de.citec.csra.regedit.util.FieldDescriptorUtil;
-import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.exception.InstantiationException;
-import de.citec.jul.exception.NotAvailableException;
-import de.citec.jul.extension.protobuf.BuilderProcessor;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.InstantiationException;
+import org.dc.jul.exception.NotAvailableException;
+import org.dc.jul.extension.protobuf.BuilderProcessor;
 import java.util.List;
 import rst.configuration.EntryType;
 

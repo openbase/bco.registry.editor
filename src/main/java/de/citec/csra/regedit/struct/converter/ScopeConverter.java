@@ -5,8 +5,8 @@
  */
 package de.citec.csra.regedit.struct.converter;
 
-import de.citec.jul.exception.CouldNotPerformException;
-import de.citec.jul.extension.rsb.scope.ScopeGenerator;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.extension.rsb.scope.ScopeGenerator;
 import java.util.HashMap;
 import java.util.Map;
 import rst.rsb.ScopeType.Scope;
