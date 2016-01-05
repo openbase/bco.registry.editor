@@ -84,8 +84,8 @@
 	
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <global.jul.version>0.5-SNAPSHOT</global.jul.version>
-        <global.rm.version>0.7-SNAPSHOT</global.rm.version>
+        <dependency.jul.version>0.5-SNAPSHOT</dependency.jul.version>
+        <dependency.bco.registry.version>0.7-SNAPSHOT</dependency.bco.registry.version>
     </properties>
 	
     <scm>
@@ -103,57 +103,57 @@
         <dependency>
             <groupId>org.dc</groupId>
             <artifactId>jul.extension.rsb.com</artifactId>
-            <version>${global.jul.version}</version>
+            <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>org.dc</groupId>
             <artifactId>jul.storage</artifactId>
-            <version>${global.jul.version}</version>
+            <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>org.dc</groupId>
             <artifactId>jul.extension.rsb.scope</artifactId>
-            <version>${global.jul.version}</version>
+            <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>org.dc</groupId>
             <artifactId>jul.processing</artifactId>
-            <version>${global.jul.version}</version>
+            <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
             <artifactId>dm.remote</artifactId>
-            <version>${global.rm.version}</version>
+            <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
             <artifactId>lm.remote</artifactId>
-            <version>${global.rm.version}</version>
+            <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
             <artifactId>scm.remote</artifactId>
-            <version>${global.rm.version}</version>
+            <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
             <artifactId>agm.remote</artifactId>
-            <version>${global.rm.version}</version>
+            <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
             <artifactId>apm.remote</artifactId>
-            <version>${global.rm.version}</version>
+            <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
             <artifactId>rem.usr.remote</artifactId>
-            <version>${global.rm.version}</version>
+            <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
     </dependencies>
