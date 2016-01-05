@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.citec.csra</groupId>
-    <artifactId>registry-editor</artifactId>
+    <groupId>org.dc.bco.registry</groupId>
+    <artifactId>editor</artifactId>
     <version>0.7-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -34,7 +34,7 @@
                 <configuration>
                     <programs>
                         <program>
-                            <mainClass>de.citec.csra.regedit.RegistryEditor</mainClass>
+                            <mainClass>org.dc.bco.registry.editor.RegistryEditor</mainClass>
                             <id>registry-editor</id>
                             <platforms>
                                 <platform>unix</platform>
@@ -50,7 +50,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.citec.csra.regedit.RegistryEditor</mainClass>
+                            <mainClass>org.dc.bco.registry.editor.RegistryEditor</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -122,37 +122,37 @@
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
-            <artifactId>dm.remote</artifactId>
+            <artifactId>registry.device.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
-            <artifactId>lm.remote</artifactId>
+            <artifactId>registry.location.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
-            <artifactId>scm.remote</artifactId>
+            <artifactId>registry.scene.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
-            <artifactId>agm.remote</artifactId>
+            <artifactId>registry.agent.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
-            <artifactId>apm.remote</artifactId>
+            <artifactId>registry.app.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.dc.bco</groupId>
-            <artifactId>rem.usr.remote</artifactId>
+            <artifactId>registry.user.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
