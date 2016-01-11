@@ -3,7 +3,7 @@
 
     <groupId>org.dc.bco.registry</groupId>
     <artifactId>editor</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>RegistryEditor</name>
@@ -119,8 +119,8 @@
 	
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dependency.jul.version>0.5-SNAPSHOT</dependency.jul.version>
-        <dependency.bco.registry.version>0.7-SNAPSHOT</dependency.bco.registry.version>
+        <dependency.jul.version>[1.0,1.1-SNAPSHOT)</dependency.jul.version>
+        <dependency.bco.registry.version>[1.0,1.1-SNAPSHOT)</dependency.bco.registry.version>
     </properties>
 	
     <scm>
