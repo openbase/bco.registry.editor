@@ -30,6 +30,8 @@ import org.dc.jul.exception.InstantiationException;
 import org.dc.jul.exception.printer.LogLevel;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -40,6 +42,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.dc.jul.extension.rsb.scope.ScopeGenerator;
 import rst.configuration.EntryType;
 import rst.homeautomation.device.DeviceConfigType;
 import rst.spatial.LocationConfigType.LocationConfig;
@@ -49,15 +52,15 @@ import rst.spatial.LocationConfigType.LocationConfig;
  * @author thuxohl
  */
 public class ValueCell extends RowCell {
-
+    
     protected final Button applyButton, cancelButton;
     protected final HBox buttonLayout;
     protected LeafContainer leaf;
-
+    
     protected SimpleObjectProperty<Boolean> changed = null;
     protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-
+    
     public ValueCell() {
         super();
         applyButton = new Button("Apply");
@@ -67,19 +70,19 @@ public class ValueCell extends RowCell {
         buttonLayout = new HBox(applyButton, cancelButton);
         this.changeListener = new ChangedListener();
     }
-
+    
     @Override
     public void startEdit() {
         super.startEdit();
-
+        
         if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
             setGraphic(getEditingGraphic());
         }
     }
-
+    
     private javafx.scene.Node getEditingGraphic() {
-
+        
         javafx.scene.Node graphic = null;
         Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor(), leaf.getParent().getBuilder());
         if (type != null) {
@@ -101,17 +104,17 @@ public class ValueCell extends RowCell {
         }
         return graphic;
     }
-
+    
     @Override
     public void cancelEdit() {
         super.cancelEdit();
         setGraphic(null);
     }
-
+    
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-
+        
         if (empty) {
             setGraphic(null);
             setText("");
@@ -125,9 +128,17 @@ public class ValueCell extends RowCell {
             } else if (((Leaf) item).getValue() instanceof EnumValueDescriptor) {
                 text = (((EnumValueDescriptor) ((Leaf) item).getValue()).getName());
             } else if ((((Leaf) item).getValue() != null)) {
-                text = ((Leaf) item).getValue().toString();
+                if ("location_id".equals(item.getDescriptor()) || "parent_id".equals(item.getDescriptor()) || "child_id".equals(item.getDescriptor())) {
+                    try {
+                        text = ScopeGenerator.generateStringRep(remotePool.getLocationRemote().getLocationConfigById((String) ((Leaf) item).getValue()).getScope());
+                    } catch (CouldNotPerformException ex) {
+                        text = ((Leaf) item).getValue().toString();
+                    }
+                } else {
+                    text = ((Leaf) item).getValue().toString();
+                }
             }
-
+            
             if (((LeafContainer) item).getEditable()) {
                 setText(text);
                 setGraphic(null);
@@ -135,7 +146,7 @@ public class ValueCell extends RowCell {
                 setGraphic(SelectableLabel.makeSelectable(new Label(text)));
             }
         }
-
+        
         if (item instanceof GenericNodeContainer) {
             GenericNodeContainer container = (GenericNodeContainer) item;
             String text = getBuilderDescription(container.getBuilder());
@@ -150,7 +161,7 @@ public class ValueCell extends RowCell {
                 if (container.hasChanged()) {
                     setGraphic(buttonLayout);
                 }
-
+                
                 try {
                     if ("".equals(FieldDescriptorUtil.getId(container.getBuilder()))) {
                         container.setChanged(true);
@@ -182,7 +193,7 @@ public class ValueCell extends RowCell {
         }
         // ============================================
     }
-
+    
     public String getBuilderDescription(Message.Builder builder) {
         if (builder instanceof EntryType.Entry.Builder) {
             EntryType.Entry.Builder entry = (EntryType.Entry.Builder) builder;
@@ -195,11 +206,11 @@ public class ValueCell extends RowCell {
         }
         return null;
     }
-
+    
     public LeafContainer getLeaf() {
         return leaf;
     }
-
+    
     private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
         if (changed != null) {
             changed.removeListener(changeListener);
@@ -209,9 +220,9 @@ public class ValueCell extends RowCell {
             changed.addListener(changeListener);
         }
     }
-
+    
     private class ApplyEventHandler implements EventHandler<ActionEvent> {
-
+        
         @Override
         public void handle(ActionEvent event) {
             logger.info("new apply event");
@@ -241,9 +252,9 @@ public class ValueCell extends RowCell {
             thread.start();
         }
     }
-
+    
     private class CancelEventHandler implements EventHandler<ActionEvent> {
-
+        
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
@@ -269,13 +280,13 @@ public class ValueCell extends RowCell {
             thread.start();
         }
     }
-
+    
     private class ChangedListener implements ChangeListener<Boolean> {
-
+        
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
             Platform.runLater(new Runnable() {
-
+                
                 @Override
                 public void run() {
                     if (newValue) {
