@@ -39,7 +39,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import org.dc.bco.registry.editor.visual.RegistryTreeTableView;
+import org.dc.bco.registry.editor.visual.cell.editing.UserConfigComboBoxConverter;
 import org.dc.jul.extension.rsb.scope.ScopeGenerator;
+import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.configuration.EntryType;
 
 /**
@@ -97,7 +99,9 @@ public class ValueCell extends RowCell {
         } else if (leaf.getValue() instanceof Boolean) {
             graphic = new ValueCheckBox(this, true, false);
         }
-        graphic.setPrefWidth(this.getWidth() * 5 / 8);
+        if (graphic != null) {
+            graphic.setPrefWidth(this.getWidth() * 5 / 8);
+        }
         return graphic;
     }
 
@@ -124,9 +128,15 @@ public class ValueCell extends RowCell {
             } else if (((Leaf) item).getValue() instanceof EnumValueDescriptor) {
                 text = (((EnumValueDescriptor) ((Leaf) item).getValue()).getName());
             } else if ((((Leaf) item).getValue() != null)) {
-                if ("location_id".equals(item.getDescriptor()) || "parent_id".equals(item.getDescriptor()) || "child_id".equals(item.getDescriptor())) {
+                if ("location_id".equals(item.getDescriptor()) || "parent_id".equals(item.getDescriptor()) || "child_id".equals(item.getDescriptor()) || "tile_id".equals(item.getDescriptor())) {
                     try {
                         text = ScopeGenerator.generateStringRep(remotePool.getLocationRemote().getLocationConfigById((String) ((Leaf) item).getValue()).getScope());
+                    } catch (CouldNotPerformException ex) {
+                        text = ((Leaf) item).getValue().toString();
+                    }
+                } else if ("member_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof UserGroupConfig.Builder) {
+                    try {
+                        text = new UserConfigComboBoxConverter().getText(remotePool.getUserRemote().getUserConfigById((String) ((Leaf) item).getValue()));
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }

@@ -143,7 +143,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 case "device_class_id":
                     return DeviceClass.getDefaultInstance();
                 case "member_id":
-                    if (parentBuilder instanceof UserConfig.Builder) {
+                    if (parentBuilder instanceof UserGroupConfig.Builder) {
                         return UserConfig.getDefaultInstance();
                     } else if (parentBuilder instanceof UnitGroupConfig.Builder) {
                         return UnitConfig.getDefaultInstance();
