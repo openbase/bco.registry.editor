@@ -5,7 +5,6 @@
  */
 package org.dc.bco.registry.editor.visual.cell;
 
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Message;
 import org.dc.bco.registry.editor.RegistryEditor;
@@ -22,7 +21,6 @@ import org.dc.bco.registry.editor.struct.LeafContainer;
 import org.dc.bco.registry.editor.struct.Node;
 import org.dc.bco.registry.editor.struct.consistency.Configuration;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
-import org.dc.bco.registry.editor.util.RSTDefaultInstances;
 import org.dc.bco.registry.editor.util.SelectableLabel;
 import org.dc.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
 import org.dc.jul.exception.CouldNotPerformException;
@@ -30,8 +28,6 @@ import org.dc.jul.exception.InstantiationException;
 import org.dc.jul.exception.printer.LogLevel;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -42,25 +38,24 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.dc.bco.registry.editor.visual.RegistryTreeTableView;
 import org.dc.jul.extension.rsb.scope.ScopeGenerator;
 import rst.configuration.EntryType;
-import rst.homeautomation.device.DeviceConfigType;
-import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
  *
  * @author thuxohl
  */
 public class ValueCell extends RowCell {
-    
+
     protected final Button applyButton, cancelButton;
     protected final HBox buttonLayout;
     protected LeafContainer leaf;
-    
+
     protected SimpleObjectProperty<Boolean> changed = null;
     protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-    
+
     public ValueCell() {
         super();
         applyButton = new Button("Apply");
@@ -70,20 +65,20 @@ public class ValueCell extends RowCell {
         buttonLayout = new HBox(applyButton, cancelButton);
         this.changeListener = new ChangedListener();
     }
-    
+
     @Override
     public void startEdit() {
         super.startEdit();
-        
+
         if (getItem() instanceof Leaf && ((LeafContainer) getItem()).getEditable()) {
             leaf = ((LeafContainer) getItem());
             setGraphic(getEditingGraphic());
         }
     }
-    
-    private javafx.scene.Node getEditingGraphic() {
-        
-        javafx.scene.Node graphic = null;
+
+    private javafx.scene.control.Control getEditingGraphic() {
+
+        javafx.scene.control.Control graphic = null;
         Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor(), leaf.getParent().getBuilder());
         if (type != null) {
             try {
@@ -102,19 +97,20 @@ public class ValueCell extends RowCell {
         } else if (leaf.getValue() instanceof Boolean) {
             graphic = new ValueCheckBox(this, true, false);
         }
+        graphic.setPrefWidth(this.getWidth() * 5 / 8);
         return graphic;
     }
-    
+
     @Override
     public void cancelEdit() {
         super.cancelEdit();
         setGraphic(null);
     }
-    
+
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         if (empty) {
             setGraphic(null);
             setText("");
@@ -138,7 +134,7 @@ public class ValueCell extends RowCell {
                     text = ((Leaf) item).getValue().toString();
                 }
             }
-            
+
             if (((LeafContainer) item).getEditable()) {
                 setText(text);
                 setGraphic(null);
@@ -146,7 +142,7 @@ public class ValueCell extends RowCell {
                 setGraphic(SelectableLabel.makeSelectable(new Label(text)));
             }
         }
-        
+
         if (item instanceof GenericNodeContainer) {
             GenericNodeContainer container = (GenericNodeContainer) item;
             String text = getBuilderDescription(container.getBuilder());
@@ -161,7 +157,7 @@ public class ValueCell extends RowCell {
                 if (container.hasChanged()) {
                     setGraphic(buttonLayout);
                 }
-                
+
                 try {
                     if ("".equals(FieldDescriptorUtil.getId(container.getBuilder()))) {
                         container.setChanged(true);
@@ -193,7 +189,7 @@ public class ValueCell extends RowCell {
         }
         // ============================================
     }
-    
+
     public String getBuilderDescription(Message.Builder builder) {
         if (builder instanceof EntryType.Entry.Builder) {
             EntryType.Entry.Builder entry = (EntryType.Entry.Builder) builder;
@@ -206,11 +202,11 @@ public class ValueCell extends RowCell {
         }
         return null;
     }
-    
+
     public LeafContainer getLeaf() {
         return leaf;
     }
-    
+
     private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
         if (changed != null) {
             changed.removeListener(changeListener);
@@ -220,9 +216,9 @@ public class ValueCell extends RowCell {
             changed.addListener(changeListener);
         }
     }
-    
+
     private class ApplyEventHandler implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             logger.info("new apply event");
@@ -252,9 +248,9 @@ public class ValueCell extends RowCell {
             thread.start();
         }
     }
-    
+
     private class CancelEventHandler implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             Thread thread = new Thread(
@@ -267,7 +263,9 @@ public class ValueCell extends RowCell {
                                     container.getParent().getChildren().remove(container);
                                 } else {
                                     int index = container.getParent().getChildren().indexOf(container);
-                                    container.getParent().getChildren().set(index, new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), remotePool.getById(FieldDescriptorUtil.getId(container.getBuilder()), container.getBuilder())));
+                                    GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), remotePool.getById(FieldDescriptorUtil.getId(container.getBuilder()), container.getBuilder()));
+                                    RegistryTreeTableView.expandEqually(container, oldNode);
+                                    container.getParent().getChildren().set(index, oldNode);
                                 }
                             } catch (Exception ex) {
                                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
@@ -280,13 +278,13 @@ public class ValueCell extends RowCell {
             thread.start();
         }
     }
-    
+
     private class ChangedListener implements ChangeListener<Boolean> {
-        
+
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
             Platform.runLater(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     if (newValue) {

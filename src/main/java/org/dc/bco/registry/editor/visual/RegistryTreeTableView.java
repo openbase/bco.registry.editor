@@ -25,6 +25,7 @@ import java.util.List;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
@@ -101,7 +102,6 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     public void update(List<? extends GeneratedMessage> messageList) throws CouldNotPerformException {
         // get all changes
         listDiff.diff(messageList);
-
         // Remove all removed messages
         for (Object message : listDiff.getRemovedMessageMap().getMessages()) {
 //            logger.info("Removed message [" + message + "]");
@@ -130,11 +130,13 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
 //            logger.info("Found old node to remove to update [" + nodeToRemove.getBuilder().build() + "]");
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
-                GlobalTextArea.getInstance().setText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cance'\nTo overwrite the global changes with yours press 'Apply'");
+                GlobalTextArea.getInstance().setText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'");
                 continue;
             }
             GenericListContainer parent = (GenericListContainer) nodeToRemove.getParent();
-            parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder()));
+            GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
+            expandEqually(nodeToRemove, updatedNode);
+            parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
         }
         for (Object message : listDiff.getNewMessageMap().getMessages()) {
 //            logger.info("New message [" + message + "]");
@@ -195,6 +197,18 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
             }
         }
         return null;
+    }
+
+    public static void expandEqually(TreeItem origin, TreeItem update) {
+        if (origin.isExpanded()) {
+            update.setExpanded(true);
+        }
+
+        for (int i = 0; i < origin.getChildren().size(); i++) {
+            if (i < update.getChildren().size()) {
+                expandEqually((TreeItem) origin.getChildren().get(i), (TreeItem) update.getChildren().get(i));
+            }
+        }
     }
 
     public void setReadOnlyMode(boolean readOnly) {
