@@ -52,7 +52,7 @@ public class RSTDefaultInstances {
     }
 
     public static ConnectionConfig.Builder getDefaultConnectionConfig() {
-        return ConnectionConfig.newBuilder().setPlacement(PlacementConfig.newBuilder().setPosition(getDefaultPose()));
+        return ConnectionConfig.newBuilder().setPlacementConfig(PlacementConfig.newBuilder().setPosition(getDefaultPose()));
     }
 
     public static ShapeType.Shape getDefaultShape() {
