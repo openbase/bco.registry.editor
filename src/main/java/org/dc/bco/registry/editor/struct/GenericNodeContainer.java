@@ -71,7 +71,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
         }
     }
 
-    private void registerElement(String fieldName, Object value) throws InstantiationException {
+    public void registerElement(String fieldName, Object value) throws InstantiationException {
         super.add(new LeafContainer(value, fieldName, this, Configuration.isModifiableField(builder, fieldName)));
     }
 }

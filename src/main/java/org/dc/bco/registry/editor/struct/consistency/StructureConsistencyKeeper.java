@@ -8,13 +8,17 @@ package org.dc.bco.registry.editor.struct.consistency;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
+import java.util.ArrayList;
+import java.util.List;
 import org.dc.bco.registry.editor.struct.GenericListContainer;
 import org.dc.bco.registry.editor.struct.GenericNodeContainer;
+import org.dc.bco.registry.editor.struct.LeafContainer;
 import org.dc.bco.registry.editor.struct.Node;
 import org.dc.bco.registry.editor.struct.NodeContainer;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.bco.registry.editor.util.RemotePool;
 import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.storage.registry.EntryModification;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
@@ -23,6 +27,7 @@ import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.homeautomation.unit.UnitTemplateConfigType.UnitTemplateConfig;
+import rst.homeautomation.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.person.PersonType;
 import rst.timing.TimestampType.Timestamp;
 
@@ -43,6 +48,12 @@ public class StructureConsistencyKeeper {
             keepDeviceConfigStructure((NodeContainer<DeviceConfig.Builder>) container, fieldName);
         } else if (container.getBuilder() instanceof UnitTemplateConfig.Builder) {
             keepUnitTemplateConfigStructure((NodeContainer<UnitTemplateConfig.Builder>) container, fieldName);
+        } else if (container.getBuilder() instanceof UnitGroupConfig.Builder) {
+            if (container instanceof GenericListContainer) {
+                keepUnitGroupConfigStructure(((GenericNodeContainer<UnitGroupConfig.Builder>) container.getParent().getValue()), fieldName);
+            } else {
+                keepUnitGroupConfigStructure(((GenericNodeContainer<UnitGroupConfig.Builder>) container), fieldName);
+            }
         }
     }
 
@@ -51,6 +62,9 @@ public class StructureConsistencyKeeper {
         for (int i = 0; i < container.getChildren().size(); i++) {
             Node item = container.getChildren().get(i).getValue();
             if (item instanceof NodeContainer && ((NodeContainer) item).getDescriptor().equals(fieldName)) {
+                container.getChildren().remove(i);
+                i--;
+            } else if (item instanceof LeafContainer && ((LeafContainer) item).getDescriptor().equals(fieldName)) {
                 container.getChildren().remove(i);
                 i--;
             }
@@ -126,6 +140,58 @@ public class StructureConsistencyKeeper {
                 });
                 builder.addUnitConfig(unitConfig);
             }
+        }
+    }
+
+    //unit group configs ... if service type changes set unit type unknown,
+    //                       if unit type changes set service types,
+    //                       in all cases remove incongrous member ids
+    private static void keepUnitGroupConfigStructure(GenericNodeContainer<UnitGroupConfig.Builder> container, String changedField) throws CouldNotPerformException {
+        Descriptors.FieldDescriptor field;
+        boolean change = false;
+        if ("service_type".equals(changedField)) {
+            change = true;
+            StructureConsistencyKeeper.clearField(container, "unit_type");
+            container.getBuilder().setUnitType(UnitType.UNKNOWN);
+            field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.UNIT_TYPE_FIELD_NUMBER, container.getBuilder());
+            container.registerElement(field.getName(), container.getBuilder().getField(field));
+        } else if ("unit_type".equals(changedField)) {
+            change = true;
+            StructureConsistencyKeeper.clearField(container, "service_type");
+            container.getBuilder().addAllServiceType(RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getUnitType()).getServiceTypeList());
+            field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.SERVICE_TYPE_FIELD_NUMBER, container.getBuilder());
+            container.add(new GenericListContainer<>(field, container.getBuilder()));
+        }
+
+        if (change) {
+            List<String> memberIds = new ArrayList<>();
+            if (container.getBuilder().getUnitType() == UnitType.UNKNOWN) {
+                //check if every unit hast all given services
+                for (String memberId : container.getBuilder().getMemberIdList()) {
+                    UnitConfig unitConfig = RemotePool.getInstance().getDeviceRemote().getUnitConfigById(memberId);
+                    boolean skip = false;
+                    for (ServiceConfig serviceConfig : unitConfig.getServiceConfigList()) {
+                        if (!container.getBuilder().getServiceTypeList().contains(serviceConfig.getType())) {
+                            skip = true;
+                        }
+                    }
+                    if (skip) {
+                        continue;
+                    }
+                    memberIds.add(memberId);
+                }
+            } else {
+                for (String memberId : container.getBuilder().getMemberIdList()) {
+                    UnitType unitType = RemotePool.getInstance().getDeviceRemote().getUnitConfigById(memberId).getType();
+                    if (unitType == container.getBuilder().getUnitType() || RemotePool.getInstance().getDeviceRemote().getSubUnitTypesOfUnitType(container.getBuilder().getUnitType()).contains(unitType)) {
+                        memberIds.add(memberId);
+                    }
+                }
+            }
+            StructureConsistencyKeeper.clearField(container, "member_id");
+            container.getBuilder().addAllMemberId(memberIds);
+            field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.MEMBER_ID_FIELD_NUMBER, container.getBuilder());
+            container.add(new GenericListContainer<>(field, container.getBuilder()));
         }
     }
 }
