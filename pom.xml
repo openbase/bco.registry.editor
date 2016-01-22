@@ -3,7 +3,7 @@
 
     <groupId>org.dc.bco.registry</groupId>
     <artifactId>editor</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
     <packaging>jar</packaging>
 
     <name>RegistryEditor</name>
