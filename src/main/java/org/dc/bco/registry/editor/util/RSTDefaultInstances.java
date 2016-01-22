@@ -48,7 +48,7 @@ public class RSTDefaultInstances {
     }
 
     public static LocationConfig.Builder getDefaultLocationConfig() {
-        return LocationConfig.newBuilder().setPosition(getDefaultPose()).setPlacementConfig(PlacementConfig.newBuilder().setPosition(getDefaultPose()));
+        return LocationConfig.newBuilder().setPlacementConfig(PlacementConfig.newBuilder().setPosition(getDefaultPose()));
     }
 
     public static ConnectionConfig.Builder getDefaultConnectionConfig() {
