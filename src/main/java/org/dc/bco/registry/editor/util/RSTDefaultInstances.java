@@ -15,6 +15,7 @@ import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.state.ActivationStateType.ActivationState;
+import rst.homeautomation.state.EnablingStateType.EnablingState;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.math.Vec3DDoubleType.Vec3DDouble;
@@ -63,12 +64,16 @@ public class RSTDefaultInstances {
         return ActivationState.newBuilder().setValue(ActivationState.State.ACTIVE).build();
     }
 
+    public static EnablingState getDefaultEnablingState() {
+        return EnablingState.newBuilder().setValue(EnablingState.State.ENABLED).build();
+    }
+
     public static SceneConfig.Builder getDefaultSceneConfig() {
         return SceneConfig.newBuilder().setActivationState(getDefaultActivationState());
     }
 
     public static AgentConfig.Builder getDefaultAgentConfig() {
-        return AgentConfig.newBuilder().setActivationState(getDefaultActivationState());
+        return AgentConfig.newBuilder().setEnablingState(getDefaultEnablingState());
     }
 
     public static AppConfig.Builder getDefaultAppConfig() {
