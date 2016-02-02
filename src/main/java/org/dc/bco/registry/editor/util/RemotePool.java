@@ -1,40 +1,57 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.dc.bco.registry.editor.util;
+
+/*
+ * #%L
+ * RegistryEditor
+ * %%
+ * Copyright (C) 2014 - 2016 DivineCooperation
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
 
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import org.dc.bco.registry.agent.remote.AgentRegistryRemote;
-import org.dc.bco.registry.app.remote.AppRegistryRemote;
-import org.dc.bco.registry.device.remote.DeviceRegistryRemote;
-import org.dc.bco.registry.agent.lib.jp.JPAgentRegistryScope;
-import org.dc.bco.registry.app.lib.jp.JPAppRegistryScope;
-import org.dc.bco.registry.device.lib.jp.JPDeviceRegistryScope;
-import org.dc.bco.registry.location.lib.jp.JPLocationRegistryScope;
-import org.dc.bco.registry.scene.lib.jp.JPSceneRegistryScope;
-import org.dc.bco.registry.user.lib.jp.JPUserRegistryScope;
-import org.dc.jul.exception.CouldNotPerformException;
-import org.dc.jul.exception.InitializationException;
-import org.dc.jul.exception.InstantiationException;
-import org.dc.jul.extension.rsb.com.RSBRemoteService;
-import org.dc.bco.registry.location.remote.LocationRegistryRemote;
-import org.dc.bco.registry.user.remote.UserRegistryRemote;
-import org.dc.bco.registry.scene.remote.SceneRegistryRemote;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import org.dc.bco.registry.agent.lib.jp.JPAgentRegistryScope;
+import org.dc.bco.registry.agent.remote.AgentRegistryRemote;
+import org.dc.bco.registry.app.lib.jp.JPAppRegistryScope;
+import org.dc.bco.registry.app.remote.AppRegistryRemote;
+import org.dc.bco.registry.device.lib.jp.JPDeviceRegistryScope;
+import org.dc.bco.registry.device.remote.DeviceRegistryRemote;
+import org.dc.bco.registry.location.lib.jp.JPLocationRegistryScope;
+import org.dc.bco.registry.location.remote.LocationRegistryRemote;
+import org.dc.bco.registry.scene.lib.jp.JPSceneRegistryScope;
+import org.dc.bco.registry.scene.remote.SceneRegistryRemote;
+import org.dc.bco.registry.user.lib.jp.JPUserRegistryScope;
+import org.dc.bco.registry.user.remote.UserRegistryRemote;
 import org.dc.jps.core.JPService;
 import org.dc.jps.exception.JPServiceException;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.InitializationException;
+import org.dc.jul.exception.InstantiationException;
+import org.dc.jul.extension.rsb.com.RSBRemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
+import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;

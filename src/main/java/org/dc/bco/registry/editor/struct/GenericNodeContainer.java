@@ -1,19 +1,36 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.dc.bco.registry.editor.struct;
+
+/*
+ * #%L
+ * RegistryEditor
+ * %%
+ * Copyright (C) 2014 - 2016 DivineCooperation
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
-import org.dc.bco.registry.editor.struct.converter.DefaultConverter;
+import java.util.Map.Entry;
 import org.dc.bco.registry.editor.struct.consistency.Configuration;
+import org.dc.bco.registry.editor.struct.converter.DefaultConverter;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.jul.exception.CouldNotPerformException;
 import org.dc.jul.exception.InstantiationException;
 import org.dc.jul.exception.NotAvailableException;
-import java.util.Map.Entry;
 
 /**
  *

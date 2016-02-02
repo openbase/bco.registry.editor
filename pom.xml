@@ -1,18 +1,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
+
     <groupId>org.dc.bco.registry</groupId>
     <artifactId>editor</artifactId>
     <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>RegistryEditor</name>
-    <url>http://maven.apache.org</url>
+    <inceptionYear>2014</inceptionYear>
+    
+    <url>https://github.com/DivineCooperation/bco.registry.editor/wiki</url>
 
     <organization>
         <name>DivineCooperation</name>
         <url>https://github.com/divinecooperation</url>
     </organization>
+    
     <developers>
         <developer>
             <id>pLeminoq</id>
@@ -42,6 +49,13 @@
             <timezone>+1</timezone>
         </developer>
     </developers>
+    
+     <licenses>
+        <license>
+            <name>GPLv3</name>
+            <url>http://www.gnu.org/licenses/gpl.html</url>
+        </license>
+    </licenses>
 
     <build>
         <plugins>
@@ -107,6 +121,36 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.8</version>
+                <configuration>
+                    <verbose>false</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>first</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <licenseName>gpl_v3</licenseName>
+                            <roots>
+                                <root>src/main/java</root>
+                                <root>src/test</root>
+                            </roots>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-licenses</id>
+                        <goals>
+                            <goal>download-licenses</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -124,8 +168,8 @@
     </properties>
 	
     <scm>
-        <developerConnection>scm:git:https://projects.cit-ec.uni-bielefeld.de/git/lsp-csra.registry-editor.git</developerConnection>
-        <url>https://projects.cit-ec.uni-bielefeld.de/git/lsp-csra.registry-editor.git</url>
+        <developerConnection>scm:git:https://github.com/DivineCooperation/bco.registry.editor.git</developerConnection>
+        <url>https://github.com/DivineCooperation/bco.registry.editor/wiki</url>
     </scm>
 
     <dependencies>

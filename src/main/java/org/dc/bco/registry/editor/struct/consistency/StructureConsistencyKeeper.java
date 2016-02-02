@@ -1,9 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.dc.bco.registry.editor.struct.consistency;
+
+/*
+ * #%L
+ * RegistryEditor
+ * %%
+ * Copyright (C) 2014 - 2016 DivineCooperation
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
@@ -18,7 +35,6 @@ import org.dc.bco.registry.editor.struct.NodeContainer;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.bco.registry.editor.util.RemotePool;
 import org.dc.jul.exception.CouldNotPerformException;
-import org.dc.jul.storage.registry.EntryModification;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
@@ -77,7 +93,7 @@ public class StructureConsistencyKeeper {
             // clear the field in the builder and remove all child tree items representing these
             StructureConsistencyKeeper.clearField(container, "unit_config");
 
-            // create the new values for the field and add them to the builder  
+            // create the new values for the field and add them to the builder
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(container.getBuilder().getDeviceClassId()).getUnitTemplateConfigList()) {
                 UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToDevice(true);
                 unitConfig.setPlacementConfig(container.getBuilder().getPlacementConfig());
@@ -99,7 +115,7 @@ public class StructureConsistencyKeeper {
             // clear the field in the builder and remove all child tree items representing these
             StructureConsistencyKeeper.clearField(container, "service_template");
 
-            // create the new values for the field and add them to the builder  
+            // create the new values for the field and add them to the builder
             for (ServiceTemplate.ServiceType serviceType : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceTypeList()) {
                 ServiceTemplate.Builder serviceTemplateBuilder = ServiceTemplate.newBuilder().setServiceType(serviceType);
                 container.getBuilder().addServiceTemplate(serviceTemplateBuilder);
@@ -115,7 +131,7 @@ public class StructureConsistencyKeeper {
         // clear the field in the builder and remove all child tree items representing these
         StructureConsistencyKeeper.clearField(container, "timestamp");
 
-        // create the new values for the field and add them to the builder  
+        // create the new values for the field and add them to the builder
         container.getBuilder().setTimestamp(Timestamp.newBuilder().setTime(System.currentTimeMillis()));
 
         // create and add a new child node container representing these children
