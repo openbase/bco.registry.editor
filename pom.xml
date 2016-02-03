@@ -168,8 +168,8 @@
     </properties>
 	
     <scm>
-        <developerConnection>scm:git:https://github.com/DivineCooperation/bco.registry.editor.git</developerConnection>
-        <url>https://github.com/DivineCooperation/bco.registry.editor/wiki</url>
+        <developerConnection>scm:git:https://github.com/divinecooperation/bco.registry.editor.git</developerConnection>
+        <url>https://github.com/divinecooperation/bco.registry.editor/wiki</url>
     </scm>
 
     <dependencies>
