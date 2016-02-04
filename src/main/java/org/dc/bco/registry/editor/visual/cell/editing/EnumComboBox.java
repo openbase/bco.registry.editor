@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import java.util.ArrayList;
@@ -37,12 +36,18 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import org.dc.bco.registry.editor.visual.cell.ValueCell;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.printer.ExceptionPrinter;
+import org.dc.jul.exception.printer.LogLevel;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
+
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(EnumComboBox.class);
 
     public EnumComboBox(ValueCell cell, EnumValueDescriptor currentValue) {
         super();
@@ -53,9 +58,13 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
 
             @Override
             public void handle(Event event) {
-                if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
-                    cell.getLeaf().setValue(getSelectionModel().getSelectedItem());
-                    cell.commitEdit(cell.getLeaf());
+                try {
+                    if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
+                        cell.getLeaf().setValue(getSelectionModel().getSelectedItem());
+                        cell.commitEdit(cell.getLeaf());
+                    }
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });

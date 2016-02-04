@@ -35,6 +35,7 @@ import org.dc.bco.registry.editor.struct.NodeContainer;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.bco.registry.editor.util.RemotePool;
 import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.InstantiationException;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
@@ -55,7 +56,7 @@ public class StructureConsistencyKeeper {
 
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(StructureConsistencyKeeper.class);
 
-    public static void keepStructure(NodeContainer<? extends Message.Builder> container, String fieldName) throws CouldNotPerformException {
+    public static void keepStructure(NodeContainer<? extends Message.Builder> container, String fieldName) throws CouldNotPerformException, InterruptedException {
         if (container.getBuilder() instanceof InventoryState.Builder) {
             keepInventoryStateStructure((NodeContainer<InventoryState.Builder>) container);
         } else if (container.getBuilder() instanceof PersonType.Person.Builder && ((NodeContainer<GeneratedMessage.Builder>) container.getParent().getValue()).getBuilder() instanceof InventoryState.Builder) {
@@ -88,7 +89,7 @@ public class StructureConsistencyKeeper {
         builder.clearField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder));
     }
 
-    private static void keepDeviceConfigStructure(NodeContainer<DeviceConfig.Builder> container, String changedField) throws CouldNotPerformException {
+    private static void keepDeviceConfigStructure(NodeContainer<DeviceConfig.Builder> container, String changedField) throws CouldNotPerformException, InterruptedException {
         if ("device_class_id".equals(changedField)) {
             // clear the field in the builder and remove all child tree items representing these
             StructureConsistencyKeeper.clearField(container, "unit_config");
@@ -109,7 +110,7 @@ public class StructureConsistencyKeeper {
         }
     }
 
-    private static void keepUnitTemplateConfigStructure(NodeContainer<UnitTemplateConfig.Builder> container, String changedField) throws CouldNotPerformException {
+    private static void keepUnitTemplateConfigStructure(NodeContainer<UnitTemplateConfig.Builder> container, String changedField) throws CouldNotPerformException, InstantiationException, InterruptedException {
         // check if the right field has been set
         if ("type".equals(changedField)) {
             // clear the field in the builder and remove all child tree items representing these
@@ -139,13 +140,13 @@ public class StructureConsistencyKeeper {
         container.add(new GenericNodeContainer<>(field, container.getBuilder().getTimestampBuilder()));
     }
 
-    public static void keepStructure(Message.Builder builder, String fieldName) throws CouldNotPerformException {
+    public static void keepStructure(Message.Builder builder, String fieldName) throws CouldNotPerformException, InterruptedException {
         if (builder instanceof DeviceConfig.Builder) {
             keepDeviceConfigStructure((DeviceConfig.Builder) builder, fieldName);
         }
     }
 
-    private static void keepDeviceConfigStructure(DeviceConfig.Builder builder, String changedField) throws CouldNotPerformException {
+    private static void keepDeviceConfigStructure(DeviceConfig.Builder builder, String changedField) throws CouldNotPerformException, InterruptedException {
         if ("device_class_id".equals(changedField)) {
 
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(builder.getDeviceClassId()).getUnitTemplateConfigList()) {
@@ -162,7 +163,7 @@ public class StructureConsistencyKeeper {
     //unit group configs ... if service type changes set unit type unknown,
     //                       if unit type changes set service types,
     //                       in all cases remove incongrous member ids
-    private static void keepUnitGroupConfigStructure(GenericNodeContainer<UnitGroupConfig.Builder> container, String changedField) throws CouldNotPerformException {
+    private static void keepUnitGroupConfigStructure(GenericNodeContainer<UnitGroupConfig.Builder> container, String changedField) throws CouldNotPerformException, InterruptedException {
         Descriptors.FieldDescriptor field;
         boolean change = false;
         if ("service_type".equals(changedField)) {

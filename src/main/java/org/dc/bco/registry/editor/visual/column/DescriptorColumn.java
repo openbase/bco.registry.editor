@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual.column;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import java.util.Comparator;
 import java.util.Map;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -36,12 +35,17 @@ import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.bco.registry.editor.visual.cell.DescriptionCell;
 import static org.dc.bco.registry.editor.visual.column.ValueColumn.VALUE_COLUMN_PROPORTION;
 import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.printer.ExceptionPrinter;
+import org.dc.jul.exception.printer.LogLevel;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author thuxohl
  */
 public class DescriptorColumn extends Column {
+
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(DescriptorColumn.class);
 
     public static final double DESCRIPTOR_COLUMN_PROPORTION = 1 - VALUE_COLUMN_PROPORTION;
     private final Map<String, Integer> fieldPriorityMap;
@@ -56,7 +60,12 @@ public class DescriptorColumn extends Column {
 
             @Override
             public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-                return new DescriptionCell();
+                try {
+                    return new DescriptionCell();
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Could not build description cell!", ex), logger, LogLevel.WARN);
+                    return new TreeTableCell();
+                }
             }
         });
         setComparator(new Comparator<Node>() {

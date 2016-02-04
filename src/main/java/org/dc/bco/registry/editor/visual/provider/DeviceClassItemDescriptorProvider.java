@@ -41,7 +41,7 @@ public class DeviceClassItemDescriptorProvider extends AbstractTreeItemDescripto
     }
 
     @Override
-    public String getDescriptor(Message.Builder builder) throws CouldNotPerformException {
+    public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
         DeviceClass deviceClass = RemotePool.getInstance().getDeviceRemote().getDeviceClassById((String) fieldGroup.getValue(builder));
         return deviceClass.getLabel();
     }
@@ -52,7 +52,7 @@ public class DeviceClassItemDescriptorProvider extends AbstractTreeItemDescripto
     }
 
     @Override
-    public void setValue(Message.Builder msg, Object value) throws CouldNotPerformException {
+    public void setValue(Message.Builder msg, Object value) throws CouldNotPerformException, InterruptedException {
         fieldGroup.setValue(msg, value);
     }
 

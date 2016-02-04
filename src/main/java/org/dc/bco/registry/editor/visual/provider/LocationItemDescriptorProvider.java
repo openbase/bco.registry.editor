@@ -43,7 +43,7 @@ public class LocationItemDescriptorProvider extends AbstractTreeItemDescriptorPr
     }
 
     @Override
-    public String getDescriptor(Message.Builder builder) throws CouldNotPerformException {
+    public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
         LocationConfig location = RemotePool.getInstance().getLocationRemote().getLocationConfigById((String) fieldGroup.getValue(builder));
         return ScopeGenerator.generateStringRep(location.getScope());
     }
@@ -54,7 +54,7 @@ public class LocationItemDescriptorProvider extends AbstractTreeItemDescriptorPr
     }
 
     @Override
-    public void setValue(Message.Builder msg, Object value) throws CouldNotPerformException {
+    public void setValue(Message.Builder msg, Object value) throws CouldNotPerformException, InterruptedException {
         fieldGroup.setValue(msg, value);
     }
 

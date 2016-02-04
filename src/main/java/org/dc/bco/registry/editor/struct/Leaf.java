@@ -30,5 +30,5 @@ public interface Leaf extends Node {
 
     public Object getValue();
 
-    public void setValue(Object value);
+    public void setValue(Object value) throws InterruptedException;
 }

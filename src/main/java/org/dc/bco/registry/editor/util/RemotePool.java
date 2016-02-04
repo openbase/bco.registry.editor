@@ -80,14 +80,14 @@ public class RemotePool {
     private final AppRegistryRemote appRemote;
     private final UserRegistryRemote userRemote;
 
-    public static RemotePool getInstance() throws InstantiationException {
+    public static RemotePool getInstance() throws InstantiationException, InterruptedException {
         if (remotePool == null) {
             remotePool = new RemotePool();
         }
         return remotePool;
     }
 
-    public RemotePool() throws InstantiationException {
+    public RemotePool() throws InstantiationException, InterruptedException {
         this.deviceRemote = new DeviceRegistryRemote();
         this.locationRemote = new LocationRegistryRemote();
         this.sceneRemote = new SceneRegistryRemote();
@@ -96,7 +96,7 @@ public class RemotePool {
         this.userRemote = new UserRegistryRemote();
     }
 
-    public void init() throws InitializationException {
+    public void init() throws InitializationException, InterruptedException {
         try {
             deviceRemote.init(JPService.getProperty(JPDeviceRegistryScope.class).getValue());
             locationRemote.init(JPService.getProperty(JPLocationRegistryScope.class).getValue());

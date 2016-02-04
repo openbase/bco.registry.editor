@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -29,12 +28,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.dc.bco.registry.editor.visual.cell.ValueCell;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.printer.ExceptionPrinter;
+import org.dc.jul.exception.printer.LogLevel;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class StringTextField extends TextField {
+
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(StringTextField.class);
 
     public StringTextField(ValueCell cell, String text) {
         super();
@@ -43,11 +48,15 @@ public class StringTextField extends TextField {
 
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (!newValue && !cell.getLeaf().getValue().equals(getText())) {
-                    cell.getLeaf().setValue(getText());
-                    // even though commit is called the text property won't change fast enough without this line?!?
-                    cell.setText(getText());
-                    cell.commitEdit(cell.getLeaf());
+                try {
+                    if (!newValue && !cell.getLeaf().getValue().equals(getText())) {
+                        cell.getLeaf().setValue(getText());
+                        // even though commit is called the text property won't change fast enough without this line?!?
+                        cell.setText(getText());
+                        cell.commitEdit(cell.getLeaf());
+                    }
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });
@@ -55,12 +64,16 @@ public class StringTextField extends TextField {
 
             @Override
             public void handle(KeyEvent event) {
-                if (event.getCode().equals(KeyCode.ESCAPE)) {
-                    cell.cancelEdit();
-                } else if (event.getCode().equals(KeyCode.ENTER)) {
-                    cell.getLeaf().setValue(getText());
-                    cell.setText(getText());
-                    cell.commitEdit(cell.getLeaf());
+                try {
+                    if (event.getCode().equals(KeyCode.ESCAPE)) {
+                        cell.cancelEdit();
+                    } else if (event.getCode().equals(KeyCode.ENTER)) {
+                        cell.getLeaf().setValue(getText());
+                        cell.setText(getText());
+                        cell.commitEdit(cell.getLeaf());
+                    }
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });

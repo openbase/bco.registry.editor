@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual.cell;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Message;
 import java.text.DecimalFormat;
@@ -75,7 +74,7 @@ public class ValueCell extends RowCell {
     protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-    public ValueCell() {
+    public ValueCell() throws InterruptedException {
         super();
         applyButton = new Button("Apply");
         applyButton.setOnAction(new ApplyEventHandler());

@@ -28,8 +28,8 @@ package org.dc.bco.registry.editor.visual.provider;
  */
 
 import com.google.protobuf.Message;
-import org.dc.jul.exception.CouldNotPerformException;
 import java.util.List;
+import org.dc.jul.exception.CouldNotPerformException;
 
 /**
  *
@@ -37,15 +37,15 @@ import java.util.List;
  */
 public interface TreeItemDescriptorProvider {
 
-    public String getDescriptor(Message msg) throws CouldNotPerformException;
+    public String getDescriptor(Message msg) throws CouldNotPerformException, InterruptedException;
 
-    public String getDescriptor(Message.Builder msg) throws CouldNotPerformException;
+    public String getDescriptor(Message.Builder msg) throws CouldNotPerformException, InterruptedException;
 
     public Object getValue(Message msg) throws CouldNotPerformException;
 
     public Object getValue(Message.Builder msg) throws CouldNotPerformException;
 
-    public void setValue(Message.Builder msg, Object value) throws CouldNotPerformException;
+    public void setValue(Message.Builder msg, Object value) throws CouldNotPerformException, InterruptedException;
 
     public boolean hasEqualValue(Message msg, Object value) throws CouldNotPerformException;
 

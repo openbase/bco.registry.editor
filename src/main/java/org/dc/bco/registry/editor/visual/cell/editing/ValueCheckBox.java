@@ -26,6 +26,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 import org.dc.bco.registry.editor.visual.cell.ValueCell;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.printer.ExceptionPrinter;
+import org.dc.jul.exception.printer.LogLevel;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -36,7 +39,7 @@ public class ValueCheckBox extends CheckBox {
 
     private final Object selected;
     private final Object unselected;
-    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(ValueCheckBox.class);
 
     public ValueCheckBox(ValueCell cell) {
         this(cell, true, false);
@@ -52,6 +55,7 @@ public class ValueCheckBox extends CheckBox {
 
             @Override
             public void handle(ActionEvent t) {
+                 try {
                 Object value;
                 if (isSelected()) {
                     value = selected;
@@ -61,6 +65,9 @@ public class ValueCheckBox extends CheckBox {
                 cell.getLeaf().setValue(value);
                 cell.setText(value.toString());
                 cell.commitEdit(cell.getLeaf());
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
+                }
             }
         });
     }

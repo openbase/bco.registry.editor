@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LeafContainer implements Leaf {
 
-    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(LeafContainer.class);
 
     private final boolean editable;
     private final String fieldName;
@@ -85,7 +85,7 @@ public class LeafContainer implements Leaf {
     }
 
     @Override
-    public void setValue(Object value) {
+    public void setValue(Object value) throws InterruptedException {
         this.value = value;
 
         try {

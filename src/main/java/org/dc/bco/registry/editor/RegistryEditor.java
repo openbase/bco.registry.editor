@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import java.util.HashMap;
@@ -114,7 +113,7 @@ public class RegistryEditor extends Application {
     private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView, userConfigTreeTableview, userGroupConfigTreeTableView, unitGroupConfigTreeTableView;
     private final Map<String, Boolean> intialized;
 
-    public RegistryEditor() throws InstantiationException {
+    public RegistryEditor() throws InstantiationException, InterruptedException {
         remotePool = RemotePool.getInstance();
         intialized = new HashMap<>();
         intialized.put(DeviceRegistry.class.getSimpleName(), Boolean.FALSE);
@@ -367,7 +366,7 @@ public class RegistryEditor extends Application {
 //                        logger.info("Updating " + data.getClass().getSimpleName());
                         tab.setContent(updateTreeTableView(data));
                     }
-                } catch (CouldNotPerformException ex) {
+                } catch (CouldNotPerformException | InterruptedException ex) {
                     logger.error("Registry not available!", ex);
                     tab.setContent(new Label("Error: " + ex.getMessage()));
                 }
@@ -375,7 +374,7 @@ public class RegistryEditor extends Application {
         });
     }
 
-    private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException {
+    private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException, InterruptedException {
         if (msg instanceof DeviceRegistry) {
             DeviceRegistry data = (DeviceRegistry) msg;
             TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);

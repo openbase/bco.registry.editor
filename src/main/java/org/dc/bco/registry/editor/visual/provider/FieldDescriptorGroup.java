@@ -119,7 +119,7 @@ public class FieldDescriptorGroup extends AbstractTreeItemDescriptorProvider {
      * @param value the value set for that field
      */
     @Override
-    public void setValue(Message.Builder builder, Object value) {
+    public void setValue(Message.Builder builder, Object value) throws InterruptedException {
         Message.Builder mBuilder = builder;
         for (int i = 0; i < fieldDescriptors.length - 1; i++) {
             mBuilder = mBuilder.getFieldBuilder(fieldDescriptors[i]);
