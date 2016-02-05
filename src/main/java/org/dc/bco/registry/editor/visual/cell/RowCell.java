@@ -25,12 +25,20 @@ package org.dc.bco.registry.editor.visual.cell;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TreeTableCell;
 import org.dc.bco.registry.editor.RegistryEditor;
 import org.dc.bco.registry.editor.struct.GenericGroupContainer;
-import org.dc.bco.registry.editor.struct.Leaf;
-import org.dc.bco.registry.editor.struct.LeafContainer;
 import org.dc.bco.registry.editor.struct.GenericListContainer;
 import org.dc.bco.registry.editor.struct.GenericNodeContainer;
+import org.dc.bco.registry.editor.struct.Leaf;
+import org.dc.bco.registry.editor.struct.LeafContainer;
 import org.dc.bco.registry.editor.struct.Node;
 import org.dc.bco.registry.editor.struct.NodeContainer;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
@@ -40,14 +48,6 @@ import org.dc.jul.exception.CouldNotPerformException;
 import org.dc.jul.exception.InstantiationException;
 import org.dc.jul.exception.printer.LogLevel;
 import org.dc.jul.extension.protobuf.BuilderProcessor;
-import java.util.ArrayList;
-import java.util.List;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeTableCell;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -58,13 +58,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class RowCell extends TreeTableCell<Node, Node> {
 
-    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(RowCell.class);
 
     protected RemotePool remotePool;
     private final ContextMenu contextMenu;
     private final MenuItem addMenuItem, removeMenuItem;
 
-    public RowCell() {
+    public RowCell() throws InterruptedException {
         try {
             remotePool = RemotePool.getInstance();
         } catch (InstantiationException ex) {
@@ -131,7 +131,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             thread.start();
         }
 
-        private void addAction(Node add) {
+        private void addAction(Node add) throws InterruptedException {
             try {
                 if (add instanceof GenericNodeContainer) {
                     GeneratedMessage.Builder builder = ((NodeContainer) add).getBuilder();
@@ -170,7 +170,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             }
         }
 
-        private void addGroupValues(NodeContainer startingContainer, GeneratedMessage.Builder builder, GeneratedMessage.Builder groupExample) throws CouldNotPerformException {
+        private void addGroupValues(NodeContainer startingContainer, GeneratedMessage.Builder builder, GeneratedMessage.Builder groupExample) throws CouldNotPerformException, InterruptedException {
             NodeContainer groupContainer = startingContainer;
             GenericGroupContainer parent;
             while (groupContainer.getParent() != null && groupContainer.getParent().getValue() instanceof GenericGroupContainer) {

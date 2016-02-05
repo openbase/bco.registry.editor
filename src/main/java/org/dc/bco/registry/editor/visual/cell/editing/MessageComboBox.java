@@ -38,7 +38,11 @@ import javafx.util.Callback;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.bco.registry.editor.util.RemotePool;
 import org.dc.bco.registry.editor.visual.cell.ValueCell;
+import org.dc.jul.exception.CouldNotPerformException;
 import org.dc.jul.exception.InstantiationException;
+import org.dc.jul.exception.printer.ExceptionPrinter;
+import org.dc.jul.exception.printer.LogLevel;
+import org.slf4j.LoggerFactory;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
@@ -51,6 +55,8 @@ import rst.spatial.LocationConfigType.LocationConfig;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class MessageComboBox extends ComboBox<Message> {
+
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(MessageComboBox.class);
 
     private static final int DEFAULT_VISIBLE_ROW_COUNT = 5;
     private final MessageComboBoxConverterInterface converter;
@@ -73,9 +79,13 @@ public class MessageComboBox extends ComboBox<Message> {
 
             @Override
             public void handle(Event event) {
+                 try {
                 if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
                     cell.getLeaf().setValue(converter.getValue(getSelectionModel().getSelectedItem()));
                     cell.commitEdit(cell.getLeaf());
+                }
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });

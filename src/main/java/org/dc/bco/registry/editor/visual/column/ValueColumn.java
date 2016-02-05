@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual.column;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -32,6 +31,10 @@ import javafx.util.Callback;
 import org.dc.bco.registry.editor.struct.Leaf;
 import org.dc.bco.registry.editor.struct.Node;
 import org.dc.bco.registry.editor.visual.cell.ValueCell;
+import static org.dc.bco.registry.editor.visual.column.DescriptorColumn.logger;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.printer.ExceptionPrinter;
+import org.dc.jul.exception.printer.LogLevel;
 
 /**
  *
@@ -50,7 +53,12 @@ public class ValueColumn extends Column {
 
             @Override
             public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-                return new ValueCell();
+                try {
+                    return new ValueCell();
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Could not build description cell!", ex), logger, LogLevel.WARN);
+                    return new TreeTableCell();
+                }
             }
         });
     }
@@ -60,7 +68,12 @@ public class ValueColumn extends Column {
         @Override
         public void handle(CellEditEvent<Node, Node> event) {
             if (event.getRowValue().getValue() instanceof Leaf) {
-                ((Leaf) event.getRowValue().getValue()).setValue(((Leaf) event.getNewValue()).getValue());
+
+                try {
+                    ((Leaf) event.getRowValue().getValue()).setValue(((Leaf) event.getNewValue()).getValue());
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handling skipped!", ex), logger, LogLevel.WARN);
+                }
             }
         }
     }

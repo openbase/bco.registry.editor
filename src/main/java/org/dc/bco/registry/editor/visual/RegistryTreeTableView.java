@@ -23,20 +23,6 @@ package org.dc.bco.registry.editor.visual;
  */
 
 import com.google.protobuf.GeneratedMessage;
-import org.dc.bco.registry.editor.struct.GenericGroupContainer;
-import org.dc.bco.registry.editor.struct.GenericListContainer;
-import org.dc.bco.registry.editor.struct.GenericNodeContainer;
-import org.dc.bco.registry.editor.util.SendableType;
-import org.dc.bco.registry.editor.visual.column.Column;
-import org.dc.bco.registry.editor.visual.column.DescriptorColumn;
-import org.dc.bco.registry.editor.visual.column.ValueColumn;
-import org.dc.bco.registry.editor.struct.Node;
-import org.dc.bco.registry.editor.struct.NodeContainer;
-import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
-import org.dc.bco.registry.editor.util.RemotePool;
-import org.dc.jul.exception.CouldNotPerformException;
-import org.dc.jul.exception.InstantiationException;
-import org.dc.jul.extension.protobuf.ProtobufListDiff;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -48,6 +34,20 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.VBox;
+import org.dc.bco.registry.editor.struct.GenericGroupContainer;
+import org.dc.bco.registry.editor.struct.GenericListContainer;
+import org.dc.bco.registry.editor.struct.GenericNodeContainer;
+import org.dc.bco.registry.editor.struct.Node;
+import org.dc.bco.registry.editor.struct.NodeContainer;
+import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
+import org.dc.bco.registry.editor.util.RemotePool;
+import org.dc.bco.registry.editor.util.SendableType;
+import org.dc.bco.registry.editor.visual.column.Column;
+import org.dc.bco.registry.editor.visual.column.DescriptorColumn;
+import org.dc.bco.registry.editor.visual.column.ValueColumn;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.InstantiationException;
+import org.dc.jul.extension.protobuf.ProtobufListDiff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     private final VBox vBox;
     private final RemotePool remotePool;
 
-    public RegistryTreeTableView(SendableType type) throws InstantiationException {
+    public RegistryTreeTableView(SendableType type) throws InstantiationException, InterruptedException {
         this.type = type;
         this.setEditable(true);
         this.setShowRoot(false);

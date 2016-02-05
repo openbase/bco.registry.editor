@@ -24,12 +24,12 @@ package org.dc.bco.registry.editor.struct;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
+import java.util.ArrayList;
+import java.util.List;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.bco.registry.editor.visual.provider.TreeItemDescriptorProvider;
 import org.dc.jul.exception.CouldNotPerformException;
 import org.dc.jul.exception.InstantiationException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -50,11 +50,11 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
     private final List values;
     private final Descriptors.FieldDescriptor fieldDescriptor;
 
-    public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException {
+    public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {
         this(descriptor, FieldDescriptorUtil.getFieldDescriptor(fieldNumber, builder), builder, builderList, groups);
     }
 
-    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException {
+    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {
         super(descriptor, builder);
         this.treeItemDescriptorProvider = groups[0];
         this.fieldDescriptor = fieldDescriptor;

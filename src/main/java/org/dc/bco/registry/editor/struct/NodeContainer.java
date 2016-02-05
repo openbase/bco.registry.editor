@@ -23,6 +23,8 @@ package org.dc.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.GeneratedMessage;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.TreeItem;
 import org.dc.bco.registry.editor.struct.consistency.Configuration;
 import org.dc.bco.registry.editor.struct.consistency.StructureConsistencyKeeper;
 import org.dc.bco.registry.editor.struct.converter.Converter;
@@ -30,9 +32,6 @@ import org.dc.bco.registry.editor.struct.converter.ConverterSelector;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.jul.exception.CouldNotPerformException;
 import org.dc.jul.exception.InstantiationException;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.TreeItem;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -42,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<Node> implements Node {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(NodeContainer.class);
 
     protected final MB builder;
     protected final String descriptor;
@@ -120,7 +119,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         return ((NodeContainer) sendableNode).getBuilder();
     }
 
-    public void updateBuilder(String fieldName, Object value, int index) throws CouldNotPerformException {
+    public void updateBuilder(String fieldName, Object value, int index) throws CouldNotPerformException, InterruptedException {
         if (index == -1) {
             converter.updateBuilder(fieldName, value);
         } else {

@@ -26,7 +26,6 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import org.dc.bco.registry.editor.struct.Node;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Column extends TreeTableColumn<Node, Node> {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(Column.class);
 
     public Column(String text) {
         super(text);

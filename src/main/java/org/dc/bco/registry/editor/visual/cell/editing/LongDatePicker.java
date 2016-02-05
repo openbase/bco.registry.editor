@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -30,12 +29,18 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.DatePicker;
 import org.dc.bco.registry.editor.visual.cell.ValueCell;
+import org.dc.jul.exception.CouldNotPerformException;
+import org.dc.jul.exception.printer.ExceptionPrinter;
+import org.dc.jul.exception.printer.LogLevel;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class LongDatePicker extends DatePicker {
+
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(LongDatePicker.class);
 
     public static final DateFormat DATE_CONVERTER = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -47,10 +52,14 @@ public class LongDatePicker extends DatePicker {
 
             @Override
             public void handle(ActionEvent event) {
-                if (getValue() != null && getValue().toEpochDay() != (Long) cell.getLeaf().getValue()) {
-                    cell.getLeaf().setValue(getValue().toEpochDay() * 24 * 60 * 60 * 1000);
-                    cell.setText(DATE_CONVERTER.format(new Date((Long) cell.getLeaf().getValue())));
-                    cell.commitEdit(cell.getLeaf());
+                try {
+                    if (getValue() != null && getValue().toEpochDay() != (Long) cell.getLeaf().getValue()) {
+                        cell.getLeaf().setValue(getValue().toEpochDay() * 24 * 60 * 60 * 1000);
+                        cell.setText(DATE_CONVERTER.format(new Date((Long) cell.getLeaf().getValue())));
+                        cell.commitEdit(cell.getLeaf());
+                    }
+                } catch (InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });

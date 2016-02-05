@@ -37,7 +37,7 @@ import rst.geometry.RotationType.Rotation;
  */
 public class RotationConverter implements Converter {
 
-    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(RotationConverter.class);
 
     private final Rotation.Builder rotation;
     private final Vector3d euler;

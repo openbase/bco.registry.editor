@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual.provider;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Message;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +33,10 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractTreeItemDescriptorProvider implements TreeItemDescriptorProvider {
 
-    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(AbstractTreeItemDescriptorProvider.class);
 
     @Override
-    public String getDescriptor(Message msg) throws CouldNotPerformException {
+    public String getDescriptor(Message msg) throws CouldNotPerformException, InterruptedException {
         return getDescriptor(msg.toBuilder());
     }
 

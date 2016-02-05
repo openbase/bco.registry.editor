@@ -34,7 +34,7 @@ import rst.authorization.UserConfigType.UserConfig;
  */
 public class DescriptionCell extends RowCell {
 
-    public DescriptionCell() {
+    public DescriptionCell() throws InterruptedException {
         super();
     }
 
