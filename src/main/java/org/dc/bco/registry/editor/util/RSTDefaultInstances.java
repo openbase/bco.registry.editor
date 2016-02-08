@@ -86,7 +86,7 @@ public class RSTDefaultInstances {
     }
 
     public static SceneConfig.Builder getDefaultSceneConfig() {
-        return SceneConfig.newBuilder().setActivationState(getDefaultActivationState());
+        return SceneConfig.newBuilder().setEnablingState(getDefaultEnablingState());
     }
 
     public static AgentConfig.Builder getDefaultAgentConfig() {
@@ -94,7 +94,7 @@ public class RSTDefaultInstances {
     }
 
     public static AppConfig.Builder getDefaultAppConfig() {
-        return AppConfig.newBuilder().setActivationState(getDefaultActivationState());
+        return AppConfig.newBuilder().setEnablingState(getDefaultEnablingState());
     }
 
     public static Vec3DDouble.Builder getDefaultVec3DDouble() {
