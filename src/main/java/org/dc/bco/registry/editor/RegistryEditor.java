@@ -215,7 +215,7 @@ public class RegistryEditor extends Application {
                             GeneratedMessage data = remote.getData();
                             logger.info("Got data");
                             getRegistryTabByRemote(remote).setContent(updateTreeTableView(data));
-                        } catch (CouldNotPerformException ex) {
+                        } catch (CouldNotPerformException | InterruptedException ex) {
                             java.util.logging.Logger.getLogger(RegistryEditor.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
@@ -450,7 +450,7 @@ public class RegistryEditor extends Application {
         return null;
     }
 
-    private javafx.scene.Node updateTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException {
+    private javafx.scene.Node updateTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException, InterruptedException {
         if (msg instanceof DeviceRegistry) {
             DeviceRegistry data = (DeviceRegistry) msg;
             deviceClassTreeTableView.update(data.getDeviceClassList());
