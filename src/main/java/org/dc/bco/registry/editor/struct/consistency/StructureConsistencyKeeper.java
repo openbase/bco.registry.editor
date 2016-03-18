@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.struct.consistency;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
@@ -45,7 +44,6 @@ import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.homeautomation.unit.UnitTemplateConfigType.UnitTemplateConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate.UnitType;
-import rst.person.PersonType;
 import rst.timing.TimestampType.Timestamp;
 
 /**
@@ -59,8 +57,6 @@ public class StructureConsistencyKeeper {
     public static void keepStructure(NodeContainer<? extends Message.Builder> container, String fieldName) throws CouldNotPerformException, InterruptedException {
         if (container.getBuilder() instanceof InventoryState.Builder) {
             keepInventoryStateStructure((NodeContainer<InventoryState.Builder>) container);
-        } else if (container.getBuilder() instanceof PersonType.Person.Builder && ((NodeContainer<GeneratedMessage.Builder>) container.getParent().getValue()).getBuilder() instanceof InventoryState.Builder) {
-            keepInventoryStateStructure((NodeContainer<InventoryState.Builder>) container.getParent().getValue());
         } else if (container.getBuilder() instanceof DeviceConfig.Builder) {
             keepDeviceConfigStructure((NodeContainer<DeviceConfig.Builder>) container, fieldName);
         } else if (container.getBuilder() instanceof UnitTemplateConfig.Builder) {

@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import java.util.Collections;
@@ -55,18 +54,18 @@ import rst.spatial.LocationConfigType.LocationConfig;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class MessageComboBox extends ComboBox<Message> {
-
+    
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(MessageComboBox.class);
-
+    
     private static final int DEFAULT_VISIBLE_ROW_COUNT = 5;
     private final MessageComboBoxConverterInterface converter;
-
+    
     public MessageComboBox(ValueCell cell, Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         super();
         this.setVisibleRowCount(DEFAULT_VISIBLE_ROW_COUNT);
         this.converter = getConverterByMessageType(fieldName, parentBuilder);
         this.setCellFactory(new Callback<ListView<Message>, ListCell<Message>>() {
-
+            
             @Override
             public ListCell<Message> call(ListView<Message> param) {
                 return new MessageComboBoxCell();
@@ -76,21 +75,22 @@ public class MessageComboBox extends ComboBox<Message> {
         this.setItems(sortedList(parentBuilder, fieldName, cell.getLeaf().getValue()));
         this.setStartingValue(cell.getLeaf().getValue());
         this.setOnAction(new EventHandler() {
-
+            
             @Override
             public void handle(Event event) {
-                 try {
-                if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
-                    cell.getLeaf().setValue(converter.getValue(getSelectionModel().getSelectedItem()));
-                    cell.commitEdit(cell.getLeaf());
-                }
+                try {
+                    if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
+                        cell.getLeaf().setValue(converter.getValue(getSelectionModel().getSelectedItem()));
+                        cell.setText(converter.getText(getSelectionModel().getSelectedItem()));
+                        cell.commitEdit(cell.getLeaf());
+                    }
                 } catch (InterruptedException ex) {
                     ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });
     }
-
+    
     private void setStartingValue(Object value) {
         for (Message msg : this.getItems()) {
             if (converter.getValue(msg).equals(value)) {
@@ -99,7 +99,7 @@ public class MessageComboBox extends ComboBox<Message> {
             }
         }
     }
-
+    
     private ObservableList<Message> sortedList(Message.Builder parentBuilder, String fieldName, Object leafValue) throws InstantiationException {
         try {
             List<? extends Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
@@ -139,7 +139,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             }
             Collections.sort(list, new Comparator<Message>() {
-
+                
                 @Override
                 public int compare(Message o1, Message o2) {
                     if (o1 == null && o2 == null) {
@@ -158,7 +158,7 @@ public class MessageComboBox extends ComboBox<Message> {
             throw new InstantiationException(this, ex);
         }
     }
-
+    
     public static GeneratedMessage getMessageEnumBoxType(String fieldName, Message.Builder parentBuilder) {
         if (null != fieldName) {
             switch (fieldName) {
@@ -175,11 +175,13 @@ public class MessageComboBox extends ComboBox<Message> {
                     } else if (parentBuilder instanceof UnitGroupConfig.Builder) {
                         return UnitConfig.getDefaultInstance();
                     }
+                case "owner_id":
+                    return UserConfig.getDefaultInstance();
             }
         }
         return null;
     }
-
+    
     public MessageComboBoxConverterInterface getConverterByMessageType(String fieldName, Message.Builder parentBuilder) {
         GeneratedMessage msg = getMessageEnumBoxType(fieldName, parentBuilder);
         if (msg instanceof LocationConfig) {
@@ -190,9 +192,9 @@ public class MessageComboBox extends ComboBox<Message> {
             return new DefaultMessageComboBoxConverter();
         }
     }
-
+    
     private class MessageComboBoxCell extends ListCell<Message> {
-
+        
         @Override
         public void updateItem(Message item, boolean empty) {
             super.updateItem(item, empty);

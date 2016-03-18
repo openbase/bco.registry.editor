@@ -59,6 +59,7 @@ import org.dc.jul.exception.printer.LogLevel;
 import org.dc.jul.extension.rsb.scope.ScopeGenerator;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.configuration.EntryType;
+import rst.homeautomation.state.InventoryStateType.InventoryState;
 
 /**
  *
@@ -151,6 +152,12 @@ public class ValueCell extends RowCell {
                         text = ((Leaf) item).getValue().toString();
                     }
                 } else if ("member_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof UserGroupConfig.Builder) {
+                    try {
+                        text = new UserConfigComboBoxConverter().getText(remotePool.getUserRemote().getUserConfigById((String) ((Leaf) item).getValue()));
+                    } catch (CouldNotPerformException ex) {
+                        text = ((Leaf) item).getValue().toString();
+                    }
+                } else if ("owner_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof InventoryState.Builder) {
                     try {
                         text = new UserConfigComboBoxConverter().getText(remotePool.getUserRemote().getUserConfigById((String) ((Leaf) item).getValue()));
                     } catch (CouldNotPerformException ex) {
