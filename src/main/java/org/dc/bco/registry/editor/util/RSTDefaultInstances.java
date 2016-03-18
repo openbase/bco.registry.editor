@@ -21,9 +21,10 @@ package org.dc.bco.registry.editor.util;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.GeneratedMessage.Builder;
 import java.util.Date;
+import rst.authorization.UserConfigType.UserConfig;
+import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.geometry.PoseType.Pose;
 import rst.geometry.RotationType.Rotation;
 import rst.geometry.TranslationType.Translation;
@@ -97,6 +98,14 @@ public class RSTDefaultInstances {
         return AppConfig.newBuilder().setEnablingState(getDefaultEnablingState());
     }
 
+    public static UserConfig.Builder getDefaultUserConfig() {
+        return UserConfig.newBuilder().setEnablingState(getDefaultEnablingState());
+    }
+
+    public static UserGroupConfig.Builder getDefaultUserGroupConfig() {
+        return UserGroupConfig.newBuilder().setEnablingState(getDefaultEnablingState());
+    }
+
     public static Vec3DDouble.Builder getDefaultVec3DDouble() {
         return Vec3DDouble.newBuilder().setX(0).setY(0).setZ(0);
     }
@@ -114,6 +123,10 @@ public class RSTDefaultInstances {
             return getDefaultAppConfig();
         } else if (builderType instanceof Vec3DDouble.Builder) {
             return getDefaultVec3DDouble();
+        } else if (builderType instanceof UserConfig.Builder) {
+            return getDefaultUserConfig();
+        } else if (builderType instanceof UserGroupConfig.Builder) {
+            return getDefaultUserGroupConfig();
         } else {
             return (Builder) builderType.build().getDefaultInstanceForType().toBuilder();
         }

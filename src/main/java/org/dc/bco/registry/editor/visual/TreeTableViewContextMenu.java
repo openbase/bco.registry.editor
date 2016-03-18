@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.visual;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.GeneratedMessage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -78,6 +77,12 @@ public class TreeTableViewContextMenu extends ContextMenu {
                             break;
                         case CONNECTION_CONFIG:
                             newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultConnectionConfig());
+                            break;
+                        case USER_CONFIG:
+                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultUserConfig());
+                            break;
+                        case USER_GROUP_CONFIG:
+                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultUserGroupConfig());
                             break;
                         default:
                             newNode = new GenericNodeContainer("", (GeneratedMessage.Builder) type.getDefaultInstanceForType().toBuilder());
