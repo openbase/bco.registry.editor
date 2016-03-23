@@ -29,6 +29,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
@@ -49,27 +50,27 @@ import org.dc.jul.exception.InstantiationException;
 import org.dc.jul.extension.protobuf.ProtobufListDiff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.homeautomation.device.DeviceConfigType;
 
 /**
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class RegistryTreeTableView extends TreeTableView<Node> {
-
+    
     private static final Logger logger = LoggerFactory.getLogger(RegistryTreeTableView.class);
-
+    
     private final DescriptorColumn descriptorColumn;
     private final SendableType type;
     private final ProtobufListDiff listDiff;
     private final Label readOnlyLabel;
     private final VBox vBox;
     private final RemotePool remotePool;
-
+    
     public RegistryTreeTableView(SendableType type) throws InstantiationException, InterruptedException {
         this.type = type;
         this.setEditable(true);
         this.setShowRoot(false);
+        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.descriptorColumn = new DescriptorColumn();
         this.getColumns().addAll(descriptorColumn, new ValueColumn());
         if (type != null) {
@@ -77,44 +78,44 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
         setSortMode(TreeSortMode.ALL_DESCENDANTS);
         getSortOrder().add(descriptorColumn);
-
+        
         this.listDiff = new ProtobufListDiff();
-
+        
         this.readOnlyLabel = new Label("Read-Only-Mode");
         this.readOnlyLabel.setAlignment(Pos.CENTER);
         this.readOnlyLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
-
+        
         this.vBox = new VBox();
         this.vBox.setAlignment(Pos.CENTER);
         this.vBox.getChildren().addAll(readOnlyLabel, this);
-
+        
         this.remotePool = RemotePool.getInstance();
     }
-
+    
     public void addWidthProperty(ReadOnlyDoubleProperty widthProperty) {
         for (Object column : getColumns()) {
             ((Column) column).addWidthProperty(widthProperty);
         }
     }
-
+    
     public void addHeightProperty(ReadOnlyDoubleProperty heightProperty) {
         heightProperty.addListener(new ChangeListener<Number>() {
-
+            
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 RegistryTreeTableView.this.setPrefHeight(newValue.doubleValue());
             }
         });
     }
-
+    
     public DescriptorColumn getDescriptorColumn() {
         return descriptorColumn;
     }
-
+    
     public SendableType getSendableType() {
         return type;
     }
-
+    
     public void update(List<? extends GeneratedMessage> messageList) throws CouldNotPerformException, InterruptedException {
         // get all changes
         listDiff.diff(messageList);
@@ -165,15 +166,15 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
                 ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder());
             }
         }
-
+        
         setReadOnlyMode(remotePool.isReadOnly(type));
     }
-
+    
     private NodeContainer getNodeByMessage(List<TreeItem<Node>> nodes, GeneratedMessage msg) {
         if (nodes.isEmpty()) {
             return null;
         }
-
+        
         try {
             if (FieldDescriptorUtil.getId(msg).equals(FieldDescriptorUtil.getId(((NodeContainer) nodes.get(0)).getBuilder()))) {
                 return (NodeContainer) nodes.get(0);
@@ -189,12 +190,12 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
             return getNodeByMessage(nodes, msg);
         }
     }
-
+    
     private GenericListContainer getAccordingParent(List<TreeItem<Node>> nodes, GeneratedMessage msg) throws CouldNotPerformException, InterruptedException {
         if (nodes.isEmpty()) {
             return null;
         }
-
+        
         if (nodes.get(0) instanceof GenericGroupContainer) {
             GenericGroupContainer group = (GenericGroupContainer) nodes.get(0);
             GenericGroupContainer parent = (GenericGroupContainer) group.getParent();
@@ -216,19 +217,19 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
         return null;
     }
-
+    
     public static void expandEqually(TreeItem origin, TreeItem update) {
         if (origin.isExpanded()) {
             update.setExpanded(true);
         }
-
+        
         for (int i = 0; i < origin.getChildren().size(); i++) {
             if (i < update.getChildren().size()) {
                 expandEqually((TreeItem) origin.getChildren().get(i), (TreeItem) update.getChildren().get(i));
             }
         }
     }
-
+    
     public void setReadOnlyMode(boolean readOnly) {
         if (readOnly) {
             getStylesheets().add("read_only.css");
@@ -239,7 +240,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
         setEditableWithReadOnlyLabel(!readOnly);
     }
-
+    
     public void setEditableWithReadOnlyLabel(boolean editable) {
         if (!editable) {
             vBox.getChildren().clear();
@@ -249,15 +250,15 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
         super.setEditable(editable);
     }
-
+    
     public Label getReadOnlyLabel() {
         return readOnlyLabel;
     }
-
+    
     public VBox getVBox() {
         return vBox;
     }
-
+    
     public ProtobufListDiff getListDiff() {
         return listDiff;
     }
