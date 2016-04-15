@@ -21,11 +21,12 @@ package org.dc.bco.registry.editor.struct;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.bco.registry.editor.visual.provider.TreeItemDescriptorProvider;
 import org.dc.jul.exception.CouldNotPerformException;
@@ -48,6 +49,9 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
      * A list for all the values in the group.
      */
     private final List values;
+    private final Map<NodeContainer, Object> valueMap = new HashMap<>();
+    private final TreeItemDescriptorProvider[] groups;
+    private final TreeItemDescriptorProvider[] childGroups;
     private final Descriptors.FieldDescriptor fieldDescriptor;
 
     public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {
@@ -56,11 +60,12 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
 
     public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {
         super(descriptor, builder);
+        this.groups = groups;
         this.treeItemDescriptorProvider = groups[0];
         this.fieldDescriptor = fieldDescriptor;
-        TreeItemDescriptorProvider childGroups[] = new TreeItemDescriptorProvider[groups.length - 1];
+        this.childGroups = new TreeItemDescriptorProvider[groups.length - 1];
         for (int i = 1; i < groups.length; i++) {
-            childGroups[i - 1] = groups[i];
+            this.childGroups[i - 1] = groups[i];
         }
         try {
             List<RFMB> groupBuilderList = new ArrayList<>();
@@ -72,9 +77,13 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
                     }
                 }
                 if (groups.length == 1 && !groupBuilderList.isEmpty()) {
-                    super.add(new GenericListContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList));
+                    GenericListContainer<MB, GeneratedMessage, RFMB> genericListContainer = new GenericListContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList);
+                    valueMap.put(genericListContainer, value);
+                    super.add(genericListContainer);
                 } else {
-                    super.add(new GenericGroupContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList, childGroups));
+                    GenericGroupContainer<MB, GeneratedMessage, RFMB> genericGroupContainer = new GenericGroupContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList, childGroups);
+                    valueMap.put(genericGroupContainer, value);
+                    super.add(genericGroupContainer);
                 }
                 groupBuilderList.clear();
             }
@@ -93,5 +102,21 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
 
     public Descriptors.FieldDescriptor getFieldDescriptor() {
         return fieldDescriptor;
+    }
+
+    public boolean isLastGroup() {
+        return groups.length == 1;
+    }
+
+    public TreeItemDescriptorProvider[] getGroups() {
+        return groups;
+    }
+
+    public TreeItemDescriptorProvider[] getChildGroups() {
+        return childGroups;
+    }
+
+    public Map<NodeContainer, Object> getValueMap() {
+        return valueMap;
     }
 }

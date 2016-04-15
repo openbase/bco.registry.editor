@@ -26,14 +26,19 @@ import com.google.protobuf.Message;
 import java.text.DecimalFormat;
 import java.util.Date;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import org.dc.bco.registry.editor.RegistryEditor;
 import org.dc.bco.registry.editor.struct.GenericGroupContainer;
@@ -211,8 +216,7 @@ public class ValueCell extends RowCell {
                 GenericGroupContainer parent = (GenericGroupContainer) ((GenericGroupContainer) item).getParent().getValue();
                 if (parent.getFieldGroup() instanceof DeviceClassItemDescriptorProvider) {
                     try {
-                        int index = parent.getChildren().indexOf(item);
-                        String text = remotePool.getDeviceRemote().getDeviceClassById((String) parent.getValues().get(index)).getDescription();
+                        String text = remotePool.getDeviceRemote().getDeviceClassById((String) parent.getValueMap().get(getItem())).getDescription();
                         setGraphic(SelectableLabel.makeSelectable(new Label(text)));
                     } catch (CouldNotPerformException ex) {
                         RegistryEditor.printException(ex, logger, LogLevel.DEBUG);
