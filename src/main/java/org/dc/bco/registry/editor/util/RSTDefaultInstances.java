@@ -127,6 +127,8 @@ public class RSTDefaultInstances {
             return getDefaultUserConfig();
         } else if (builderType instanceof UserGroupConfig.Builder) {
             return getDefaultUserGroupConfig();
+        } else if (builderType instanceof ConnectionConfig.Builder) {
+            return getDefaultConnectionConfig();
         } else {
             return (Builder) builderType.build().getDefaultInstanceForType().toBuilder();
         }

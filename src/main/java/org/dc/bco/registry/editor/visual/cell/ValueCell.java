@@ -49,6 +49,7 @@ import org.dc.bco.registry.editor.struct.Node;
 import org.dc.bco.registry.editor.struct.consistency.Configuration;
 import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.bco.registry.editor.util.SelectableLabel;
+import org.dc.bco.registry.editor.visual.GlobalTextArea;
 import org.dc.bco.registry.editor.visual.RegistryTreeTableView;
 import org.dc.bco.registry.editor.visual.cell.editing.DecimalTextField;
 import org.dc.bco.registry.editor.visual.cell.editing.EnumComboBox;
@@ -123,6 +124,8 @@ public class ValueCell extends RowCell {
         }
         if (graphic != null) {
             graphic.setPrefWidth(this.getWidth() * 5 / 8);
+            // if still not in focus -> wrap in platform run later
+            graphic.requestFocus();
         }
         return graphic;
     }
@@ -258,7 +261,8 @@ public class ValueCell extends RowCell {
 
         @Override
         public void handle(ActionEvent event) {
-            logger.info("new apply event");
+            logger.debug("new apply event");
+            GlobalTextArea.getInstance().clearText();
             Thread thread = new Thread(
                     new Task<Boolean>() {
                         @Override
@@ -290,6 +294,7 @@ public class ValueCell extends RowCell {
 
         @Override
         public void handle(ActionEvent event) {
+            GlobalTextArea.getInstance().clearText();
             Thread thread = new Thread(
                     new Task<Boolean>() {
                         @Override

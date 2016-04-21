@@ -147,7 +147,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
-                GlobalTextArea.getInstance().setText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been removed from the global database!");
+                GlobalTextArea.getInstance().setTextAreaStyle("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been removed from the global database!");
                 continue;
             }
             TreeItem<Node> parent = nodeToRemove.getParent();
@@ -169,7 +169,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
 //            logger.info("Found old node to remove to update [" + nodeToRemove.getBuilder().build() + "]");
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
-                GlobalTextArea.getInstance().setText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'");
+                GlobalTextArea.getInstance().setTextAreaStyle("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'");
                 continue;
             }
             GenericListContainer parent = (GenericListContainer) nodeToRemove.getParent();

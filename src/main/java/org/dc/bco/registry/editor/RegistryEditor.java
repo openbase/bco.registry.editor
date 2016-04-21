@@ -60,6 +60,7 @@ import org.dc.bco.registry.editor.util.RemotePool;
 import org.dc.bco.registry.editor.util.SendableType;
 import org.dc.bco.registry.editor.visual.GlobalTextArea;
 import org.dc.bco.registry.editor.visual.RegistryTreeTableView;
+import org.dc.bco.registry.editor.visual.TabPaneWithClearing;
 import org.dc.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
 import org.dc.bco.registry.editor.visual.provider.FieldDescriptorGroup;
 import org.dc.bco.registry.editor.visual.provider.LocationItemDescriptorProvider;
@@ -104,7 +105,7 @@ public class RegistryEditor extends Application {
     private MenuBar menuBar;
     private Menu fileMenu;
     private MenuItem sortMenuItem, resyncMenuItem;
-    private TabPane registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane;
+    private TabPaneWithClearing registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane;
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab, unitGroupTab;
     private Tab locationConfigTab, connectionConfigTab;
@@ -129,7 +130,7 @@ public class RegistryEditor extends Application {
         super.init();
         remotePool.init();
 
-        registryTabPane = new TabPane();
+        registryTabPane = new TabPaneWithClearing();
         registryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
         deviceRegistryTab = new Tab("DeviceRegistry");
@@ -159,7 +160,7 @@ public class RegistryEditor extends Application {
         userGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.USER_GROUP_CONFIG);
         unitGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_GROUP_CONFIG);
 
-        deviceRegistryTabPane = new TabPane();
+        deviceRegistryTabPane = new TabPaneWithClearing();
         deviceRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         deviceClassTab = new Tab("DeviceClass");
         deviceConfigTab = new Tab("DeviceConfig");
@@ -171,7 +172,7 @@ public class RegistryEditor extends Application {
         unitGroupTab.setContent(unitGroupConfigTreeTableView.getVBox());
         deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab, unitTemplateTab, unitGroupTab);
 
-        locationRegistryTabPane = new TabPane();
+        locationRegistryTabPane = new TabPaneWithClearing();
         locationRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         locationConfigTab = new Tab("LocationConfig");
         locationConfigTab.setContent(locationConfigTreeTableView.getVBox());
@@ -179,7 +180,7 @@ public class RegistryEditor extends Application {
         connectionConfigTab.setContent(connectionConfigTreeTableView.getVBox());
         locationRegistryTabPane.getTabs().addAll(connectionConfigTab, locationConfigTab);
 
-        userRegistryTabPane = new TabPane();
+        userRegistryTabPane = new TabPaneWithClearing();
         userRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         userConfigTab = new Tab("UserConfig");
         userConfigTab.setContent(userConfigTreeTableview.getVBox());

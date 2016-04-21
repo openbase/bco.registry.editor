@@ -21,8 +21,12 @@ package org.dc.bco.registry.editor.visual;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import org.dc.jul.exception.printer.ExceptionPrinter;
 
@@ -30,8 +34,9 @@ import org.dc.jul.exception.printer.ExceptionPrinter;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class GlobalTextArea extends TextArea {
+public class GlobalTextArea extends StackPane {
 
+    private final TextArea textArea;
     private static GlobalTextArea globalTextArea;
 
     public static GlobalTextArea getInstance() {
@@ -42,12 +47,38 @@ public class GlobalTextArea extends TextArea {
     }
 
     public GlobalTextArea() {
-        this.setEditable(false);
-        this.setFont(Font.font("Monospaced"));
+        this.textArea = new TextArea();
+        this.textArea.setEditable(false);
+        this.textArea.setFont(Font.font("Monospaced"));
+        BorderPane borderPane1 = new BorderPane();
+        BorderPane borderPane2 = new BorderPane();
+        borderPane1.setBottom(borderPane2);
+        Button button = new Button("Clear");
+        button.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                textArea.clear();
+            }
+        });
+        borderPane2.setRight(button);
+        this.getChildren().addAll(textArea, borderPane1);
     }
 
     public void printException(Throwable th) {
-        this.setText("");
-        this.setText(ExceptionPrinter.getHistory(th));
+        this.textArea.clear();
+        this.textArea.setText(ExceptionPrinter.getHistory(th));
+    }
+
+    public void clearText() {
+        this.textArea.clear();
+    }
+
+    public void setText(String text) {
+        this.textArea.setText(text);
+    }
+
+    public void setTextAreaStyle(String style) {
+        this.textArea.setStyle(style);
     }
 }

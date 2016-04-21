@@ -46,16 +46,16 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
-    
+
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(EnumComboBox.class);
-    
+
     public EnumComboBox(ValueCell cell, EnumValueDescriptor currentValue) {
         super();
         setVisibleRowCount(5);
         setItems(removeUnkownType(currentValue.getType()));
         setValue(currentValue);
         setOnAction(new EventHandler() {
-            
+
             @Override
             public void handle(Event event) {
                 try {
@@ -70,7 +70,7 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
             }
         });
         setCellFactory(new Callback<ListView<EnumValueDescriptor>, ListCell<EnumValueDescriptor>>() {
-            
+
             @Override
             public ListCell<EnumValueDescriptor> call(ListView<EnumValueDescriptor> p) {
                 return new EnumComboBoxCell();
@@ -78,11 +78,20 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
         });
         setButtonCell(new EnumComboBoxCell());
     }
-    
+
     private ObservableList removeUnkownType(EnumDescriptor enumDescriptor) {
         List<EnumValueDescriptor> values = new ArrayList<>(enumDescriptor.getValues());
+//        int unknownIndex = -1;
+//        for (int i = 0; i < values.size(); i++) {
+//            if (values.get(i).getName().toLowerCase().equals("unknown")) {
+//                unknownIndex = i;
+//            }
+//        }
+//        if (unknownIndex != -1) {
+//            values.remove(unknownIndex);
+//        }
         Collections.sort(values, new Comparator<EnumValueDescriptor>() {
-            
+
             @Override
             public int compare(EnumValueDescriptor o1, EnumValueDescriptor o2) {
                 if (o1 == null && o2 == null) {
@@ -95,16 +104,11 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
                 return o1.getName().compareTo(o2.getName());
             }
         });
-//        for (int i = 0; i < values.size(); i++) {
-//            if ("unknown".equalsIgnoreCase(values.get(i).getName())) {
-//                values.remove(i);
-//            }
-//        }
         return FXCollections.observableArrayList(values);
     }
-    
+
     private class EnumComboBoxCell extends ListCell<EnumValueDescriptor> {
-        
+
         @Override
         public void updateItem(EnumValueDescriptor item, boolean empty) {
             super.updateItem(item, empty);
