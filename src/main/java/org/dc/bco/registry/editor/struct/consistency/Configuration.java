@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.struct.consistency;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import rst.authorization.UserConfigType.UserConfig;

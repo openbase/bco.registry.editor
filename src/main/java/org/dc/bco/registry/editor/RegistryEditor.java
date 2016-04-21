@@ -36,12 +36,14 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
@@ -230,6 +232,8 @@ public class RegistryEditor extends Application {
         logger.info("Init finished");
     }
 
+    private SplitPane splitPane;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         logger.info("Starting");
@@ -237,14 +241,18 @@ public class RegistryEditor extends Application {
             updateTab(remote);
         });
 
-        VBox vBox = new VBox(menuBar, registryTabPane, globalTextArea);
+        splitPane = new SplitPane(registryTabPane, globalTextArea);
+        globalTextArea.addParent(splitPane);
+        splitPane.setOrientation(Orientation.VERTICAL);
+
+        VBox vBox = new VBox(menuBar, splitPane);
         Scene scene = new Scene(vBox, RESOLUTION_WIDTH, 576);
         scene.heightProperty().addListener(new ChangeListener<Number>() {
 
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                registryTabPane.setPrefHeight(newValue.doubleValue() * 0.80);
-                globalTextArea.setPrefHeight(newValue.doubleValue() * 0.20);
+                splitPane.setPrefHeight(newValue.doubleValue());
+                splitPane.setDividerPositions(1);
             }
         });
 

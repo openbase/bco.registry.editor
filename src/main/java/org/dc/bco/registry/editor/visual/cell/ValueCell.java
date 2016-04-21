@@ -76,6 +76,7 @@ public class ValueCell extends RowCell {
     protected final Button applyButton, cancelButton;
     protected final HBox buttonLayout;
     protected LeafContainer leaf;
+    private javafx.scene.control.Control graphic;
 
     protected SimpleObjectProperty<Boolean> changed = null;
     protected final ChangeListener<Boolean> changeListener;
@@ -102,8 +103,7 @@ public class ValueCell extends RowCell {
     }
 
     private javafx.scene.control.Control getEditingGraphic() {
-
-        javafx.scene.control.Control graphic = null;
+        graphic = null;
         Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor(), leaf.getParent().getBuilder());
         if (type != null) {
             try {
@@ -125,7 +125,13 @@ public class ValueCell extends RowCell {
         if (graphic != null) {
             graphic.setPrefWidth(this.getWidth() * 5 / 8);
             // if still not in focus -> wrap in platform run later
-            graphic.requestFocus();
+//            Platform.runLater(new Runnable() {
+//
+//                @Override
+//                public void run() {
+//                    graphic.requestFocus();
+//                }
+//            });
         }
         return graphic;
     }

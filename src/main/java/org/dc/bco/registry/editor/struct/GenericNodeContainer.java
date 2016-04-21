@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.struct;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
 import java.util.Map.Entry;
@@ -31,6 +30,7 @@ import org.dc.bco.registry.editor.util.FieldDescriptorUtil;
 import org.dc.jul.exception.CouldNotPerformException;
 import org.dc.jul.exception.InstantiationException;
 import org.dc.jul.exception.NotAvailableException;
+import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
  *
@@ -84,6 +84,9 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
         } else if (field.getType().equals(FieldDescriptor.Type.MESSAGE)) {
             super.add(new GenericNodeContainer(field, (GeneratedMessage.Builder) builder.getFieldBuilder(field)));
         } else {
+            if(builder instanceof PlacementConfig.Builder) {
+                int i = 0;
+            }
             super.add(new LeafContainer(builder.getField(field), field.getName(), this, Configuration.isModifiableField(builder, field.getName())));
         }
     }

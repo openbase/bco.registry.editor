@@ -21,7 +21,6 @@ package org.dc.bco.registry.editor.struct;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.GeneratedMessage;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
