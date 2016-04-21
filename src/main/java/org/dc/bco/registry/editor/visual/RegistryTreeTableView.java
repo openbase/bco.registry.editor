@@ -266,9 +266,11 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
 
     public void setReadOnlyMode(boolean readOnly) {
         if (readOnly) {
+            getStylesheets().clear();
             getStylesheets().add("read_only.css");
             setContextMenu(null);
         } else {
+            getStylesheets().clear();
             getStylesheets().add("default.css");
             setContextMenu(new TreeTableViewContextMenu(this, type));
         }
