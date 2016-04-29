@@ -32,6 +32,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -80,7 +81,7 @@ import org.dc.jul.exception.InstantiationException;
 import org.dc.jul.exception.printer.ExceptionPrinter;
 import org.dc.jul.exception.printer.LogLevel;
 import org.dc.jul.extension.rsb.com.RSBRemoteService;
-import org.dc.jul.pattern.Observable;
+import org.dc.jul.pattern.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.authorization.UserRegistryType.UserRegistry;
@@ -321,8 +322,12 @@ public class RegistryEditor extends Application {
                 @Override
                 public Void call() throws Exception {
                     try {
-                        remote.addObserver((Observable source, Object data) -> {
-                            updateTab(remote);
+                        remote.addObserver(new Observer() {
+
+                            @Override
+                            public void update(org.dc.jul.pattern.Observable source, Object data) throws Exception {
+                                updateTab(remote);
+                            }
                         });
                         if (remote.equals(remotePool.getDeviceRemote())) {
 //                            logger.info("Device tree cannot be created without activated location remote. Waiting for its activation...");
