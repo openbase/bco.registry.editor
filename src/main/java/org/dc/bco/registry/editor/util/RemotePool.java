@@ -118,18 +118,18 @@ public class RemotePool {
         userRemote.shutdown();
     }
 
-    public <M extends Message> M register(Message msg) throws CouldNotPerformException {
+    public <M extends Message> Future<M> register(Message msg) throws CouldNotPerformException {
         try {
-            return ((Future<M>) invokeMethod("register", msg)).get();
-        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+            return (Future<M>) invokeMethod("register", msg);
+        } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not register [" + msg + "]", ex);
         }
     }
 
-    public <M extends Message> M update(Message msg) throws CouldNotPerformException {
+    public <M extends Message> Future<M> update(Message msg) throws CouldNotPerformException {
         try {
-            return ((Future<M>) invokeMethod("update", msg)).get();
-        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+            return (Future<M>) invokeMethod("update", msg);
+        } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not update [" + msg + "]", ex);
         }
     }
@@ -142,10 +142,10 @@ public class RemotePool {
         }
     }
 
-    public <M extends Message> M remove(Message msg) throws CouldNotPerformException {
+    public <M extends Message> Future<M> remove(Message msg) throws CouldNotPerformException {
         try {
-            return ((Future<M>) invokeMethod("remove", msg)).get();
-        } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+            return (Future<M>) invokeMethod("remove", msg);
+        } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not remove [" + msg + "]", ex);
         }
     }
