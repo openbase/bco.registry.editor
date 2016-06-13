@@ -2,12 +2,9 @@
 APP_NAME='registry-editor'
 clear &&
 echo "=== clean ${APP_NAME} ===" &&
-mvn clean &&
+mvn clean $@ &&
 clear &&
-echo "=== install ${APP_NAME} ===" &&
-mvn install $@ &&
-clear &&
-echo "=== deploy ${APP_NAME} to ${prefix} ===" &&
-mvn package jar:jar appassembler:assemble -DassembleDirectory=${prefix} $@ &&
+echo "=== install and deploy ${APP_NAME} ===" &&
+mvn install -DassembleDirectory=${prefix} $@ &&
 clear &&
 echo "=== ${APP_NAME} is successfully installed to ${prefix} ==="

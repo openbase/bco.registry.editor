@@ -277,13 +277,13 @@ public class ValueCell extends RowCell {
                             Message msg = null;
                             try {
                                 msg = container.getBuilder().build();
+                                container.setChanged(false);
                                 if (remotePool.contains(msg)) {
                                     remotePool.update(msg);
                                 } else {
                                     container.getParent().getChildren().remove(container);
                                     remotePool.register(msg);
                                 }
-                                container.setChanged(false);
                             } catch (Exception ex) {
                                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                                 logger.warn("Could not register or update message [" + msg + "]", ex);

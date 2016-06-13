@@ -22,16 +22,11 @@ package org.dc.bco.registry.editor.visual;
  * #L%
  */
 import com.google.protobuf.GeneratedMessage;
-import com.google.protobuf.Message;
-import com.sun.javafx.beans.event.AbstractNotifyListener;
-import com.sun.javafx.property.adapter.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WeakChangeListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -42,7 +37,6 @@ import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 import org.dc.bco.registry.editor.struct.GenericGroupContainer;
 import org.dc.bco.registry.editor.struct.GenericListContainer;
 import org.dc.bco.registry.editor.struct.GenericNodeContainer;

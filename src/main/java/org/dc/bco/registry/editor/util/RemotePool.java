@@ -118,17 +118,17 @@ public class RemotePool {
         userRemote.shutdown();
     }
 
-    public <M extends Message> M register(Message msg) throws CouldNotPerformException {
+    public <M extends Message> Future<M> register(Message msg) throws CouldNotPerformException {
         try {
-            return (M) invokeMethod("register", msg);
+            return (Future<M>) invokeMethod("register", msg);
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not register [" + msg + "]", ex);
         }
     }
 
-    public <M extends Message> M update(Message msg) throws CouldNotPerformException {
+    public <M extends Message> Future<M> update(Message msg) throws CouldNotPerformException {
         try {
-            return (M) invokeMethod("update", msg);
+            return (Future<M>) invokeMethod("update", msg);
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not update [" + msg + "]", ex);
         }
@@ -142,9 +142,9 @@ public class RemotePool {
         }
     }
 
-    public <M extends Message> M remove(Message msg) throws CouldNotPerformException {
+    public <M extends Message> Future<M> remove(Message msg) throws CouldNotPerformException {
         try {
-            return (M) invokeMethod("remove", msg);
+            return (Future<M>) invokeMethod("remove", msg);
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not remove [" + msg + "]", ex);
         }
@@ -206,8 +206,8 @@ public class RemotePool {
         try {
             RSBRemoteService remote = getRemoteByMessage(type.getDefaultInstanceForType());
             Method method = remote.getClass().getMethod(methodName);
-            return ((Future<Boolean>) method.invoke(remote)).get();
-        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InterruptedException | ExecutionException ex) {
+            return (Boolean) method.invoke(remote);
+        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new CouldNotPerformException(ex);
         }
     }
