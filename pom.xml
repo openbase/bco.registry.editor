@@ -5,7 +5,7 @@
         <maven>3.0</maven>
     </prerequisites>
 
-    <groupId>org.dc.bco.registry</groupId>
+    <groupId>org.openbase.bco.registry</groupId>
     <artifactId>editor</artifactId>
     <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -13,11 +13,11 @@
     <name>RegistryEditor</name>
     <inceptionYear>2014</inceptionYear>
     
-    <url>https://github.com/divinecooperation/bco.registry.editor/wiki</url>
+    <url>https://github.com/openbase/bco.registry.editor/wiki</url>
 
     <organization>
-        <name>DivineCooperation</name>
-        <url>https://github.com/divinecooperation</url>
+        <name>openbase.org</name>
+        <url>https://github.com/openbase</url>
     </organization>
     
     <developers>
@@ -26,8 +26,8 @@
             <name>Tamino Huxohl</name>
             <email>taminoh@ymail.com</email>
             <url>https://github.com/pLeminoq</url>
-            <organization>DivineCooperation</organization>
-            <organizationUrl>https://github.com/divinecooperation</organizationUrl>
+            <organization>openbase.org</organization>
+            <organizationUrl>https://github.com/openbase</organizationUrl>
             <roles>
                 <role>architect</role>
                 <role>developer</role>
@@ -40,8 +40,8 @@
 
             <email>divinethreepwood@gmail.com</email>
             <url>https://github.com/DivineThreepwood</url>
-            <organization>DivineCooperation</organization>
-            <organizationUrl>https://github.com/divinecooperation</organizationUrl>
+            <organization>openbase.org</organization>
+            <organizationUrl>https://github.com/openbase</organizationUrl>
             <roles>
                 <role>developer</role>
                 <role>tester</role>
@@ -83,7 +83,7 @@
                 <configuration>
                     <programs>
                         <program>
-                            <mainClass>org.dc.bco.registry.editor.RegistryEditor</mainClass>
+                            <mainClass>org.openbase.bco.registry.editor.RegistryEditor</mainClass>
                             <id>registry-editor</id>
                             <platforms>
                                 <platform>unix</platform>
@@ -99,7 +99,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.dc.bco.registry.editor.RegistryEditor</mainClass>
+                            <mainClass>org.openbase.bco.registry.editor.RegistryEditor</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -168,9 +168,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git@github.com/divinecooperation/bco.registry.editor.git</connection>
-        <developerConnection>scm:git:git@github.com/divinecooperation/bco.registry.editor.git</developerConnection>
-        <url>git@github.com/divinecooperation/bco.registry.editor.git</url>
+        <connection>scm:git:git@github.com/openbase/bco.registry.editor.git</connection>
+        <developerConnection>scm:git:git@github.com/openbase/bco.registry.editor.git</developerConnection>
+        <url>git@github.com/openbase/bco.registry.editor.git</url>
     </scm>
 
     <dependencies>
@@ -181,57 +181,57 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.dc</groupId>
+            <groupId>org.openbase</groupId>
             <artifactId>jul.extension.rsb.com</artifactId>
             <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.dc</groupId>
+            <groupId>org.openbase</groupId>
             <artifactId>jul.storage</artifactId>
             <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.dc</groupId>
+            <groupId>org.openbase</groupId>
             <artifactId>jul.extension.rsb.scope</artifactId>
             <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.dc</groupId>
+            <groupId>org.openbase</groupId>
             <artifactId>jul.processing</artifactId>
             <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.dc.bco</groupId>
+            <groupId>org.openbase.bco</groupId>
             <artifactId>registry.device.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.dc.bco</groupId>
+            <groupId>org.openbase.bco</groupId>
             <artifactId>registry.location.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.dc.bco</groupId>
+            <groupId>org.openbase.bco</groupId>
             <artifactId>registry.scene.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.dc.bco</groupId>
+            <groupId>org.openbase.bco</groupId>
             <artifactId>registry.agent.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.dc.bco</groupId>
+            <groupId>org.openbase.bco</groupId>
             <artifactId>registry.app.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.dc.bco</groupId>
+            <groupId>org.openbase.bco</groupId>
             <artifactId>registry.user.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
