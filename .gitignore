@@ -1,5 +1,4 @@
-/target/
-/nbactions.xml
-/nbactions-toolkit-nightly.xml
-/nbactions-bone-profile.xml
-/nb-configuration.xml
+*~
+*.swp
+build
+**/target/
