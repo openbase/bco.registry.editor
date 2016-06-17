@@ -228,7 +228,8 @@ public class RegistryEditor extends Application {
         });
         fileMenu = new Menu("File");
         fileMenu.getItems().addAll(sortMenuItem, resyncMenuItem);
-        menuBar = new MenuBar(fileMenu);
+        menuBar = new MenuBar(/*fileMenu*/);
+        menuBar.getMenus().add(fileMenu);
 
         logger.info("Init finished");
     }
@@ -242,7 +243,8 @@ public class RegistryEditor extends Application {
             updateTab(remote);
         });
 
-        splitPane = new SplitPane(registryTabPane, globalTextArea);
+        splitPane = new SplitPane(/*registryTabPane, globalTextArea*/);
+        splitPane.getItems().addAll(registryTabPane, globalTextArea);
         globalTextArea.addParent(splitPane);
         splitPane.setOrientation(Orientation.VERTICAL);
 
