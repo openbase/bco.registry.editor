@@ -243,7 +243,8 @@ public class RegistryEditor extends Application {
             updateTab(remote);
         });
 
-        splitPane = new SplitPane(registryTabPane, globalTextArea);
+        splitPane = new SplitPane(/*registryTabPane, globalTextArea*/);
+        splitPane.getItems().addAll(registryTabPane, globalTextArea);
         globalTextArea.addParent(splitPane);
         splitPane.setOrientation(Orientation.VERTICAL);
 
