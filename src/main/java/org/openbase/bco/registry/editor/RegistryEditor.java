@@ -32,7 +32,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -207,28 +206,21 @@ public class RegistryEditor extends Application {
             }
         });
         resyncMenuItem = new MenuItem("resync");
-        resyncMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                logger.info("Resyncing");
-                for (RSBRemoteService remote : remotePool.getRemotes()) {
-                    if (remote.isConnected()) {
-                        logger.info("Remote is connected [" + remote.getClass().getSimpleName() + "]");
-                        try {
-                            GeneratedMessage data = remote.getData();
-                            logger.info("Got data");
-                            getRegistryTabByRemote(remote).setContent(updateTreeTableView(data));
-                        } catch (CouldNotPerformException | InterruptedException ex) {
-                            java.util.logging.Logger.getLogger(RegistryEditor.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
+        resyncMenuItem.setOnAction((ActionEvent event) -> {
+            remotePool.getRemotes().stream().forEach((remote) -> {
+                try {
+                    remote.requestData();
+                } catch (CouldNotPerformException ex) {
+                    java.util.logging.Logger.getLogger(RegistryEditor.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
+            });
         });
         fileMenu = new Menu("File");
-        fileMenu.getItems().addAll(sortMenuItem, resyncMenuItem);
+
+        fileMenu.getItems()
+                .addAll(sortMenuItem, resyncMenuItem);
         menuBar = new MenuBar(/*fileMenu*/);
+
         menuBar.getMenus().add(fileMenu);
 
         logger.info("Init finished");
@@ -542,13 +534,21 @@ public class RegistryEditor extends Application {
 
         /* Setup JPService */
         JPService.setApplicationName(APP_NAME);
-        JPService.registerProperty(JPReadOnly.class);
-        JPService.registerProperty(JPDeviceRegistryScope.class);
-        JPService.registerProperty(JPLocationRegistryScope.class);
-        JPService.registerProperty(JPSceneRegistryScope.class);
-        JPService.registerProperty(JPAgentRegistryScope.class);
-        JPService.registerProperty(JPAppRegistryScope.class);
-        JPService.registerProperty(JPUserRegistryScope.class);
+        JPService
+                .registerProperty(JPReadOnly.class
+                );
+        JPService.registerProperty(JPDeviceRegistryScope.class
+        );
+        JPService.registerProperty(JPLocationRegistryScope.class
+        );
+        JPService.registerProperty(JPSceneRegistryScope.class
+        );
+        JPService.registerProperty(JPAgentRegistryScope.class
+        );
+        JPService.registerProperty(JPAppRegistryScope.class
+        );
+        JPService.registerProperty(JPUserRegistryScope.class
+        );
         JPService.parseAndExitOnError(args);
 
         launch(args);
