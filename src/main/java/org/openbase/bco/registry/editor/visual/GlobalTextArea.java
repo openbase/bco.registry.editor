@@ -21,17 +21,12 @@ package org.openbase.bco.registry.editor.visual;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
@@ -41,68 +36,67 @@ import org.openbase.jul.exception.printer.ExceptionPrinter;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class GlobalTextArea extends TextArea {
-    
+
     private static GlobalTextArea globalTextArea;
-    
+
     private SplitPane parent;
-    
+
     public static GlobalTextArea getInstance() {
         if (globalTextArea == null) {
             globalTextArea = new GlobalTextArea();
         }
         return globalTextArea;
     }
-    
+
     public GlobalTextArea() {
         super();
         this.parent = null;
         ContextMenu contextMenu = new ContextMenu();
         MenuItem clear = new MenuItem("Clear");
         clear.setOnAction(new EventHandler<ActionEvent>() {
-            
+
             @Override
             public void handle(ActionEvent event) {
                 clearText();
             }
         });
         contextMenu.getItems().add(clear);
-        
+
         this.setContextMenu(contextMenu);
         this.setEditable(false);
         this.setFont(Font.font("Monospaced"));
         this.setMinHeight(0);
     }
-    
+
     public void printException(Throwable th) {
         this.clear();
         this.setText(ExceptionPrinter.getHistory(th));
         resize(getText());
     }
-    
+
     public void clearText() {
         this.clear();
         if (parent != null) {
             parent.setDividerPositions(1);
         }
     }
-    
+
     public void putText(String text) {
         this.setText(text);
         resize(text);
     }
-    
+
     private void resize(String text) {
         Text helper = new Text();
         helper.setText(text);
         helper.setFont(this.getFont());
         helper.setWrappingWidth(Double.MAX_VALUE);
         this.setPrefHeight(helper.getLayoutBounds().getHeight());
-        System.out.println("New pref height [" + helper.getLayoutBounds().getHeight() + "] for text [" + text + "]");
         if (parent != null) {
             parent.setDividerPositions(1.0 - ((this.getPrefHeight() + 50) / parent.getPrefHeight()));
         }
     }
-    
+
     public void addParent(SplitPane splitPane) {
         this.parent = splitPane;
     }
