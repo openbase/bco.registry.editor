@@ -316,7 +316,7 @@ public class RegistryEditor extends Application {
                 @Override
                 public Void call() throws Exception {
                     try {
-                        remote.addObserver(new Observer() {
+                        remote.addDataObserver(new Observer() {
 
                             @Override
                             public void update(org.openbase.jul.pattern.Observable source, Object data) throws Exception {
