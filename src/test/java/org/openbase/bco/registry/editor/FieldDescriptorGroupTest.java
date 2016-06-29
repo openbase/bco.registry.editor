@@ -86,7 +86,7 @@ public class FieldDescriptorGroupTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
+    @Test(timeout = 5000)
     public void testGetFieldValues() throws Exception {
         System.out.println("getFieldValues");
         
@@ -106,7 +106,7 @@ public class FieldDescriptorGroupTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
+    @Test(timeout = 5000)
     public void testGetValue() throws Exception {
         System.out.println("getValue");
 
@@ -124,7 +124,7 @@ public class FieldDescriptorGroupTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
+    @Test(timeout = 5000)
     public void testHasEqualValue() throws Exception {
         System.out.println("hasEqualValue");
 
@@ -143,7 +143,7 @@ public class FieldDescriptorGroupTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
+    @Test(timeout = 5000)
     public void testsetValue() throws Exception {
         System.out.println("setValue");
 
