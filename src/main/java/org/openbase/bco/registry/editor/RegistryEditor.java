@@ -26,8 +26,6 @@ import com.google.protobuf.GeneratedMessage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import javafx.application.Application;
@@ -77,10 +75,12 @@ import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPReadOnly;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
+import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.openbase.jul.pattern.Observer;
+import org.openbase.jul.schedule.GlobalExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.authorization.UserRegistryType.UserRegistry;
@@ -304,14 +304,12 @@ public class RegistryEditor extends Application {
         registerObserver();
     }
 
-    private final ExecutorService executerService = Executors.newCachedThreadPool();
-
     public void registerObserver() throws Exception {
 
         final Map<RSBRemoteService, Future<Void>> registrationFutureMap = new HashMap<>();
 
         for (RSBRemoteService remote : remotePool.getRemotes()) {
-            registrationFutureMap.put(remote, executerService.submit(new Callable<Void>() {
+            registrationFutureMap.put(remote, GlobalExecutionService.submit(new Callable<Void>() {
 
                 @Override
                 public Void call() throws Exception {
@@ -350,7 +348,6 @@ public class RegistryEditor extends Application {
     public void stop() throws Exception {
         super.stop();
         remotePool.shutdown();
-        executerService.shutdown();
         //TODO: search why it will not shutdown without system exit
         System.exit(0);
     }
@@ -375,7 +372,7 @@ public class RegistryEditor extends Application {
                         tab.setContent(updateTreeTableView(data));
                     }
                 } catch (CouldNotPerformException | InterruptedException ex) {
-                    logger.error("Registry not available!", ex);
+                    ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), logger);
                     tab.setContent(new Label("Error: " + ex.getMessage()));
                 }
             }
