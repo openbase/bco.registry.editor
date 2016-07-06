@@ -36,6 +36,7 @@ import rst.homeautomation.state.ActivationStateType.ActivationState;
 import rst.homeautomation.state.EnablingStateType.EnablingState;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.math.Vec3DDoubleType.Vec3DDouble;
 import rst.spatial.ConnectionConfigType.ConnectionConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
@@ -106,8 +107,15 @@ public class RSTDefaultInstances {
         return UserGroupConfig.newBuilder().setEnablingState(getDefaultEnablingState());
     }
 
+    public static PlacementConfig.Builder getDefaultPlacementConfig() {
+        return PlacementConfig.newBuilder().setPosition(getDefaultPose());
+    }
     public static Vec3DDouble.Builder getDefaultVec3DDouble() {
         return Vec3DDouble.newBuilder().setX(0).setY(0).setZ(0);
+    }
+    
+    public static UnitGroupConfig.Builder getDefaultUnitGroupConfig() {
+        return UnitGroupConfig.newBuilder().setPlacementConfig(getDefaultPlacementConfig());
     }
 
     public static Builder getDefaultBuilder(Builder builderType) {
@@ -129,7 +137,9 @@ public class RSTDefaultInstances {
             return getDefaultUserGroupConfig();
         } else if (builderType instanceof ConnectionConfig.Builder) {
             return getDefaultConnectionConfig();
-        } else {
+        } else if (builderType instanceof UnitGroupConfig.Builder) {
+            return getDefaultUnitGroupConfig();
+        }else {
             return (Builder) builderType.build().getDefaultInstanceForType().toBuilder();
         }
     }

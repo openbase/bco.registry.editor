@@ -25,20 +25,16 @@ import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Message;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.struct.GenericGroupContainer;
@@ -281,10 +277,11 @@ public class ValueCell extends RowCell {
                                 if (remotePool.contains(msg)) {
                                     remotePool.update(msg);
                                 } else {
+//                                    container.getParent().getChildren().remove(container);
+                                    remotePool.register(msg).get();
                                     container.getParent().getChildren().remove(container);
-                                    remotePool.register(msg);
                                 }
-                            } catch (Exception ex) {
+                            } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
                                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                                 logger.warn("Could not register or update message [" + msg + "]", ex);
                             }
