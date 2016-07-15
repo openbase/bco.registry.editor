@@ -30,7 +30,7 @@ import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.homeautomation.device.DeviceRegistryType.DeviceRegistry;
+import rst.homeautomation.device.DeviceRegistryDataType.DeviceRegistryData;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
 import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
@@ -55,7 +55,7 @@ public class Configuration {
             return false;
         } else if (builder instanceof UnitConfig.Builder && "service_config".equals(fieldName)) {
             return false;
-        } else if (builder instanceof DeviceRegistry.Builder && "unit_template".equals(fieldName)) {
+        } else if (builder instanceof DeviceRegistryData.Builder && "unit_template".equals(fieldName)) {
             return false;
         } else if (builder instanceof LocationConfig.Builder && "unit_id".equals(fieldName)) {
             return false;

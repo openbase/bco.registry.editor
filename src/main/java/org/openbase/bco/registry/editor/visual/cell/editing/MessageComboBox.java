@@ -23,6 +23,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -45,6 +46,8 @@ import org.slf4j.LoggerFactory;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
+import rst.homeautomation.service.ServiceTemplateType;
+import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
@@ -130,7 +133,11 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             }
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
-                list = RemotePool.getInstance().getDeviceRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), ((UnitGroupConfig.Builder) parentBuilder).getServiceTypeList());
+                List<ServiceTemplateType.ServiceTemplate.ServiceType> serviceTypes = new ArrayList<>();
+                for(ServiceTemplate serviceTemplate : ((UnitGroupConfig.Builder) parentBuilder).getServiceTemplateList()) {
+                    serviceTypes.add(serviceTemplate.getType());
+                }
+                list = RemotePool.getInstance().getDeviceRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), serviceTypes);
                 for (String memberId : ((UnitGroupConfig.Builder) parentBuilder).getMemberIdList()) {
                     if (memberId.equals(leafValue)) {
                         continue;

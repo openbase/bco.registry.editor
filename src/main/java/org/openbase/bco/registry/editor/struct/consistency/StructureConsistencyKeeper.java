@@ -38,6 +38,7 @@ import org.openbase.jul.exception.InstantiationException;
 import org.slf4j.LoggerFactory;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
+import rst.homeautomation.service.ServiceTemplateConfigType.ServiceTemplateConfig;
 import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
@@ -92,10 +93,10 @@ public class StructureConsistencyKeeper {
 
             // create the new values for the field and add them to the builder
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(container.getBuilder().getDeviceClassId()).getUnitTemplateConfigList()) {
-                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToDevice(true);
+                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToSystemUnit(true);
                 unitConfig.setPlacementConfig(container.getBuilder().getPlacementConfig());
-                unitTemplate.getServiceTemplateList().stream().forEach((serviceTemplate) -> {
-                    unitConfig.addServiceConfig(ServiceConfig.newBuilder().setType(serviceTemplate.getServiceType()));
+                unitTemplate.getServiceTemplateConfigList().stream().forEach((serviceTemplateConfig) -> {
+                    unitConfig.addServiceConfig(ServiceConfig.newBuilder().setServiceTemplate(ServiceTemplate.newBuilder().setType(serviceTemplateConfig.getServiceType())));
                 });
                 container.getBuilder().addUnitConfig(unitConfig);
             }
@@ -113,13 +114,13 @@ public class StructureConsistencyKeeper {
             StructureConsistencyKeeper.clearField(container, "service_template");
 
             // create the new values for the field and add them to the builder
-            for (ServiceTemplate.ServiceType serviceType : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceTypeList()) {
-                ServiceTemplate.Builder serviceTemplateBuilder = ServiceTemplate.newBuilder().setServiceType(serviceType);
-                container.getBuilder().addServiceTemplate(serviceTemplateBuilder);
+            for (ServiceTemplate serviceTemplate : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceTemplateList()) {
+                ServiceTemplateConfig.Builder serviceTemplateConfigBuilder = ServiceTemplateConfig.newBuilder().setServiceType(serviceTemplate.getType());
+                container.getBuilder().addServiceTemplateConfig(serviceTemplateConfigBuilder);
             }
 
             // create and add a new child node container representing these children
-            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(UnitTemplateConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
+            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(UnitTemplateConfig.SERVICE_TEMPLATE_CONFIG_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
@@ -146,10 +147,10 @@ public class StructureConsistencyKeeper {
         if ("device_class_id".equals(changedField)) {
 
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(builder.getDeviceClassId()).getUnitTemplateConfigList()) {
-                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToDevice(true);
+                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToSystemUnit(true);
                 unitConfig.setPlacementConfig(builder.getPlacementConfig());
-                unitTemplate.getServiceTemplateList().stream().forEach((serviceTemplate) -> {
-                    unitConfig.addServiceConfig(ServiceConfig.newBuilder().setType(serviceTemplate.getServiceType()));
+                unitTemplate.getServiceTemplateConfigList().stream().forEach((serviceTemplateConfig) -> {
+                    unitConfig.addServiceConfig(ServiceConfig.newBuilder().setServiceTemplate(ServiceTemplate.newBuilder().setType(serviceTemplateConfig.getServiceType())));
                 });
                 builder.addUnitConfig(unitConfig);
             }
@@ -171,8 +172,8 @@ public class StructureConsistencyKeeper {
         } else if ("unit_type".equals(changedField)) {
             change = true;
             StructureConsistencyKeeper.clearField(container, "service_type");
-            container.getBuilder().addAllServiceType(RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getUnitType()).getServiceTypeList());
-            field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.SERVICE_TYPE_FIELD_NUMBER, container.getBuilder());
+            container.getBuilder().addAllServiceTemplate(RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getUnitType()).getServiceTemplateList());
+            field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer<>(field, container.getBuilder()));
         }
 
@@ -184,7 +185,7 @@ public class StructureConsistencyKeeper {
                     UnitConfig unitConfig = RemotePool.getInstance().getDeviceRemote().getUnitConfigById(memberId);
                     boolean skip = false;
                     for (ServiceConfig serviceConfig : unitConfig.getServiceConfigList()) {
-                        if (!container.getBuilder().getServiceTypeList().contains(serviceConfig.getType())) {
+                        if (!container.getBuilder().getServiceTemplateList().contains(serviceConfig.getServiceTemplate())) {
                             skip = true;
                         }
                     }
