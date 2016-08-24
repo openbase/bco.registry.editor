@@ -57,6 +57,7 @@ import org.openbase.bco.registry.editor.visual.cell.editing.ValueCheckBox;
 import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
@@ -265,13 +266,21 @@ public class ValueCell extends RowCell {
         public void handle(ActionEvent event) {
             logger.debug("new apply event");
             GlobalTextArea.getInstance().clearText();
-            Thread thread = new Thread(
+            Thread thread;
+            thread = new Thread(
                     new Task<Boolean>() {
                         @Override
                         protected Boolean call() throws Exception {
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
                             Message msg = null;
                             try {
+                                if (!container.getBuilder().isInitialized()) {
+                                    String errors = "";
+                                    for (Object error : container.getBuilder().findInitializationErrors()) {
+                                        errors += "[" + error.toString() + "]";
+                                    }
+                                    throw new CouldNotPerformException("Could not build sendable msg! Missing required field/s[" + errors + "]");
+                                }
                                 msg = container.getBuilder().build();
                                 container.setChanged(false);
                                 if (remotePool.contains(msg)) {
@@ -284,6 +293,8 @@ public class ValueCell extends RowCell {
                             } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
                                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                                 logger.warn("Could not register or update message [" + msg + "]", ex);
+                            } catch (Exception ex) {
+                                ExceptionPrinter.printHistory(ex, logger);
                             }
                             return true;
                         }

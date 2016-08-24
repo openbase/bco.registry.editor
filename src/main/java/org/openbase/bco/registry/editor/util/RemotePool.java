@@ -21,14 +21,12 @@ package org.openbase.bco.registry.editor.util;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.openbase.bco.registry.agent.lib.jp.JPAgentRegistryScope;
 import org.openbase.bco.registry.agent.remote.AgentRegistryRemote;
@@ -52,7 +50,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
+import rst.homeautomation.control.agent.AgentClassType.AgentClass;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
+import rst.homeautomation.control.app.AppClassType.AppClass;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
@@ -189,7 +189,7 @@ public class RemotePool {
 
     public <M extends Message> List<M> getMessageList(Message msg) throws CouldNotPerformException {
         String methodName = getMethodName("get", "s", msg);
-        if (msg instanceof DeviceClass) {
+        if (msg instanceof DeviceClass || msg instanceof AgentClass || msg instanceof AppClass) {
             methodName = getMethodName("get", "es", msg);
         }
         try {
@@ -229,11 +229,11 @@ public class RemotePool {
             return deviceRemote;
         } else if (builder instanceof LocationConfig.Builder || builder instanceof ConnectionConfig.Builder) {
             return locationRemote;
-        } else if (builder instanceof AgentConfig.Builder) {
+        } else if (builder instanceof AgentConfig.Builder || builder instanceof AgentClass.Builder) {
             return agentRemote;
         } else if (builder instanceof SceneConfig.Builder) {
             return sceneRemote;
-        } else if (builder instanceof AppConfig.Builder) {
+        } else if (builder instanceof AppConfig.Builder || builder instanceof AppClass.Builder) {
             return appRemote;
         } else if (builder instanceof UserConfig.Builder || builder instanceof UserGroupConfig.Builder) {
             return userRemote;

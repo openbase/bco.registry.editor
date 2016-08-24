@@ -25,7 +25,9 @@ import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
+import rst.homeautomation.control.agent.AgentClassType.AgentClass;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
+import rst.homeautomation.control.app.AppClassType.AppClass;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
@@ -96,7 +98,11 @@ public class Configuration {
             return !("id".equals(fieldName));
         } else if (builder instanceof AgentConfig.Builder) {
             return !("id".equals(fieldName));
+        } else if (builder instanceof AgentClass.Builder) {
+            return !("id".equals(fieldName));
         } else if (builder instanceof AppConfig.Builder) {
+            return !("id".equals(fieldName));
+        } else if (builder instanceof AppClass.Builder) {
             return !("id".equals(fieldName));
         } else if (builder instanceof UnitTemplateConfig.Builder) {
             return !("id".equals(fieldName));
@@ -116,7 +122,9 @@ public class Configuration {
                 || (builder instanceof UnitTemplate.Builder)
                 || (builder instanceof LocationConfig.Builder)
                 || (builder instanceof AgentConfig.Builder)
+                || (builder instanceof AgentClass.Builder)
                 || (builder instanceof AppConfig.Builder)
+                || (builder instanceof AppClass.Builder)
                 || (builder instanceof SceneConfig.Builder)
                 || (builder instanceof ConnectionConfig.Builder)
                 || (builder instanceof UserConfig.Builder)

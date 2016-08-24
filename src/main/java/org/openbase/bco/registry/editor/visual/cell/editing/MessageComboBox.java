@@ -45,6 +45,8 @@ import org.openbase.jul.exception.printer.LogLevel;
 import org.slf4j.LoggerFactory;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
+import rst.homeautomation.control.agent.AgentClassType.AgentClass;
+import rst.homeautomation.control.app.AppClassType.AppClass;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.service.ServiceTemplateType;
 import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
@@ -57,18 +59,18 @@ import rst.spatial.LocationConfigType.LocationConfig;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class MessageComboBox extends ComboBox<Message> {
-    
+
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(MessageComboBox.class);
-    
+
     private static final int DEFAULT_VISIBLE_ROW_COUNT = 5;
     private final MessageComboBoxConverterInterface converter;
-    
+
     public MessageComboBox(ValueCell cell, Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         super();
         this.setVisibleRowCount(DEFAULT_VISIBLE_ROW_COUNT);
         this.converter = getConverterByMessageType(fieldName, parentBuilder);
         this.setCellFactory(new Callback<ListView<Message>, ListCell<Message>>() {
-            
+
             @Override
             public ListCell<Message> call(ListView<Message> param) {
                 return new MessageComboBoxCell();
@@ -78,7 +80,7 @@ public class MessageComboBox extends ComboBox<Message> {
         this.setItems(sortedList(parentBuilder, fieldName, cell.getLeaf().getValue()));
         this.setStartingValue(cell.getLeaf().getValue());
         this.setOnAction(new EventHandler() {
-            
+
             @Override
             public void handle(Event event) {
                 try {
@@ -93,7 +95,7 @@ public class MessageComboBox extends ComboBox<Message> {
             }
         });
     }
-    
+
     private void setStartingValue(Object value) {
         for (Message msg : this.getItems()) {
             if (converter.getValue(msg).equals(value)) {
@@ -102,7 +104,7 @@ public class MessageComboBox extends ComboBox<Message> {
             }
         }
     }
-    
+
     private ObservableList<Message> sortedList(Message.Builder parentBuilder, String fieldName, Object leafValue) throws InstantiationException {
         try {
             List<? extends Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
@@ -134,7 +136,7 @@ public class MessageComboBox extends ComboBox<Message> {
             }
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
                 List<ServiceTemplateType.ServiceTemplate.ServiceType> serviceTypes = new ArrayList<>();
-                for(ServiceTemplate serviceTemplate : ((UnitGroupConfig.Builder) parentBuilder).getServiceTemplateList()) {
+                for (ServiceTemplate serviceTemplate : ((UnitGroupConfig.Builder) parentBuilder).getServiceTemplateList()) {
                     serviceTypes.add(serviceTemplate.getType());
                 }
                 list = RemotePool.getInstance().getDeviceRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), serviceTypes);
@@ -146,7 +148,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             }
             Collections.sort(list, new Comparator<Message>() {
-                
+
                 @Override
                 public int compare(Message o1, Message o2) {
                     if (o1 == null && o2 == null) {
@@ -165,7 +167,7 @@ public class MessageComboBox extends ComboBox<Message> {
             throw new InstantiationException(this, ex);
         }
     }
-    
+
     public static GeneratedMessage getMessageEnumBoxType(String fieldName, Message.Builder parentBuilder) {
         if (null != fieldName) {
             switch (fieldName) {
@@ -184,24 +186,32 @@ public class MessageComboBox extends ComboBox<Message> {
                     }
                 case "owner_id":
                     return UserConfig.getDefaultInstance();
+                case "agent_class_id":
+                    return AgentClass.getDefaultInstance();
+                case "app_class_id":
+                    return AppClass.getDefaultInstance();
             }
         }
         return null;
     }
-    
+
     public MessageComboBoxConverterInterface getConverterByMessageType(String fieldName, Message.Builder parentBuilder) {
         GeneratedMessage msg = getMessageEnumBoxType(fieldName, parentBuilder);
         if (msg instanceof LocationConfig) {
             return new LocationConfigComboBoxConverter();
         } else if (msg instanceof UserConfig) {
             return new UserConfigComboBoxConverter();
+        } else if (msg instanceof AgentClass) {
+            return new AgentClassComboBoxConverter();
+        } else if (msg instanceof AppClass) {
+            return new AppClassComboBoxConverter();
         } else {
             return new DefaultMessageComboBoxConverter();
         }
     }
-    
+
     private class MessageComboBoxCell extends ListCell<Message> {
-        
+
         @Override
         public void updateItem(Message item, boolean empty) {
             super.updateItem(item, empty);

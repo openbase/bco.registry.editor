@@ -107,13 +107,20 @@ public class RegistryEditor extends Application {
     private MenuBar menuBar;
     private Menu fileMenu;
     private MenuItem sortMenuItem, resyncMenuItem;
-    private TabPaneWithClearing registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane;
+    private TabPaneWithClearing registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane, agentRegistryTabPane, appRegistryTabPane;
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab, unitGroupTab;
     private Tab locationConfigTab, connectionConfigTab;
     private Tab userConfigTab, userGroupConfigTab;
+    private Tab agentClassTab, agentConfigTab;
+    private Tab appClassTab, appConfigTab;
     private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator, userRegistryProgessInidicator;
-    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView, connectionConfigTreeTableView, sceneConfigTreeTableView, agentConfigTreeTableView, appConfigTreeTableView, unitTemplateTreeTableView, userConfigTreeTableview, userGroupConfigTreeTableView, unitGroupConfigTreeTableView;
+    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, unitTemplateTreeTableView, unitGroupConfigTreeTableView;
+    private RegistryTreeTableView locationConfigTreeTableView, connectionConfigTreeTableView;
+    private RegistryTreeTableView sceneConfigTreeTableView;
+    private RegistryTreeTableView agentConfigTreeTableView, agentClassTreeTableView;
+    private RegistryTreeTableView appConfigTreeTableView, appClassTreeTableView;
+    private RegistryTreeTableView userConfigTreeTableview, userGroupConfigTreeTableView;
     private final Map<String, Boolean> intialized;
 
     public RegistryEditor() throws InstantiationException, InterruptedException {
@@ -156,7 +163,9 @@ public class RegistryEditor extends Application {
         connectionConfigTreeTableView = new RegistryTreeTableView(SendableType.CONNECTION_CONFIG);
         sceneConfigTreeTableView = new RegistryTreeTableView(SendableType.SCENE_CONFIG);
         agentConfigTreeTableView = new RegistryTreeTableView(SendableType.AGENT_CONFIG);
+        agentClassTreeTableView = new RegistryTreeTableView(SendableType.AGENT_CLASS);
         appConfigTreeTableView = new RegistryTreeTableView(SendableType.APP_CONFIG);
+        appClassTreeTableView = new RegistryTreeTableView(SendableType.APP_CLASS);
         unitTemplateTreeTableView = new RegistryTreeTableView(SendableType.UNIT_TEMPLATE);
         userConfigTreeTableview = new RegistryTreeTableView(SendableType.USER_CONFIG);
         userGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.USER_GROUP_CONFIG);
@@ -190,6 +199,22 @@ public class RegistryEditor extends Application {
         userGroupConfigTab.setContent(userGroupConfigTreeTableView.getVBox());
         userRegistryTabPane.getTabs().addAll(userConfigTab, userGroupConfigTab);
 
+        agentRegistryTabPane = new TabPaneWithClearing();
+        agentRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        agentClassTab = new Tab("AgentClass");
+        agentClassTab.setContent(agentClassTreeTableView.getVBox());
+        agentConfigTab = new Tab("AgentConfig");
+        agentConfigTab.setContent(agentConfigTreeTableView.getVBox());
+        agentRegistryTabPane.getTabs().addAll(agentClassTab, agentConfigTab);
+
+        appRegistryTabPane = new TabPaneWithClearing();
+        appRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        appClassTab = new Tab("AppClass");
+        appClassTab.setContent(appClassTreeTableView.getVBox());
+        appConfigTab = new Tab("AppConfig");
+        appConfigTab.setContent(appConfigTreeTableView.getVBox());
+        appRegistryTabPane.getTabs().addAll(appClassTab, appConfigTab);
+
         sortMenuItem = new MenuItem("Sort");
         sortMenuItem.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -217,8 +242,7 @@ public class RegistryEditor extends Application {
         });
         fileMenu = new Menu("File");
 
-        fileMenu.getItems()
-                .addAll(sortMenuItem, resyncMenuItem);
+        fileMenu.getItems().addAll(sortMenuItem, resyncMenuItem);
         menuBar = new MenuBar(/*fileMenu*/);
 
         menuBar.getMenus().add(fileMenu);
@@ -257,7 +281,9 @@ public class RegistryEditor extends Application {
         connectionConfigTreeTableView.addWidthProperty(scene.widthProperty());
         sceneConfigTreeTableView.addWidthProperty(scene.widthProperty());
         agentConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        agentClassTreeTableView.addWidthProperty(scene.widthProperty());
         appConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        appClassTreeTableView.addWidthProperty(scene.widthProperty());
         unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
         userConfigTreeTableview.addWidthProperty(scene.widthProperty());
         userGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
@@ -269,6 +295,9 @@ public class RegistryEditor extends Application {
         connectionConfigTreeTableView.addHeightProperty(scene.heightProperty());
         sceneConfigTreeTableView.addHeightProperty(scene.heightProperty());
         agentConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        agentClassTreeTableView.addHeightProperty(scene.heightProperty());
+        appConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        appClassTreeTableView.addHeightProperty(scene.heightProperty());
         unitTemplateTreeTableView.addHeightProperty(scene.heightProperty());
         userConfigTreeTableview.addHeightProperty(scene.heightProperty());
         userGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
@@ -429,15 +458,25 @@ public class RegistryEditor extends Application {
             appConfigTreeTableView.setRoot(new GenericListContainer(AppRegistryData.APP_CONFIG_FIELD_NUMBER, data.toBuilder()));
             appConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.APP_CONFIG));
             appConfigTreeTableView.getListDiff().diff(data.getAppConfigList());
+
+            appClassTreeTableView.setRoot(new GenericListContainer(AppRegistryData.APP_CLASS_FIELD_NUMBER, data.toBuilder()));
+            appClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.APP_CLASS));
+            appClassTreeTableView.getListDiff().diff(data.getAppClassList());
+
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return appConfigTreeTableView;
+            return appRegistryTabPane;
         } else if (msg instanceof AgentRegistryData) {
             AgentRegistryData data = (AgentRegistryData) msg;
             agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistryData.AGENT_CONFIG_FIELD_NUMBER, data.toBuilder()));
             agentConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CONFIG));
             agentConfigTreeTableView.getListDiff().diff(data.getAgentConfigList());
+
+            agentClassTreeTableView.setRoot(new GenericListContainer(AgentRegistryData.AGENT_CLASS_FIELD_NUMBER, data.toBuilder()));
+            agentClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CLASS));
+            agentClassTreeTableView.getListDiff().diff(data.getAgentClassList());
+
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return agentConfigTreeTableView;
+            return agentRegistryTabPane;
         } else if (msg instanceof UserRegistryData) {
             UserRegistryData data = (UserRegistryData) msg;
             userConfigTreeTableview.setRoot(new GenericListContainer<>(UserRegistryData.USER_CONFIG_FIELD_NUMBER, data.toBuilder()));
@@ -475,11 +514,13 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof AppRegistryData) {
             AppRegistryData data = (AppRegistryData) msg;
             appConfigTreeTableView.update(data.getAppConfigList());
-            return appConfigTreeTableView;
+            appClassTreeTableView.update(data.getAppClassList());
+            return appRegistryTabPane;
         } else if (msg instanceof AgentRegistryData) {
             AgentRegistryData data = (AgentRegistryData) msg;
             agentConfigTreeTableView.update(data.getAgentConfigList());
-            return agentConfigTreeTableView;
+            agentClassTreeTableView.update(data.getAgentClassList());
+            return agentRegistryTabPane;
         } else if (msg instanceof UserRegistryData) {
             UserRegistryData data = (UserRegistryData) msg;
             userConfigTreeTableview.update(data.getUserConfigList());
@@ -531,21 +572,13 @@ public class RegistryEditor extends Application {
 
         /* Setup JPService */
         JPService.setApplicationName(APP_NAME);
-        JPService
-                .registerProperty(JPReadOnly.class
-                );
-        JPService.registerProperty(JPDeviceRegistryScope.class
-        );
-        JPService.registerProperty(JPLocationRegistryScope.class
-        );
-        JPService.registerProperty(JPSceneRegistryScope.class
-        );
-        JPService.registerProperty(JPAgentRegistryScope.class
-        );
-        JPService.registerProperty(JPAppRegistryScope.class
-        );
-        JPService.registerProperty(JPUserRegistryScope.class
-        );
+        JPService.registerProperty(JPReadOnly.class);
+        JPService.registerProperty(JPDeviceRegistryScope.class);
+        JPService.registerProperty(JPLocationRegistryScope.class);
+        JPService.registerProperty(JPSceneRegistryScope.class);
+        JPService.registerProperty(JPAgentRegistryScope.class);
+        JPService.registerProperty(JPAppRegistryScope.class);
+        JPService.registerProperty(JPUserRegistryScope.class);
         JPService.parseAndExitOnError(args);
 
         launch(args);

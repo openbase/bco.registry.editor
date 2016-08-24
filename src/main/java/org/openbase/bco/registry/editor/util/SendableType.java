@@ -21,12 +21,13 @@ package org.openbase.bco.registry.editor.util;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
+import rst.homeautomation.control.agent.AgentClassType.AgentClass;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
+import rst.homeautomation.control.app.AppClassType.AppClass;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
@@ -43,7 +44,9 @@ import rst.spatial.LocationConfigType.LocationConfig;
 public enum SendableType {
 
     AGENT_CONFIG(AgentConfig.getDefaultInstance()),
+    AGENT_CLASS(AgentClass.getDefaultInstance()),
     APP_CONFIG(AppConfig.getDefaultInstance()),
+    APP_CLASS(AppClass.getDefaultInstance()),
     DEVICE_CLASS(DeviceClass.getDefaultInstance()),
     DEVICE_CONFIG(DeviceConfig.getDefaultInstance()),
     LOCATION_CONFIG(LocationConfig.getDefaultInstance()),
@@ -67,8 +70,12 @@ public enum SendableType {
     public static SendableType getTypeToBuilder(Message.Builder builder) {
         if (builder instanceof AgentConfig.Builder) {
             return AGENT_CONFIG;
+        } else if (builder instanceof AgentClass.Builder) {
+            return AGENT_CLASS;
         } else if (builder instanceof AppConfig.Builder) {
             return APP_CONFIG;
+        } else if (builder instanceof AppClass.Builder) {
+            return APP_CLASS;
         } else if (builder instanceof DeviceClass.Builder) {
             return DEVICE_CLASS;
         } else if (builder instanceof DeviceConfig.Builder) {
