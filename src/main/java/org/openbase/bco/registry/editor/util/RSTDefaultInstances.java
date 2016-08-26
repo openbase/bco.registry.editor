@@ -22,26 +22,26 @@ package org.openbase.bco.registry.editor.util;
  * #L%
  */
 import com.google.protobuf.GeneratedMessage.Builder;
-import java.util.Date;
 import rst.authorization.UserConfigType.UserConfig;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
+import rst.geometry.AxisAlignedBoundingBox3DFloatType.AxisAlignedBoundingBox3DFloat;
 import rst.geometry.PoseType.Pose;
 import rst.geometry.RotationType.Rotation;
 import rst.geometry.TranslationType.Translation;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
+import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.state.ActivationStateType.ActivationState;
 import rst.homeautomation.state.EnablingStateType.EnablingState;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
-import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.math.Vec3DDoubleType.Vec3DDouble;
 import rst.spatial.ConnectionConfigType.ConnectionConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
-import rst.spatial.ShapeType;
+import rst.spatial.ShapeType.Shape;
 import rst.timing.TimestampType.Timestamp;
 
 /**
@@ -50,21 +50,36 @@ import rst.timing.TimestampType.Timestamp;
  */
 public class RSTDefaultInstances {
 
-    public static DeviceConfig.Builder getDefaultDeviceConfig() {
-        PlacementConfig placementConfig = PlacementConfig.newBuilder().setPosition(getDefaultPose()).build();
-        InventoryState inventoryState = InventoryState.newBuilder().setTimestamp(Timestamp.newBuilder().setTime((new Date()).toInstant().toEpochMilli()).build()).build();
-        return DeviceConfig.newBuilder().setPlacementConfig(placementConfig).setInventoryState(inventoryState);
+    public static Timestamp getDefaultTimestamp() {
+        return Timestamp.newBuilder().setTime(System.currentTimeMillis()).build();
     }
 
-    public static UnitConfig.Builder setDefaultPlacement(UnitConfig.Builder unitBuilder) {
-        PlacementConfig placementConfig = PlacementConfig.newBuilder().setPosition(getDefaultPose()).build();
-        return unitBuilder.setPlacementConfig(placementConfig);
+    public static InventoryState getDefaultInventoryState() {
+        return InventoryState.newBuilder().setTimestamp(getDefaultTimestamp()).build();
+    }
+
+    public static DeviceConfig.Builder getDefaultDeviceConfig() {
+        return DeviceConfig.newBuilder().setPlacementConfig(getDefaultPlacementConfig()).setInventoryState(getDefaultInventoryState());
+    }
+
+    public static Translation getDefaultTranslation() {
+        return Translation.newBuilder().setX(0).setY(0).setZ(0).build();
+    }
+
+    public static Rotation getDefaultRotation() {
+        return Rotation.newBuilder().setQw(1).setQx(0).setQy(0).setQz(0).build();
+    }
+
+    public static AxisAlignedBoundingBox3DFloat getDefaultBoundingBox() {
+        return AxisAlignedBoundingBox3DFloat.newBuilder().setDepth(1).setHeight(1).setWidth(1).setLeftFrontBottom(getDefaultTranslation()).build();
+    }
+
+    public static Shape getDefaultShape() {
+        return Shape.newBuilder().setBoundingBox(getDefaultBoundingBox()).build();
     }
 
     public static Pose getDefaultPose() {
-        Rotation rotation = Rotation.newBuilder().setQw(1).setQx(0).setQy(0).setQz(0).build();
-        Translation translation = Translation.newBuilder().setX(0).setY(0).setZ(0).build();
-        return Pose.newBuilder().setRotation(rotation).setTranslation(translation).build();
+        return Pose.newBuilder().setRotation(getDefaultRotation()).setTranslation(getDefaultTranslation()).build();
     }
 
     public static LocationConfig.Builder getDefaultLocationConfig() {
@@ -75,16 +90,12 @@ public class RSTDefaultInstances {
         return ConnectionConfig.newBuilder().setPlacementConfig(PlacementConfig.newBuilder().setPosition(getDefaultPose()));
     }
 
-    public static ShapeType.Shape getDefaultShape() {
-        return null;
-    }
-
     public static ActivationState getDefaultActivationState() {
         return ActivationState.newBuilder().setValue(ActivationState.State.ACTIVE).build();
     }
 
     public static EnablingState getDefaultEnablingState() {
-        return EnablingState.newBuilder().setValue(EnablingState.State.ENABLED).build();
+        return EnablingState.newBuilder().setValue(EnablingState.State.ENABLED).setTimestamp(getDefaultTimestamp()).build();
     }
 
     public static SceneConfig.Builder getDefaultSceneConfig() {
@@ -108,14 +119,19 @@ public class RSTDefaultInstances {
     }
 
     public static PlacementConfig.Builder getDefaultPlacementConfig() {
-        return PlacementConfig.newBuilder().setPosition(getDefaultPose());
+        return PlacementConfig.newBuilder().setPosition(getDefaultPose()).setShape(getDefaultShape());
     }
+
     public static Vec3DDouble.Builder getDefaultVec3DDouble() {
         return Vec3DDouble.newBuilder().setX(0).setY(0).setZ(0);
     }
-    
+
     public static UnitGroupConfig.Builder getDefaultUnitGroupConfig() {
         return UnitGroupConfig.newBuilder().setPlacementConfig(getDefaultPlacementConfig());
+    }
+
+    public static DeviceClass.Builder getDefaultDeviceClass() {
+        return DeviceClass.newBuilder().setShape(getDefaultShape());
     }
 
     public static Builder getDefaultBuilder(Builder builderType) {
@@ -139,7 +155,9 @@ public class RSTDefaultInstances {
             return getDefaultConnectionConfig();
         } else if (builderType instanceof UnitGroupConfig.Builder) {
             return getDefaultUnitGroupConfig();
-        }else {
+        } else if (builderType instanceof DeviceClass.Builder) {
+            return getDefaultDeviceClass();
+        } else {
             return (Builder) builderType.build().getDefaultInstanceForType().toBuilder();
         }
     }

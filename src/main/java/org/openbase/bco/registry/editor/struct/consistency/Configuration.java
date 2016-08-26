@@ -51,7 +51,7 @@ public class Configuration {
 
     //TODO:tamino redesign
     public static boolean isModifiableList(GeneratedMessage.Builder builder, String fieldName) {
-        if (builder instanceof UnitTemplateConfig.Builder && "service_template".equals(fieldName)) {
+        if (builder instanceof UnitTemplateConfig.Builder && "service_template_config".equals(fieldName)) {
             return false;
         } else if (builder instanceof DeviceConfig.Builder && "unit_config".equals(fieldName)) {
             return false;
@@ -87,7 +87,7 @@ public class Configuration {
         } else if (builder instanceof Scope.Builder) {
             return !("scope".equals(fieldName));
         } else if (builder instanceof UnitConfig.Builder) {
-            return !("id".equals(fieldName) || "device_id".equals(fieldName) || "type".equals(fieldName) || "unit_template_config_id".equals(fieldName));
+            return !("id".equals(fieldName) || "system_unit_id".equals(fieldName) || "type".equals(fieldName) || "unit_template_config_id".equals(fieldName));
         } else if (builder instanceof ServiceConfig.Builder) {
             return !("type".equals(fieldName) || "unit_id".equals(fieldName));
         } else if (builder instanceof LocationConfig.Builder) {

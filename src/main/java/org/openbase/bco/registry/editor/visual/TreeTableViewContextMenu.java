@@ -35,7 +35,6 @@ import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
 
 /**
  *
@@ -58,7 +57,7 @@ public class TreeTableViewContextMenu extends ContextMenu {
                     GenericNodeContainer newNode = null;
                     switch (type) {
                         case DEVICE_CLASS:
-                            newNode = new GenericNodeContainer("", DeviceClass.getDefaultInstance().toBuilder());
+                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultDeviceClass());
                             break;
                         case DEVICE_CONFIG:
                             newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultDeviceConfig());

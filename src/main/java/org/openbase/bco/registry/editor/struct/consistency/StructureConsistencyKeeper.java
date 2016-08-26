@@ -25,7 +25,9 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.openbase.bco.registry.editor.struct.GenericListContainer;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.LeafContainer;
@@ -40,6 +42,7 @@ import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
 import rst.homeautomation.service.ServiceTemplateConfigType.ServiceTemplateConfig;
 import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
+import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate.ServiceType;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
@@ -52,9 +55,9 @@ import rst.timing.TimestampType.Timestamp;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class StructureConsistencyKeeper {
-
+    
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(StructureConsistencyKeeper.class);
-
+    
     public static void keepStructure(NodeContainer<? extends Message.Builder> container, String fieldName) throws CouldNotPerformException, InterruptedException {
         if (container.getBuilder() instanceof InventoryState.Builder) {
             keepInventoryStateStructure((NodeContainer<InventoryState.Builder>) container);
@@ -70,7 +73,7 @@ public class StructureConsistencyKeeper {
             }
         }
     }
-
+    
     public static void clearField(NodeContainer<? extends Message.Builder> container, String fieldName) {
         GeneratedMessage.Builder builder = container.getBuilder();
         for (int i = 0; i < container.getChildren().size(); i++) {
@@ -85,7 +88,7 @@ public class StructureConsistencyKeeper {
         }
         builder.clearField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder));
     }
-
+    
     private static void keepDeviceConfigStructure(NodeContainer<DeviceConfig.Builder> container, String changedField) throws CouldNotPerformException, InterruptedException {
         if ("device_class_id".equals(changedField)) {
             // clear the field in the builder and remove all child tree items representing these
@@ -95,9 +98,12 @@ public class StructureConsistencyKeeper {
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(container.getBuilder().getDeviceClassId()).getUnitTemplateConfigList()) {
                 UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToSystemUnit(true);
                 unitConfig.setPlacementConfig(container.getBuilder().getPlacementConfig());
-                unitTemplate.getServiceTemplateConfigList().stream().forEach((serviceTemplateConfig) -> {
-                    unitConfig.addServiceConfig(ServiceConfig.newBuilder().setServiceTemplate(ServiceTemplate.newBuilder().setType(serviceTemplateConfig.getServiceType())));
-                });
+                for (ServiceTemplate serviceTemplate : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(unitTemplate.getType()).getServiceTemplateList()) {
+                    unitConfig.addServiceConfig(ServiceConfig.newBuilder().setServiceTemplate(ServiceTemplate.newBuilder().setType(serviceTemplate.getType()).setPattern(serviceTemplate.getPattern())));
+                }
+//                unitTemplate.getServiceTemplateConfigList().stream().forEach((serviceTemplateConfig) -> {
+//                    unitConfig.addServiceConfig(ServiceConfig.newBuilder().setServiceTemplate(ServiceTemplate.newBuilder().setType(serviceTemplateConfig.getServiceType())));
+//                });
                 container.getBuilder().addUnitConfig(unitConfig);
             }
 
@@ -106,25 +112,30 @@ public class StructureConsistencyKeeper {
             container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
-
+    
     private static void keepUnitTemplateConfigStructure(NodeContainer<UnitTemplateConfig.Builder> container, String changedField) throws CouldNotPerformException, InstantiationException, InterruptedException {
         // check if the right field has been set
         if ("type".equals(changedField)) {
             // clear the field in the builder and remove all child tree items representing these
-            StructureConsistencyKeeper.clearField(container, "service_template");
+            StructureConsistencyKeeper.clearField(container, "service_template_config");
+
+            // filter so that every serviceType is only added once
+            Map<String, ServiceType> serviceTypeMap = new HashMap();
+            for (ServiceTemplate serviceTemplate : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceTemplateList()) {
+                serviceTypeMap.put(serviceTemplate.getType().toString(), serviceTemplate.getType());
+            }
 
             // create the new values for the field and add them to the builder
-            for (ServiceTemplate serviceTemplate : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceTemplateList()) {
-                ServiceTemplateConfig.Builder serviceTemplateConfigBuilder = ServiceTemplateConfig.newBuilder().setServiceType(serviceTemplate.getType());
+            serviceTypeMap.values().stream().map((serviceType) -> ServiceTemplateConfig.newBuilder().setServiceType(serviceType)).forEach((serviceTemplateConfigBuilder) -> {
                 container.getBuilder().addServiceTemplateConfig(serviceTemplateConfigBuilder);
-            }
+            });
 
             // create and add a new child node container representing these children
             Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(UnitTemplateConfig.SERVICE_TEMPLATE_CONFIG_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
-
+    
     private static void keepInventoryStateStructure(NodeContainer<InventoryState.Builder> container) throws CouldNotPerformException {
         // clear the field in the builder and remove all child tree items representing these
         StructureConsistencyKeeper.clearField(container, "timestamp");
@@ -136,16 +147,16 @@ public class StructureConsistencyKeeper {
         Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
         container.add(new GenericNodeContainer<>(field, container.getBuilder().getTimestampBuilder()));
     }
-
+    
     public static void keepStructure(Message.Builder builder, String fieldName) throws CouldNotPerformException, InterruptedException {
         if (builder instanceof DeviceConfig.Builder) {
             keepDeviceConfigStructure((DeviceConfig.Builder) builder, fieldName);
         }
     }
-
+    
     private static void keepDeviceConfigStructure(DeviceConfig.Builder builder, String changedField) throws CouldNotPerformException, InterruptedException {
         if ("device_class_id".equals(changedField)) {
-
+            
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(builder.getDeviceClassId()).getUnitTemplateConfigList()) {
                 UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToSystemUnit(true);
                 unitConfig.setPlacementConfig(builder.getPlacementConfig());
@@ -176,7 +187,7 @@ public class StructureConsistencyKeeper {
             field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer<>(field, container.getBuilder()));
         }
-
+        
         if (change) {
             List<String> memberIds = new ArrayList<>();
             if (container.getBuilder().getUnitType() == UnitType.UNKNOWN) {

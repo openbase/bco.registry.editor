@@ -57,7 +57,6 @@ import org.openbase.bco.registry.editor.visual.cell.editing.ValueCheckBox;
 import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
-import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import rst.authorization.UserGroupConfigType.UserGroupConfig;
@@ -275,11 +274,11 @@ public class ValueCell extends RowCell {
                             Message msg = null;
                             try {
                                 if (!container.getBuilder().isInitialized()) {
-                                    String errors = "";
+                                    String missingFields = "";
                                     for (Object error : container.getBuilder().findInitializationErrors()) {
-                                        errors += "[" + error.toString() + "]";
+                                        missingFields += "[" + error.toString() + "]";
                                     }
-                                    throw new CouldNotPerformException("Could not build sendable msg! Missing required field/s[" + errors + "]");
+                                    throw new CouldNotPerformException("Could not build sendable msg! Missing required field/s[" + missingFields + "]");
                                 }
                                 msg = container.getBuilder().build();
                                 container.setChanged(false);
@@ -293,8 +292,6 @@ public class ValueCell extends RowCell {
                             } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
                                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                                 logger.warn("Could not register or update message [" + msg + "]", ex);
-                            } catch (Exception ex) {
-                                ExceptionPrinter.printHistory(ex, logger);
                             }
                             return true;
                         }
