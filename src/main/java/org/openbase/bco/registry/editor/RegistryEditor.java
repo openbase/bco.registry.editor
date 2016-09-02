@@ -120,7 +120,7 @@ public class RegistryEditor extends Application {
     private RegistryTreeTableView sceneConfigTreeTableView;
     private RegistryTreeTableView agentConfigTreeTableView, agentClassTreeTableView;
     private RegistryTreeTableView appConfigTreeTableView, appClassTreeTableView;
-    private RegistryTreeTableView userConfigTreeTableview, userGroupConfigTreeTableView;
+    private RegistryTreeTableView userConfigTreeTableview, authorizationGroupConfigTreeTableView;
     private final Map<String, Boolean> intialized;
 
     public RegistryEditor() throws InstantiationException, InterruptedException {
@@ -168,7 +168,7 @@ public class RegistryEditor extends Application {
         appClassTreeTableView = new RegistryTreeTableView(SendableType.APP_CLASS);
         unitTemplateTreeTableView = new RegistryTreeTableView(SendableType.UNIT_TEMPLATE);
         userConfigTreeTableview = new RegistryTreeTableView(SendableType.USER_CONFIG);
-        userGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.USER_GROUP_CONFIG);
+        authorizationGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.AUTHORIZATION_GROUP_CONFIG);
         unitGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_GROUP_CONFIG);
 
         deviceRegistryTabPane = new TabPaneWithClearing();
@@ -195,8 +195,8 @@ public class RegistryEditor extends Application {
         userRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         userConfigTab = new Tab("UserConfig");
         userConfigTab.setContent(userConfigTreeTableview.getVBox());
-        userGroupConfigTab = new Tab("UserGroupConfig");
-        userGroupConfigTab.setContent(userGroupConfigTreeTableView.getVBox());
+        userGroupConfigTab = new Tab("AuthorizationGroupConfig");
+        userGroupConfigTab.setContent(authorizationGroupConfigTreeTableView.getVBox());
         userRegistryTabPane.getTabs().addAll(userConfigTab, userGroupConfigTab);
 
         agentRegistryTabPane = new TabPaneWithClearing();
@@ -286,7 +286,7 @@ public class RegistryEditor extends Application {
         appClassTreeTableView.addWidthProperty(scene.widthProperty());
         unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
         userConfigTreeTableview.addWidthProperty(scene.widthProperty());
-        userGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        authorizationGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
         unitGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
 
         deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
@@ -300,7 +300,7 @@ public class RegistryEditor extends Application {
         appClassTreeTableView.addHeightProperty(scene.heightProperty());
         unitTemplateTreeTableView.addHeightProperty(scene.heightProperty());
         userConfigTreeTableview.addHeightProperty(scene.heightProperty());
-        userGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        authorizationGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
         unitGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
 
         primaryStage.setTitle("Registry Editor");
@@ -483,9 +483,9 @@ public class RegistryEditor extends Application {
             userConfigTreeTableview.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_CONFIG));
             userConfigTreeTableview.getListDiff().diff(data.getUserConfigList());
 
-            userGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistryData.USER_GROUP_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            userGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_GROUP_CONFIG));
-            userGroupConfigTreeTableView.getListDiff().diff(data.getUserGroupConfigList());
+            authorizationGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistryData.AUTHORIZATION_GROUP_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            authorizationGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AUTHORIZATION_GROUP_CONFIG));
+            authorizationGroupConfigTreeTableView.getListDiff().diff(data.getAuthorizationGroupConfigList());
 
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
             return userRegistryTabPane;
@@ -524,7 +524,7 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof UserRegistryData) {
             UserRegistryData data = (UserRegistryData) msg;
             userConfigTreeTableview.update(data.getUserConfigList());
-            userGroupConfigTreeTableView.update(data.getUserGroupConfigList());
+            authorizationGroupConfigTreeTableView.update(data.getAuthorizationGroupConfigList());
             return userRegistryTabPane;
         }
         return null;

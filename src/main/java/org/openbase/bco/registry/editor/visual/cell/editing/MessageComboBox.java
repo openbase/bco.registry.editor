@@ -43,8 +43,8 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.slf4j.LoggerFactory;
+import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
-import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.homeautomation.control.agent.AgentClassType.AgentClass;
 import rst.homeautomation.control.app.AppClassType.AppClass;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
@@ -126,8 +126,8 @@ public class MessageComboBox extends ComboBox<Message> {
                     }
                 }
             }
-            if (parentBuilder instanceof UserGroupConfig.Builder) {
-                for (String memberId : ((UserGroupConfig.Builder) parentBuilder).getMemberIdList()) {
+            if (parentBuilder instanceof AuthorizationGroupConfig.Builder) {
+                for (String memberId : ((AuthorizationGroupConfig.Builder) parentBuilder).getMemberIdList()) {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }
@@ -179,7 +179,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 case "device_class_id":
                     return DeviceClass.getDefaultInstance();
                 case "member_id":
-                    if (parentBuilder instanceof UserGroupConfig.Builder) {
+                    if (parentBuilder instanceof AuthorizationGroupConfig.Builder) {
                         return UserConfig.getDefaultInstance();
                     } else if (parentBuilder instanceof UnitGroupConfig.Builder) {
                         return UnitConfig.getDefaultInstance();

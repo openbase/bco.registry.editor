@@ -23,8 +23,8 @@ package org.openbase.bco.registry.editor.struct.consistency;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
+import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
-import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.homeautomation.control.agent.AgentClassType.AgentClass;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppClassType.AppClass;
@@ -108,7 +108,7 @@ public class Configuration {
             return !("id".equals(fieldName));
         } else if (builder instanceof UserConfig.Builder) {
             return !("id".equals(fieldName));
-        } else if (builder instanceof UserGroupConfig.Builder) {
+        } else if (builder instanceof AuthorizationGroupConfig.Builder) {
             return !("id".equals(fieldName));
         } else if (builder instanceof UnitGroupConfig.Builder) {
             return !("id".equals(fieldName));
@@ -128,7 +128,7 @@ public class Configuration {
                 || (builder instanceof SceneConfig.Builder)
                 || (builder instanceof ConnectionConfig.Builder)
                 || (builder instanceof UserConfig.Builder)
-                || (builder instanceof UserGroupConfig.Builder)
+                || (builder instanceof AuthorizationGroupConfig.Builder)
                 || (builder instanceof UnitGroupConfig.Builder));
     }
 }

@@ -48,8 +48,8 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
-import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.homeautomation.control.agent.AgentClassType.AgentClass;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppClassType.AppClass;
@@ -235,7 +235,7 @@ public class RemotePool {
             return sceneRemote;
         } else if (builder instanceof AppConfig.Builder || builder instanceof AppClass.Builder) {
             return appRemote;
-        } else if (builder instanceof UserConfig.Builder || builder instanceof UserGroupConfig.Builder) {
+        } else if (builder instanceof UserConfig.Builder || builder instanceof AuthorizationGroupConfig.Builder) {
             return userRemote;
         } else {
             throw new CouldNotPerformException("No matching remote for type [" + builder.getDescriptorForType().getName() + "]found");

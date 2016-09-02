@@ -59,7 +59,7 @@ import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.authorization.UserGroupConfigType.UserGroupConfig;
+import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.configuration.EntryType;
 import rst.homeautomation.state.InventoryStateType.InventoryState;
 
@@ -161,7 +161,7 @@ public class ValueCell extends RowCell {
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
-                } else if ("member_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof UserGroupConfig.Builder) {
+                } else if ("member_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof AuthorizationGroupConfig.Builder) {
                     try {
                         text = new UserConfigComboBoxConverter().getText(remotePool.getUserRemote().getUserConfigById((String) ((Leaf) item).getValue()));
                     } catch (CouldNotPerformException ex) {

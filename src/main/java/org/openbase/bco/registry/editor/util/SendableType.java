@@ -23,8 +23,8 @@ package org.openbase.bco.registry.editor.util;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
+import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
-import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.homeautomation.control.agent.AgentClassType.AgentClass;
 import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppClassType.AppClass;
@@ -54,7 +54,7 @@ public enum SendableType {
     SCENE_CONFIG(SceneConfig.getDefaultInstance()),
     UNIT_TEMPLATE(UnitTemplate.getDefaultInstance()),
     USER_CONFIG(UserConfig.getDefaultInstance()),
-    USER_GROUP_CONFIG(UserGroupConfig.getDefaultInstance()),
+    AUTHORIZATION_GROUP_CONFIG(AuthorizationGroupConfig.getDefaultInstance()),
     UNIT_GROUP_CONFIG(UnitGroupConfig.getDefaultInstance());
 
     private final GeneratedMessage defaultInstanceForType;
@@ -90,8 +90,8 @@ public enum SendableType {
             return UNIT_TEMPLATE;
         } else if (builder instanceof UserConfig.Builder) {
             return USER_CONFIG;
-        } else if (builder instanceof UserGroupConfig.Builder) {
-            return USER_GROUP_CONFIG;
+        } else if (builder instanceof AuthorizationGroupConfig.Builder) {
+            return AUTHORIZATION_GROUP_CONFIG;
         } else if (builder instanceof UnitGroupConfig.Builder) {
             return UNIT_GROUP_CONFIG;
         } else {

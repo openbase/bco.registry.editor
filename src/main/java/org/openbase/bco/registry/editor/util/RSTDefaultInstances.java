@@ -22,8 +22,8 @@ package org.openbase.bco.registry.editor.util;
  * #L%
  */
 import com.google.protobuf.GeneratedMessage.Builder;
+import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
-import rst.authorization.UserGroupConfigType.UserGroupConfig;
 import rst.geometry.AxisAlignedBoundingBox3DFloatType.AxisAlignedBoundingBox3DFloat;
 import rst.geometry.PoseType.Pose;
 import rst.geometry.RotationType.Rotation;
@@ -114,8 +114,8 @@ public class RSTDefaultInstances {
         return UserConfig.newBuilder().setEnablingState(getDefaultEnablingState());
     }
 
-    public static UserGroupConfig.Builder getDefaultUserGroupConfig() {
-        return UserGroupConfig.newBuilder().setEnablingState(getDefaultEnablingState());
+    public static AuthorizationGroupConfig.Builder getDefaultAuthorizationGroupConfig() {
+        return AuthorizationGroupConfig.newBuilder().setEnablingState(getDefaultEnablingState());
     }
 
     public static PlacementConfig.Builder getDefaultPlacementConfig() {
@@ -149,8 +149,8 @@ public class RSTDefaultInstances {
             return getDefaultVec3DDouble();
         } else if (builderType instanceof UserConfig.Builder) {
             return getDefaultUserConfig();
-        } else if (builderType instanceof UserGroupConfig.Builder) {
-            return getDefaultUserGroupConfig();
+        } else if (builderType instanceof AuthorizationGroupConfig.Builder) {
+            return getDefaultAuthorizationGroupConfig();
         } else if (builderType instanceof ConnectionConfig.Builder) {
             return getDefaultConnectionConfig();
         } else if (builderType instanceof UnitGroupConfig.Builder) {

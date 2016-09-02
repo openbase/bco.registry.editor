@@ -80,8 +80,8 @@ public class TreeTableViewContextMenu extends ContextMenu {
                         case USER_CONFIG:
                             newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultUserConfig());
                             break;
-                        case USER_GROUP_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultUserGroupConfig());
+                        case AUTHORIZATION_GROUP_CONFIG:
+                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultAuthorizationGroupConfig());
                             break;
                         case UNIT_GROUP_CONFIG:
                             newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultUnitGroupConfig());
