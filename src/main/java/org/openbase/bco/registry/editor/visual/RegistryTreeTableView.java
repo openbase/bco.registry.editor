@@ -35,7 +35,6 @@ import javafx.scene.control.SortEvent;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import org.openbase.bco.registry.editor.struct.GenericGroupContainer;
 import org.openbase.bco.registry.editor.struct.GenericListContainer;
@@ -159,7 +158,6 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         for (Object message : listDiff.getUpdatedMessageMap().getMessages()) {
 //            logger.info("Updated message [" + message + "]");
             GeneratedMessage msg = (GeneratedMessage) message;
-            //TODO: should throw a null pointer if getChildren is null... -> test what happens on an empty database
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
 //            logger.info("Found old node to remove to update [" + nodeToRemove.getBuilder().build() + "]");
             if (nodeToRemove.hasChanged()) {
