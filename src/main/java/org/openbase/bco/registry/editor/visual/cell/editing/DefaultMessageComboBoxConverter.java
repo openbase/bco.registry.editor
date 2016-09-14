@@ -29,7 +29,7 @@ import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class DefaultMessageComboBoxConverter implements MessageComboBoxConverterInterface {
+public class DefaultMessageComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {

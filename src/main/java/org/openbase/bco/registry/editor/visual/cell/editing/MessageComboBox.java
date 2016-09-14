@@ -63,7 +63,7 @@ public class MessageComboBox extends ComboBox<Message> {
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(MessageComboBox.class);
 
     private static final int DEFAULT_VISIBLE_ROW_COUNT = 5;
-    private final MessageComboBoxConverterInterface converter;
+    private final MessageComboBoxConverter converter;
 
     public MessageComboBox(ValueCell cell, Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         super();
@@ -195,7 +195,7 @@ public class MessageComboBox extends ComboBox<Message> {
         return null;
     }
 
-    public MessageComboBoxConverterInterface getConverterByMessageType(String fieldName, Message.Builder parentBuilder) {
+    public MessageComboBoxConverter getConverterByMessageType(String fieldName, Message.Builder parentBuilder) {
         GeneratedMessage msg = getMessageEnumBoxType(fieldName, parentBuilder);
         if (msg instanceof LocationConfig) {
             return new LocationConfigComboBoxConverter();

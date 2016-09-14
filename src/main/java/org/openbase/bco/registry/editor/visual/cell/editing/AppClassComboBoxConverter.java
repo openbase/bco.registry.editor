@@ -35,7 +35,7 @@ import rst.homeautomation.control.app.AppClassType.AppClass;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class AppClassComboBoxConverter implements MessageComboBoxConverterInterface {
+public class AppClassComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {

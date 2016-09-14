@@ -30,7 +30,7 @@ import rst.authorization.UserConfigType.UserConfig;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class UserConfigComboBoxConverter implements MessageComboBoxConverterInterface {
+public class UserConfigComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {

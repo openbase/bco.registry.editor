@@ -28,7 +28,7 @@ import com.google.protobuf.Message;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public interface MessageComboBoxConverterInterface {
+public interface MessageComboBoxConverter {
 
     public String getText(Message msg);
 

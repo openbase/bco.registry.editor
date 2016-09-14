@@ -35,7 +35,7 @@ import rst.homeautomation.control.agent.AgentClassType.AgentClass;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class AgentClassComboBoxConverter implements MessageComboBoxConverterInterface {
+public class AgentClassComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {

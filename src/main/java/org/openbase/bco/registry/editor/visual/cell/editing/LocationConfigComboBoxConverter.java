@@ -32,7 +32,7 @@ import rst.spatial.LocationConfigType.LocationConfig;
  *
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
-public class LocationConfigComboBoxConverter implements MessageComboBoxConverterInterface {
+public class LocationConfigComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
