@@ -84,7 +84,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
         } else if (field.getType().equals(FieldDescriptor.Type.MESSAGE)) {
             super.add(new GenericNodeContainer(field, (GeneratedMessage.Builder) builder.getFieldBuilder(field)));
         } else {
-            if(builder instanceof PlacementConfig.Builder) {
+            if (builder instanceof PlacementConfig.Builder) {
                 int i = 0;
             }
             super.add(new LeafContainer(builder.getField(field), field.getName(), this, Configuration.isModifiableField(builder, field.getName())));

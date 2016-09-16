@@ -23,9 +23,11 @@ package org.openbase.bco.registry.editor.visual.cell;
  */
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Message;
+import com.google.protobuf.Message.Builder;
 import java.text.DecimalFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
+import java.util.List;
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -33,7 +35,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.RegistryEditor;
@@ -265,6 +270,49 @@ public class ValueCell extends RowCell {
         public void handle(ActionEvent event) {
             logger.debug("new apply event");
             GlobalTextArea.getInstance().clearText();
+            GenericNodeContainer container = (GenericNodeContainer) getItem();
+
+            if (!container.getBuilder().isInitialized()) {
+                List<String> missingFieldList = container.getBuilder().findInitializationErrors();
+                String missingFields = "";
+//                missingFields = missingFieldList.stream().map((error) -> "[" + error + "]").reduce(missingFields, String::concat);
+
+                Alert alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Message sending error!");
+                //TODO: contain missingFields in the header text
+                alert.setHeaderText("Missing some required fields!");
+                alert.setContentText("Are you ok with clearing these to send the rest of the message?");
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK) {
+                    // clear missing required fields...
+                    for (String fieldPath : missingFieldList) {
+                        System.out.println("path: " + fieldPath);
+                        String[] fields = fieldPath.split("\\.");
+                        Builder builder = container.getBuilder();
+                        System.out.println("split lenght: " + fields.length);
+                        for (int i = 0; i < fields.length - 1; ++i) {
+                            if (fields[i].endsWith("]")) {
+                                String fieldName = fields[i].split("\\[")[0];
+                                int number = Integer.parseInt(fields[i].split("\\[")[1].split("\\]")[0]);
+                                System.out.println("Fieldname: " + fieldName);
+                                System.out.println("number:" + number);
+                                builder = ((Message) builder.getRepeatedField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder), number)).toBuilder();
+                            } else {
+                                builder = builder.getFieldBuilder(FieldDescriptorUtil.getFieldDescriptor(fields[i], builder));
+                            }
+                        }
+                        builder.clearField(FieldDescriptorUtil.getFieldDescriptor(fields[fields.length - 2], builder));
+                    }
+                } else {
+                    return;
+                }
+
+                missingFieldList = container.getBuilder().findInitializationErrors();
+                missingFields = missingFieldList.stream().map((error) -> "[" + error + "]").reduce(missingFields, String::concat);
+                System.out.println(missingFieldList);
+            }
+
             Thread thread;
             thread = new Thread(
                     new Task<Boolean>() {
@@ -272,14 +320,8 @@ public class ValueCell extends RowCell {
                         protected Boolean call() throws Exception {
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
                             Message msg = null;
+
                             try {
-                                if (!container.getBuilder().isInitialized()) {
-                                    String missingFields = "";
-                                    for (Object error : container.getBuilder().findInitializationErrors()) {
-                                        missingFields += "[" + error.toString() + "]";
-                                    }
-                                    throw new CouldNotPerformException("Could not build sendable msg! Missing required field/s[" + missingFields + "]");
-                                }
                                 msg = container.getBuilder().build();
                                 container.setChanged(false);
                                 if (remotePool.contains(msg)) {
@@ -289,10 +331,11 @@ public class ValueCell extends RowCell {
                                     remotePool.register(msg).get();
                                     container.getParent().getChildren().remove(container);
                                 }
-                            } catch (CouldNotPerformException | InterruptedException | ExecutionException ex) {
+                            } catch (CouldNotPerformException ex) {
                                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                                 logger.warn("Could not register or update message [" + msg + "]", ex);
                             }
+
                             return true;
                         }
                     });
