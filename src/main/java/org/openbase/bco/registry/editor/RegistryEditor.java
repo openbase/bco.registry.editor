@@ -106,7 +106,7 @@ public class RegistryEditor extends Application {
     private final RemotePool remotePool;
     private MenuBar menuBar;
     private Menu fileMenu;
-    private MenuItem sortMenuItem, resyncMenuItem;
+    private MenuItem resyncMenuItem;
     private TabPaneWithClearing registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane, agentRegistryTabPane, appRegistryTabPane;
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab, unitGroupTab;
@@ -215,22 +215,7 @@ public class RegistryEditor extends Application {
         appConfigTab.setContent(appConfigTreeTableView.getVBox());
         appRegistryTabPane.getTabs().addAll(appClassTab, appConfigTab);
 
-        sortMenuItem = new MenuItem("Sort");
-        sortMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-//                agentConfigTreeTableView.sort();
-//                appConfigTreeTableView.sort();
-//                deviceClassTreeTableView.sort();
-//                deviceConfigTreeTableView.sort();
-//                locationConfigTreeTableView.sort();
-//                sceneConfigTreeTableView.sort();
-                logger.info("Sorting unitTemplateTreeTableView");
-                unitTemplateTreeTableView.sort();
-            }
-        });
-        resyncMenuItem = new MenuItem("resync");
+        resyncMenuItem = new MenuItem("Resync");
         resyncMenuItem.setOnAction((ActionEvent event) -> {
             remotePool.getRemotes().stream().forEach((remote) -> {
                 try {
@@ -240,11 +225,10 @@ public class RegistryEditor extends Application {
                 }
             });
         });
-        fileMenu = new Menu("File");
+        fileMenu = new Menu("Registry");
 
-        fileMenu.getItems().addAll(sortMenuItem, resyncMenuItem);
-        menuBar = new MenuBar(/*fileMenu*/);
-
+        fileMenu.getItems().addAll(resyncMenuItem);
+        menuBar = new MenuBar();
         menuBar.getMenus().add(fileMenu);
 
         logger.info("Init finished");
