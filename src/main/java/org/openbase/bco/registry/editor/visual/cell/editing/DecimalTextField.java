@@ -60,12 +60,10 @@ public class DecimalTextField extends TextField {
                             return;
                         }
 
-                        double parsedValue = 0;
+                        Double parsedValue = Double.parseDouble(getText());
                         if (cell.getLeaf().getValue() instanceof Float) {
-                            parsedValue = Float.parseFloat(getText());
-                            cell.getLeaf().setValue(parsedValue);
+                            cell.getLeaf().setValue(parsedValue.floatValue());
                         } else if (cell.getLeaf().getValue() instanceof Double) {
-                            parsedValue = Double.parseDouble(getText());
                             cell.getLeaf().setValue(parsedValue);
                         }
                         cell.setText(Double.toString(parsedValue));
@@ -85,14 +83,13 @@ public class DecimalTextField extends TextField {
                         return;
                     }
 
-                    double parsedValue = 0;
-                    if (cell.getLeaf().getValue() instanceof Float) {
-                        parsedValue = Float.parseFloat(getText());
-                    } else if (cell.getLeaf().getValue() instanceof Double) {
-                        parsedValue = Double.parseDouble(getText());
-                    }
+                    Double parsedValue = Double.parseDouble(getText());
                     if (!newValue && !cell.getLeaf().getValue().equals(parsedValue)) {
-                        cell.getLeaf().setValue(parsedValue);
+                        if (cell.getLeaf().getValue() instanceof Float) {
+                            cell.getLeaf().setValue(parsedValue.floatValue());
+                        } else if (cell.getLeaf().getValue() instanceof Double) {
+                            cell.getLeaf().setValue(parsedValue);
+                        }
                         // even though commit is called the text property won't change fast enough without this line?!?
                         cell.setText(Double.toString(parsedValue));
                         cell.commitEdit(cell.getLeaf());

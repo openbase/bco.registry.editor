@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor.struct;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.ProtocolMessageEnum;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.jul.exception.CouldNotPerformException;

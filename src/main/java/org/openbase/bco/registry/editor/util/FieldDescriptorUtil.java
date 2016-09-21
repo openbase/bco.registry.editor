@@ -84,101 +84,69 @@ public class FieldDescriptorUtil {
         Descriptors.FieldDescriptor fieldDescriptor;
         Message.Builder tmpBuilder = builder;
 
-        System.out.println("path: " + fieldPath);
         String[] fields = fieldPath.split("\\.");
-        System.out.println("split lenght: " + fields.length);
-
         for (int i = 0; i < fields.length - 1; ++i) {
             if (fields[i].endsWith("]")) {
                 String fieldName = fields[i].split("\\[")[0];
                 int number = Integer.parseInt(fields[i].split("\\[")[1].split("\\]")[0]);
                 fieldDescriptor = FieldDescriptorUtil.getFieldDescriptor(fieldName, tmpBuilder);
-                System.out.println("field: " + fieldDescriptor.getName());
-                System.out.println("number:" + number);
 
                 Message.Builder subBuilder = ((Message) tmpBuilder.getRepeatedField(fieldDescriptor, number)).toBuilder();
-                System.out.println("tmpBuilder: " + tmpBuilder);
-                System.out.println("subBuilder: " + subBuilder);
                 String subPath = fields[i + 1];
                 for (int j = i + 2; j < fields.length; ++j) {
                     subPath += "." + fields[j];
                 }
-                System.out.println("subPath: " + subPath);
                 tmpBuilder.setRepeatedField(fieldDescriptor, number, initFieldWithDefault(subBuilder, subPath).buildPartial());
                 return builder;
             } else {
                 fieldDescriptor = FieldDescriptorUtil.getFieldDescriptor(fields[i], tmpBuilder);
-                System.out.println("Current field: " + fieldDescriptor.getName());
                 tmpBuilder = tmpBuilder.getFieldBuilder(fieldDescriptor);
             }
         }
         fieldDescriptor = FieldDescriptorUtil.getFieldDescriptor(fields[fields.length - 1], tmpBuilder);
         Object field = tmpBuilder.getField(fieldDescriptor);
-        System.out.println("Set field: " + fieldDescriptor.getName() + " to " + field.toString());
         tmpBuilder.setField(fieldDescriptor, field);
-        System.out.println("builder: " + builder);
-        System.out.println("tmpbuilder: " + tmpBuilder);
         return builder;
     }
 
-    public static Message.Builder clearRequiredFields(Message.Builder builder) {
+    public static void clearRequiredFields(Message.Builder builder) {
+        builder.findInitializationErrors().stream().forEach((initError) -> {
+            clearRequiredField(builder, initError);
+        });
+    }
+
+    public static Message.Builder clearRequiredField(Message.Builder builder, String fieldPath) {
         Descriptors.FieldDescriptor fieldDescriptor;
-        Message.Builder tmpBuilder;
+        Message.Builder tmpBuilder = builder;
 
-        for (String fieldPath : builder.findInitializationErrors()) {
-            tmpBuilder = builder;
-            System.out.println("path: " + fieldPath);
-            String[] fields = fieldPath.split("\\.");
-            System.out.println("split lenght: " + fields.length);
-            boolean alreadyRemoved = false;
-            for (int i = 0; i < fields.length - 2; ++i) {
-                if (fields[i].endsWith("]")) {
-                    String fieldName = fields[i].split("\\[")[0];
-                    int number = Integer.parseInt(fields[i].split("\\[")[1].split("\\]")[0]);
-                    fieldDescriptor = FieldDescriptorUtil.getFieldDescriptor(fieldName, tmpBuilder);
-                    System.out.println("field: " + fieldDescriptor.getName());
-                    System.out.println("number:" + number);
+        String[] fields = fieldPath.split("\\.");
+        boolean alreadyRemoved = false;
+        for (int i = 0; i < fields.length - 2; ++i) {
+            if (fields[i].endsWith("]")) {
+                String fieldName = fields[i].split("\\[")[0];
+                int number = Integer.parseInt(fields[i].split("\\[")[1].split("\\]")[0]);
+                fieldDescriptor = FieldDescriptorUtil.getFieldDescriptor(fieldName, tmpBuilder);
 
-                    Message.Builder subBuilder = ((Message) tmpBuilder.getRepeatedField(fieldDescriptor, number)).toBuilder();
-                    System.out.println("tmpBuilder: " + tmpBuilder);
-                    System.out.println("subBuilder: " + subBuilder);
-                    String subPath = fields[i + 1];
-                    for (int j = i + 2; j < fields.length; ++j) {
-                        subPath += "." + fields[j];
-                    }
-                    System.out.println("subPath: " + subPath);
-                    tmpBuilder.setRepeatedField(fieldDescriptor, number, clearRequiredFields(subBuilder).buildPartial());
-                    return builder;
-                } else {
-                    System.out.println("test: " + fields[i]);
-                    fieldDescriptor = FieldDescriptorUtil.getFieldDescriptor(fields[i], tmpBuilder);
-                    if (!tmpBuilder.hasField(fieldDescriptor)) {
-                        alreadyRemoved = true;
-                        continue;
-                    }
-                    System.out.println("Current field: " + fieldDescriptor.getName());
-                    tmpBuilder = tmpBuilder.getFieldBuilder(fieldDescriptor);
+                Message.Builder subBuilder = ((Message) tmpBuilder.getRepeatedField(fieldDescriptor, number)).toBuilder();
+                String subPath = fields[i + 1];
+                for (int j = i + 2; j < fields.length; ++j) {
+                    subPath += "." + fields[j];
                 }
+                tmpBuilder.setRepeatedField(fieldDescriptor, number, clearRequiredField(subBuilder, subPath).buildPartial());
+                return builder;
+            } else {
+                fieldDescriptor = FieldDescriptorUtil.getFieldDescriptor(fields[i], tmpBuilder);
+                if (!tmpBuilder.hasField(fieldDescriptor)) {
+                    alreadyRemoved = true;
+                    continue;
+                }
+                tmpBuilder = tmpBuilder.getFieldBuilder(fieldDescriptor);
             }
-            if (alreadyRemoved) {
-                System.out.println("Already removed!");
-                continue;
-            }
+        }
+        if (!alreadyRemoved) {
             fieldDescriptor = FieldDescriptorUtil.getFieldDescriptor(fields[fields.length - 2], tmpBuilder);
-            System.out.println("Clear field: " + fieldDescriptor.getName());
             tmpBuilder.clearField(fieldDescriptor);
-            System.out.println("builder: " + builder);
-            System.out.println("tmpbuilder: " + tmpBuilder);
-            System.out.println("tmp: " + tmpBuilder.buildPartial());
-            System.out.println("message: " + builder.buildPartial());
         }
-
-        List<String> missingFieldList = builder.findInitializationErrors();
-        String missingFields = "";
-        for (String error : missingFieldList) {
-            missingFields += "[" + error + "]\n";
-        }
-        System.out.println("Errors:\n" + missingFields);
         return builder;
     }
 

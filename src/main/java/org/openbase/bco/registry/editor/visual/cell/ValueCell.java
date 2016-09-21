@@ -279,14 +279,9 @@ public class ValueCell extends RowCell {
 
             if (!builder.isInitialized()) {
                 if (FieldDescriptorUtil.onlySomeRequiredFieldsAreSet(builder)) {
-                    System.out.println("only some required fields are set!");
                     List<String> missingFieldList = builder.findInitializationErrors();
                     String missingFields = "";
-                    for (String error : missingFieldList) {
-                        missingFields += "[" + error + "]\n";
-                    }
-                    System.out.println("Missing fields:\n" + missingFields);
-//                missingFields = missingFieldList.stream().map((error) -> "[" + error + "]").reduce(missingFields, String::concat);
+                    missingFields = missingFieldList.stream().map((error) -> error + "\n").reduce(missingFields, String::concat);
 
                     Alert alert = new Alert(AlertType.CONFIRMATION);
                     alert.setResizable(true);
@@ -316,22 +311,6 @@ public class ValueCell extends RowCell {
 
                     alert.getDialogPane().setExpandableContent(expContent);
 
-                    alert.getDialogPane().widthProperty().addListener(new ChangeListener<Number>() {
-
-                        @Override
-                        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                            System.out.println("width: " + newValue.doubleValue());
-//                            alert.setWidth(newValue.doubleValue() + 100);
-                        }
-                    });
-                    alert.getDialogPane().heightProperty().addListener(new ChangeListener<Number>() {
-
-                        @Override
-                        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                            System.out.println("height: " + newValue.doubleValue());
-                        }
-                    });
-
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.get() == clearButton) {
                         FieldDescriptorUtil.clearRequiredFields(builder);
@@ -340,12 +319,6 @@ public class ValueCell extends RowCell {
                     } else {
                         return;
                     }
-                    missingFieldList = builder.findInitializationErrors();
-                    missingFields = "";
-                    for (String error : missingFieldList) {
-                        missingFields += "[" + error + "]\n";
-                    }
-                    System.out.println("Missing fields:\n" + missingFields);
                 } else {
                     FieldDescriptorUtil.clearRequiredFields(builder);
                 }
