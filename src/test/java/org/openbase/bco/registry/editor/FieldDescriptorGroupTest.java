@@ -21,20 +21,32 @@ package org.openbase.bco.registry.editor;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
-import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
-import org.openbase.jul.exception.InstantiationException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
+import org.openbase.jul.exception.InstantiationException;
+import org.openbase.jul.extension.rsb.com.RSBFactoryImpl;
+import org.openbase.jul.extension.rsb.iface.RSBInformer;
+import org.openbase.jul.extension.rsb.iface.RSBListener;
+import rsb.Event;
+import rsb.Handler;
+import rsb.Scope;
+import rsb.converter.DefaultConverterRepository;
+import rsb.converter.ProtocolBufferConverter;
+import rst.geometry.AxisAlignedBoundingBox3DFloatType.AxisAlignedBoundingBox3DFloat;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.math.Vec3DDoubleType;
 import rst.spatial.PlacementConfigType.PlacementConfig;
+import rst.spatial.ShapeType.Shape;
 
 /**
  *
@@ -89,7 +101,7 @@ public class FieldDescriptorGroupTest {
     @Test(timeout = 5000)
     public void testGetFieldValues() throws Exception {
         System.out.println("getFieldValues");
-        
+
         List<Message.Builder> builderList = new ArrayList<>();
         builderList.add(device1);
         builderList.add(device2);
@@ -150,5 +162,51 @@ public class FieldDescriptorGroupTest {
         DeviceConfig.Builder builder = DeviceConfig.newBuilder();
         group.setValue(builder, homeID);
         assertEquals(homeID, builder.getPlacementConfig().getLocationId());
+    }
+
+    boolean dataReceived = false;
+
+    @Test
+    public void testRequired() throws Exception {
+        DefaultConverterRepository.getDefaultConverterRepository().addConverter(new ProtocolBufferConverter<>(Shape.getDefaultInstance()));
+
+        Shape.Builder shapeBuilder = Shape.newBuilder();
+        shapeBuilder.setBoundingBox(AxisAlignedBoundingBox3DFloat.getDefaultInstance());
+        shapeBuilder.addFloor(Vec3DDoubleType.Vec3DDouble.newBuilder().setX(1).setY(2).setZ(3));
+//        shapeBuilder.clearField(FieldDescriptorUtil.getFieldDescriptor("bounding_box", shapeBuilder));
+        shapeBuilder.getBoundingBoxBuilder().clearLeftFrontBottom();
+        String missingFields = "";
+        for (String error : shapeBuilder.findInitializationErrors()) {
+            missingFields += "[" + error + "]";
+        }
+        for (Descriptors.FieldDescriptor a : shapeBuilder.getDescriptorForType().getFields()) {
+            System.out.println("FieldName: " + a.getName());
+            System.out.println("is required" + a.isRequired());
+        }
+        System.out.println("Errors:\n" + missingFields);
+        Shape shape = shapeBuilder.build();
+        System.out.println("Shape:\n" + shape);
+
+        Scope scope = new Scope("/test/required/fields");
+
+        RSBInformer<Shape> informer = RSBFactoryImpl.getInstance().createSynchronizedInformer(scope, Shape.class);
+        informer.activate();
+
+        RSBListener listener = RSBFactoryImpl.getInstance().createSynchronizedListener(scope);
+        listener.activate();
+
+        listener.addHandler(new Handler() {
+
+            @Override
+            public void internalNotify(Event event) {
+                dataReceived = true;
+                assertEquals(shape, event.getData());
+                System.out.println(event.getData().toString());
+            }
+        }, true);
+
+        informer.publish(shape);
+
+        assertTrue(dataReceived);
     }
 }

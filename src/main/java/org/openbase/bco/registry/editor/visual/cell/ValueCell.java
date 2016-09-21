@@ -38,9 +38,13 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.struct.GenericGroupContainer;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
@@ -271,46 +275,80 @@ public class ValueCell extends RowCell {
             logger.debug("new apply event");
             GlobalTextArea.getInstance().clearText();
             GenericNodeContainer container = (GenericNodeContainer) getItem();
+            Builder builder = container.getBuilder();
 
-            if (!container.getBuilder().isInitialized()) {
-                List<String> missingFieldList = container.getBuilder().findInitializationErrors();
-                String missingFields = "";
+            if (!builder.isInitialized()) {
+                if (FieldDescriptorUtil.onlySomeRequiredFieldsAreSet(builder)) {
+                    System.out.println("only some required fields are set!");
+                    List<String> missingFieldList = builder.findInitializationErrors();
+                    String missingFields = "";
+                    for (String error : missingFieldList) {
+                        missingFields += "[" + error + "]\n";
+                    }
+                    System.out.println("Missing fields:\n" + missingFields);
 //                missingFields = missingFieldList.stream().map((error) -> "[" + error + "]").reduce(missingFields, String::concat);
 
-                Alert alert = new Alert(AlertType.CONFIRMATION);
-                alert.setTitle("Message sending error!");
-                //TODO: contain missingFields in the header text
-                alert.setHeaderText("Missing some required fields!");
-                alert.setContentText("Are you ok with clearing these to send the rest of the message?");
+                    Alert alert = new Alert(AlertType.CONFIRMATION);
+                    alert.setResizable(true);
+                    alert.setTitle("Message initialization error!");
+                    alert.setHeaderText("Missing some required fields!");
+                    alert.setContentText("Initialize them with default values or clear them?");
 
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.get() == ButtonType.OK) {
-                    // clear missing required fields...
-                    for (String fieldPath : missingFieldList) {
-                        System.out.println("path: " + fieldPath);
-                        String[] fields = fieldPath.split("\\.");
-                        Builder builder = container.getBuilder();
-                        System.out.println("split lenght: " + fields.length);
-                        for (int i = 0; i < fields.length - 1; ++i) {
-                            if (fields[i].endsWith("]")) {
-                                String fieldName = fields[i].split("\\[")[0];
-                                int number = Integer.parseInt(fields[i].split("\\[")[1].split("\\]")[0]);
-                                System.out.println("Fieldname: " + fieldName);
-                                System.out.println("number:" + number);
-                                builder = ((Message) builder.getRepeatedField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder), number)).toBuilder();
-                            } else {
-                                builder = builder.getFieldBuilder(FieldDescriptorUtil.getFieldDescriptor(fields[i], builder));
-                            }
+                    ButtonType initButton = new ButtonType("Init");
+                    ButtonType clearButton = new ButtonType("Clear");
+                    ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+                    alert.getButtonTypes().setAll(initButton, clearButton, cancelButton);
+
+                    TextArea textArea = new TextArea(missingFields);
+                    textArea.setEditable(false);
+                    textArea.setWrapText(true);
+                    Label label = new Label("Missing fields:");
+
+                    textArea.setMaxWidth(Double.MAX_VALUE);
+                    textArea.setMaxHeight(Double.MAX_VALUE);
+                    GridPane.setVgrow(textArea, Priority.ALWAYS);
+                    GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+                    GridPane expContent = new GridPane();
+                    expContent.setMaxWidth(Double.MAX_VALUE);
+                    expContent.add(label, 0, 0);
+                    expContent.add(textArea, 0, 1);
+
+                    alert.getDialogPane().setExpandableContent(expContent);
+
+                    alert.getDialogPane().widthProperty().addListener(new ChangeListener<Number>() {
+
+                        @Override
+                        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                            System.out.println("width: " + newValue.doubleValue());
+//                            alert.setWidth(newValue.doubleValue() + 100);
                         }
-                        builder.clearField(FieldDescriptorUtil.getFieldDescriptor(fields[fields.length - 2], builder));
-                    }
-                } else {
-                    return;
-                }
+                    });
+                    alert.getDialogPane().heightProperty().addListener(new ChangeListener<Number>() {
 
-                missingFieldList = container.getBuilder().findInitializationErrors();
-                missingFields = missingFieldList.stream().map((error) -> "[" + error + "]").reduce(missingFields, String::concat);
-                System.out.println(missingFieldList);
+                        @Override
+                        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                            System.out.println("height: " + newValue.doubleValue());
+                        }
+                    });
+
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.get() == clearButton) {
+                        FieldDescriptorUtil.clearRequiredFields(builder);
+                    } else if (result.get() == initButton) {
+                        FieldDescriptorUtil.initRequiredFieldsWithDefault(builder);
+                    } else {
+                        return;
+                    }
+                    missingFieldList = builder.findInitializationErrors();
+                    missingFields = "";
+                    for (String error : missingFieldList) {
+                        missingFields += "[" + error + "]\n";
+                    }
+                    System.out.println("Missing fields:\n" + missingFields);
+                } else {
+                    FieldDescriptorUtil.clearRequiredFields(builder);
+                }
             }
 
             Thread thread;
@@ -339,7 +377,9 @@ public class ValueCell extends RowCell {
                             return true;
                         }
                     });
-            thread.setDaemon(true);
+
+            thread.setDaemon(
+                    true);
             thread.start();
         }
     }
