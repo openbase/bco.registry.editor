@@ -212,6 +212,18 @@ public class RemotePool {
         }
     }
 
+    public boolean isConsistent(SendableType type) throws CouldNotPerformException {
+        String methodName = getMethodName("is", "RegistryConsistent", type.getDefaultInstanceForType());
+        System.out.println("Calling Method [" + methodName + "]");
+        try {
+            RSBRemoteService remote = getRemoteByMessage(type.getDefaultInstanceForType());
+            Method method = remote.getClass().getMethod(methodName);
+            return (Boolean) method.invoke(remote);
+        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new CouldNotPerformException(ex);
+        }
+    }
+
     private String getMethodName(String prefix, String suffix, Message msg) {
         return prefix + msg.getClass().getSimpleName() + suffix;
     }

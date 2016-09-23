@@ -50,6 +50,7 @@ import org.openbase.bco.registry.editor.visual.column.ValueColumn;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.protobuf.ProtobufListDiff;
+import org.openbase.jul.pattern.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +65,10 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     private final DescriptorColumn descriptorColumn;
     private final SendableType type;
     private final ProtobufListDiff listDiff;
-    private final Label readOnlyLabel;
     private final VBox vBox;
     private final RemotePool remotePool;
+    private final Label statusInfoLabel;
+    private final List<Observer<Boolean>> disconnectionObserver;
 
     public RegistryTreeTableView(SendableType type) throws InstantiationException, InterruptedException {
         this.type = type;
@@ -74,6 +76,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         this.setShowRoot(false);
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.getSelectionModel().setCellSelectionEnabled(false);
+        this.disconnectionObserver = new ArrayList<>();
         this.descriptorColumn = new DescriptorColumn();
         ValueColumn valueColumn = new ValueColumn();
         this.getColumns().addAll(descriptorColumn, valueColumn);
@@ -96,13 +99,12 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
 //        this.comparatorProperty().;
         this.listDiff = new ProtobufListDiff();
 
-        this.readOnlyLabel = new Label("Read-Only-Mode");
-        this.readOnlyLabel.setAlignment(Pos.CENTER);
-        this.readOnlyLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
+        this.statusInfoLabel = new Label("Status Info Label");
+        this.statusInfoLabel.setAlignment(Pos.CENTER);
 
         this.vBox = new VBox();
         this.vBox.setAlignment(Pos.CENTER);
-        this.vBox.getChildren().addAll(readOnlyLabel, this);
+        this.vBox.getChildren().addAll(statusInfoLabel, this);
 
         this.remotePool = RemotePool.getInstance();
     }
@@ -258,6 +260,19 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     }
 
     public void setReadOnlyMode(boolean readOnly) {
+        System.out.println("Setting read only mode of registry [" + type.name() + "]...");
+        try {
+            if (!remotePool.isConsistent(type)) {
+                System.out.println("\nRegistry is not even consistent\n");
+                statusInfoLabel.setText("Registry inconsistent!");
+                statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");
+            } else {
+                statusInfoLabel.setText("Read-Only-Mode");
+                statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
+            }
+        } catch (CouldNotPerformException ex) {
+            System.out.println("Failed to call is consistent for registry [" + type.name() + "]");
+        }
         if (readOnly) {
             getStylesheets().clear();
             getStylesheets().add("read_only.css");
@@ -273,15 +288,49 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     public void setEditableWithReadOnlyLabel(boolean editable) {
         if (!editable) {
             vBox.getChildren().clear();
-            vBox.getChildren().addAll(readOnlyLabel, this);
+            vBox.getChildren().addAll(statusInfoLabel, this);
         } else {
-            vBox.getChildren().remove(readOnlyLabel);
+            vBox.getChildren().remove(statusInfoLabel);
         }
         super.setEditable(editable);
     }
 
-    public Label getReadOnlyLabel() {
-        return readOnlyLabel;
+    public void setDisconnected(boolean disconnected) {
+        System.out.println("Set to disconnected [" + type.name() + "]: " + disconnected);
+
+        if (disconnected) {
+            statusInfoLabel.setText("Registry disconnected!");
+            statusInfoLabel.setStyle("-fx-text-background-color: rgb(120,120,120); -fx-font-weight: bold;");
+            vBox.getChildren().clear();
+            vBox.getChildren().addAll(statusInfoLabel, this);
+        } else {
+            vBox.getChildren().clear();
+            vBox.getChildren().addAll(this);
+        }
+
+        notifiyDisconnection(disconnected);
+    }
+
+    public void addDisconnectedObserver(Observer<Boolean> observer) {
+        disconnectionObserver.add(observer);
+    }
+
+    public void removeDisconnectedObserver(Observer<Boolean> observer) {
+        disconnectionObserver.remove(observer);
+    }
+
+    private void notifiyDisconnection(Boolean connected) {
+        for (Observer<Boolean> observer : disconnectionObserver) {
+            try {
+                observer.update(null, connected);
+            } catch (Exception ex) {
+                logger.warn("Could not notify connection to value cell!");
+            }
+        }
+    }
+
+    public Label getStatusInfoLabel() {
+        return statusInfoLabel;
     }
 
     public VBox getVBox() {

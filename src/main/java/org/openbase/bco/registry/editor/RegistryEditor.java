@@ -23,7 +23,9 @@ package org.openbase.bco.registry.editor;
  */
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -79,7 +81,9 @@ import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
+import org.openbase.jul.pattern.Observable;
 import org.openbase.jul.pattern.Observer;
+import org.openbase.jul.pattern.Remote.ConnectionState;
 import org.openbase.jul.schedule.GlobalExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +101,10 @@ import rst.spatial.LocationRegistryDataType.LocationRegistryData;
  */
 public class RegistryEditor extends Application {
 
+    //TODO: 
+    // - differentiate in every tab between read only registry and consistent
+    // - check if read only label is visible in scene registry tab
+    // - when the remote is disconnected -> show that in the read only label and deactivate apply and cancel buttons
     private static final Logger logger = LoggerFactory.getLogger(RegistryEditor.class);
 
     public static final String APP_NAME = "RegistryView";
@@ -107,13 +115,14 @@ public class RegistryEditor extends Application {
     private MenuBar menuBar;
     private Menu fileMenu;
     private MenuItem resyncMenuItem;
-    private TabPaneWithClearing registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane, agentRegistryTabPane, appRegistryTabPane;
+    private TabPaneWithClearing registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane, agentRegistryTabPane, appRegistryTabPane, sceneRegistryTabPane;
     private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab;
     private Tab deviceClassTab, deviceConfigTab, unitTemplateTab, unitGroupTab;
     private Tab locationConfigTab, connectionConfigTab;
     private Tab userConfigTab, userGroupConfigTab;
     private Tab agentClassTab, agentConfigTab;
     private Tab appClassTab, appConfigTab;
+    private Tab sceneConfigTab;
     private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator, userRegistryProgessInidicator;
     private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView, unitTemplateTreeTableView, unitGroupConfigTreeTableView;
     private RegistryTreeTableView locationConfigTreeTableView, connectionConfigTreeTableView;
@@ -214,6 +223,12 @@ public class RegistryEditor extends Application {
         appConfigTab = new Tab("AppConfig");
         appConfigTab.setContent(appConfigTreeTableView.getVBox());
         appRegistryTabPane.getTabs().addAll(appClassTab, appConfigTab);
+
+        sceneRegistryTabPane = new TabPaneWithClearing();
+        sceneRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        sceneConfigTab = new Tab("SceneConfig");
+        sceneConfigTab.setContent(sceneConfigTreeTableView.getVBox());
+        sceneRegistryTabPane.getTabs().addAll(sceneConfigTab);
 
         resyncMenuItem = new MenuItem("Resync");
         resyncMenuItem.setOnAction((ActionEvent event) -> {
@@ -348,6 +363,28 @@ public class RegistryEditor extends Application {
                     return null;
                 }
             }));
+
+            remote.addConnectionStateObserver(new Observer<ConnectionState>() {
+
+                @Override
+                public void update(Observable<ConnectionState> source, ConnectionState data) throws Exception {
+                    System.out.println("Remote connection state has changed to: " + data);
+                    Platform.runLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            boolean disonnected = false;
+                            if (data != ConnectionState.CONNECTED) {
+                                disonnected = true;
+                            }
+
+                            for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
+                                treeTable.setDisconnected(disonnected);
+                            }
+                        }
+                    });
+                }
+            });
         }
 
 //        remotePool.getAgentRemote().isActive();
@@ -436,7 +473,7 @@ public class RegistryEditor extends Application {
             sceneConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SCENE_CONFIG));
             sceneConfigTreeTableView.getListDiff().diff(data.getSceneConfigList());
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return sceneConfigTreeTableView;
+            return sceneRegistryTabPane;
         } else if (msg instanceof AppRegistryData) {
             AppRegistryData data = (AppRegistryData) msg;
             appConfigTreeTableView.setRoot(new GenericListContainer(AppRegistryData.APP_CONFIG_FIELD_NUMBER, data.toBuilder()));
@@ -494,7 +531,7 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof SceneRegistryData) {
             SceneRegistryData data = (SceneRegistryData) msg;
             sceneConfigTreeTableView.update(data.getSceneConfigList());
-            return sceneConfigTreeTableView;
+            return sceneRegistryTabPane;
         } else if (msg instanceof AppRegistryData) {
             AppRegistryData data = (AppRegistryData) msg;
             appConfigTreeTableView.update(data.getAppConfigList());
@@ -529,6 +566,31 @@ public class RegistryEditor extends Application {
             return userRegistryTab;
         }
         return null;
+    }
+
+    private List<RegistryTreeTableView> getTreeTablesByRemote(RSBRemoteService remote) {
+        List<RegistryTreeTableView> treeTableList = new ArrayList<>();
+        if (remote instanceof DeviceRegistryRemote) {
+            treeTableList.add(deviceClassTreeTableView);
+            treeTableList.add(deviceConfigTreeTableView);
+            treeTableList.add(unitGroupConfigTreeTableView);
+            treeTableList.add(unitTemplateTreeTableView);
+        } else if (remote instanceof LocationRegistryRemote) {
+            treeTableList.add(locationConfigTreeTableView);
+            treeTableList.add(connectionConfigTreeTableView);
+        } else if (remote instanceof SceneRegistryRemote) {
+            treeTableList.add(sceneConfigTreeTableView);
+        } else if (remote instanceof AppRegistryRemote) {
+            treeTableList.add(appClassTreeTableView);
+            treeTableList.add(appConfigTreeTableView);
+        } else if (remote instanceof AgentRegistryRemote) {
+            treeTableList.add(agentClassTreeTableView);
+            treeTableList.add(agentConfigTreeTableView);
+        } else if (remote instanceof UserRegistryRemote) {
+            treeTableList.add(userConfigTreeTableview);
+            treeTableList.add(authorizationGroupConfigTreeTableView);
+        }
+        return treeTableList;
     }
 
     private ProgressIndicator getProgressindicatorByRemote(RSBRemoteService remote) {
