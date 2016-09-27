@@ -103,7 +103,6 @@ public class RegistryEditor extends Application {
 
     //TODO: 
     // - differentiate in every tab between read only registry and consistent
-    // - check if read only label is visible in scene registry tab
     // - when the remote is disconnected -> show that in the read only label and deactivate apply and cancel buttons
     private static final Logger logger = LoggerFactory.getLogger(RegistryEditor.class);
 

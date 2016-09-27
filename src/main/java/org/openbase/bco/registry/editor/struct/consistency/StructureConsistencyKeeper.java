@@ -55,9 +55,9 @@ import rst.timing.TimestampType.Timestamp;
  * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
  */
 public class StructureConsistencyKeeper {
-    
+
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(StructureConsistencyKeeper.class);
-    
+
     public static void keepStructure(NodeContainer<? extends Message.Builder> container, String fieldName) throws CouldNotPerformException, InterruptedException {
         if (container.getBuilder() instanceof InventoryState.Builder) {
             keepInventoryStateStructure((NodeContainer<InventoryState.Builder>) container);
@@ -73,7 +73,7 @@ public class StructureConsistencyKeeper {
             }
         }
     }
-    
+
     public static void clearField(NodeContainer<? extends Message.Builder> container, String fieldName) {
         GeneratedMessage.Builder builder = container.getBuilder();
         for (int i = 0; i < container.getChildren().size(); i++) {
@@ -88,7 +88,7 @@ public class StructureConsistencyKeeper {
         }
         builder.clearField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder));
     }
-    
+
     private static void keepDeviceConfigStructure(NodeContainer<DeviceConfig.Builder> container, String changedField) throws CouldNotPerformException, InterruptedException {
         if ("device_class_id".equals(changedField)) {
             // clear the field in the builder and remove all child tree items representing these
@@ -96,7 +96,7 @@ public class StructureConsistencyKeeper {
 
             // create the new values for the field and add them to the builder
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(container.getBuilder().getDeviceClassId()).getUnitTemplateConfigList()) {
-                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToSystemUnit(true);
+                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToUnitHost(true);
                 unitConfig.setPlacementConfig(container.getBuilder().getPlacementConfig());
                 for (ServiceTemplate serviceTemplate : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(unitTemplate.getType()).getServiceTemplateList()) {
                     unitConfig.addServiceConfig(ServiceConfig.newBuilder().setServiceTemplate(ServiceTemplate.newBuilder().setType(serviceTemplate.getType()).setPattern(serviceTemplate.getPattern())));
@@ -112,7 +112,7 @@ public class StructureConsistencyKeeper {
             container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
-    
+
     private static void keepUnitTemplateConfigStructure(NodeContainer<UnitTemplateConfig.Builder> container, String changedField) throws CouldNotPerformException, InstantiationException, InterruptedException {
         // check if the right field has been set
         if ("type".equals(changedField)) {
@@ -135,7 +135,7 @@ public class StructureConsistencyKeeper {
             container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
-    
+
     private static void keepInventoryStateStructure(NodeContainer<InventoryState.Builder> container) throws CouldNotPerformException {
         // clear the field in the builder and remove all child tree items representing these
         StructureConsistencyKeeper.clearField(container, "timestamp");
@@ -147,18 +147,18 @@ public class StructureConsistencyKeeper {
         Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
         container.add(new GenericNodeContainer<>(field, container.getBuilder().getTimestampBuilder()));
     }
-    
+
     public static void keepStructure(Message.Builder builder, String fieldName) throws CouldNotPerformException, InterruptedException {
         if (builder instanceof DeviceConfig.Builder) {
             keepDeviceConfigStructure((DeviceConfig.Builder) builder, fieldName);
         }
     }
-    
+
     private static void keepDeviceConfigStructure(DeviceConfig.Builder builder, String changedField) throws CouldNotPerformException, InterruptedException {
         if ("device_class_id".equals(changedField)) {
-            
+
             for (UnitTemplateConfig unitTemplate : RemotePool.getInstance().getDeviceRemote().getDeviceClassById(builder.getDeviceClassId()).getUnitTemplateConfigList()) {
-                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToSystemUnit(true);
+                UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setType(unitTemplate.getType()).setBoundToUnitHost(true);
                 unitConfig.setPlacementConfig(builder.getPlacementConfig());
                 unitTemplate.getServiceTemplateConfigList().stream().forEach((serviceTemplateConfig) -> {
                     unitConfig.addServiceConfig(ServiceConfig.newBuilder().setServiceTemplate(ServiceTemplate.newBuilder().setType(serviceTemplateConfig.getServiceType())));
@@ -187,7 +187,7 @@ public class StructureConsistencyKeeper {
             field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer<>(field, container.getBuilder()));
         }
-        
+
         if (change) {
             List<String> memberIds = new ArrayList<>();
             if (container.getBuilder().getUnitType() == UnitType.UNKNOWN) {

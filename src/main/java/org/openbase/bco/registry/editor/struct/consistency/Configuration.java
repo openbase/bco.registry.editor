@@ -87,7 +87,7 @@ public class Configuration {
         } else if (builder instanceof Scope.Builder) {
             return !("scope".equals(fieldName));
         } else if (builder instanceof UnitConfig.Builder) {
-            return !("id".equals(fieldName) || "system_unit_id".equals(fieldName) || "type".equals(fieldName) || "unit_template_config_id".equals(fieldName));
+            return !("id".equals(fieldName) || "unit_host_id".equals(fieldName) || "type".equals(fieldName) || "unit_template_config_id".equals(fieldName));
         } else if (builder instanceof ServiceConfig.Builder) {
             return !("type".equals(fieldName) || "unit_id".equals(fieldName));
         } else if (builder instanceof LocationConfig.Builder) {
