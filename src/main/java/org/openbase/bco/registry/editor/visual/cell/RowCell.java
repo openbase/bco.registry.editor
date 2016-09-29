@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * Cell factory to manage similar options for all cells in a row. Initializes
  * and manages the context menu for all child cells.
  *
- * @author thuxohl
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public abstract class RowCell extends TreeTableCell<Node, Node> {
 

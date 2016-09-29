@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.com">Tamino Huxohl</a>
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class DecimalTextField extends TextField {
 

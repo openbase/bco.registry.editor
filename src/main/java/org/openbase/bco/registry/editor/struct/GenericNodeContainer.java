@@ -34,7 +34,7 @@ import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
  *
- * @author thuxohl
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  * @param <MB>
  */
 public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends NodeContainer<MB> {

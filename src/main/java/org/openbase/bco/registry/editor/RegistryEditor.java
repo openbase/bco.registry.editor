@@ -97,7 +97,7 @@ import rst.spatial.LocationRegistryDataType.LocationRegistryData;
 
 /**
  *
- * @author thuxohl
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class RegistryEditor extends Application {
 

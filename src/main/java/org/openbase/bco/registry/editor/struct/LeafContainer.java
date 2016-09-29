@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thuxohl
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class LeafContainer implements Leaf {
 

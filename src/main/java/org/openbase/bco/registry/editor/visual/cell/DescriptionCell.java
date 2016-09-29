@@ -30,7 +30,7 @@ import rst.authorization.UserConfigType.UserConfig;
 
 /**
  *
- * @author thuxohl
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class DescriptionCell extends RowCell {
 

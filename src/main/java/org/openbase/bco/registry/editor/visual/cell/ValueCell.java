@@ -74,7 +74,7 @@ import rst.homeautomation.state.InventoryStateType.InventoryState;
 
 /**
  *
- * @author thuxohl
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class ValueCell extends RowCell {
     

@@ -46,7 +46,7 @@ import rst.timing.TimestampType.Timestamp;
 
 /**
  *
- * @author thuxohl
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class RSTDefaultInstances {
 
