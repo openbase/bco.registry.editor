@@ -24,7 +24,7 @@ package org.openbase.bco.registry.editor.visual.cell;
 
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Node;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
 import rst.authorization.UserConfigType.UserConfig;
 
@@ -52,7 +52,7 @@ public class DescriptionCell extends RowCell {
             if (item instanceof GenericNodeContainer) {
                 GenericNodeContainer container = (GenericNodeContainer) item;
                 try {
-                    String label = FieldDescriptorUtil.getLabel(container.getBuilder());
+                    String label = ProtoBufFieldProcessor.getLabel(container.getBuilder());
                     if (!label.isEmpty()) {
                         setText(label);
                     } else {
@@ -60,7 +60,7 @@ public class DescriptionCell extends RowCell {
                     }
                 } catch (Exception ex) {
                     try {
-                        String id = FieldDescriptorUtil.getId(container.getBuilder().build());
+                        String id = ProtoBufFieldProcessor.getId(container.getBuilder().build());
                         if (!id.isEmpty()) {
                             setText(id);
                         }

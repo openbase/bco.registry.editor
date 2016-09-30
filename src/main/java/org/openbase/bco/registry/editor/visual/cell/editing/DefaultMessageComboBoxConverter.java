@@ -23,7 +23,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
 /**
  *
@@ -38,7 +38,7 @@ public class DefaultMessageComboBoxConverter implements MessageComboBoxConverter
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(FieldDescriptorUtil.getFieldDescriptor("id", msg.toBuilder()));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor("id", msg.toBuilder()));
     }
 
 }

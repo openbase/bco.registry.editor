@@ -41,7 +41,7 @@ import org.openbase.bco.registry.editor.struct.Leaf;
 import org.openbase.bco.registry.editor.struct.LeafContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.util.RSTDefaultInstances;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.jul.exception.CouldNotPerformException;
@@ -187,8 +187,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 NodeContainer removed = (NodeContainer) nodeToRemove;
                 try {
                     Message message = removed.getBuilder().build();
-                    logger.info("Removing message with Id [" + FieldDescriptorUtil.getId(message) + "]");
-                    if (!"".equals(FieldDescriptorUtil.getId(message)) && remotePool.contains(message)) {
+                    logger.info("Removing message with Id [" + ProtoBufFieldProcessor.getId(message) + "]");
+                    if (!"".equals(ProtoBufFieldProcessor.getId(message)) && remotePool.contains(message)) {
                         remotePool.remove(message);
                     }
                 } catch (CouldNotPerformException ex) {
@@ -207,7 +207,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     }
 
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
-        Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(parent.getDescriptor(), parent.getBuilder());
+        Descriptors.FieldDescriptor field = ProtoBufFieldProcessor.getFieldDescriptor(parent.getDescriptor(), parent.getBuilder());
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));
         updatedList.remove(index);
         parent.getBuilder().clearField(field);

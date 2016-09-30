@@ -31,7 +31,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.visual.cell.DescriptionCell;
 import static org.openbase.bco.registry.editor.visual.column.ValueColumn.VALUE_COLUMN_PROPORTION;
 import org.openbase.jul.exception.CouldNotPerformException;
@@ -106,7 +106,7 @@ public class DescriptorColumn extends Column {
     private String getLabelOrId(NodeContainer container) {
         String text = "";
         try {
-            text = FieldDescriptorUtil.getLabel(container.getBuilder());
+            text = ProtoBufFieldProcessor.getLabel(container.getBuilder());
             if (!text.isEmpty()) {
                 return text;
             } else {
@@ -114,7 +114,7 @@ public class DescriptorColumn extends Column {
             }
         } catch (Exception ex) {
             try {
-                text = FieldDescriptorUtil.getId(container.getBuilder().build());
+                text = ProtoBufFieldProcessor.getId(container.getBuilder().build());
                 if (!text.isEmpty()) {
                     return text;
                 }

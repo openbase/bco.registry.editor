@@ -26,7 +26,7 @@ import com.google.protobuf.GeneratedMessage;
 import java.util.Map.Entry;
 import org.openbase.bco.registry.editor.struct.consistency.Configuration;
 import org.openbase.bco.registry.editor.struct.converter.DefaultConverter;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.NotAvailableException;
@@ -45,7 +45,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
 
             for (Entry<String, Object> entry : converter.getFields().entrySet()) {
                 if (converter instanceof DefaultConverter) {
-                    registerElement(FieldDescriptorUtil.getFieldDescriptor(entry.getKey(), builder));
+                    registerElement(ProtoBufFieldProcessor.getFieldDescriptor(entry.getKey(), builder));
                 } else {
                     registerElement(entry.getKey(), entry.getValue());
                 }
@@ -56,7 +56,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
     }
 
     public GenericNodeContainer(final int fieldNumber, final MB builder) throws InstantiationException {
-        this(FieldDescriptorUtil.getFieldDescriptor(fieldNumber, builder), builder);
+        this(ProtoBufFieldProcessor.getFieldDescriptor(fieldNumber, builder), builder);
     }
 
     public GenericNodeContainer(final FieldDescriptor fieldDescriptor, final MB builder) throws InstantiationException {
@@ -68,7 +68,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
 
             for (Entry<String, Object> entry : converter.getFields().entrySet()) {
                 if (converter instanceof DefaultConverter) {
-                    registerElement(FieldDescriptorUtil.getFieldDescriptor(entry.getKey(), builder));
+                    registerElement(ProtoBufFieldProcessor.getFieldDescriptor(entry.getKey(), builder));
                 } else {
                     registerElement(entry.getKey(), entry.getValue());
                 }

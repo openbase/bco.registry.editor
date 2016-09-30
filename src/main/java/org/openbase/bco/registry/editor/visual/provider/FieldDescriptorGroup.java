@@ -27,7 +27,7 @@ import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.struct.consistency.StructureConsistencyKeeper;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.printer.LogLevel;
 
@@ -71,10 +71,10 @@ public class FieldDescriptorGroup extends AbstractTreeItemDescriptorProvider {
         fieldDescriptors = new Descriptors.FieldDescriptor[descriptorNumbers.length];
         Message.Builder test = builder;
         for (int i = 0; i < descriptorNumbers.length - 1; i++) {
-            fieldDescriptors[i] = FieldDescriptorUtil.getFieldDescriptor(descriptorNumbers[i], test);
+            fieldDescriptors[i] = ProtoBufFieldProcessor.getFieldDescriptor(descriptorNumbers[i], test);
             test = ((GeneratedMessage) test.getField(fieldDescriptors[i])).toBuilder();
         }
-        fieldDescriptors[descriptorNumbers.length - 1] = FieldDescriptorUtil.getFieldDescriptor(descriptorNumbers[descriptorNumbers.length - 1], test);
+        fieldDescriptors[descriptorNumbers.length - 1] = ProtoBufFieldProcessor.getFieldDescriptor(descriptorNumbers[descriptorNumbers.length - 1], test);
     }
 
 //    /**

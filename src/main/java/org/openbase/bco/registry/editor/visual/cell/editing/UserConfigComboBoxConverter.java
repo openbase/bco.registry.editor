@@ -23,7 +23,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import rst.authorization.UserConfigType.UserConfig;
 
 /**
@@ -34,15 +34,15 @@ public class UserConfigComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        String userName = (String) msg.getField(FieldDescriptorUtil.getFieldDescriptor(UserConfig.USER_NAME_FIELD_NUMBER, UserConfig.getDefaultInstance()));
-        String firstName = (String) msg.getField(FieldDescriptorUtil.getFieldDescriptor(UserConfig.FIRST_NAME_FIELD_NUMBER, UserConfig.getDefaultInstance()));
-        String lastName = (String) msg.getField(FieldDescriptorUtil.getFieldDescriptor(UserConfig.LAST_NAME_FIELD_NUMBER, UserConfig.getDefaultInstance()));
+        String userName = (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UserConfig.USER_NAME_FIELD_NUMBER, UserConfig.getDefaultInstance()));
+        String firstName = (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UserConfig.FIRST_NAME_FIELD_NUMBER, UserConfig.getDefaultInstance()));
+        String lastName = (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UserConfig.LAST_NAME_FIELD_NUMBER, UserConfig.getDefaultInstance()));
         return userName + " (" + firstName + " " + lastName + ")";
     }
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(FieldDescriptorUtil.getFieldDescriptor(UserConfig.ID_FIELD_NUMBER, UserConfig.getDefaultInstance()));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UserConfig.ID_FIELD_NUMBER, UserConfig.getDefaultInstance()));
     }
 
 }

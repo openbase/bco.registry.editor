@@ -35,7 +35,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
@@ -109,7 +109,7 @@ public class MessageComboBox extends ComboBox<Message> {
         try {
             List<? extends Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
             if (parentBuilder instanceof LocationConfig.Builder) {
-                list.remove(RemotePool.getInstance().getById(FieldDescriptorUtil.getId(parentBuilder), parentBuilder).build());
+                list.remove(RemotePool.getInstance().getById(ProtoBufFieldProcessor.getId(parentBuilder), parentBuilder).build());
                 for (String childId : ((LocationConfig.Builder) parentBuilder).getChildIdList()) {
                     if (childId.equals(leafValue)) {
                         continue;

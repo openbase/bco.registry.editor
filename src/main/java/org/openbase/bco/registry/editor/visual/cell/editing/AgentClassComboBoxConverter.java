@@ -28,7 +28,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import rst.homeautomation.control.agent.AgentClassType.AgentClass;
 
 /**
@@ -39,11 +39,11 @@ public class AgentClassComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        return (String) msg.getField(FieldDescriptorUtil.getFieldDescriptor(AgentClass.LABEL_FIELD_NUMBER, AgentClass.getDefaultInstance()));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AgentClass.LABEL_FIELD_NUMBER, AgentClass.getDefaultInstance()));
     }
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(FieldDescriptorUtil.getFieldDescriptor(AgentClass.ID_FIELD_NUMBER, AgentClass.getDefaultInstance()));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AgentClass.ID_FIELD_NUMBER, AgentClass.getDefaultInstance()));
     }
 }

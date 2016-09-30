@@ -52,7 +52,7 @@ import org.openbase.bco.registry.editor.struct.Leaf;
 import org.openbase.bco.registry.editor.struct.LeafContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.consistency.Configuration;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
 import org.openbase.bco.registry.editor.visual.GlobalTextArea;
 import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
@@ -218,7 +218,7 @@ public class ValueCell extends RowCell {
                 }
                 
                 try {
-                    if ("".equals(FieldDescriptorUtil.getId(container.getBuilder()))) {
+                    if ("".equals(ProtoBufFieldProcessor.getId(container.getBuilder()))) {
                         container.setChanged(true);
                     }
                 } catch (CouldNotPerformException ex) {
@@ -254,7 +254,7 @@ public class ValueCell extends RowCell {
             return entry.getKey() + " = " + entry.getValue();
         } else if (Configuration.isSendable(builder)) {
             try {
-                return FieldDescriptorUtil.getDescription(builder);
+                return ProtoBufFieldProcessor.getDescription(builder);
             } catch (CouldNotPerformException ex) {
             }
         }
@@ -285,7 +285,7 @@ public class ValueCell extends RowCell {
             Builder builder = container.getBuilder();
             
             if (!builder.isInitialized()) {
-                if (FieldDescriptorUtil.onlySomeRequiredFieldsAreSet(builder)) {
+                if (ProtoBufFieldProcessor.checkIfSomeButNotAllRequiredFieldsAreSet(builder)) {
                     List<String> missingFieldList = builder.findInitializationErrors();
                     String missingFields = "";
                     missingFields = missingFieldList.stream().map((error) -> error + "\n").reduce(missingFields, String::concat);
@@ -320,14 +320,14 @@ public class ValueCell extends RowCell {
                     
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.get() == clearButton) {
-                        FieldDescriptorUtil.clearRequiredFields(builder);
+                        ProtoBufFieldProcessor.clearRequiredFields(builder);
                     } else if (result.get() == initButton) {
-                        FieldDescriptorUtil.initRequiredFieldsWithDefault(builder);
+                        ProtoBufFieldProcessor.initRequiredFieldsWithDefault(builder);
                     } else {
                         return;
                     }
                 } else {
-                    FieldDescriptorUtil.clearRequiredFields(builder);
+                    ProtoBufFieldProcessor.clearRequiredFields(builder);
                 }
             }
             
@@ -376,11 +376,11 @@ public class ValueCell extends RowCell {
                         protected Boolean call() throws Exception {
                             GenericNodeContainer container = (GenericNodeContainer) getItem();
                             try {
-                                if ("".equals(FieldDescriptorUtil.getId(container.getBuilder()))) {
+                                if ("".equals(ProtoBufFieldProcessor.getId(container.getBuilder()))) {
                                     container.getParent().getChildren().remove(container);
                                 } else {
                                     int index = container.getParent().getChildren().indexOf(container);
-                                    GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), remotePool.getById(FieldDescriptorUtil.getId(container.getBuilder()), container.getBuilder()));
+                                    GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()));
                                     RegistryTreeTableView.expandEqually(container, oldNode);
                                     container.getParent().getChildren().set(index, oldNode);
                                 }

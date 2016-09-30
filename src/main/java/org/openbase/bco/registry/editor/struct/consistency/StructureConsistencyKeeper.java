@@ -33,7 +33,7 @@ import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.LeafContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
@@ -86,7 +86,7 @@ public class StructureConsistencyKeeper {
                 i--;
             }
         }
-        builder.clearField(FieldDescriptorUtil.getFieldDescriptor(fieldName, builder));
+        builder.clearField(ProtoBufFieldProcessor.getFieldDescriptor(fieldName, builder));
     }
 
     private static void keepDeviceConfigStructure(NodeContainer<DeviceConfig.Builder> container, String changedField) throws CouldNotPerformException, InterruptedException {
@@ -108,7 +108,7 @@ public class StructureConsistencyKeeper {
             }
 
             // create and add a new child node container representing these children
-            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(DeviceConfig.UNIT_CONFIG_FIELD_NUMBER, container.getBuilder());
+            Descriptors.FieldDescriptor field = ProtoBufFieldProcessor.getFieldDescriptor(DeviceConfig.UNIT_CONFIG_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
@@ -131,7 +131,7 @@ public class StructureConsistencyKeeper {
             });
 
             // create and add a new child node container representing these children
-            Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(UnitTemplateConfig.SERVICE_TEMPLATE_CONFIG_FIELD_NUMBER, container.getBuilder());
+            Descriptors.FieldDescriptor field = ProtoBufFieldProcessor.getFieldDescriptor(UnitTemplateConfig.SERVICE_TEMPLATE_CONFIG_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer(field, container.getBuilder()));
         }
     }
@@ -144,7 +144,7 @@ public class StructureConsistencyKeeper {
         container.getBuilder().setTimestamp(Timestamp.newBuilder().setTime(System.currentTimeMillis()));
 
         // create and add a new child node container representing these children
-        Descriptors.FieldDescriptor field = FieldDescriptorUtil.getFieldDescriptor(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
+        Descriptors.FieldDescriptor field = ProtoBufFieldProcessor.getFieldDescriptor(InventoryState.TIMESTAMP_FIELD_NUMBER, container.getBuilder());
         container.add(new GenericNodeContainer<>(field, container.getBuilder().getTimestampBuilder()));
     }
 
@@ -178,13 +178,13 @@ public class StructureConsistencyKeeper {
             change = true;
             StructureConsistencyKeeper.clearField(container, "unit_type");
             container.getBuilder().setUnitType(UnitType.UNKNOWN);
-            field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.UNIT_TYPE_FIELD_NUMBER, container.getBuilder());
+            field = ProtoBufFieldProcessor.getFieldDescriptor(UnitGroupConfig.UNIT_TYPE_FIELD_NUMBER, container.getBuilder());
             container.registerElement(field.getName(), container.getBuilder().getField(field));
         } else if ("unit_type".equals(changedField)) {
             change = true;
             StructureConsistencyKeeper.clearField(container, "service_type");
             container.getBuilder().addAllServiceTemplate(RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getUnitType()).getServiceTemplateList());
-            field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
+            field = ProtoBufFieldProcessor.getFieldDescriptor(UnitGroupConfig.SERVICE_TEMPLATE_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer<>(field, container.getBuilder()));
         }
 
@@ -215,7 +215,7 @@ public class StructureConsistencyKeeper {
             }
             StructureConsistencyKeeper.clearField(container, "member_id");
             container.getBuilder().addAllMemberId(memberIds);
-            field = FieldDescriptorUtil.getFieldDescriptor(UnitGroupConfig.MEMBER_ID_FIELD_NUMBER, container.getBuilder());
+            field = ProtoBufFieldProcessor.getFieldDescriptor(UnitGroupConfig.MEMBER_ID_FIELD_NUMBER, container.getBuilder());
             container.add(new GenericListContainer<>(field, container.getBuilder()));
         }
     }

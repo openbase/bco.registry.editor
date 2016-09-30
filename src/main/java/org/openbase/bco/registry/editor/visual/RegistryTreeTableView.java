@@ -41,7 +41,7 @@ import org.openbase.bco.registry.editor.struct.GenericListContainer;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.bco.registry.editor.util.FieldDescriptorUtil;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.column.Column;
@@ -205,7 +205,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
 
         try {
-            if (FieldDescriptorUtil.getId(msg).equals(FieldDescriptorUtil.getId(((NodeContainer) nodes.get(0)).getBuilder()))) {
+            if (ProtoBufFieldProcessor.getId(msg).equals(ProtoBufFieldProcessor.getId(((NodeContainer) nodes.get(0)).getBuilder()))) {
                 return (NodeContainer) nodes.get(0);
             } else {
                 nodes.addAll(nodes.get(0).getChildren());
