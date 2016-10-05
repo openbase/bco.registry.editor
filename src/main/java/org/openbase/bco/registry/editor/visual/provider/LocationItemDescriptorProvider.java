@@ -21,13 +21,11 @@ package org.openbase.bco.registry.editor.visual.provider;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Message;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.homeautomation.device.DeviceConfigType;
-import rst.spatial.LocationConfigType.LocationConfig;
+import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
@@ -39,12 +37,12 @@ public class LocationItemDescriptorProvider extends AbstractTreeItemDescriptorPr
     FieldDescriptorGroup fieldGroup;
 
     public LocationItemDescriptorProvider() {
-        fieldGroup = new FieldDescriptorGroup(DeviceConfigType.DeviceConfig.newBuilder(), DeviceConfigType.DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+        fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
     }
 
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
-        LocationConfig location = RemotePool.getInstance().getLocationRemote().getLocationConfigById((String) fieldGroup.getValue(builder));
+        UnitConfig location = RemotePool.getInstance().getLocationRemote().getLocationConfigById((String) fieldGroup.getValue(builder));
         return ScopeGenerator.generateStringRep(location.getScope());
     }
 

@@ -27,11 +27,9 @@ import java.util.List;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SortEvent;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
@@ -41,7 +39,6 @@ import org.openbase.bco.registry.editor.struct.GenericListContainer;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.column.Column;
@@ -50,6 +47,7 @@ import org.openbase.bco.registry.editor.visual.column.ValueColumn;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.protobuf.ProtobufListDiff;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.pattern.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,18 +83,6 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
         setSortMode(TreeSortMode.ALL_DESCENDANTS);
         getSortOrder().addAll(descriptorColumn, valueColumn);
-        setOnSort(new EventHandler<SortEvent<TreeTableView<Node>>>() {
-
-            @Override
-            public void handle(SortEvent<TreeTableView<Node>> event) {
-//                logger.info("Sorting tree table view!");
-//                ValueColumn test = (ValueColumn) RegistryTreeTableView.this.getColumns().get(1);
-//                test.getc
-//                DescriptorColumn test2 = (DescriptorColumn) RegistryTreeTableView.this.getColumns().get(0);
-            }
-        });
-
-//        this.comparatorProperty().;
         this.listDiff = new ProtobufListDiff();
 
         this.statusInfoLabel = new Label("Status Info Label");

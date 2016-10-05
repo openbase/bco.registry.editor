@@ -32,7 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
 import org.openbase.jul.exception.InstantiationException;
-import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
@@ -49,19 +49,19 @@ public class FieldDescriptorGroupTest {
     private final PlacementConfig home;
     private final PlacementConfig kitchen;
 
-    private final DeviceConfig.Builder device1;
-    private final DeviceConfig.Builder device2;
-    private final DeviceConfig.Builder device3;
+    private final UnitConfig.Builder device1;
+    private final UnitConfig.Builder device2;
+    private final UnitConfig.Builder device3;
 
     public FieldDescriptorGroupTest() throws InstantiationException {
-        group = new FieldDescriptorGroup(DeviceConfig.newBuilder(), DeviceConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+        group = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
 
         home = PlacementConfig.newBuilder().setLocationId(homeID).build();
         kitchen = PlacementConfig.newBuilder().setLocationId(kitchenID).build();
 
-        device1 = DeviceConfig.newBuilder().setId("device_1").setPlacementConfig(home);
-        device2 = DeviceConfig.newBuilder().setId("device_2").setPlacementConfig(home);
-        device3 = DeviceConfig.newBuilder().setId("device_3").setPlacementConfig(kitchen);
+        device1 = UnitConfig.newBuilder().setId("device_1").setPlacementConfig(home);
+        device2 = UnitConfig.newBuilder().setId("device_2").setPlacementConfig(home);
+        device3 = UnitConfig.newBuilder().setId("device_3").setPlacementConfig(kitchen);
     }
 
     @BeforeClass
@@ -146,7 +146,7 @@ public class FieldDescriptorGroupTest {
     public void testsetValue() throws Exception {
         System.out.println("setValue");
 
-        DeviceConfig.Builder builder = DeviceConfig.newBuilder();
+        UnitConfig.Builder builder = UnitConfig.newBuilder();
         group.setValue(builder, homeID);
         assertEquals(homeID, builder.getPlacementConfig().getLocationId());
     }

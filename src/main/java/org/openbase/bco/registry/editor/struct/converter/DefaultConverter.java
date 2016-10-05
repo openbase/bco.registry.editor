@@ -21,13 +21,12 @@ package org.openbase.bco.registry.editor.struct.converter;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import java.util.HashMap;
 import java.util.Map;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
 /**
  *
@@ -44,7 +43,7 @@ public class DefaultConverter implements Converter {
     @Override
     public void updateBuilder(String fieldName, Object value) throws CouldNotPerformException {
         try {
-            builder.setField(ProtoBufFieldProcessor.getFieldDescriptor(fieldName, builder), value);
+            builder.setField(ProtoBufFieldProcessor.getFieldDescriptor(builder, fieldName), value);
         } catch (Exception ex) {
             throw new CouldNotPerformException("Could not update field [" + fieldName + "," + value + "]", ex);
         }

@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.visual.provider.TreeItemDescriptorProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
 /**
  *
@@ -55,7 +55,7 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
     private final Descriptors.FieldDescriptor fieldDescriptor;
 
     public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {
-        this(descriptor, ProtoBufFieldProcessor.getFieldDescriptor(fieldNumber, builder), builder, builderList, groups);
+        this(descriptor, ProtoBufFieldProcessor.getFieldDescriptor(builder, fieldNumber), builder, builderList, groups);
     }
 
     public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {

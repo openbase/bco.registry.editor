@@ -32,6 +32,7 @@ import rst.homeautomation.control.app.AppConfigType.AppConfig;
 import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
+import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.ConnectionConfigType.ConnectionConfig;
@@ -55,6 +56,7 @@ public enum SendableType {
     UNIT_TEMPLATE(UnitTemplate.getDefaultInstance()),
     USER_CONFIG(UserConfig.getDefaultInstance()),
     AUTHORIZATION_GROUP_CONFIG(AuthorizationGroupConfig.getDefaultInstance()),
+    UNIT_CONFIG(UnitConfig.getDefaultInstance()),
     UNIT_GROUP_CONFIG(UnitGroupConfig.getDefaultInstance());
 
     private final GeneratedMessage defaultInstanceForType;
@@ -94,6 +96,8 @@ public enum SendableType {
             return AUTHORIZATION_GROUP_CONFIG;
         } else if (builder instanceof UnitGroupConfig.Builder) {
             return UNIT_GROUP_CONFIG;
+        } else if (builder instanceof UnitConfig.Builder) {
+            return UNIT_CONFIG;
         } else {
             return null;
         }

@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
@@ -38,7 +37,7 @@ public class DefaultMessageComboBoxConverter implements MessageComboBoxConverter
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor("id", msg.toBuilder()));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(msg.toBuilder(), "id"));
     }
 
 }

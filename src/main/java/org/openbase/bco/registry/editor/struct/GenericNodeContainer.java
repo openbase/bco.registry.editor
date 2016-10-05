@@ -26,11 +26,10 @@ import com.google.protobuf.GeneratedMessage;
 import java.util.Map.Entry;
 import org.openbase.bco.registry.editor.struct.consistency.Configuration;
 import org.openbase.bco.registry.editor.struct.converter.DefaultConverter;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.NotAvailableException;
-import rst.spatial.PlacementConfigType.PlacementConfig;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
 /**
  *
@@ -45,7 +44,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
 
             for (Entry<String, Object> entry : converter.getFields().entrySet()) {
                 if (converter instanceof DefaultConverter) {
-                    registerElement(ProtoBufFieldProcessor.getFieldDescriptor(entry.getKey(), builder));
+                    registerElement(ProtoBufFieldProcessor.getFieldDescriptor(builder, entry.getKey()));
                 } else {
                     registerElement(entry.getKey(), entry.getValue());
                 }
@@ -56,7 +55,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
     }
 
     public GenericNodeContainer(final int fieldNumber, final MB builder) throws InstantiationException {
-        this(ProtoBufFieldProcessor.getFieldDescriptor(fieldNumber, builder), builder);
+        this(ProtoBufFieldProcessor.getFieldDescriptor(builder, fieldNumber), builder);
     }
 
     public GenericNodeContainer(final FieldDescriptor fieldDescriptor, final MB builder) throws InstantiationException {
@@ -68,7 +67,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
 
             for (Entry<String, Object> entry : converter.getFields().entrySet()) {
                 if (converter instanceof DefaultConverter) {
-                    registerElement(ProtoBufFieldProcessor.getFieldDescriptor(entry.getKey(), builder));
+                    registerElement(ProtoBufFieldProcessor.getFieldDescriptor(builder, entry.getKey()));
                 } else {
                     registerElement(entry.getKey(), entry.getValue());
                 }
@@ -84,9 +83,6 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
         } else if (field.getType().equals(FieldDescriptor.Type.MESSAGE)) {
             super.add(new GenericNodeContainer(field, (GeneratedMessage.Builder) builder.getFieldBuilder(field)));
         } else {
-            if (builder instanceof PlacementConfig.Builder) {
-                int i = 0;
-            }
             super.add(new LeafContainer(builder.getField(field), field.getName(), this, Configuration.isModifiableField(builder, field.getName())));
         }
     }

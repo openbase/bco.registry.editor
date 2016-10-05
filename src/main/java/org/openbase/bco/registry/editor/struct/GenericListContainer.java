@@ -24,13 +24,13 @@ package org.openbase.bco.registry.editor.struct;
 import com.google.protobuf.Descriptors;
 import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
 import com.google.protobuf.GeneratedMessage;
+import java.util.List;
 import org.openbase.bco.registry.editor.struct.consistency.Configuration;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
-import java.util.List;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
 /**
  *
@@ -45,7 +45,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
     private final boolean modifiable;
 
     public GenericListContainer(int repeatedFieldNumber, final MB builder) throws InstantiationException {
-        this(ProtoBufFieldProcessor.getFieldDescriptor(repeatedFieldNumber, builder), builder);
+        this(ProtoBufFieldProcessor.getFieldDescriptor(builder, repeatedFieldNumber), builder);
     }
 
     public GenericListContainer(final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder) throws InstantiationException {

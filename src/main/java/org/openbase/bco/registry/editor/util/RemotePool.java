@@ -26,6 +26,8 @@ import com.google.protobuf.Message;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 import org.openbase.bco.registry.agent.lib.jp.JPAgentRegistryScope;
@@ -38,6 +40,8 @@ import org.openbase.bco.registry.location.lib.jp.JPLocationRegistryScope;
 import org.openbase.bco.registry.location.remote.LocationRegistryRemote;
 import org.openbase.bco.registry.scene.lib.jp.JPSceneRegistryScope;
 import org.openbase.bco.registry.scene.remote.SceneRegistryRemote;
+import org.openbase.bco.registry.unit.lib.jp.JPUnitRegistryScope;
+import org.openbase.bco.registry.unit.remote.UnitRegistryRemote;
 import org.openbase.bco.registry.user.lib.jp.JPUserRegistryScope;
 import org.openbase.bco.registry.user.remote.UserRegistryRemote;
 import org.openbase.jps.core.JPService;
@@ -79,6 +83,9 @@ public class RemotePool {
     private final AgentRegistryRemote agentRemote;
     private final AppRegistryRemote appRemote;
     private final UserRegistryRemote userRemote;
+    private final UnitRegistryRemote unitRemote;
+
+    private final List<RSBRemoteService> remotes = new ArrayList();
 
     public static RemotePool getInstance() throws InstantiationException, InterruptedException {
         if (remotePool == null) {
@@ -94,6 +101,14 @@ public class RemotePool {
         this.agentRemote = new AgentRegistryRemote();
         this.appRemote = new AppRegistryRemote();
         this.userRemote = new UserRegistryRemote();
+        this.unitRemote = new UnitRegistryRemote();
+        remotes.add(appRemote);
+        remotes.add(agentRemote);
+        remotes.add(locationRemote);
+        remotes.add(deviceRemote);
+        remotes.add(sceneRemote);
+        remotes.add(userRemote);
+        remotes.add(unitRemote);
     }
 
     public void init() throws InitializationException, InterruptedException {
@@ -104,6 +119,7 @@ public class RemotePool {
             agentRemote.init(JPService.getProperty(JPAgentRegistryScope.class).getValue());
             appRemote.init(JPService.getProperty(JPAppRegistryScope.class).getValue());
             userRemote.init(JPService.getProperty(JPUserRegistryScope.class).getValue());
+            unitRemote.init(JPService.getProperty(JPUnitRegistryScope.class).getValue());
         } catch (JPServiceException ex) {
             throw new InitializationException(this, ex);
         }
@@ -116,6 +132,7 @@ public class RemotePool {
         agentRemote.shutdown();
         appRemote.shutdown();
         userRemote.shutdown();
+        unitRemote.shutdown();
     }
 
     public <M extends Message> Future<M> register(Message msg) throws CouldNotPerformException {
@@ -278,14 +295,11 @@ public class RemotePool {
         return userRemote;
     }
 
-    public List<RSBRemoteService> getRemotes() {
-        List<RSBRemoteService> remotes = new ArrayList<>();
-        remotes.add(appRemote);
-        remotes.add(agentRemote);
-        remotes.add(locationRemote);
-        remotes.add(deviceRemote);
-        remotes.add(sceneRemote);
-        remotes.add(userRemote);
-        return remotes;
+    public UnitRegistryRemote getUnitRemote() {
+        return unitRemote;
+    }
+
+    public Collection<RSBRemoteService> getRemotes() {
+        return Collections.unmodifiableCollection(remotes);
     }
 }

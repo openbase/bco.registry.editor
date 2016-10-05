@@ -26,7 +26,6 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import rst.homeautomation.control.app.AppClassType.AppClass;
@@ -39,11 +38,11 @@ public class AppClassComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AppClass.LABEL_FIELD_NUMBER, AppClass.getDefaultInstance()));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AppClass.getDefaultInstance(), AppClass.LABEL_FIELD_NUMBER));
     }
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AppClass.ID_FIELD_NUMBER, AppClass.getDefaultInstance()));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AppClass.getDefaultInstance(), AppClass.ID_FIELD_NUMBER));
     }
 }

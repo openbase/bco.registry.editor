@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor.visual.cell;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
@@ -41,13 +40,13 @@ import org.openbase.bco.registry.editor.struct.Leaf;
 import org.openbase.bco.registry.editor.struct.LeafContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.util.RSTDefaultInstances;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -207,7 +206,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     }
 
     private void removeNodeFromRepeatedField(NodeContainer parent, int index) {
-        Descriptors.FieldDescriptor field = ProtoBufFieldProcessor.getFieldDescriptor(parent.getDescriptor(), parent.getBuilder());
+        Descriptors.FieldDescriptor field = ProtoBufFieldProcessor.getFieldDescriptor(parent.getBuilder(), parent.getDescriptor());
         List updatedList = new ArrayList((List) parent.getBuilder().getField(field));
         updatedList.remove(index);
         parent.getBuilder().clearField(field);

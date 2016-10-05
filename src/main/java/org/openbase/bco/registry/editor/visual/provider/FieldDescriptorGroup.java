@@ -21,15 +21,11 @@ package org.openbase.bco.registry.editor.visual.provider;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.RegistryEditor;
-import org.openbase.bco.registry.editor.struct.consistency.StructureConsistencyKeeper;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.exception.printer.LogLevel;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
 /**
  *
@@ -71,10 +67,10 @@ public class FieldDescriptorGroup extends AbstractTreeItemDescriptorProvider {
         fieldDescriptors = new Descriptors.FieldDescriptor[descriptorNumbers.length];
         Message.Builder test = builder;
         for (int i = 0; i < descriptorNumbers.length - 1; i++) {
-            fieldDescriptors[i] = ProtoBufFieldProcessor.getFieldDescriptor(descriptorNumbers[i], test);
+            fieldDescriptors[i] = ProtoBufFieldProcessor.getFieldDescriptor(test, descriptorNumbers[i]);
             test = ((GeneratedMessage) test.getField(fieldDescriptors[i])).toBuilder();
         }
-        fieldDescriptors[descriptorNumbers.length - 1] = ProtoBufFieldProcessor.getFieldDescriptor(descriptorNumbers[descriptorNumbers.length - 1], test);
+        fieldDescriptors[descriptorNumbers.length - 1] = ProtoBufFieldProcessor.getFieldDescriptor(test, descriptorNumbers[descriptorNumbers.length - 1]);
     }
 
 //    /**
@@ -94,7 +90,6 @@ public class FieldDescriptorGroup extends AbstractTreeItemDescriptorProvider {
 //        }
 //        return values;
 //    }
-
     /**
      * Get the value for the group from one builder.
      *
@@ -125,11 +120,11 @@ public class FieldDescriptorGroup extends AbstractTreeItemDescriptorProvider {
             mBuilder = mBuilder.getFieldBuilder(fieldDescriptors[i]);
         }
         mBuilder.setField(fieldDescriptors[fieldDescriptors.length - 1], value);
-        try {
-            StructureConsistencyKeeper.keepStructure(builder, fieldDescriptors[fieldDescriptors.length - 1].getName());
-        } catch (CouldNotPerformException ex) {
-            RegistryEditor.printException(ex, logger, LogLevel.WARN);
-        }
+//        try {
+//            StructureConsistencyKeeper.keepStructure(builder, fieldDescriptors[fieldDescriptors.length - 1].getName());
+//        } catch (CouldNotPerformException ex) {
+//            RegistryEditor.printException(ex, logger, LogLevel.WARN);
+//        }
     }
 
     /**

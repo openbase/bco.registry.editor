@@ -59,7 +59,7 @@ public class RSTDefaultInstances {
     }
 
     public static DeviceConfig.Builder getDefaultDeviceConfig() {
-        return DeviceConfig.newBuilder().setPlacementConfig(getDefaultPlacementConfig()).setInventoryState(getDefaultInventoryState());
+        return DeviceConfig.newBuilder();
     }
 
     public static Translation getDefaultTranslation() {
@@ -83,11 +83,11 @@ public class RSTDefaultInstances {
     }
 
     public static LocationConfig.Builder getDefaultLocationConfig() {
-        return LocationConfig.newBuilder().setPlacementConfig(PlacementConfig.newBuilder().setPosition(getDefaultPose()));
+        return LocationConfig.newBuilder();
     }
 
     public static ConnectionConfig.Builder getDefaultConnectionConfig() {
-        return ConnectionConfig.newBuilder().setPlacementConfig(PlacementConfig.newBuilder().setPosition(getDefaultPose()));
+        return ConnectionConfig.newBuilder();
     }
 
     public static ActivationState getDefaultActivationState() {
@@ -99,23 +99,23 @@ public class RSTDefaultInstances {
     }
 
     public static SceneConfig.Builder getDefaultSceneConfig() {
-        return SceneConfig.newBuilder().setEnablingState(getDefaultEnablingState());
+        return SceneConfig.newBuilder();
     }
 
     public static AgentConfig.Builder getDefaultAgentConfig() {
-        return AgentConfig.newBuilder().setEnablingState(getDefaultEnablingState());
+        return AgentConfig.newBuilder();
     }
 
     public static AppConfig.Builder getDefaultAppConfig() {
-        return AppConfig.newBuilder().setEnablingState(getDefaultEnablingState());
+        return AppConfig.newBuilder();
     }
 
     public static UserConfig.Builder getDefaultUserConfig() {
-        return UserConfig.newBuilder().setEnablingState(getDefaultEnablingState());
+        return UserConfig.newBuilder();
     }
 
     public static AuthorizationGroupConfig.Builder getDefaultAuthorizationGroupConfig() {
-        return AuthorizationGroupConfig.newBuilder().setEnablingState(getDefaultEnablingState());
+        return AuthorizationGroupConfig.newBuilder();
     }
 
     public static PlacementConfig.Builder getDefaultPlacementConfig() {
@@ -127,7 +127,7 @@ public class RSTDefaultInstances {
     }
 
     public static UnitGroupConfig.Builder getDefaultUnitGroupConfig() {
-        return UnitGroupConfig.newBuilder().setPlacementConfig(getDefaultPlacementConfig());
+        return UnitGroupConfig.newBuilder();
     }
 
     public static DeviceClass.Builder getDefaultDeviceClass() {

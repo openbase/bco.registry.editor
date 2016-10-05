@@ -28,9 +28,9 @@ import org.openbase.bco.registry.editor.struct.consistency.Configuration;
 import org.openbase.bco.registry.editor.struct.consistency.StructureConsistencyKeeper;
 import org.openbase.bco.registry.editor.struct.converter.Converter;
 import org.openbase.bco.registry.editor.struct.converter.ConverterSelector;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -122,7 +122,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         if (index == -1) {
             converter.updateBuilder(fieldName, value);
         } else {
-            builder.setRepeatedField(ProtoBufFieldProcessor.getFieldDescriptor(fieldName, builder), index, value);
+            builder.setRepeatedField(ProtoBufFieldProcessor.getFieldDescriptor(builder, fieldName), index, value);
         }
         StructureConsistencyKeeper.keepStructure(this, fieldName);
         setSendableChanged();

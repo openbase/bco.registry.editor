@@ -21,12 +21,11 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import rst.homeautomation.unit.UnitConfigType.UnitConfig;
 import rst.rsb.ScopeType.Scope;
-import rst.spatial.LocationConfigType.LocationConfig;
 
 /**
  *
@@ -36,11 +35,11 @@ public class LocationConfigComboBoxConverter implements MessageComboBoxConverter
 
     @Override
     public String getText(Message msg) {
-        return ScopeGenerator.generateStringRep((Scope) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(LocationConfig.SCOPE_FIELD_NUMBER, LocationConfig.getDefaultInstance())));
+        return ScopeGenerator.generateStringRep((Scope) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.SCOPE_FIELD_NUMBER)));
     }
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(LocationConfig.ID_FIELD_NUMBER, LocationConfig.getDefaultInstance()));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.ID_FIELD_NUMBER));
     }
 }
