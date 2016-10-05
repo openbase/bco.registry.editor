@@ -35,13 +35,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
 import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.authorization.UserConfigType.UserConfig;
@@ -109,12 +109,12 @@ public class MessageComboBox extends ComboBox<Message> {
         try {
             List<? extends Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
             if (parentBuilder instanceof LocationConfig.Builder) {
-                list.remove(RemotePool.getInstance().getById(ProtoBufFieldProcessor.getId(parentBuilder), parentBuilder).build());
+                list.remove(RemotePool.getInstance().getById(ProtoBufFieldProcessor.getId(parentBuilder), parentBuilder));
                 for (String childId : ((LocationConfig.Builder) parentBuilder).getChildIdList()) {
                     if (childId.equals(leafValue)) {
                         continue;
                     }
-                    list.remove(RemotePool.getInstance().getById(childId, parentBuilder).build());
+                    list.remove(RemotePool.getInstance().getById(childId, parentBuilder));
                 }
             }
             if ("tile_id".equals(fieldName)) {
@@ -131,7 +131,7 @@ public class MessageComboBox extends ComboBox<Message> {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }
-                    list.remove(RemotePool.getInstance().getById(memberId, UserConfig.newBuilder()).build());
+                    list.remove(RemotePool.getInstance().getById(memberId, UserConfig.newBuilder()));
                 }
             }
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
@@ -144,7 +144,7 @@ public class MessageComboBox extends ComboBox<Message> {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }
-                    list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()).build());
+                    list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()));
                 }
             }
             Collections.sort(list, new Comparator<Message>() {

@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor.util;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,22 +29,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
-import org.openbase.bco.registry.agent.lib.jp.JPAgentRegistryScope;
 import org.openbase.bco.registry.agent.remote.AgentRegistryRemote;
-import org.openbase.bco.registry.app.lib.jp.JPAppRegistryScope;
 import org.openbase.bco.registry.app.remote.AppRegistryRemote;
-import org.openbase.bco.registry.device.lib.jp.JPDeviceRegistryScope;
 import org.openbase.bco.registry.device.remote.DeviceRegistryRemote;
-import org.openbase.bco.registry.location.lib.jp.JPLocationRegistryScope;
 import org.openbase.bco.registry.location.remote.LocationRegistryRemote;
-import org.openbase.bco.registry.scene.lib.jp.JPSceneRegistryScope;
 import org.openbase.bco.registry.scene.remote.SceneRegistryRemote;
-import org.openbase.bco.registry.unit.lib.jp.JPUnitRegistryScope;
 import org.openbase.bco.registry.unit.remote.UnitRegistryRemote;
-import org.openbase.bco.registry.user.lib.jp.JPUserRegistryScope;
 import org.openbase.bco.registry.user.remote.UserRegistryRemote;
-import org.openbase.jps.core.JPService;
-import org.openbase.jps.exception.JPServiceException;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.InstantiationException;
@@ -62,7 +52,6 @@ import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
 import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
-import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
 import rst.spatial.ConnectionConfigType.ConnectionConfig;
 import rst.spatial.LocationConfigType.LocationConfig;
@@ -112,27 +101,31 @@ public class RemotePool {
     }
 
     public void init() throws InitializationException, InterruptedException {
-        try {
-            deviceRemote.init(JPService.getProperty(JPDeviceRegistryScope.class).getValue());
-            locationRemote.init(JPService.getProperty(JPLocationRegistryScope.class).getValue());
-            sceneRemote.init(JPService.getProperty(JPSceneRegistryScope.class).getValue());
-            agentRemote.init(JPService.getProperty(JPAgentRegistryScope.class).getValue());
-            appRemote.init(JPService.getProperty(JPAppRegistryScope.class).getValue());
-            userRemote.init(JPService.getProperty(JPUserRegistryScope.class).getValue());
-            unitRemote.init(JPService.getProperty(JPUnitRegistryScope.class).getValue());
-        } catch (JPServiceException ex) {
-            throw new InitializationException(this, ex);
-        }
+        deviceRemote.init();
+        locationRemote.init();
+        sceneRemote.init();
+        agentRemote.init();
+        appRemote.init();
+        userRemote.init();
+        unitRemote.init();
     }
 
     public void shutdown() {
-        deviceRemote.shutdown();
-        locationRemote.shutdown();
-        sceneRemote.shutdown();
-        agentRemote.shutdown();
-        appRemote.shutdown();
-        userRemote.shutdown();
-        unitRemote.shutdown();
+        remotes.stream().forEach((remote) -> {
+            remote.shutdown();
+        });
+    }
+
+    public void activate() throws InterruptedException, CouldNotPerformException {
+        for (RSBRemoteService remote : remotes) {
+            remote.activate();
+        }
+    }
+
+    public void deactivate() throws InterruptedException, CouldNotPerformException {
+        for (RSBRemoteService remote : remotes) {
+            remote.deactivate();
+        }
     }
 
     public <M extends Message> Future<M> register(Message msg) throws CouldNotPerformException {
@@ -178,27 +171,16 @@ public class RemotePool {
         }
     }
 
-    public GeneratedMessage.Builder getById(String id, Message msg) throws CouldNotPerformException {
-        String methodName = getMethodName("get", "ById", msg);
-        try {
-            RSBRemoteService remote = getRemoteByMessage(msg);
-            Method method = remote.getClass().getMethod(methodName, String.class);
-            Object result = method.invoke(remote, id);
-            Method toBuilder = result.getClass().getMethod("toBuilder");
-            return (GeneratedMessage.Builder) toBuilder.invoke(result);
-        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new CouldNotPerformException(ex);
-        }
+    public Message getById(String id, Message msg) throws CouldNotPerformException {
+        return getById(id, msg.toBuilder());
     }
 
-    public GeneratedMessage.Builder getById(String id, Message.Builder builder) throws CouldNotPerformException {
+    public Message getById(String id, Message.Builder builder) throws CouldNotPerformException {
         String methodName = getMethodName("get", "ById", builder);
         try {
-            RSBRemoteService remote = getRemoteByMessageBuilder(builder);
+            RSBRemoteService remote = getRemoteByMessage(builder);
             Method method = remote.getClass().getMethod(methodName, String.class);
-            Object result = method.invoke(remote, id);
-            Method toBuilder = result.getClass().getMethod("toBuilder");
-            return (GeneratedMessage.Builder) toBuilder.invoke(result);
+            return (Message) method.invoke(remote, id);
         } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new CouldNotPerformException(ex);
         }
@@ -218,10 +200,10 @@ public class RemotePool {
         }
     }
 
-    public boolean isReadOnly(SendableType type) throws CouldNotPerformException {
-        String methodName = getMethodName("is", "RegistryReadOnly", type.getDefaultInstanceForType());
+    public Boolean isReadOnly(Message msg) throws CouldNotPerformException {
+        String methodName = getMethodName("is", "RegistryReadOnly", msg);
         try {
-            RSBRemoteService remote = getRemoteByMessage(type.getDefaultInstanceForType());
+            RSBRemoteService remote = getRemoteByMessage(msg);
             Method method = remote.getClass().getMethod(methodName);
             return (Boolean) method.invoke(remote);
         } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -229,11 +211,11 @@ public class RemotePool {
         }
     }
 
-    public boolean isConsistent(SendableType type) throws CouldNotPerformException {
-        String methodName = getMethodName("is", "RegistryConsistent", type.getDefaultInstanceForType());
+    public Boolean isConsistent(Message msg) throws CouldNotPerformException {
+        String methodName = getMethodName("is", "RegistryConsistent", msg);
         System.out.println("Calling Method [" + methodName + "]");
         try {
-            RSBRemoteService remote = getRemoteByMessage(type.getDefaultInstanceForType());
+            RSBRemoteService remote = getRemoteByMessage(msg);
             Method method = remote.getClass().getMethod(methodName);
             return (Boolean) method.invoke(remote);
         } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -242,30 +224,74 @@ public class RemotePool {
     }
 
     private String getMethodName(String prefix, String suffix, Message msg) {
-        return prefix + msg.getClass().getSimpleName() + suffix;
+        return getMethodName(prefix, suffix, msg.toBuilder());
     }
 
     private String getMethodName(String prefix, String suffix, Message.Builder msg) {
-        return prefix + msg.getDescriptorForType().getName() + suffix;
+        return prefix + getMethodNameForBuilder(msg) + suffix;
+    }
+
+    private String getMethodNameForBuilder(Message.Builder builder) {
+        if (builder instanceof UnitConfig.Builder) {
+            switch (((UnitConfig.Builder) builder).getType()) {
+                case AGENT:
+                    return AgentConfig.class.getSimpleName();
+                case APP:
+                    return AppConfig.class.getSimpleName();
+                case DEVICE:
+                    return DeviceConfig.class.getSimpleName();
+                case LOCATION:
+                    return LocationConfig.class.getSimpleName();
+                case CONNECTION:
+                    return ConnectionConfig.class.getSimpleName();
+                case SCENE:
+                    return SceneConfig.class.getSimpleName();
+                case USER:
+                    return UserConfig.class.getSimpleName();
+                case AUTHORIZATION_GROUP:
+                    return AuthorizationGroupConfig.class.getSimpleName();
+                default:
+                    return UnitConfig.class.getSimpleName();
+            }
+        } else {
+            return builder.getDescriptorForType().getName();
+        }
     }
 
     public RSBRemoteService getRemoteByMessage(Message msg) throws CouldNotPerformException {
-        return getRemoteByMessageBuilder(msg.toBuilder());
+        return getRemoteByMessage(msg.toBuilder());
     }
 
-    public RSBRemoteService getRemoteByMessageBuilder(Message.Builder builder) throws CouldNotPerformException {
-        if (builder instanceof DeviceClass.Builder || builder instanceof DeviceConfig.Builder || builder instanceof UnitTemplate.Builder || builder instanceof UnitGroupConfig.Builder || builder instanceof UnitConfig.Builder) {
+    public RSBRemoteService getRemoteByMessage(Message.Builder builder) throws CouldNotPerformException {
+        if (builder instanceof DeviceClass.Builder) {
             return deviceRemote;
-        } else if (builder instanceof LocationConfig.Builder || builder instanceof ConnectionConfig.Builder) {
-            return locationRemote;
-        } else if (builder instanceof AgentConfig.Builder || builder instanceof AgentClass.Builder) {
+        } else if (builder instanceof AgentClass.Builder) {
             return agentRemote;
-        } else if (builder instanceof SceneConfig.Builder) {
-            return sceneRemote;
-        } else if (builder instanceof AppConfig.Builder || builder instanceof AppClass.Builder) {
+        } else if (builder instanceof AppClass.Builder) {
             return appRemote;
-        } else if (builder instanceof UserConfig.Builder || builder instanceof AuthorizationGroupConfig.Builder) {
-            return userRemote;
+        } else if (builder instanceof UnitTemplate.Builder) {
+            return unitRemote;
+        } else if (builder instanceof UnitConfig.Builder) {
+            switch (((UnitConfig.Builder) builder).getType()) {
+                case AGENT:
+                    return agentRemote;
+                case APP:
+                    return appRemote;
+                case DEVICE:
+                    return deviceRemote;
+                case LOCATION:
+                    return locationRemote;
+                case CONNECTION:
+                    return locationRemote;
+                case SCENE:
+                    return sceneRemote;
+                case USER:
+                    return userRemote;
+                case AUTHORIZATION_GROUP:
+                    return userRemote;
+                default:
+                    return unitRemote;
+            }
         } else {
             throw new CouldNotPerformException("No matching remote for type [" + builder.getDescriptorForType().getName() + "]found");
         }

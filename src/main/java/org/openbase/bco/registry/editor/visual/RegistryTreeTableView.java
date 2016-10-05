@@ -182,7 +182,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
             }
         }
 
-        setReadOnlyMode(remotePool.isReadOnly(type));
+        setReadOnlyMode(remotePool.isReadOnly(type.getDefaultInstanceForType()));
     }
 
     private NodeContainer getNodeByMessage(List<TreeItem<Node>> nodes, GeneratedMessage msg) {
@@ -248,7 +248,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     public void setReadOnlyMode(boolean readOnly) {
         System.out.println("Setting read only mode of registry [" + type.name() + "]...");
         try {
-            if (!remotePool.isConsistent(type)) {
+            if (!remotePool.isConsistent(type.getDefaultInstanceForType())) {
                 System.out.println("\nRegistry is not even consistent\n");
                 statusInfoLabel.setText("Registry inconsistent!");
                 statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");

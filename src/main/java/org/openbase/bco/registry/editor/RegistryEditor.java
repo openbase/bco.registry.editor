@@ -450,14 +450,14 @@ public class RegistryEditor extends Application {
             TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);
             Descriptors.FieldDescriptor deviceClassfield = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistryData.DEVICE_CLASS_FIELD_NUMBER);
             deviceClassTreeTableView.setRoot(new GenericGroupContainer<>(deviceClassfield.getName(), deviceClassfield, data.toBuilder(), data.toBuilder().getDeviceClassBuilderList(), company));
-            deviceClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CLASS));
+            deviceClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CLASS.getDefaultInstanceForType()));
             deviceClassTreeTableView.getListDiff().diff(data.getDeviceClassList());
 
             TreeItemDescriptorProvider deviceClassId = new DeviceClassItemDescriptorProvider();
             TreeItemDescriptorProvider locationId = new LocationItemDescriptorProvider();
             Descriptors.FieldDescriptor deviceConfigfield = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistryData.DEVICE_UNIT_CONFIG_FIELD_NUMBER);
             deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(deviceConfigfield.getName(), deviceConfigfield, data.toBuilder(), data.toBuilder().getDeviceUnitConfigBuilderList(), deviceClassId, locationId));
-            deviceConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CONFIG));
+            deviceConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CONFIG.getDefaultInstanceForType()));
             deviceConfigTreeTableView.getListDiff().diff(data.getDeviceUnitConfigList());
 
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
@@ -465,11 +465,11 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof LocationRegistryData) {
             LocationRegistryData data = (LocationRegistryData) msg;
             locationConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistryData.LOCATION_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            locationConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.LOCATION_CONFIG));
+            locationConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.LOCATION_CONFIG.getDefaultInstanceForType()));
             locationConfigTreeTableView.getListDiff().diff(data.getLocationUnitConfigList());
 
             connectionConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistryData.CONNECTION_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            connectionConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.CONNECTION_CONFIG));
+            connectionConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.CONNECTION_CONFIG.getDefaultInstanceForType()));
             connectionConfigTreeTableView.getListDiff().diff(data.getConnectionUnitConfigList());
 
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
@@ -477,18 +477,18 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof SceneRegistryData) {
             SceneRegistryData data = (SceneRegistryData) msg;
             sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistryData.SCENE_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            sceneConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SCENE_CONFIG));
+            sceneConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SCENE_CONFIG.getDefaultInstanceForType()));
             sceneConfigTreeTableView.getListDiff().diff(data.getSceneUnitConfigList());
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
             return sceneRegistryTabPane;
         } else if (msg instanceof AppRegistryData) {
             AppRegistryData data = (AppRegistryData) msg;
             appConfigTreeTableView.setRoot(new GenericListContainer(AppRegistryData.APP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            appConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.APP_CONFIG));
+            appConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.APP_CONFIG.getDefaultInstanceForType()));
             appConfigTreeTableView.getListDiff().diff(data.getAppUnitConfigList());
 
             appClassTreeTableView.setRoot(new GenericListContainer(AppRegistryData.APP_CLASS_FIELD_NUMBER, data.toBuilder()));
-            appClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.APP_CLASS));
+            appClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.APP_CLASS.getDefaultInstanceForType()));
             appClassTreeTableView.getListDiff().diff(data.getAppClassList());
 
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
@@ -496,11 +496,11 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof AgentRegistryData) {
             AgentRegistryData data = (AgentRegistryData) msg;
             agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            agentConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CONFIG));
+            agentConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CONFIG.getDefaultInstanceForType()));
             agentConfigTreeTableView.getListDiff().diff(data.getAgentUnitConfigList());
 
             agentClassTreeTableView.setRoot(new GenericListContainer(AgentRegistryData.AGENT_CLASS_FIELD_NUMBER, data.toBuilder()));
-            agentClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CLASS));
+            agentClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CLASS.getDefaultInstanceForType()));
             agentClassTreeTableView.getListDiff().diff(data.getAgentClassList());
 
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
@@ -508,11 +508,11 @@ public class RegistryEditor extends Application {
         } else if (msg instanceof UserRegistryData) {
             UserRegistryData data = (UserRegistryData) msg;
             userConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistryData.USER_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            userConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_CONFIG));
+            userConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_CONFIG.getDefaultInstanceForType()));
             userConfigTreeTableView.getListDiff().diff(data.getUserUnitConfigList());
 
             authorizationGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistryData.AUTHORIZATION_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            authorizationGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AUTHORIZATION_GROUP_CONFIG));
+            authorizationGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AUTHORIZATION_GROUP_CONFIG.getDefaultInstanceForType()));
             authorizationGroupConfigTreeTableView.getListDiff().diff(data.getAuthorizationGroupUnitConfigList());
 
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
@@ -522,11 +522,11 @@ public class RegistryEditor extends Application {
 //            unitConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_C));
 
             unitTemplateTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
-            unitTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_TEMPLATE));
+            unitTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_TEMPLATE.getDefaultInstanceForType()));
             unitTemplateTreeTableView.getListDiff().diff(data.getUnitTemplateList());
 
             unitGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG));
+            unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType()));
             unitGroupConfigTreeTableView.getListDiff().diff(data.getUnitGroupUnitConfigList());
         }
 

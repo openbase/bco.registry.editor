@@ -23,20 +23,12 @@ package org.openbase.bco.registry.editor.util;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
-import rst.authorization.UserConfigType.UserConfig;
 import rst.homeautomation.control.agent.AgentClassType.AgentClass;
-import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
 import rst.homeautomation.control.app.AppClassType.AppClass;
-import rst.homeautomation.control.app.AppConfigType.AppConfig;
-import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
 import rst.homeautomation.device.DeviceClassType.DeviceClass;
-import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
 import rst.homeautomation.unit.UnitConfigType.UnitConfig;
-import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
 import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
-import rst.spatial.ConnectionConfigType.ConnectionConfig;
-import rst.spatial.LocationConfigType.LocationConfig;
+import rst.homeautomation.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 /**
  *
@@ -44,20 +36,20 @@ import rst.spatial.LocationConfigType.LocationConfig;
  */
 public enum SendableType {
 
-    AGENT_CONFIG(AgentConfig.getDefaultInstance()),
+    AGENT_CONFIG(UnitConfig.newBuilder().setType(UnitType.AGENT).build()),
     AGENT_CLASS(AgentClass.getDefaultInstance()),
-    APP_CONFIG(AppConfig.getDefaultInstance()),
+    APP_CONFIG(UnitConfig.newBuilder().setType(UnitType.APP).build()),
     APP_CLASS(AppClass.getDefaultInstance()),
     DEVICE_CLASS(DeviceClass.getDefaultInstance()),
-    DEVICE_CONFIG(DeviceConfig.getDefaultInstance()),
-    LOCATION_CONFIG(LocationConfig.getDefaultInstance()),
-    CONNECTION_CONFIG(ConnectionConfig.getDefaultInstance()),
-    SCENE_CONFIG(SceneConfig.getDefaultInstance()),
+    DEVICE_CONFIG(UnitConfig.newBuilder().setType(UnitType.DEVICE).build()),
+    LOCATION_CONFIG(UnitConfig.newBuilder().setType(UnitType.LOCATION).build()),
+    CONNECTION_CONFIG(UnitConfig.newBuilder().setType(UnitType.CONNECTION).build()),
+    SCENE_CONFIG(UnitConfig.newBuilder().setType(UnitType.SCENE).build()),
     UNIT_TEMPLATE(UnitTemplate.getDefaultInstance()),
-    USER_CONFIG(UserConfig.getDefaultInstance()),
-    AUTHORIZATION_GROUP_CONFIG(AuthorizationGroupConfig.getDefaultInstance()),
-    UNIT_CONFIG(UnitConfig.getDefaultInstance()),
-    UNIT_GROUP_CONFIG(UnitGroupConfig.getDefaultInstance());
+    USER_CONFIG(UnitConfig.newBuilder().setType(UnitType.USER).build()),
+    AUTHORIZATION_GROUP_CONFIG(UnitConfig.newBuilder().setType(UnitType.AUTHORIZATION_GROUP).build()),
+    UNIT_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNKNOWN).build()),
+    UNIT_GROUP_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNIT_GROUP).build());
 
     private final GeneratedMessage defaultInstanceForType;
 
@@ -70,34 +62,37 @@ public enum SendableType {
     }
 
     public static SendableType getTypeToBuilder(Message.Builder builder) {
-        if (builder instanceof AgentConfig.Builder) {
-            return AGENT_CONFIG;
-        } else if (builder instanceof AgentClass.Builder) {
+        if (builder instanceof AgentClass.Builder) {
             return AGENT_CLASS;
-        } else if (builder instanceof AppConfig.Builder) {
-            return APP_CONFIG;
         } else if (builder instanceof AppClass.Builder) {
             return APP_CLASS;
         } else if (builder instanceof DeviceClass.Builder) {
             return DEVICE_CLASS;
-        } else if (builder instanceof DeviceConfig.Builder) {
-            return DEVICE_CONFIG;
-        } else if (builder instanceof LocationConfig.Builder) {
-            return LOCATION_CONFIG;
-        } else if (builder instanceof ConnectionConfig.Builder) {
-            return CONNECTION_CONFIG;
-        } else if (builder instanceof SceneConfig.Builder) {
-            return SCENE_CONFIG;
         } else if (builder instanceof UnitTemplate.Builder) {
             return UNIT_TEMPLATE;
-        } else if (builder instanceof UserConfig.Builder) {
-            return USER_CONFIG;
-        } else if (builder instanceof AuthorizationGroupConfig.Builder) {
-            return AUTHORIZATION_GROUP_CONFIG;
-        } else if (builder instanceof UnitGroupConfig.Builder) {
-            return UNIT_GROUP_CONFIG;
         } else if (builder instanceof UnitConfig.Builder) {
-            return UNIT_CONFIG;
+            switch (((UnitConfig.Builder) builder).getType()) {
+                case AGENT:
+                    return AGENT_CONFIG;
+                case APP:
+                    return APP_CONFIG;
+                case DEVICE:
+                    return DEVICE_CONFIG;
+                case LOCATION:
+                    return LOCATION_CONFIG;
+                case CONNECTION:
+                    return CONNECTION_CONFIG;
+                case SCENE:
+                    return SCENE_CONFIG;
+                case USER:
+                    return USER_CONFIG;
+                case AUTHORIZATION_GROUP:
+                    return AUTHORIZATION_GROUP_CONFIG;
+                case UNIT_GROUP:
+                    return UNIT_GROUP_CONFIG;
+                default:
+                    return UNIT_CONFIG;
+            }
         } else {
             return null;
         }
