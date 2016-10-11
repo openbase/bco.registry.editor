@@ -28,7 +28,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.homeautomation.control.agent.AgentClassType.AgentClass;
+import rst.domotic.unit.agent.AgentClassType.AgentClass;
 
 /**
  *

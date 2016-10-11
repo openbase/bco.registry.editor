@@ -23,8 +23,8 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.authorization.UserConfigType.UserConfig;
-import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.user.UserConfigType.UserConfig;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
 
 /**
  *

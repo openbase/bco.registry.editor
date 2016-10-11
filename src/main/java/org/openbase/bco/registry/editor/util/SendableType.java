@@ -23,12 +23,12 @@ package org.openbase.bco.registry.editor.util;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import rst.homeautomation.control.agent.AgentClassType.AgentClass;
-import rst.homeautomation.control.app.AppClassType.AppClass;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
-import rst.homeautomation.unit.UnitConfigType.UnitConfig;
-import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
-import rst.homeautomation.unit.UnitTemplateType.UnitTemplate.UnitType;
+import rst.domotic.unit.agent.AgentClassType.AgentClass;
+import rst.domotic.unit.app.AppClassType.AppClass;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 /**
  *

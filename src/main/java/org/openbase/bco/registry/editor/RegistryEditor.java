@@ -88,14 +88,14 @@ import org.openbase.jul.pattern.Remote.ConnectionState;
 import org.openbase.jul.schedule.GlobalExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.authorization.UserRegistryDataType.UserRegistryData;
-import rst.homeautomation.control.agent.AgentRegistryDataType.AgentRegistryData;
-import rst.homeautomation.control.app.AppRegistryDataType.AppRegistryData;
-import rst.homeautomation.control.scene.SceneRegistryDataType.SceneRegistryData;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
-import rst.homeautomation.device.DeviceRegistryDataType.DeviceRegistryData;
-import rst.homeautomation.unit.UnitRegistryDataType.UnitRegistryData;
-import rst.spatial.LocationRegistryDataType.LocationRegistryData;
+import rst.domotic.registry.UserRegistryDataType.UserRegistryData;
+import rst.domotic.registry.AgentRegistryDataType.AgentRegistryData;
+import rst.domotic.registry.AppRegistryDataType.AppRegistryData;
+import rst.domotic.registry.SceneRegistryDataType.SceneRegistryData;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import rst.domotic.registry.DeviceRegistryDataType.DeviceRegistryData;
+import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
+import rst.domotic.registry.LocationRegistryDataType.LocationRegistryData;
 
 /**
  *

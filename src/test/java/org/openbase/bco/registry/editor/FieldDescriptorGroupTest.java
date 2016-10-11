@@ -32,7 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
 import org.openbase.jul.exception.InstantiationException;
-import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**

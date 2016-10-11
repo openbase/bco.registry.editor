@@ -26,7 +26,7 @@ import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
-import rst.authorization.UserConfigType.UserConfig;
+import rst.domotic.unit.user.UserConfigType.UserConfig;
 
 /**
  *

@@ -43,16 +43,16 @@ import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
-import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
-import rst.authorization.UserConfigType.UserConfig;
-import rst.homeautomation.control.agent.AgentClassType.AgentClass;
-import rst.homeautomation.control.app.AppClassType.AppClass;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
-import rst.homeautomation.service.ServiceTemplateType;
-import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
-import rst.homeautomation.unit.UnitConfigType.UnitConfig;
-import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
-import rst.spatial.LocationConfigType.LocationConfig;
+import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
+import rst.domotic.unit.user.UserConfigType.UserConfig;
+import rst.domotic.unit.agent.AgentClassType.AgentClass;
+import rst.domotic.unit.app.AppClassType.AppClass;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import rst.domotic.service.ServiceTemplateType;
+import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
+import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 
 /**
  *

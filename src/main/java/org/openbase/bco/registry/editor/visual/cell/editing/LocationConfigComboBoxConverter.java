@@ -24,7 +24,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.homeautomation.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.rsb.ScopeType.Scope;
 
 /**

@@ -23,25 +23,25 @@ package org.openbase.bco.registry.editor.struct.consistency;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
-import rst.authorization.UserConfigType.UserConfig;
-import rst.homeautomation.control.agent.AgentClassType.AgentClass;
-import rst.homeautomation.control.agent.AgentConfigType.AgentConfig;
-import rst.homeautomation.control.app.AppClassType.AppClass;
-import rst.homeautomation.control.app.AppConfigType.AppConfig;
-import rst.homeautomation.control.scene.SceneConfigType.SceneConfig;
-import rst.homeautomation.device.DeviceClassType.DeviceClass;
-import rst.homeautomation.device.DeviceConfigType.DeviceConfig;
-import rst.homeautomation.device.DeviceRegistryDataType.DeviceRegistryData;
-import rst.homeautomation.service.ServiceConfigType.ServiceConfig;
-import rst.homeautomation.service.ServiceTemplateType.ServiceTemplate;
-import rst.homeautomation.unit.UnitConfigType.UnitConfig;
-import rst.homeautomation.unit.UnitGroupConfigType.UnitGroupConfig;
-import rst.homeautomation.unit.UnitTemplateConfigType.UnitTemplateConfig;
-import rst.homeautomation.unit.UnitTemplateType.UnitTemplate;
+import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
+import rst.domotic.unit.user.UserConfigType.UserConfig;
+import rst.domotic.unit.agent.AgentClassType.AgentClass;
+import rst.domotic.unit.agent.AgentConfigType.AgentConfig;
+import rst.domotic.unit.app.AppClassType.AppClass;
+import rst.domotic.unit.app.AppConfigType.AppConfig;
+import rst.domotic.unit.scene.SceneConfigType.SceneConfig;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
+import rst.domotic.registry.DeviceRegistryDataType.DeviceRegistryData;
+import rst.domotic.service.ServiceConfigType.ServiceConfig;
+import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
+import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 import rst.rsb.ScopeType.Scope;
-import rst.spatial.ConnectionConfigType.ConnectionConfig;
-import rst.spatial.LocationConfigType.LocationConfig;
+import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
+import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 
 /**
  *

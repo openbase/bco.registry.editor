@@ -69,9 +69,9 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.authorization.AuthorizationGroupConfigType.AuthorizationGroupConfig;
+import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.configuration.EntryType;
-import rst.homeautomation.state.InventoryStateType.InventoryState;
+import rst.domotic.state.InventoryStateType.InventoryState;
 
 /**
  *
