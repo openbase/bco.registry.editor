@@ -46,7 +46,7 @@ public class DeviceConfigItemDescriptorProvider extends AbstractTreeItemDescript
     public String getDescriptor(Message.Builder msg) throws CouldNotPerformException, InterruptedException {
         UnitConfig deviceUnitConfig = remotePool.getDeviceRemote().getDeviceConfigById(((UnitConfig.Builder) msg).getUnitHostId());
         DeviceClass deviceClass = remotePool.getDeviceRemote().getDeviceClassById(deviceUnitConfig.getDeviceConfig().getDeviceClassId());
-        return deviceClass.getLabel() + " - " + deviceUnitConfig.getLabel();
+        return deviceClass.getLabel() + " , " + deviceUnitConfig.getLabel();
     }
 
     @Override

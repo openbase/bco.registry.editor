@@ -27,6 +27,7 @@ import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import org.openbase.jul.processing.StringProcessor;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 
 /**
@@ -48,7 +49,7 @@ public class DescriptionCell extends RowCell {
             textProperty().setValue("");
             setContextMenu(null);
         } else if (item instanceof Node) {
-            setText(convertDescriptorToReadable(item.getDescriptor()));
+            setText(StringProcessor.transformToCamelCase(item.getDescriptor()).replace(",", " - "));
             //TODO: thuxohl change this part
             if (item instanceof GenericNodeContainer) {
                 GenericNodeContainer container = (GenericNodeContainer) item;
