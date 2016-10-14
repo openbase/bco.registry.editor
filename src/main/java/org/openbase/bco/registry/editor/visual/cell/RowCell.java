@@ -26,7 +26,7 @@ import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.concurrent.Task;
+import java.util.concurrent.Callable;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
@@ -47,6 +47,7 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import org.openbase.jul.schedule.GlobalExecutionService;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -112,22 +113,18 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
         @Override
         public void handle(ActionEvent event) {
-            Thread thread = new Thread(
-                    new Task<Boolean>() {
+            GlobalExecutionService.submit(new Callable<Boolean>() {
 
-                        @Override
-                        protected Boolean call() throws Exception {
-                            if (event.getSource().equals(addMenuItem)) {
-                                addAction(RowCell.this.getItem());
-                            } else if (event.getSource().equals(removeMenuItem)) {
-                                removeAction(RowCell.this.getItem());
-                            }
-                            return true;
-                        }
-
-                    });
-            thread.setDaemon(true);
-            thread.start();
+                @Override
+                public Boolean call() throws Exception {
+                    if (event.getSource().equals(addMenuItem)) {
+                        addAction(RowCell.this.getItem());
+                    } else if (event.getSource().equals(removeMenuItem)) {
+                        removeAction(RowCell.this.getItem());
+                    }
+                    return true;
+                }
+            });
         }
 
         private void addAction(Node add) throws InterruptedException {

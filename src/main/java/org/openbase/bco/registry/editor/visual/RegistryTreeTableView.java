@@ -246,10 +246,8 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     }
 
     public void setReadOnlyMode(boolean readOnly) {
-        System.out.println("Setting read only mode of registry [" + type.name() + "]...");
         try {
             if (!remotePool.isConsistent(type.getDefaultInstanceForType())) {
-                System.out.println("\nRegistry is not even consistent\n");
                 statusInfoLabel.setText("Registry inconsistent!");
                 statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");
             } else {
@@ -282,8 +280,6 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     }
 
     public void setDisconnected(boolean disconnected) {
-        System.out.println("Set to disconnected [" + type.name() + "]: " + disconnected);
-
         if (disconnected) {
             statusInfoLabel.setText("Registry disconnected!");
             statusInfoLabel.setStyle("-fx-text-background-color: rgb(120,120,120); -fx-font-weight: bold;");

@@ -42,19 +42,19 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
-import rst.domotic.unit.user.UserConfigType.UserConfig;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 import rst.domotic.unit.agent.AgentClassType.AgentClass;
 import rst.domotic.unit.agent.AgentConfigType.AgentConfig;
 import rst.domotic.unit.app.AppClassType.AppClass;
 import rst.domotic.unit.app.AppConfigType.AppConfig;
-import rst.domotic.unit.scene.SceneConfigType.SceneConfig;
+import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
+import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate;
-import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
+import rst.domotic.unit.scene.SceneConfigType.SceneConfig;
+import rst.domotic.unit.user.UserConfigType.UserConfig;
 
 /**
  *
@@ -213,7 +213,6 @@ public class RemotePool {
 
     public Boolean isConsistent(Message msg) throws CouldNotPerformException {
         String methodName = getMethodName("is", "RegistryConsistent", msg);
-        System.out.println("Calling Method [" + methodName + "]");
         try {
             RSBRemoteService remote = getRemoteByMessage(msg);
             Method method = remote.getClass().getMethod(methodName);

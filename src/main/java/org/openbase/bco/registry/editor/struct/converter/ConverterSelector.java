@@ -21,8 +21,20 @@ package org.openbase.bco.registry.editor.struct.converter;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.GeneratedMessage;
+import org.openbase.bco.registry.editor.struct.converter.filter.AgentUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.AppUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.AuthorizationGroupUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.ConnectionUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.DalUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.DeviceUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.Filter;
+import org.openbase.bco.registry.editor.struct.converter.filter.LocationUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.SceneUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.UnitGroupUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.UserUnitConfigFilter;
+import rst.domotic.state.EnablingStateType.EnablingState;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.geometry.RotationType.Rotation;
 import rst.rsb.ScopeType.Scope;
 
@@ -37,6 +49,43 @@ public class ConverterSelector {
             return new ScopeConverter((Scope.Builder) builder);
         } else if (builder instanceof Rotation.Builder) {
             return new RotationConverter((Rotation.Builder) builder);
+        } else if (builder instanceof EnablingState.Builder) {
+            return new EnablingStateConverter((EnablingState.Builder) builder);
+        } else if (builder instanceof UnitConfig.Builder) {
+            Filter filter;
+            switch (((UnitConfig.Builder) builder).getType()) {
+                case AGENT:
+                    filter = new AgentUnitConfigFilter();
+                    break;
+                case APP:
+                    filter = new AppUnitConfigFilter();
+                    break;
+                case AUTHORIZATION_GROUP:
+                    filter = new AuthorizationGroupUnitConfigFilter();
+                    break;
+                case CONNECTION:
+                    filter = new ConnectionUnitConfigFilter();
+                    break;
+                case DEVICE:
+                    filter = new DeviceUnitConfigFilter();
+                    break;
+                case LOCATION:
+                    filter = new LocationUnitConfigFilter();
+                    break;
+                case SCENE:
+                    filter = new SceneUnitConfigFilter();
+                    break;
+                case UNIT_GROUP:
+                    filter = new UnitGroupUnitConfigFilter();
+                    break;
+                case USER:
+                    filter = new UserUnitConfigFilter();
+                    break;
+                default:
+                    filter = new DalUnitConfigFilter();
+                    break;
+            }
+            return new DefaultConverter(builder, filter);
         } else {
             return new DefaultConverter(builder);
         }

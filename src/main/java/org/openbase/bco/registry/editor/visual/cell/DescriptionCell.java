@@ -21,12 +21,13 @@ package org.openbase.bco.registry.editor.visual.cell;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.Message;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Node;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.exception.CouldNotPerformException;
-import rst.domotic.unit.user.UserConfigType.UserConfig;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 
 /**
  *
@@ -51,28 +52,37 @@ public class DescriptionCell extends RowCell {
             //TODO: thuxohl change this part
             if (item instanceof GenericNodeContainer) {
                 GenericNodeContainer container = (GenericNodeContainer) item;
-                try {
-                    String label = ProtoBufFieldProcessor.getLabel(container.getBuilder());
-                    if (!label.isEmpty()) {
-                        setText(label);
-                    } else {
-                        throw new CouldNotPerformException("Id is empty and therefor not good as a descriptor");
-                    }
-                } catch (Exception ex) {
+                if (container.getBuilder() instanceof UnitTemplate.Builder) {
+                    String type = null;
                     try {
-                        String id = ProtoBufFieldProcessor.getId(container.getBuilder().build());
-                        if (!id.isEmpty()) {
-                            setText(id);
-                        }
-                    } catch (Exception exc) {
+                        type = getTypeAsString(container.getBuilder());
+                    } catch (CouldNotPerformException ex) {
+                    }
+
+                    if (type != null && !type.isEmpty()) {
+                        setText(type);
+                        return;
                     }
                 }
-                if (((GenericNodeContainer) item).getBuilder() instanceof UserConfig.Builder) {
-                    UserConfig.Builder user = (UserConfig.Builder) ((GenericNodeContainer) item).getBuilder();
-                    setText(user.getUserName() + " (" + user.getFirstName() + " " + user.getLastName() + ")");
+
+                String label = null;
+                try {
+                    label = ProtoBufFieldProcessor.getLabel(container.getBuilder());
+                } catch (CouldNotPerformException ex) {
+                }
+
+                if (label != null && !label.isEmpty()) {
+                    setText(label);
                 }
             }
+        }
+    }
 
+    private String getTypeAsString(final Message.Builder msg) throws CouldNotPerformException {
+        try {
+            return ((Descriptors.EnumValueDescriptor) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(msg, "type"))).getName();
+        } catch (Exception ex) {
+            throw new CouldNotPerformException("Could not get label of [" + msg + "]", ex);
         }
     }
 
@@ -81,12 +91,12 @@ public class DescriptionCell extends RowCell {
             return descriptor;
         }
 
-        descriptor.toLowerCase();
+        descriptor = descriptor.toLowerCase();
         String result = "";
         String[] split = descriptor.split("_");
-        for (int i = 0; i < split.length; i++) {
-            result += Character.toUpperCase(split[i].charAt(0));
-            result += split[i].substring(1);
+        for (String split1 : split) {
+            result += Character.toUpperCase(split1.charAt(0));
+            result += split1.substring(1);
         }
         return result;
     }

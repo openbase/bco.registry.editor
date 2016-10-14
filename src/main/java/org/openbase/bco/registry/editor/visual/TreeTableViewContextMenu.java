@@ -30,7 +30,6 @@ import javafx.scene.control.TreeTableView;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Node;
-import org.openbase.bco.registry.editor.util.RSTDefaultInstances;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.slf4j.Logger;
@@ -55,41 +54,7 @@ public class TreeTableViewContextMenu extends ContextMenu {
             public void handle(ActionEvent event) {
                 try {
                     GenericNodeContainer newNode = null;
-                    switch (type) {
-                        case DEVICE_CLASS:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultDeviceClass());
-                            break;
-                        case DEVICE_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultDeviceConfig());
-                            break;
-                        case LOCATION_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultLocationConfig());
-                            break;
-                        case SCENE_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultSceneConfig());
-                            break;
-                        case AGENT_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultAgentConfig());
-                            break;
-                        case APP_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultAppConfig());
-                            break;
-                        case CONNECTION_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultConnectionConfig());
-                            break;
-                        case USER_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultUserConfig());
-                            break;
-                        case AUTHORIZATION_GROUP_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultAuthorizationGroupConfig());
-                            break;
-                        case UNIT_GROUP_CONFIG:
-                            newNode = new GenericNodeContainer("", RSTDefaultInstances.getDefaultUnitGroupConfig());
-                            break;
-                        default:
-                            newNode = new GenericNodeContainer("", (GeneratedMessage.Builder) type.getDefaultInstanceForType().toBuilder());
-                    }
-
+                    newNode = new GenericNodeContainer("", (GeneratedMessage.Builder) type.getDefaultInstanceForType().toBuilder());
                     newNode.setExpanded(true);
                     newNode.setChanged(true);
                     treeTableView.getRoot().getChildren().add(newNode);

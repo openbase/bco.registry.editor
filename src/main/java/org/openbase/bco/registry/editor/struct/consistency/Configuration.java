@@ -23,25 +23,21 @@ package org.openbase.bco.registry.editor.struct.consistency;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
-import rst.domotic.unit.user.UserConfigType.UserConfig;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
-import rst.domotic.unit.agent.AgentConfigType.AgentConfig;
-import rst.domotic.unit.app.AppClassType.AppClass;
-import rst.domotic.unit.app.AppConfigType.AppConfig;
-import rst.domotic.unit.scene.SceneConfigType.SceneConfig;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass;
-import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.domotic.registry.DeviceRegistryDataType.DeviceRegistryData;
 import rst.domotic.service.ServiceConfigType.ServiceConfig;
+import rst.domotic.service.ServiceTemplateConfigType.ServiceTemplateConfig;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
-import rst.rsb.ScopeType.Scope;
+import rst.domotic.unit.agent.AgentClassType.AgentClass;
+import rst.domotic.unit.app.AppClassType.AppClass;
 import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
+import rst.rsb.ScopeType.Scope;
+import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
  *
@@ -53,7 +49,7 @@ public class Configuration {
     public static boolean isModifiableList(GeneratedMessage.Builder builder, String fieldName) {
         if (builder instanceof UnitTemplateConfig.Builder && "service_template_config".equals(fieldName)) {
             return false;
-        } else if (builder instanceof DeviceConfig.Builder && "unit_config".equals(fieldName)) {
+        } else if (builder instanceof DeviceConfig.Builder && "unit_is".equals(fieldName)) {
             return false;
         } else if (builder instanceof UnitConfig.Builder && "service_config".equals(fieldName)) {
             return false;
@@ -87,48 +83,27 @@ public class Configuration {
         } else if (builder instanceof Scope.Builder) {
             return !("scope".equals(fieldName));
         } else if (builder instanceof UnitConfig.Builder) {
+            if (((UnitConfig.Builder) builder).getType() == UnitTemplate.UnitType.USER && "label".equals(fieldName)) {
+                return false;
+            }
             return !("id".equals(fieldName) || "unit_host_id".equals(fieldName) || "type".equals(fieldName) || "unit_template_config_id".equals(fieldName));
         } else if (builder instanceof ServiceConfig.Builder) {
             return !("type".equals(fieldName) || "unit_id".equals(fieldName));
         } else if (builder instanceof LocationConfig.Builder) {
             return !("id".equals(fieldName) || "root".equals(fieldName) || "unit_id".equals(fieldName));
-        } else if (builder instanceof ConnectionConfig.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof SceneConfig.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof AgentConfig.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof AgentClass.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof AppConfig.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof AppClass.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof UnitTemplateConfig.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof UserConfig.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof AuthorizationGroupConfig.Builder) {
-            return !("id".equals(fieldName));
-        } else if (builder instanceof UnitGroupConfig.Builder) {
-            return !("id".equals(fieldName));
+        } else if (builder instanceof ServiceTemplateConfig.Builder) {
+            return !("type".equals(fieldName));
+        } else if (builder instanceof PlacementConfig.Builder) {
+            return !("transformation_frame_id".equals(fieldName));
         }
         return true;
     }
 
     public static boolean isSendable(Message.Builder builder) {
         return ((builder instanceof DeviceClass.Builder)
-                || (builder instanceof DeviceConfig.Builder)
                 || (builder instanceof UnitTemplate.Builder)
-                || (builder instanceof LocationConfig.Builder)
-                || (builder instanceof AgentConfig.Builder)
                 || (builder instanceof AgentClass.Builder)
-                || (builder instanceof AppConfig.Builder)
                 || (builder instanceof AppClass.Builder)
-                || (builder instanceof SceneConfig.Builder)
-                || (builder instanceof ConnectionConfig.Builder)
-                || (builder instanceof UserConfig.Builder)
-                || (builder instanceof AuthorizationGroupConfig.Builder)
-                || (builder instanceof UnitGroupConfig.Builder));
+                || (builder instanceof UnitConfig.Builder));
     }
 }

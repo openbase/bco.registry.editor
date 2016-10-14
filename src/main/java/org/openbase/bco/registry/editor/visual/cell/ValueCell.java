@@ -29,11 +29,11 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
@@ -69,9 +69,10 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
+import org.openbase.jul.schedule.GlobalExecutionService;
 import rst.configuration.EntryType;
 import rst.domotic.state.InventoryStateType.InventoryState;
+import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 
 /**
  *
@@ -328,41 +329,36 @@ public class ValueCell extends RowCell {
                         return;
                     }
                 } else {
-                    ProtoBufFieldProcessor.clearRequiredFields(builder);
+                    while (!builder.findInitializationErrors().isEmpty()) {
+                        ProtoBufFieldProcessor.clearRequiredFields(builder);
+                    }
                 }
             }
 
-            Thread thread;
-            thread = new Thread(
-                    new Task<Boolean>() {
-                        @Override
-                        protected Boolean call() throws Exception {
-                            GenericNodeContainer container = (GenericNodeContainer) getItem();
-                            Message msg = null;
+            GlobalExecutionService.submit(new Callable<Boolean>() {
 
-                            try {
-                                msg = container.getBuilder().build();
-                                container.setChanged(false);
-                                if (remotePool.contains(msg)) {
-                                    remotePool.update(msg);
-                                } else {
-//                                    container.getParent().getChildren().remove(container);
-                                    msg = remotePool.register(msg).get();
-                                    System.out.println("Succesfully registered new message:\n" + msg);
-                                    container.getParent().getChildren().remove(container);
-                                }
-                            } catch (CouldNotPerformException ex) {
-                                RegistryEditor.printException(ex, logger, LogLevel.ERROR);
-                                logger.warn("Could not register or update message [" + msg + "]", ex);
-                            }
+                @Override
+                public Boolean call() throws Exception {
+                    GenericNodeContainer container = (GenericNodeContainer) getItem();
+                    Message msg;
 
-                            return true;
+                    try {
+                        msg = container.getBuilder().build();
+                        container.setChanged(false);
+                        if (remotePool.contains(msg)) {
+                            remotePool.update(msg).get();
+                        } else {
+                            msg = remotePool.register(msg).get();
+                            System.out.println("Succesfully registered new message:\n" + msg);
+                            container.getParent().getChildren().remove(container);
                         }
-                    });
-
-            thread.setDaemon(
-                    true);
-            thread.start();
+                    } catch (CouldNotPerformException ex) {
+                        RegistryEditor.printException(ex, logger, LogLevel.ERROR);
+                        container.setChanged(true);
+                    }
+                    return true;
+                }
+            });
         }
     }
 
@@ -371,29 +367,27 @@ public class ValueCell extends RowCell {
         @Override
         public void handle(ActionEvent event) {
             GlobalTextArea.getInstance().clearText();
-            Thread thread = new Thread(
-                    new Task<Boolean>() {
-                        @Override
-                        protected Boolean call() throws Exception {
-                            GenericNodeContainer container = (GenericNodeContainer) getItem();
-                            try {
-                                if ("".equals(ProtoBufFieldProcessor.getId(container.getBuilder()))) {
-                                    container.getParent().getChildren().remove(container);
-                                } else {
-                                    int index = container.getParent().getChildren().indexOf(container);
-                                    GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), (GeneratedMessage.Builder) remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
-                                    RegistryTreeTableView.expandEqually(container, oldNode);
-                                    container.getParent().getChildren().set(index, oldNode);
-                                }
-                            } catch (Exception ex) {
-                                RegistryEditor.printException(ex, logger, LogLevel.ERROR);
-                                logger.warn("Could not cancel update of [" + container.getBuilder() + "]", ex);
-                            }
-                            return true;
+            GlobalExecutionService.submit(new Callable<Boolean>() {
+
+                @Override
+                public Boolean call() throws Exception {
+                    GenericNodeContainer container = (GenericNodeContainer) getItem();
+                    try {
+                        if ("".equals(ProtoBufFieldProcessor.getId(container.getBuilder()))) {
+                            container.getParent().getChildren().remove(container);
+                        } else {
+                            int index = container.getParent().getChildren().indexOf(container);
+                            GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), (GeneratedMessage.Builder) remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
+                            RegistryTreeTableView.expandEqually(container, oldNode);
+                            container.getParent().getChildren().set(index, oldNode);
                         }
-                    });
-            thread.setDaemon(true);
-            thread.start();
+                    } catch (Exception ex) {
+                        RegistryEditor.printException(ex, logger, LogLevel.ERROR);
+                        logger.warn("Could not cancel update of [" + container.getBuilder() + "]", ex);
+                    }
+                    return true;
+                }
+            });
         }
     }
 

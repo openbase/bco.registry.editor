@@ -1,8 +1,8 @@
 package org.openbase.bco.registry.editor.struct.converter;
 
-/*
+/*-
  * #%L
- * RegistryEditor
+ * BCO Registry Editor
  * %%
  * Copyright (C) 2014 - 2016 openbase.org
  * %%
@@ -21,42 +21,45 @@ package org.openbase.bco.registry.editor.struct.converter;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+import com.google.protobuf.Descriptors;
 import java.util.HashMap;
 import java.util.Map;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.rsb.ScopeType.Scope;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import rst.domotic.state.EnablingStateType.EnablingState;
 
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class ScopeConverter implements Converter {
+public class EnablingStateConverter implements Converter {
 
-    private final Scope.Builder scope;
-    private static final String SCOPE = "scope";
+    private static final String VALUE_FIELD = "value";
 
-    public ScopeConverter(Scope.Builder scope) {
-        this.scope = scope;
+    private final EnablingState.Builder enablingState;
+    private final Descriptors.FieldDescriptor fieldDescriptor;
+
+    public EnablingStateConverter(EnablingState.Builder enablingState) {
+        this.enablingState = enablingState;
+        this.fieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(enablingState, VALUE_FIELD);
     }
 
     @Override
     public void updateBuilder(String fieldName, Object value) throws CouldNotPerformException {
         switch (fieldName) {
-            case SCOPE:
-                String[] split = ((String) value).split("/");
-                for (int i = 0; i < split.length; i++) {
-                    scope.setComponent(i, ScopeGenerator.convertIntoValidScopeComponent(split[i]));
-                }
+            case VALUE_FIELD:
+                enablingState.setField(fieldDescriptor, value);
                 break;
             default:
         }
+
     }
 
     @Override
     public Map<String, Object> getFields() {
         Map<String, Object> fieldMap = new HashMap<>();
-        fieldMap.put(SCOPE, ScopeGenerator.generateStringRep(scope.getComponentList()));
+        fieldMap.put(VALUE_FIELD, enablingState.getField(fieldDescriptor));
         return fieldMap;
     }
+
 }

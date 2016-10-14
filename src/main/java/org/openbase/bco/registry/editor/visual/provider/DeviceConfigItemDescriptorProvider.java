@@ -1,8 +1,8 @@
 package org.openbase.bco.registry.editor.visual.provider;
 
-/*
+/*-
  * #%L
- * RegistryEditor
+ * BCO Registry Editor
  * %%
  * Copyright (C) 2014 - 2016 openbase.org
  * %%
@@ -24,26 +24,29 @@ package org.openbase.bco.registry.editor.visual.provider;
 import com.google.protobuf.Message;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.InstantiationException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
-import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class DeviceClassItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
+public class DeviceConfigItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
 
-    FieldDescriptorGroup fieldGroup;
+    private final FieldDescriptorGroup fieldGroup;
+    private final RemotePool remotePool;
 
-    public DeviceClassItemDescriptorProvider() {
-        fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.DEVICE_CONFIG_FIELD_NUMBER, DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER);
+    public DeviceConfigItemDescriptorProvider() throws InstantiationException, InterruptedException {
+        fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.UNIT_HOST_ID_FIELD_NUMBER);
+        remotePool = RemotePool.getInstance();
     }
 
     @Override
-    public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
-        DeviceClass deviceClass = RemotePool.getInstance().getDeviceRemote().getDeviceClassById((String) fieldGroup.getValue(builder));
-        return deviceClass.getLabel();
+    public String getDescriptor(Message.Builder msg) throws CouldNotPerformException, InterruptedException {
+        UnitConfig deviceUnitConfig = remotePool.getDeviceRemote().getDeviceConfigById(((UnitConfig.Builder) msg).getUnitHostId());
+        DeviceClass deviceClass = remotePool.getDeviceRemote().getDeviceClassById(deviceUnitConfig.getDeviceConfig().getDeviceClassId());
+        return deviceClass.getLabel() + " - " + deviceUnitConfig.getLabel();
     }
 
     @Override
@@ -60,4 +63,5 @@ public class DeviceClassItemDescriptorProvider extends AbstractTreeItemDescripto
     public boolean hasEqualValue(Message.Builder msg, Object value) throws CouldNotPerformException {
         return value.equals(getValue(msg));
     }
+
 }

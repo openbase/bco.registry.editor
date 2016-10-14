@@ -1,8 +1,8 @@
-package org.openbase.bco.registry.editor.visual.cell.editing;
+package org.openbase.bco.registry.editor.struct.converter.filter;
 
-/*
+/*-
  * #%L
- * RegistryEditor
+ * BCO Registry Editor
  * %%
  * Copyright (C) 2014 - 2016 openbase.org
  * %%
@@ -21,26 +21,17 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import com.google.protobuf.Message;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.user.UserConfigType.UserConfig;
 
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class UserConfigComboBoxConverter implements MessageComboBoxConverter {
+public class NotDalUnitConfigFilter extends DalUnitConfigFilter {
 
     @Override
-    public String getText(Message msg) {
-        UserConfig userConfig = ((UnitConfig) msg).getUserConfig();
-        return userConfig.getUserName() + " (" + userConfig.getFirstName() + " " + userConfig.getFirstName() + ")";
+    protected void registerFilteredFields() {
+        super.registerFilteredFields();
+        registerFilteredField(UnitConfig.UNIT_TEMPLATE_CONFIG_ID_FIELD_NUMBER, UnitConfig.BOUND_TO_UNIT_HOST_FIELD_NUMBER, UnitConfig.UNIT_HOST_ID_FIELD_NUMBER);
     }
-
-    @Override
-    public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.ID_FIELD_NUMBER));
-    }
-
 }

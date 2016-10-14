@@ -36,6 +36,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import org.openbase.bco.registry.editor.util.RemotePool;
+import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
@@ -44,11 +45,6 @@ import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
-import rst.domotic.unit.user.UserConfigType.UserConfig;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
-import rst.domotic.unit.app.AppClassType.AppClass;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass;
-import rst.domotic.service.ServiceTemplateType;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
@@ -131,11 +127,11 @@ public class MessageComboBox extends ComboBox<Message> {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }
-                    list.remove(RemotePool.getInstance().getById(memberId, UserConfig.newBuilder()));
+                    list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()));
                 }
             }
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
-                List<ServiceTemplateType.ServiceTemplate.ServiceType> serviceTypes = new ArrayList<>();
+                List<ServiceTemplate.ServiceType> serviceTypes = new ArrayList<>();
                 for (ServiceTemplate serviceTemplate : ((UnitGroupConfig.Builder) parentBuilder).getServiceTemplateList()) {
                     serviceTypes.add(serviceTemplate.getType());
                 }
@@ -175,21 +171,21 @@ public class MessageComboBox extends ComboBox<Message> {
                 case "child_id":
                 case "parent_id":
                 case "tile_id":
-                    return LocationConfig.getDefaultInstance();
+                    return SendableType.LOCATION_CONFIG.getDefaultInstanceForType();
                 case "device_class_id":
-                    return DeviceClass.getDefaultInstance();
+                    return SendableType.DEVICE_CLASS.getDefaultInstanceForType();
                 case "member_id":
                     if (parentBuilder instanceof AuthorizationGroupConfig.Builder) {
-                        return UserConfig.getDefaultInstance();
+                        return SendableType.USER_CONFIG.getDefaultInstanceForType();
                     } else if (parentBuilder instanceof UnitGroupConfig.Builder) {
-                        return UnitConfig.getDefaultInstance();
+                        return SendableType.UNIT_CONFIG.getDefaultInstanceForType();
                     }
                 case "owner_id":
-                    return UserConfig.getDefaultInstance();
+                    return SendableType.USER_CONFIG.getDefaultInstanceForType();
                 case "agent_class_id":
-                    return AgentClass.getDefaultInstance();
+                    return SendableType.AGENT_CLASS.getDefaultInstanceForType();
                 case "app_class_id":
-                    return AppClass.getDefaultInstance();
+                    return SendableType.APP_CLASS.getDefaultInstanceForType();
             }
         }
         return null;
@@ -197,14 +193,19 @@ public class MessageComboBox extends ComboBox<Message> {
 
     public MessageComboBoxConverter getConverterByMessageType(String fieldName, Message.Builder parentBuilder) {
         GeneratedMessage msg = getMessageEnumBoxType(fieldName, parentBuilder);
-        if (msg instanceof LocationConfig) {
-            return new LocationConfigComboBoxConverter();
-        } else if (msg instanceof UserConfig) {
-            return new UserConfigComboBoxConverter();
-        } else if (msg instanceof AgentClass) {
-            return new AgentClassComboBoxConverter();
-        } else if (msg instanceof AppClass) {
-            return new AppClassComboBoxConverter();
+        if (msg instanceof UnitConfig) {
+            switch (((UnitConfig) msg).getType()) {
+                case LOCATION:
+                    return new LocationConfigComboBoxConverter();
+                case USER:
+                    return new UserConfigComboBoxConverter();
+                case AGENT:
+                    return new AgentClassComboBoxConverter();
+                case APP:
+                    return new AppClassComboBoxConverter();
+                default:
+                    return new DefaultMessageComboBoxConverter();
+            }
         } else {
             return new DefaultMessageComboBoxConverter();
         }

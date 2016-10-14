@@ -25,6 +25,8 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import java.util.HashMap;
 import java.util.Map;
+import org.openbase.bco.registry.editor.struct.converter.filter.DefaultFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.Filter;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
@@ -35,9 +37,15 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 public class DefaultConverter implements Converter {
 
     private final GeneratedMessage.Builder builder;
+    private final Filter filter;
 
     public DefaultConverter(GeneratedMessage.Builder builder) {
+        this(builder, new DefaultFilter());
+    }
+
+    public DefaultConverter(GeneratedMessage.Builder builder, Filter filter) {
         this.builder = builder;
+        this.filter = filter;
     }
 
     @Override
@@ -53,6 +61,10 @@ public class DefaultConverter implements Converter {
     public Map<String, Object> getFields() {
         Map<String, Object> fieldMap = new HashMap<>();
         for (Descriptors.FieldDescriptor field : builder.getDescriptorForType().getFields()) {
+            if (filter.filter(field)) {
+                continue;
+            }
+
             fieldMap.put(field.getName(), builder.getField(field));
         }
         return fieldMap;

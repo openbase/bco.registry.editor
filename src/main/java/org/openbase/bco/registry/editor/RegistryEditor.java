@@ -63,6 +63,7 @@ import org.openbase.bco.registry.editor.visual.GlobalTextArea;
 import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
 import org.openbase.bco.registry.editor.visual.TabPaneWithClearing;
 import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
+import org.openbase.bco.registry.editor.visual.provider.DeviceConfigItemDescriptorProvider;
 import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
 import org.openbase.bco.registry.editor.visual.provider.LocationItemDescriptorProvider;
 import org.openbase.bco.registry.editor.visual.provider.TreeItemDescriptorProvider;
@@ -88,14 +89,14 @@ import org.openbase.jul.pattern.Remote.ConnectionState;
 import org.openbase.jul.schedule.GlobalExecutionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.domotic.registry.UserRegistryDataType.UserRegistryData;
 import rst.domotic.registry.AgentRegistryDataType.AgentRegistryData;
 import rst.domotic.registry.AppRegistryDataType.AppRegistryData;
-import rst.domotic.registry.SceneRegistryDataType.SceneRegistryData;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.registry.DeviceRegistryDataType.DeviceRegistryData;
-import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
 import rst.domotic.registry.LocationRegistryDataType.LocationRegistryData;
+import rst.domotic.registry.SceneRegistryDataType.SceneRegistryData;
+import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
+import rst.domotic.registry.UserRegistryDataType.UserRegistryData;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 
 /**
  *
@@ -132,7 +133,7 @@ public class RegistryEditor extends Application {
     private RegistryTreeTableView agentConfigTreeTableView, agentClassTreeTableView;
     private RegistryTreeTableView appConfigTreeTableView, appClassTreeTableView;
     private RegistryTreeTableView userConfigTreeTableView, authorizationGroupConfigTreeTableView;
-    private RegistryTreeTableView unitConfigTreeTableView, unitTemplateTreeTableView, unitGroupConfigTreeTableView;
+    private RegistryTreeTableView dalUnitConfigTreeTableView, unitTemplateTreeTableView, unitGroupConfigTreeTableView;
     private final Map<String, Boolean> intialized;
 
     public RegistryEditor() throws InstantiationException, InterruptedException {
@@ -185,14 +186,14 @@ public class RegistryEditor extends Application {
         userConfigTreeTableView = new RegistryTreeTableView(SendableType.USER_CONFIG);
         authorizationGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.AUTHORIZATION_GROUP_CONFIG);
         unitGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_GROUP_CONFIG);
-        unitConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_CONFIG);
+        dalUnitConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_CONFIG);
 
         unitRegistryTabPane = new TabPaneWithClearing();
         unitRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         unitConfigTab = new Tab("UnitConfig");
         unitTemplateTab = new Tab("UnitTemplate");
         unitGroupTab = new Tab("UnitGroup");
-        unitConfigTab.setContent(unitConfigTreeTableView.getVBox());
+        unitConfigTab.setContent(dalUnitConfigTreeTableView.getVBox());
         unitTemplateTab.setContent(unitTemplateTreeTableView.getVBox());
         unitGroupTab.setContent(unitGroupConfigTreeTableView.getVBox());
         unitRegistryTabPane.getTabs().addAll(unitConfigTab, unitTemplateTab, unitGroupTab);
@@ -300,7 +301,7 @@ public class RegistryEditor extends Application {
         userConfigTreeTableView.addWidthProperty(scene.widthProperty());
         authorizationGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
         unitGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        unitConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        dalUnitConfigTreeTableView.addWidthProperty(scene.widthProperty());
 
         deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
         deviceConfigTreeTableView.addHeightProperty(scene.heightProperty());
@@ -315,7 +316,7 @@ public class RegistryEditor extends Application {
         userConfigTreeTableView.addHeightProperty(scene.heightProperty());
         authorizationGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
         unitGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        unitConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        dalUnitConfigTreeTableView.addHeightProperty(scene.heightProperty());
 
         primaryStage.setTitle("Registry Editor");
         try {
@@ -383,7 +384,7 @@ public class RegistryEditor extends Application {
 
                 @Override
                 public void update(Observable<ConnectionState> source, ConnectionState data) throws Exception {
-                    System.out.println("Remote connection state has changed to: " + data);
+//                    System.out.println("Remote connection state has changed to: " + data);
                     Platform.runLater(new Runnable() {
 
                         @Override
@@ -519,7 +520,12 @@ public class RegistryEditor extends Application {
             return userRegistryTabPane;
         } else if (msg instanceof UnitRegistryData) {
             UnitRegistryData data = (UnitRegistryData) msg;
-//            unitConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_C));
+
+            TreeItemDescriptorProvider deviceDescriptor = new DeviceConfigItemDescriptorProvider();
+            Descriptors.FieldDescriptor dalUnitConfigField = data.toBuilder().getDescriptorForType().findFieldByNumber(UnitRegistryData.DAL_UNIT_CONFIG_FIELD_NUMBER);
+            dalUnitConfigTreeTableView.setRoot(new GenericGroupContainer<>(dalUnitConfigField.getName(), dalUnitConfigField, data.toBuilder(), data.toBuilder().getDalUnitConfigBuilderList(), deviceDescriptor));
+            dalUnitConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_TEMPLATE.getDefaultInstanceForType()));
+            dalUnitConfigTreeTableView.getListDiff().diff(data.getDalUnitConfigList());
 
             unitTemplateTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
             unitTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_TEMPLATE.getDefaultInstanceForType()));
@@ -528,6 +534,9 @@ public class RegistryEditor extends Application {
             unitGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
             unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType()));
             unitGroupConfigTreeTableView.getListDiff().diff(data.getUnitGroupUnitConfigList());
+
+            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
+            return unitRegistryTabPane;
         }
 
         return null;
@@ -565,8 +574,10 @@ public class RegistryEditor extends Application {
             return userRegistryTabPane;
         } else if (msg instanceof UnitRegistryData) {
             UnitRegistryData data = (UnitRegistryData) msg;
+            dalUnitConfigTreeTableView.update(data.getDalUnitConfigList());
             unitTemplateTreeTableView.update(data.getUnitTemplateList());
             unitGroupConfigTreeTableView.update(data.getUnitGroupUnitConfigList());
+            return unitRegistryTabPane;
         }
         return null;
     }
@@ -610,7 +621,7 @@ public class RegistryEditor extends Application {
             treeTableList.add(userConfigTreeTableView);
             treeTableList.add(authorizationGroupConfigTreeTableView);
         } else if (remote instanceof UnitRegistryRemote) {
-            treeTableList.add(unitConfigTreeTableView);
+            treeTableList.add(dalUnitConfigTreeTableView);
             treeTableList.add(unitGroupConfigTreeTableView);
             treeTableList.add(unitTemplateTreeTableView);
         }

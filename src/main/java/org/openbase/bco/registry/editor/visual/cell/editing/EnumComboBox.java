@@ -52,7 +52,7 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
     public EnumComboBox(ValueCell cell, EnumValueDescriptor currentValue) {
         super();
         setVisibleRowCount(5);
-        setItems(removeUnkownType(currentValue.getType()));
+        setItems(sortEnumValues(currentValue.getType()));
         setValue(currentValue);
         setOnAction(new EventHandler() {
 
@@ -79,16 +79,13 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
         setButtonCell(new EnumComboBoxCell());
     }
 
-    private ObservableList removeUnkownType(EnumDescriptor enumDescriptor) {
+    private ObservableList sortEnumValues(EnumDescriptor enumDescriptor) {
         List<EnumValueDescriptor> values = new ArrayList<>(enumDescriptor.getValues());
-//        int unknownIndex = -1;
 //        for (int i = 0; i < values.size(); i++) {
-//            if (values.get(i).getName().toLowerCase().equals("unknown")) {
-//                unknownIndex = i;
+//            if ("UNKNOWN".equals(values.get(i).getName())) {
+//                values.remove(i);
+//                i--;
 //            }
-//        }
-//        if (unknownIndex != -1) {
-//            values.remove(unknownIndex);
 //        }
         Collections.sort(values, new Comparator<EnumValueDescriptor>() {
 
