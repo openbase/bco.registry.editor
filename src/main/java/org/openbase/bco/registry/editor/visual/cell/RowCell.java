@@ -23,7 +23,6 @@ package org.openbase.bco.registry.editor.visual.cell;
  */
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
-import com.google.protobuf.Message;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -182,10 +181,11 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             if (nodeToRemove instanceof NodeContainer && ((NodeContainer) nodeToRemove).isSendable()) {
                 NodeContainer removed = (NodeContainer) nodeToRemove;
                 try {
-                    Message message = removed.getBuilder().build();
-                    logger.info("Removing message with Id [" + ProtoBufFieldProcessor.getId(message) + "]");
-                    if (!"".equals(ProtoBufFieldProcessor.getId(message)) && remotePool.contains(message)) {
-                        remotePool.remove(message);
+                    String id = ProtoBufFieldProcessor.getId(removed.getBuilder());
+                    logger.debug("Removing message with Id [" + id + "]");
+                    if (!"".equals(id) && remotePool.containsById(removed.getBuilder(), id)) {
+                        // always remove by id to ignore not initialized fields of the builder
+                        remotePool.remove(remotePool.getById(id, removed.getBuilder()));
                     }
                 } catch (CouldNotPerformException ex) {
                     RegistryEditor.printException(ex, logger, LogLevel.WARN);

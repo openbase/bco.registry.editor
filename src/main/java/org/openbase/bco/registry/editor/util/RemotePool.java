@@ -152,6 +152,17 @@ public class RemotePool {
         }
     }
 
+    public Boolean containsById(Message.Builder msg, String id) throws CouldNotPerformException {
+        String methodName = getMethodName("contains", "ById", msg);
+        try {
+            RSBRemoteService remote = getRemoteByMessage(msg);
+            Method method = remote.getClass().getMethod(methodName, String.class);
+            return (Boolean) method.invoke(remote, id);
+        } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new CouldNotPerformException(ex);
+        }
+    }
+
     public <M extends Message> Future<M> remove(Message msg) throws CouldNotPerformException {
         try {
             return (Future<M>) invokeMethod("remove", msg);
