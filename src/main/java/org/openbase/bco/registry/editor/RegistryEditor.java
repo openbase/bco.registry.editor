@@ -384,7 +384,7 @@ public class RegistryEditor extends Application {
 
                 @Override
                 public void update(Observable<ConnectionState> source, ConnectionState data) throws Exception {
-//                    System.out.println("Remote connection state has changed to: " + data);
+                    logger.debug("Remote connection state has changed to: " + data);
                     Platform.runLater(new Runnable() {
 
                         @Override
