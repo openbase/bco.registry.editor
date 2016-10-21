@@ -44,11 +44,13 @@ import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
-import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
+import rst.domotic.unit.agent.AgentClassType.AgentClass;
+import rst.domotic.unit.app.AppClassType.AppClass;
+import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
+import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 
 /**
  *
@@ -199,13 +201,13 @@ public class MessageComboBox extends ComboBox<Message> {
                     return new LocationConfigComboBoxConverter();
                 case USER:
                     return new UserConfigComboBoxConverter();
-                case AGENT:
-                    return new AgentClassComboBoxConverter();
-                case APP:
-                    return new AppClassComboBoxConverter();
                 default:
                     return new DefaultMessageComboBoxConverter();
             }
+        } else if (msg instanceof AgentClass) {
+            return new AgentClassComboBoxConverter();
+        } else if (msg instanceof AppClass) {
+            return new AppClassComboBoxConverter();
         } else {
             return new DefaultMessageComboBoxConverter();
         }
