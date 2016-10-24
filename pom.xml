@@ -55,9 +55,9 @@
     <packaging>jar</packaging>
     
     <scm>
-        <connection>scm:git:git@github.com/openbase/bco.registry.editor.git</connection>
-        <developerConnection>scm:git:git@github.com/openbase/bco.registry.editor.git</developerConnection>
-        <url>git@github.com/openbase/bco.registry.editor.git</url>
+        <connection>scm:git:https://github.com/openbase/bco.registry.editor.git</connection>
+        <developerConnection>scm:git:https://github.com/openbase/bco.registry.editor.git</developerConnection>
+        <url>https://github.com/openbase/bco.registry.editor.git</url>
     </scm>
 
     <build>
