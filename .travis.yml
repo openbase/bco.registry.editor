@@ -8,25 +8,9 @@ branches:
   - /^(?i:feature)-.*$/
   - /^(?i:release)-.*$/
 
-#jdk:
-#  - oraclejdk8
+jdk:
+  - oraclejdk8
 
-before_install:
-  - echo version before upgrade
-  - java -version
-  - sudo add-apt-repository ppa:webupd8team/java
-  - sudo apt-get update -q
-  - sudo apt-get install -y oracle-java8-installer
-  - sudo apt-get install -y oracle-java8-set-default  
-  - echo version after upgrade: 
-  - java -version
-
-script:
-  #- sudo apt-get update
-  #- sudo apt-get install -y oracle-java8-installer
-  #- sudo apt-get install -y oracle-java8-set-default
-  - java -version
-  
 install:
   - mvn --settings .travis/settings.xml install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
