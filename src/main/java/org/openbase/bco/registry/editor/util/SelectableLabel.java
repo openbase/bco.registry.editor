@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor.util;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -48,6 +47,7 @@ public class SelectableLabel {
         label.textProperty().bindBidirectional(textField.textProperty());
         label.setGraphic(textStack);
         label.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
         return label;
     }
 }

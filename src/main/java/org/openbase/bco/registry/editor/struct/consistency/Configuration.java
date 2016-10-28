@@ -49,7 +49,7 @@ public class Configuration {
     public static boolean isModifiableList(GeneratedMessage.Builder builder, String fieldName) {
         if (builder instanceof UnitTemplateConfig.Builder && "service_template_config".equals(fieldName)) {
             return false;
-        } else if (builder instanceof DeviceConfig.Builder && "unit_is".equals(fieldName)) {
+        } else if (builder instanceof DeviceConfig.Builder && "unit_id".equals(fieldName)) {
             return false;
         } else if (builder instanceof UnitConfig.Builder && "service_config".equals(fieldName)) {
             return false;
@@ -79,7 +79,7 @@ public class Configuration {
             } else if ("device_class_id".equals(fieldName)) {
                 return ((DeviceConfig.Builder) builder).getDeviceClassId().isEmpty();
             }
-            return !("id".equals(fieldName));
+            return !(("id".equals(fieldName)) || "unit_id".equals(fieldName));
         } else if (builder instanceof Scope.Builder) {
             return !("scope".equals(fieldName));
         } else if (builder instanceof UnitConfig.Builder) {
