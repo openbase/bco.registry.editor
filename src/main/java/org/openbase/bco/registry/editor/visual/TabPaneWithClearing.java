@@ -26,25 +26,40 @@ package org.openbase.bco.registry.editor.visual;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
+import java.util.HashMap;
+import java.util.Map;
 import javafx.event.EventHandler;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
+import org.openbase.bco.registry.editor.util.SendableType;
 
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class TabPaneWithClearing extends TabPane {
-
+    
+    private final Map<SendableType, Tab> senableToTabMap;
+    
     public TabPaneWithClearing() {
         super();
         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
+            
             @Override
             public void handle(MouseEvent event) {
                 GlobalTextArea.getInstance().clearText();
             }
         });
+        senableToTabMap = new HashMap<>();
+    }
+    
+    public void addTab(Tab tab, SendableType sendableType) {
+        senableToTabMap.put(sendableType, tab);
+        getTabs().add(tab);
+    }
+    
+    public void selectTabByType(SendableType sendableType) {
+        this.getSelectionModel().select(senableToTabMap.get(sendableType));
     }
 }

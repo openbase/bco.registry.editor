@@ -34,6 +34,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeSortMode;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.VBox;
+import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.struct.GenericGroupContainer;
 import org.openbase.bco.registry.editor.struct.GenericListContainer;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
@@ -67,8 +68,9 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
     private final RemotePool remotePool;
     private final Label statusInfoLabel;
     private final List<Observer<Boolean>> disconnectionObserver;
+    private final RegistryEditor registryEditor;
 
-    public RegistryTreeTableView(SendableType type) throws InstantiationException, InterruptedException {
+    public RegistryTreeTableView(SendableType type, RegistryEditor registryEditor) throws InstantiationException, InterruptedException {
         this.type = type;
         this.setEditable(true);
         this.setShowRoot(false);
@@ -93,6 +95,8 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         this.vBox.getChildren().addAll(statusInfoLabel, this);
 
         this.remotePool = RemotePool.getInstance();
+
+        this.registryEditor = registryEditor;
     }
 
     public void addWidthProperty(ReadOnlyDoubleProperty widthProperty) {
@@ -183,6 +187,15 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
 
         setReadOnlyMode(remotePool.isReadOnly(type.getDefaultInstanceForType()));
+    }
+
+    public void selectMessage(GeneratedMessage msg) throws CouldNotPerformException {
+        TreeItem container = getNodeByMessage(new ArrayList<>(getRoot().getChildren()), msg);
+        container.setExpanded(true);
+        while (container.getParent() != null) {
+            container = container.getParent();
+            container.setExpanded(true);
+        }
     }
 
     private NodeContainer getNodeByMessage(List<TreeItem<Node>> nodes, GeneratedMessage msg) {
@@ -309,6 +322,10 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
                 logger.warn("Could not notify connection to value cell!");
             }
         }
+    }
+
+    public RegistryEditor getRegistryEditor() {
+        return registryEditor;
     }
 
     public Label getStatusInfoLabel() {
