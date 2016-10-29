@@ -47,6 +47,7 @@ import org.openbase.bco.registry.editor.visual.column.DescriptorColumn;
 import org.openbase.bco.registry.editor.visual.column.ValueColumn;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.ProtobufListDiff;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.pattern.Observer;
@@ -268,7 +269,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
                 statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
             }
         } catch (CouldNotPerformException ex) {
-            System.out.println("Failed to call is consistent for registry [" + type.name() + "]");
+            ExceptionPrinter.printHistory("Failed to call is consistent for registry [" + type.name() + "]", ex, logger);
         }
         if (readOnly) {
             getStylesheets().clear();
