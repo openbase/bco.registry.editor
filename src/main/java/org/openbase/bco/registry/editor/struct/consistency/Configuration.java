@@ -32,7 +32,6 @@ import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 import rst.domotic.unit.agent.AgentClassType.AgentClass;
 import rst.domotic.unit.app.AppClassType.AppClass;
-import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
@@ -56,8 +55,6 @@ public class Configuration {
         } else if (builder instanceof DeviceRegistryData.Builder && "unit_template".equals(fieldName)) {
             return false;
         } else if (builder instanceof LocationConfig.Builder && "unit_id".equals(fieldName)) {
-            return false;
-        } else if (builder instanceof ConnectionConfig.Builder && "unit_id".equals(fieldName)) {
             return false;
         }
         return true;
