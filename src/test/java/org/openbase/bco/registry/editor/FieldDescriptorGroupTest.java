@@ -21,6 +21,7 @@ package org.openbase.bco.registry.editor;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+import com.google.protobuf.Message;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
