@@ -332,9 +332,7 @@ public class ValueCell extends RowCell {
             Builder builder = container.getBuilder();
 
             if (!builder.isInitialized()) {
-                System.out.println("Builder not initialized!");
                 if (ProtoBufFieldProcessor.checkIfSomeButNotAllRequiredFieldsAreSet(builder)) {
-                    System.out.println("not all required fields are set!");
                     List<String> missingFieldList = builder.findInitializationErrors();
                     String missingFields = "";
                     missingFields = missingFieldList.stream().map((error) -> error + "\n").reduce(missingFields, String::concat);
@@ -376,7 +374,6 @@ public class ValueCell extends RowCell {
                         return;
                     }
                 } else {
-                    System.out.println("no required field is set!");
                     while (!builder.findInitializationErrors().isEmpty()) {
                         ProtoBufFieldProcessor.clearRequiredFields(builder);
                     }

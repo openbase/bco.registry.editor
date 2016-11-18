@@ -49,6 +49,7 @@ import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.agent.AgentClassType.AgentClass;
 import rst.domotic.unit.app.AppClassType.AppClass;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
+import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 
@@ -105,7 +106,7 @@ public class MessageComboBox extends ComboBox<Message> {
 
     private ObservableList<Message> sortedList(Message.Builder parentBuilder, String fieldName, Object leafValue) throws InstantiationException {
         try {
-            List<? extends Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
+            List<Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
             if (parentBuilder instanceof LocationConfig.Builder) {
                 list.remove(RemotePool.getInstance().getById(ProtoBufFieldProcessor.getId(parentBuilder), parentBuilder));
                 for (String childId : ((LocationConfig.Builder) parentBuilder).getChildIdList()) {
@@ -137,12 +138,19 @@ public class MessageComboBox extends ComboBox<Message> {
                 for (ServiceTemplate serviceTemplate : ((UnitGroupConfig.Builder) parentBuilder).getServiceTemplateList()) {
                     serviceTypes.add(serviceTemplate.getType());
                 }
-                list = RemotePool.getInstance().getDeviceRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), serviceTypes);
+                list.clear();
+                list.addAll(RemotePool.getInstance().getDeviceRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), serviceTypes));
                 for (String memberId : ((UnitGroupConfig.Builder) parentBuilder).getMemberIdList()) {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }
                     list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()));
+                }
+            }
+            if (parentBuilder instanceof ConnectionConfig.Builder) {
+                list.clear();
+                for (String tileId : ((ConnectionConfig.Builder) parentBuilder).getTileIdList()) {
+                    list.addAll(RemotePool.getInstance().getLocationRemote().getUnitConfigsByLocation(tileId));
                 }
             }
             Collections.sort(list, new Comparator<Message>() {
@@ -188,6 +196,10 @@ public class MessageComboBox extends ComboBox<Message> {
                     return SendableType.AGENT_CLASS.getDefaultInstanceForType();
                 case "app_class_id":
                     return SendableType.APP_CLASS.getDefaultInstanceForType();
+                case "unit_id":
+                    if (parentBuilder instanceof ConnectionConfig.Builder) {
+                        return SendableType.CONNECTION_CONFIG.getDefaultInstanceForType();
+                    }
             }
         }
         return null;
@@ -201,6 +213,8 @@ public class MessageComboBox extends ComboBox<Message> {
                     return new LocationConfigComboBoxConverter();
                 case USER:
                     return new UserConfigComboBoxConverter();
+                case CONNECTION:
+                    return new LocationConfigComboBoxConverter();
                 default:
                     return new DefaultMessageComboBoxConverter();
             }
