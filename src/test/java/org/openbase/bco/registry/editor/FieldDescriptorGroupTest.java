@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import com.google.protobuf.Message;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -31,6 +30,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
+import org.openbase.jps.core.JPService;
+import org.openbase.jps.exception.JPServiceException;
 import org.openbase.jul.exception.InstantiationException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
@@ -65,7 +66,8 @@ public class FieldDescriptorGroupTest {
     }
 
     @BeforeClass
-    public static void setUpClass() {
+    public static void setUpClass() throws JPServiceException {
+        JPService.setupJUnitTestMode();
     }
 
     @AfterClass
