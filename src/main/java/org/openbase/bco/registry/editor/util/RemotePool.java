@@ -39,6 +39,7 @@ import org.openbase.bco.registry.user.remote.UserRegistryRemote;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.InstantiationException;
+import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,6 +181,17 @@ public class RemotePool {
         } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new CouldNotPerformException(ex);
         }
+    }
+
+    public Message getById(String id) throws NotAvailableException {
+        for (SendableType sendableType : SendableType.values()) {
+            try {
+                return getById(id, sendableType.getDefaultInstanceForType());
+            } catch (CouldNotPerformException ex) {
+
+            }
+        }
+        throw new NotAvailableException("Could not find message with id [" + id + "]");
     }
 
     public Message getById(String id, Message msg) throws CouldNotPerformException {
