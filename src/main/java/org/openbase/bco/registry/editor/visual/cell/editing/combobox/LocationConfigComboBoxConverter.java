@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.visual.cell.editing;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
 
 /*
  * #%L
@@ -23,21 +23,23 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.rsb.ScopeType.Scope;
 
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class DefaultMessageComboBoxConverter implements MessageComboBoxConverter {
+public class LocationConfigComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        return getValue(msg);
+        return ScopeGenerator.generateStringRep((Scope) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.SCOPE_FIELD_NUMBER)));
     }
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(msg.toBuilder(), "id"));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.ID_FIELD_NUMBER));
     }
-
 }

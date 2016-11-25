@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package org.openbase.bco.registry.editor.visual.cell.editing;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
 
-/*-
+/*
  * #%L
- * BCO Registry Editor
+ * RegistryEditor
  * %%
  * Copyright (C) 2014 - 2016 openbase.org
  * %%
@@ -28,21 +23,24 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.user.UserConfigType.UserConfig;
 
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class AgentClassComboBoxConverter implements MessageComboBoxConverter {
+public class UserConfigComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AgentClass.getDefaultInstance(), AgentClass.LABEL_FIELD_NUMBER));
+        UserConfig userConfig = ((UnitConfig) msg).getUserConfig();
+        return userConfig.getUserName() + " (" + userConfig.getFirstName() + " " + userConfig.getFirstName() + ")";
     }
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AgentClass.getDefaultInstance(), AgentClass.ID_FIELD_NUMBER));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.ID_FIELD_NUMBER));
     }
+
 }

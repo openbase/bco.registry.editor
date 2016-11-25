@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.visual.cell.editing;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
 
 /*
  * #%L

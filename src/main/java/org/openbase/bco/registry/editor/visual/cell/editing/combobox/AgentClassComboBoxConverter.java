@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.openbase.bco.registry.editor.visual.cell.editing;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
 
 /*-
  * #%L
@@ -28,21 +28,21 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  */
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.domotic.unit.app.AppClassType.AppClass;
+import rst.domotic.unit.agent.AgentClassType.AgentClass;
 
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class AppClassComboBoxConverter implements MessageComboBoxConverter {
+public class AgentClassComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AppClass.getDefaultInstance(), AppClass.LABEL_FIELD_NUMBER));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AgentClass.getDefaultInstance(), AgentClass.LABEL_FIELD_NUMBER));
     }
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AppClass.getDefaultInstance(), AppClass.ID_FIELD_NUMBER));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AgentClass.getDefaultInstance(), AgentClass.ID_FIELD_NUMBER));
     }
 }

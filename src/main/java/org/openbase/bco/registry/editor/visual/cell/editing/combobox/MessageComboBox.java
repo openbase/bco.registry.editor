@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.visual.cell.editing;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
 
 /*
  * #%L
@@ -50,6 +50,7 @@ import rst.domotic.unit.agent.AgentClassType.AgentClass;
 import rst.domotic.unit.app.AppClassType.AppClass;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 
@@ -222,6 +223,8 @@ public class MessageComboBox extends ComboBox<Message> {
             return new AgentClassComboBoxConverter();
         } else if (msg instanceof AppClass) {
             return new AppClassComboBoxConverter();
+        } else if (msg instanceof DeviceClass) {
+            return new DeviceClassComboBoxConverter();
         } else {
             return new DefaultMessageComboBoxConverter();
         }
