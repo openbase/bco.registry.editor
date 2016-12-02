@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -57,12 +58,12 @@ import org.openbase.bco.registry.editor.util.SelectableLabel;
 import org.openbase.bco.registry.editor.visual.GlobalTextArea;
 import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
 import org.openbase.bco.registry.editor.visual.cell.editing.DecimalTextField;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.EnumComboBox;
 import org.openbase.bco.registry.editor.visual.cell.editing.LongDatePicker;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.MessageComboBox;
 import org.openbase.bco.registry.editor.visual.cell.editing.StringTextField;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.UserConfigComboBoxConverter;
 import org.openbase.bco.registry.editor.visual.cell.editing.ValueCheckBox;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.EnumComboBox;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.MessageComboBox;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.UserConfigComboBoxConverter;
 import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
@@ -326,7 +327,7 @@ public class ValueCell extends RowCell {
 
         @Override
         public void handle(ActionEvent event) {
-            logger.debug("new apply event");
+            logger.info("new apply event");
             GlobalTextArea.getInstance().clearText();
             GenericNodeContainer container = (GenericNodeContainer) getItem();
             Builder builder = container.getBuilder();
@@ -391,14 +392,12 @@ public class ValueCell extends RowCell {
                         msg = container.getBuilder().build();
                         container.setChanged(false);
                         if (remotePool.contains(msg)) {
-                            msg = remotePool.update(msg).get();
-                            int i = 0;
+                            remotePool.update(msg).get();
                         } else {
-                            msg = remotePool.register(msg).get();
-                            System.out.println("Succesfully registered new message:\n" + msg);
+                            remotePool.register(msg).get();
                             container.getParent().getChildren().remove(container);
                         }
-                    } catch (CouldNotPerformException ex) {
+                    } catch (CouldNotPerformException | ExecutionException ex) {
                         RegistryEditor.printException(ex, logger, LogLevel.ERROR);
                         container.setChanged(true);
                     }
