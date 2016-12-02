@@ -61,6 +61,7 @@ import org.openbase.bco.registry.editor.visual.cell.editing.DecimalTextField;
 import org.openbase.bco.registry.editor.visual.cell.editing.LongDatePicker;
 import org.openbase.bco.registry.editor.visual.cell.editing.StringTextField;
 import org.openbase.bco.registry.editor.visual.cell.editing.ValueCheckBox;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.DeviceClassComboBoxConverter;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.EnumComboBox;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.MessageComboBox;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.UserConfigComboBoxConverter;
@@ -74,6 +75,7 @@ import org.openbase.jul.schedule.GlobalExecutionService;
 import rst.configuration.EntryType;
 import rst.domotic.state.InventoryStateType.InventoryState;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
+import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 
 /**
  *
@@ -218,6 +220,12 @@ public class ValueCell extends RowCell {
                 } else if ("owner_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof InventoryState.Builder) {
                     try {
                         text = new UserConfigComboBoxConverter().getText(remotePool.getUserRemote().getUserConfigById((String) ((Leaf) item).getValue()));
+                    } catch (CouldNotPerformException ex) {
+                        text = ((Leaf) item).getValue().toString();
+                    }
+                } else if ("device_class_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof DeviceConfig.Builder) {
+                    try {
+                        text = new DeviceClassComboBoxConverter().getText(remotePool.getDeviceRemote().getDeviceClassById((String) ((Leaf) item).getValue()));
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }

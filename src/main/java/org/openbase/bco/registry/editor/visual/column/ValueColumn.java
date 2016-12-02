@@ -31,7 +31,6 @@ import javafx.util.Callback;
 import org.openbase.bco.registry.editor.struct.Leaf;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
-import static org.openbase.bco.registry.editor.visual.column.DescriptorColumn.logger;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
