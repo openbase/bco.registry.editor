@@ -32,15 +32,15 @@ public class FieldPriorityMap extends HashMap<String, Integer> {
     public FieldPriorityMap() {
         this.put("id", -1000);
 
-        this.put("agent_config", -900);
-        this.put("app_config", -900);
-        this.put("authorization_group_config", -900);
-        this.put("connection_config", -900);
-        this.put("device_config", -900);
-        this.put("location_config", -900);
-        this.put("scene_config", -900);
-        this.put("unit_group_config", -900);
-        this.put("user_config", -900);
+        this.put("agent_config", 100);
+        this.put("app_config", 100);
+        this.put("authorization_group_config", 100);
+        this.put("connection_config", 100);
+        this.put("device_config", 100);
+        this.put("location_config", 100);
+        this.put("scene_config", 100);
+        this.put("unit_group_config", 100);
+        this.put("user_config", 100);
 
         this.put("label", -500);
         this.put("serial_number", -700);

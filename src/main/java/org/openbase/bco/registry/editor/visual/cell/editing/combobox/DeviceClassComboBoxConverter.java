@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
@@ -34,7 +33,9 @@ public class DeviceClassComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(DeviceClass.getDefaultInstance(), DeviceClass.LABEL_FIELD_NUMBER));
+        String company = (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(DeviceClass.getDefaultInstance(), DeviceClass.COMPANY_FIELD_NUMBER));
+        String label = (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(DeviceClass.getDefaultInstance(), DeviceClass.LABEL_FIELD_NUMBER));
+        return company + " - " + label;
     }
 
     @Override

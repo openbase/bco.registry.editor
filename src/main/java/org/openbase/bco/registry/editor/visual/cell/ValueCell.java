@@ -241,6 +241,11 @@ public class ValueCell extends RowCell {
                 Label selectableLabel = SelectableLabel.makeSelectable(new Label(text));
 //                if ("unit_id".equals(item.getDescriptor())) {
                 if (item.getDescriptor().endsWith("unit_id")) {
+                    try {
+                        text = ScopeGenerator.generateStringRep(remotePool.getUnitRemote().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
+                    } catch (CouldNotPerformException ex) {
+                        logger.warn("Could not retrieve unitConfig with id [" + ((Leaf) item).getValue() + "]", ex);
+                    }
                     selectableLabel = new Label(text);
                     selectableLabel.setDisable(true);
                     selectableLabel.setStyle(
