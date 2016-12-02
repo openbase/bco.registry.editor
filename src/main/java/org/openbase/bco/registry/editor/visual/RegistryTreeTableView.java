@@ -53,6 +53,7 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.pattern.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
 
 /**
  *
@@ -147,6 +148,10 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
             }
         }
         for (T msg : listDiff.getUpdatedMessageMap().getMessages()) {
+            if (msg instanceof UnitConfig) {
+                UnitConfig a = (UnitConfig) msg;
+                System.out.println("Message to update [" + a.getType().name() + ", " + a.getLabel() + "]");
+            }
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
@@ -159,6 +164,10 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
             parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
         }
         for (T msg : listDiff.getNewMessageMap().getMessages()) {
+            if (msg instanceof UnitConfig) {
+                UnitConfig a = (UnitConfig) msg;
+                System.out.println("New Message [" + a.getType().name() + ", " + a.getLabel() + "]");
+            }
             //logger.info("New message [" + message + "]");
             if (this.getRoot() instanceof GenericGroupContainer) {
                 GenericListContainer parent = getAccordingParent(new ArrayList<>(this.getRoot().getChildren()), msg);
