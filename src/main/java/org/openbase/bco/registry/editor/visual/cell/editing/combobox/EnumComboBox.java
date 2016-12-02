@@ -32,6 +32,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
@@ -61,7 +62,7 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
                 try {
                     if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
                         cell.getLeaf().setValue(getSelectionModel().getSelectedItem());
-                        cell.setText(cell.getLeaf().getValue().toString());
+                        cell.setGraphic(new Label(cell.getLeaf().getValue().toString()));
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {

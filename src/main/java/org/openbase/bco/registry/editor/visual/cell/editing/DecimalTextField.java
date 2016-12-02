@@ -24,6 +24,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -66,7 +67,7 @@ public class DecimalTextField extends TextField {
                         } else if (cell.getLeaf().getValue() instanceof Double) {
                             cell.getLeaf().setValue(parsedValue);
                         }
-                        cell.setText(Double.toString(parsedValue));
+                        cell.setGraphic(new Label(Double.toString(parsedValue)));
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {
@@ -91,7 +92,7 @@ public class DecimalTextField extends TextField {
                             cell.getLeaf().setValue(parsedValue);
                         }
                         // even though commit is called the text property won't change fast enough without this line?!?
-                        cell.setText(Double.toString(parsedValue));
+                        cell.setGraphic(new Label(Double.toString(parsedValue)));
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {

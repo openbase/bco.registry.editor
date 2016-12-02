@@ -21,10 +21,10 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
@@ -55,16 +55,16 @@ public class ValueCheckBox extends CheckBox {
 
             @Override
             public void handle(ActionEvent t) {
-                 try {
-                Object value;
-                if (isSelected()) {
-                    value = selected;
-                } else {
-                    value = unselected;
-                }
-                cell.getLeaf().setValue(value);
-                cell.setText(value.toString());
-                cell.commitEdit(cell.getLeaf());
+                try {
+                    Object value;
+                    if (isSelected()) {
+                        value = selected;
+                    } else {
+                        value = unselected;
+                    }
+                    cell.getLeaf().setValue(value);
+                    cell.setGraphic(new Label(value.toString()));
+                    cell.commitEdit(cell.getLeaf());
                 } catch (InterruptedException ex) {
                     ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
