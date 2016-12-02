@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor.visual.column;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-
 import java.util.HashMap;
 
 /**
@@ -32,6 +31,17 @@ public class FieldPriorityMap extends HashMap<String, Integer> {
 
     public FieldPriorityMap() {
         this.put("id", -1000);
+
+        this.put("agent_config", -900);
+        this.put("app_config", -900);
+        this.put("authorization_group_config", -900);
+        this.put("connection_config", -900);
+        this.put("device_config", -900);
+        this.put("location_config", -900);
+        this.put("scene_config", -900);
+        this.put("unit_group_config", -900);
+        this.put("user_config", -900);
+
         this.put("label", -500);
         this.put("serial_number", -700);
         this.put("product_number", -700);
