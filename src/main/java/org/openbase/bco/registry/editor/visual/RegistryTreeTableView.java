@@ -58,13 +58,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class RegistryTreeTableView extends TreeTableView<Node> {
+public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Builder<TB>> extends TreeTableView<Node> {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistryTreeTableView.class);
 
     private final DescriptorColumn descriptorColumn;
     private final SendableType type;
-    private final ProtobufListDiff listDiff;
+    private final ProtobufListDiff<?, T, ?> listDiff;
     private final VBox vBox;
     private final RemotePool remotePool;
     private final Label statusInfoLabel;
@@ -86,7 +86,7 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         }
         setSortMode(TreeSortMode.ALL_DESCENDANTS);
         getSortOrder().addAll(descriptorColumn, valueColumn);
-        this.listDiff = new ProtobufListDiff();
+        this.listDiff = new ProtobufListDiff<>();
 
         this.statusInfoLabel = new Label("Status Info Label");
         this.statusInfoLabel.setAlignment(Pos.CENTER);
@@ -124,13 +124,11 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
         return type;
     }
 
-    public void update(List<? extends GeneratedMessage> messageList) throws CouldNotPerformException, InterruptedException {
+    public void update(List<T> messageList) throws CouldNotPerformException, InterruptedException {
         // get all changes
         listDiff.diff(messageList);
         // Remove all removed messages
-        for (Object message : listDiff.getRemovedMessageMap().getMessages()) {
-//            logger.info("Removed message [" + message + "]");
-            GeneratedMessage msg = (GeneratedMessage) message;
+        for (T msg : listDiff.getRemovedMessageMap().getMessages()) {
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
@@ -148,11 +146,8 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
                 }
             }
         }
-        for (Object message : listDiff.getUpdatedMessageMap().getMessages()) {
-//            logger.info("Updated message [" + message + "]");
-            GeneratedMessage msg = (GeneratedMessage) message;
+        for (T msg : listDiff.getUpdatedMessageMap().getMessages()) {
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
-//            logger.info("Found old node to remove to update [" + nodeToRemove.getBuilder().build() + "]");
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
                 GlobalTextArea.getInstance().putText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'");
@@ -163,22 +158,14 @@ public class RegistryTreeTableView extends TreeTableView<Node> {
             expandEqually(nodeToRemove, updatedNode);
             parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
         }
-        for (Object message : listDiff.getNewMessageMap().getMessages()) {
+        for (T msg : listDiff.getNewMessageMap().getMessages()) {
             //logger.info("New message [" + message + "]");
-            GeneratedMessage msg = (GeneratedMessage) message;
             if (this.getRoot() instanceof GenericGroupContainer) {
                 GenericListContainer parent = getAccordingParent(new ArrayList<>(this.getRoot().getChildren()), msg);
                 //parent is null if the new entry belongs to a group that did not exists before
                 if (parent == null) {
-//                    GenericGroupContainer test = (GenericGroupContainer) this.getRoot();
-//                    List<GeneratedMessage.Builder> singleList = new ArrayList<>();
-//                    GeneratedMessage.Builder hallo = (GeneratedMessage.Builder) msg.toBuilder();
-//                    singleList.add(hallo);
-//                    if (test.isLastGroup()) {
-//                        this.getRoot().add(new GenericListContainer<>(test.getFieldGroup().getDescriptor(msg.toBuilder()), test.getFieldGroup(), test.getBuilder(), singleList));
-//                    } else {
-//                        this.getRoot().add(new GenericGroupContainer<>(test.getFieldGroup().getDescriptor(msg.toBuilder()), test.getFieldGroup(), test.getBuilder(), singleList, test.getChildGroups()));
-//                    }
+                    GenericGroupContainer rootNode = (GenericGroupContainer) this.getRoot();
+                    rootNode.addItemWithNewGroup(msg);
                 } else {
                     parent.registerElement(msg.toBuilder());
                 }

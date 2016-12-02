@@ -188,7 +188,6 @@ public class ValueCell extends RowCell {
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setGraphic(displayLabel);
     }
 
     @Override
