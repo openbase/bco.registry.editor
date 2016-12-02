@@ -92,6 +92,26 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
         }
     }
 
+    public void addItemWithNewGroup(RFM msg) throws CouldNotPerformException {
+        try {
+            Object value = treeItemDescriptorProvider.getValue(msg);
+            values.add(value);
+            List<RFMB> groupBuilderList = new ArrayList<>();
+            groupBuilderList.add((RFMB) msg.toBuilder());
+            if (groups.length == 1) {
+                GenericListContainer<MB, GeneratedMessage, RFMB> genericListContainer = new GenericListContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList);
+                valueMap.put(genericListContainer, value);
+                super.add(genericListContainer);
+            } else {
+                GenericGroupContainer<MB, GeneratedMessage, RFMB> genericGroupContainer = new GenericGroupContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList, childGroups);
+                valueMap.put(genericGroupContainer, value);
+                super.add(genericGroupContainer);
+            }
+        } catch (CouldNotPerformException | InterruptedException ex) {
+            throw new CouldNotPerformException("Could not add message with new value for this group", ex);
+        }
+    }
+
     public TreeItemDescriptorProvider getFieldGroup() {
         return treeItemDescriptorProvider;
     }

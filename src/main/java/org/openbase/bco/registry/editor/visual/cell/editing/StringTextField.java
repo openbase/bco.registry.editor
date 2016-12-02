@@ -28,9 +28,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ public class StringTextField extends TextField {
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {
-                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
+                    RegistryEditor.printException(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });
@@ -74,7 +74,7 @@ public class StringTextField extends TextField {
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {
-                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
+                    RegistryEditor.printException(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });

@@ -62,7 +62,7 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
                 try {
                     if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
                         cell.getLeaf().setValue(getSelectionModel().getSelectedItem());
-                        cell.setGraphic(new Label(cell.getLeaf().getValue().toString()));
+                        cell.setGraphic(new Label(((EnumValueDescriptor) cell.getLeaf().getValue()).getName()));
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {
@@ -82,12 +82,6 @@ public class EnumComboBox extends ComboBox<EnumValueDescriptor> {
 
     private ObservableList sortEnumValues(EnumDescriptor enumDescriptor) {
         List<EnumValueDescriptor> values = new ArrayList<>(enumDescriptor.getValues());
-//        for (int i = 0; i < values.size(); i++) {
-//            if ("UNKNOWN".equals(values.get(i).getName())) {
-//                values.remove(i);
-//                i--;
-//            }
-//        }
         Collections.sort(values, new Comparator<EnumValueDescriptor>() {
 
             @Override
