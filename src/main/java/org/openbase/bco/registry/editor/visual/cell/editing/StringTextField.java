@@ -24,6 +24,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -52,7 +53,7 @@ public class StringTextField extends TextField {
                     if (!newValue && !cell.getLeaf().getValue().equals(getText())) {
                         cell.getLeaf().setValue(getText());
                         // even though commit is called the text property won't change fast enough without this line?!?
-                        cell.setText(getText());
+                        cell.setGraphic(new Label(getText()));
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {
@@ -69,7 +70,7 @@ public class StringTextField extends TextField {
                         cell.cancelEdit();
                     } else if (event.getCode().equals(KeyCode.ENTER)) {
                         cell.getLeaf().setValue(getText());
-                        cell.setText(getText());
+                        cell.setGraphic(new Label(getText()));
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {

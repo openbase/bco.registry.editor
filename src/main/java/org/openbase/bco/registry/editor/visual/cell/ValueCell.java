@@ -148,7 +148,10 @@ public class ValueCell extends RowCell {
         }
     }
 
+    private javafx.scene.Node displayLabel;
+
     private javafx.scene.control.Control getEditingGraphic() {
+        displayLabel = getGraphic();
         graphic = null;
         Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor(), leaf.getParent().getBuilder());
         if (type != null) {
@@ -185,7 +188,7 @@ public class ValueCell extends RowCell {
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setGraphic(null);
+        setGraphic(displayLabel);
     }
 
     @Override
@@ -235,8 +238,8 @@ public class ValueCell extends RowCell {
             }
 
             if (((LeafContainer) item).getEditable()) {
-                setText(text);
-                setGraphic(null);
+//                setText(text);
+                setGraphic(new Label(text));
             } else {
                 Label selectableLabel = SelectableLabel.makeSelectable(new Label(text));
 //                if ("unit_id".equals(item.getDescriptor())) {

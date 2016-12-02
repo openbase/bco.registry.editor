@@ -28,6 +28,7 @@ import java.util.Date;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
@@ -55,7 +56,7 @@ public class LongDatePicker extends DatePicker {
                 try {
                     if (getValue() != null && getValue().toEpochDay() != (Long) cell.getLeaf().getValue()) {
                         cell.getLeaf().setValue(getValue().toEpochDay() * 24 * 60 * 60 * 1000);
-                        cell.setText(DATE_CONVERTER.format(new Date((Long) cell.getLeaf().getValue())));
+                        cell.setGraphic(new Label(DATE_CONVERTER.format(new Date((Long) cell.getLeaf().getValue()))));
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {

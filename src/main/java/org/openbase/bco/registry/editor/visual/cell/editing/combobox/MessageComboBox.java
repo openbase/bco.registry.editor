@@ -32,6 +32,7 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
@@ -86,7 +87,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 try {
                     if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
                         cell.getLeaf().setValue(converter.getValue(getSelectionModel().getSelectedItem()));
-                        cell.setText(converter.getText(getSelectionModel().getSelectedItem()));
+                        cell.setGraphic(new Label(converter.getText(getSelectionModel().getSelectedItem())));
                         cell.commitEdit(cell.getLeaf());
                     }
                 } catch (InterruptedException ex) {
