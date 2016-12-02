@@ -215,7 +215,7 @@ public class RegistryEditor extends Application {
         deviceConfigTab = new Tab("DeviceConfig");
         deviceClassTab.setContent(deviceClassTreeTableView.getVBox());
         deviceConfigTab.setContent(deviceConfigTreeTableView.getVBox());
-        deviceRegistryTabPane.getTabs().addAll(deviceClassTab, deviceConfigTab);
+        deviceRegistryTabPane.getTabs().addAll(deviceConfigTab, deviceClassTab);
 
         locationRegistryTabPane = new TabPaneWithClearing();
         locationRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -223,7 +223,7 @@ public class RegistryEditor extends Application {
         locationConfigTab.setContent(locationConfigTreeTableView.getVBox());
         connectionConfigTab = new Tab("ConnectionConfig");
         connectionConfigTab.setContent(connectionConfigTreeTableView.getVBox());
-        locationRegistryTabPane.getTabs().addAll(connectionConfigTab, locationConfigTab);
+        locationRegistryTabPane.getTabs().addAll(locationConfigTab, connectionConfigTab);
 
         userRegistryTabPane = new TabPaneWithClearing();
         userRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -239,7 +239,7 @@ public class RegistryEditor extends Application {
         agentClassTab.setContent(agentClassTreeTableView.getVBox());
         agentConfigTab = new Tab("AgentConfig");
         agentConfigTab.setContent(agentConfigTreeTableView.getVBox());
-        agentRegistryTabPane.getTabs().addAll(agentClassTab, agentConfigTab);
+        agentRegistryTabPane.getTabs().addAll(agentConfigTab, agentClassTab);
 
         appRegistryTabPane = new TabPaneWithClearing();
         appRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -247,7 +247,7 @@ public class RegistryEditor extends Application {
         appClassTab.setContent(appClassTreeTableView.getVBox());
         appConfigTab = new Tab("AppConfig");
         appConfigTab.setContent(appConfigTreeTableView.getVBox());
-        appRegistryTabPane.getTabs().addAll(appClassTab, appConfigTab);
+        appRegistryTabPane.getTabs().addAll(appConfigTab, appClassTab);
 
         sceneRegistryTabPane = new TabPaneWithClearing();
         sceneRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
