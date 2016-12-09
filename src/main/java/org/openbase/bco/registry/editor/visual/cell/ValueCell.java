@@ -71,7 +71,7 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import org.openbase.jul.schedule.GlobalExecutionService;
+import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import rst.configuration.EntryType;
 import rst.domotic.state.InventoryStateType.InventoryState;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
@@ -396,7 +396,7 @@ public class ValueCell extends RowCell {
                 }
             }
 
-            GlobalExecutionService.submit(new Callable<Boolean>() {
+            GlobalCachedExecutorService.submit(new Callable<Boolean>() {
 
                 @Override
                 public Boolean call() throws Exception {
@@ -427,7 +427,7 @@ public class ValueCell extends RowCell {
         @Override
         public void handle(ActionEvent event) {
             GlobalTextArea.getInstance().clearText();
-            GlobalExecutionService.submit(new Callable<Boolean>() {
+            GlobalCachedExecutorService.submit(new Callable<Boolean>() {
 
                 @Override
                 public Boolean call() throws Exception {
