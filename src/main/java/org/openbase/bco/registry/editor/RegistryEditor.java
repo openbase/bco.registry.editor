@@ -86,7 +86,7 @@ import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.openbase.jul.pattern.Observable;
 import org.openbase.jul.pattern.Observer;
 import org.openbase.jul.pattern.Remote.ConnectionState;
-import org.openbase.jul.schedule.GlobalExecutionService;
+import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.domotic.registry.AgentRegistryDataType.AgentRegistryData;
@@ -363,7 +363,7 @@ public class RegistryEditor extends Application {
         final Map<RSBRemoteService, Future<Void>> registrationFutureMap = new HashMap<>();
         
         for (RSBRemoteService remote : remotePool.getRemotes()) {
-            registrationFutureMap.put(remote, GlobalExecutionService.submit(new Callable<Void>() {
+            registrationFutureMap.put(remote, GlobalCachedExecutorService.submit(new Callable<Void>() {
                 
                 @Override
                 public Void call() throws Exception {

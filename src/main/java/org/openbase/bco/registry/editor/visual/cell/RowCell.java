@@ -46,7 +46,7 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import org.openbase.jul.schedule.GlobalExecutionService;
+import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -112,7 +112,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
         @Override
         public void handle(ActionEvent event) {
-            GlobalExecutionService.submit(new Callable<Boolean>() {
+            GlobalCachedExecutorService.submit(new Callable<Boolean>() {
 
                 @Override
                 public Boolean call() throws Exception {
