@@ -165,7 +165,7 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         for (T msg : listDiff.getUpdatedMessageMap().getMessages()) {
             if (msg instanceof UnitConfig) {
                 UnitConfig a = (UnitConfig) msg;
-                System.out.println("Message to update [" + a.getType().name() + ", " + a.getLabel() + "]");
+                logger.info("Message to update [" + a.getType().name() + ", " + a.getLabel() + "]");
             }
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
@@ -181,7 +181,7 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         for (T msg : listDiff.getNewMessageMap().getMessages()) {
             if (msg instanceof UnitConfig) {
                 UnitConfig a = (UnitConfig) msg;
-                System.out.println("New Message [" + a.getType().name() + ", " + a.getLabel() + "]");
+                logger.info("New Message [" + a.getType().name() + ", " + a.getLabel() + "]");
             }
             //logger.info("New message [" + message + "]");
             if (this.getRoot() instanceof GenericGroupContainer) {

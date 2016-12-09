@@ -258,7 +258,7 @@ public class ValueCell extends RowCell {
 //
 //                    @Override
 //                    public void handle(MouseEvent event) {
-//                        System.out.println("MouseReleased on selectableLabel");
+//                        logger.debug("MouseReleased on selectableLabel");
 //                    }
 //                });
                 setGraphic(selectableLabel);
