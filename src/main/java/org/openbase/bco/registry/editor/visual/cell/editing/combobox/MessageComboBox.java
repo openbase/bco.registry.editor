@@ -78,7 +78,9 @@ public class MessageComboBox extends ComboBox<Message> {
             }
         });
         this.setButtonCell(new MessageComboBoxCell());
+        System.out.println("Before Sorted List set");
         this.setItems(sortedList(parentBuilder, fieldName, cell.getLeaf().getValue()));
+        System.out.println("Sorted List set");
         this.setStartingValue(cell.getLeaf().getValue());
         this.setOnAction(new EventHandler() {
 
@@ -110,6 +112,7 @@ public class MessageComboBox extends ComboBox<Message> {
         try {
             List<Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
             if (parentBuilder instanceof LocationConfig.Builder) {
+                System.out.println("case 1");
                 list.remove(RemotePool.getInstance().getById(ProtoBufFieldProcessor.getId(parentBuilder), parentBuilder));
                 for (String childId : ((LocationConfig.Builder) parentBuilder).getChildIdList()) {
                     if (childId.equals(leafValue)) {
@@ -119,15 +122,17 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             }
             if ("tile_id".equals(fieldName)) {
+                System.out.println("case 2");
                 for (int i = 0; i < list.size(); i++) {
-                    LocationConfig location = (LocationConfig) list.get(i);
-                    if (location.getType() != LocationConfig.LocationType.TILE) {
+                    UnitConfig location = (UnitConfig) list.get(i);
+                    if (location.getLocationConfig().getType() != LocationConfig.LocationType.TILE) {
                         list.remove(i);
                         i--;
                     }
                 }
             }
             if (parentBuilder instanceof AuthorizationGroupConfig.Builder) {
+                System.out.println("case 3");
                 for (String memberId : ((AuthorizationGroupConfig.Builder) parentBuilder).getMemberIdList()) {
                     if (memberId.equals(leafValue)) {
                         continue;
@@ -136,6 +141,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             }
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
+                System.out.println("case 4");
                 List<ServiceTemplate.ServiceType> serviceTypes = new ArrayList<>();
                 for (ServiceTemplate serviceTemplate : ((UnitGroupConfig.Builder) parentBuilder).getServiceTemplateList()) {
                     serviceTypes.add(serviceTemplate.getType());
@@ -149,7 +155,8 @@ public class MessageComboBox extends ComboBox<Message> {
                     list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()));
                 }
             }
-            if (parentBuilder instanceof ConnectionConfig.Builder) {
+            if (parentBuilder instanceof ConnectionConfig.Builder && "unit_id".equals(fieldName)) {
+                System.out.println("case 5");
                 list.clear();
                 for (String tileId : ((ConnectionConfig.Builder) parentBuilder).getTileIdList()) {
                     list.addAll(RemotePool.getInstance().getLocationRemote().getUnitConfigsByLocation(tileId));
