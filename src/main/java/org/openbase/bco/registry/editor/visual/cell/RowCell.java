@@ -41,6 +41,7 @@ import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
 import org.openbase.bco.registry.editor.util.RSTDefaultInstances;
 import org.openbase.bco.registry.editor.util.RemotePool;
+import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
@@ -48,6 +49,8 @@ import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import org.slf4j.LoggerFactory;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 /**
  * Cell factory to manage similar options for all cells in a row. Initializes
@@ -145,6 +148,10 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                         if (!parentNode.getChildren().isEmpty()) {
                             addGroupValues(parentNode, addedBuilder, ((NodeContainer) parentNode.getChildren().get(0)).getBuilder());
                         }
+                        if (addedBuilder instanceof UnitConfig.Builder) {
+                            UnitType unitType = ((UnitConfig) ((RegistryTreeTableView) RowCell.this.getTreeTableView()).getSendableType().getDefaultInstanceForType()).getType();
+                            ((UnitConfig.Builder) addedBuilder).setType(unitType);
+                        }
                         parentNode.addElement(addedBuilder);
                     } else {
                         parentNode.addNewDefaultElement();
@@ -157,6 +164,10 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                         child = (NodeContainer) child.getChildren().get(0);
                     }
                     addGroupValues(container, addedBuilder, child.getBuilder());
+                    if (addedBuilder instanceof UnitConfig.Builder) {
+                        UnitType unitType = ((UnitConfig) ((RegistryTreeTableView) RowCell.this.getTreeTableView()).getSendableType().getDefaultInstanceForType()).getType();
+                        ((UnitConfig.Builder) addedBuilder).setType(unitType);
+                    }
                     container.add(new GenericNodeContainer("", addedBuilder));
                     container.setExpanded(true);
                 }
