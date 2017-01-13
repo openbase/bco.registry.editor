@@ -22,24 +22,26 @@ package org.openbase.bco.registry.editor.util;
  * #L%
  */
 import com.google.protobuf.GeneratedMessage.Builder;
+import rst.domotic.state.ActivationStateType.ActivationState;
+import rst.domotic.state.EnablingStateType.EnablingState;
+import rst.domotic.state.InventoryStateType.InventoryState;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
+import rst.domotic.unit.agent.AgentConfigType.AgentConfig;
+import rst.domotic.unit.app.AppConfigType.AppConfig;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
+import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
+import rst.domotic.unit.location.LocationConfigType.LocationConfig;
+import rst.domotic.unit.scene.SceneConfigType.SceneConfig;
+import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 import rst.domotic.unit.user.UserConfigType.UserConfig;
 import rst.geometry.AxisAlignedBoundingBox3DFloatType.AxisAlignedBoundingBox3DFloat;
 import rst.geometry.PoseType.Pose;
 import rst.geometry.RotationType.Rotation;
 import rst.geometry.TranslationType.Translation;
-import rst.domotic.unit.agent.AgentConfigType.AgentConfig;
-import rst.domotic.unit.app.AppConfigType.AppConfig;
-import rst.domotic.unit.scene.SceneConfigType.SceneConfig;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass;
-import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
-import rst.domotic.state.ActivationStateType.ActivationState;
-import rst.domotic.state.EnablingStateType.EnablingState;
-import rst.domotic.state.InventoryStateType.InventoryState;
-import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 import rst.math.Vec3DDoubleType.Vec3DDouble;
-import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
-import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 import rst.spatial.ShapeType.Shape;
 import rst.timing.TimestampType.Timestamp;
@@ -157,6 +159,29 @@ public class RSTDefaultInstances {
             return getDefaultUnitGroupConfig();
         } else if (builderType instanceof DeviceClass.Builder) {
             return getDefaultDeviceClass();
+        } else if (builderType instanceof UnitConfig.Builder) {
+            switch (((UnitConfig.Builder) builderType).getType()) {
+                case AUTHORIZATION_GROUP:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.AUTHORIZATION_GROUP);
+                case AGENT:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.AGENT);
+                case APP:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.APP);
+                case CONNECTION:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.CONNECTION);
+                case DEVICE:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.DEVICE);
+                case LOCATION:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.LOCATION);
+                case SCENE:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.SCENE);
+                case UNIT_GROUP:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.UNIT_GROUP);
+                case USER:
+                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.USER);
+                default:
+                    return UnitConfig.getDefaultInstance().toBuilder();
+            }
         } else {
             return (Builder) builderType.build().getDefaultInstanceForType().toBuilder();
         }
