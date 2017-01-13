@@ -130,17 +130,16 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
     public void update(List<T> messageList) throws CouldNotPerformException, InterruptedException {
         // TODO tamino: fix update issue and remove workaround.
         // Workaround: Hack for registry restart bug, should be removed after fixing update because empty registries can not be displayed anymore.
-        while(true) {
+        while (true) {
             CachedLocationRegistryRemote.getRegistry().waitForData();
             CachedDeviceRegistryRemote.getRegistry().waitForData();
-            if(CachedDeviceRegistryRemote.getRegistry().getData().getDeviceUnitConfigCount() == 0) {
-                Thread.sleep(100);
-                continue;
+            if (CachedDeviceRegistryRemote.getRegistry().getData().getDeviceUnitConfigCount() != 0) {
+                break;
             }
-            break;
+            Thread.sleep(100);
         }
         // =======================================
-        
+
         // get all changes
         listDiff.diff(messageList);
         // Remove all removed messages
