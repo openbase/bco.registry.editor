@@ -23,6 +23,7 @@ package org.openbase.bco.registry.editor.struct.converter;
  */
 import java.util.Map;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.NotAvailableException;
 
 /**
  *
@@ -34,5 +35,5 @@ public interface Converter {
     //TODO Tamnio: Why is this converter not generic? -> Converter<V> -> updateBuilder(String fieldName, V value)
     public void updateBuilder(String fieldName, Object value) throws CouldNotPerformException;
 
-    public Map<String, Object> getFields();
+    public Map<String, Object> getFields() throws NotAvailableException;
 }

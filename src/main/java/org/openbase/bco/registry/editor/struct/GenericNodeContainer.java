@@ -26,6 +26,7 @@ import com.google.protobuf.GeneratedMessage;
 import java.util.Map.Entry;
 import org.openbase.bco.registry.editor.struct.consistency.Configuration;
 import org.openbase.bco.registry.editor.struct.converter.DefaultConverter;
+import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
@@ -47,7 +48,7 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
                     registerElement(entry.getKey(), entry.getValue());
                 }
             }
-        } catch (InstantiationException ex) {
+        } catch (CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
         }
     }

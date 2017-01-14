@@ -35,7 +35,11 @@ public class LocationConfigComboBoxConverter implements MessageComboBoxConverter
 
     @Override
     public String getText(Message msg) {
-        return ScopeGenerator.generateStringRep((Scope) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.SCOPE_FIELD_NUMBER)));
+        try {
+            return ScopeGenerator.generateStringRep((Scope) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.SCOPE_FIELD_NUMBER)));
+        } catch (Exception ex) {
+            return "?";
+        }
     }
 
     @Override

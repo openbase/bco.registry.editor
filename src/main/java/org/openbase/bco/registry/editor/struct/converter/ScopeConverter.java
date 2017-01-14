@@ -21,9 +21,11 @@ package org.openbase.bco.registry.editor.struct.converter;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+import java.io.NotActiveException;
 import java.util.HashMap;
 import java.util.Map;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import rst.rsb.ScopeType.Scope;
 
@@ -54,9 +56,13 @@ public class ScopeConverter implements Converter {
     }
 
     @Override
-    public Map<String, Object> getFields() {
-        Map<String, Object> fieldMap = new HashMap<>();
-        fieldMap.put(SCOPE, ScopeGenerator.generateStringRep(scope.getComponentList()));
-        return fieldMap;
+    public Map<String, Object> getFields() throws NotAvailableException {
+        try {
+            Map<String, Object> fieldMap = new HashMap<>();
+            fieldMap.put(SCOPE, ScopeGenerator.generateStringRep(scope.getComponentList()));
+            return fieldMap;
+        } catch (CouldNotPerformException ex) {
+            throw new NotAvailableException("scope fields", ex);
+        }
     }
 }
