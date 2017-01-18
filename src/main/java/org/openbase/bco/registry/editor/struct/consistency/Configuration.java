@@ -94,6 +94,8 @@ public class Configuration {
             return !("transformation_frame_id".equals(fieldName));
         } else if (builder instanceof AppClass.Builder) {
             return !("id".equals(fieldName));
+        } else if (builder instanceof AgentClass.Builder) {
+            return !("id".equals(fieldName));
         }
         return true;
     }
