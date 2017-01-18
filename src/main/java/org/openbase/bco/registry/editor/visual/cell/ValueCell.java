@@ -83,16 +83,16 @@ import rst.math.Vec3DDoubleType.Vec3DDouble;
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class ValueCell extends RowCell {
-    
+
     protected final Button applyButton, cancelButton;
     protected final HBox buttonLayout;
     protected LeafContainer leaf;
     private javafx.scene.control.Control graphic;
-    
+
     protected SimpleObjectProperty<Boolean> changed = null;
     protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-    
+
     public ValueCell() throws InterruptedException {
         super();
         applyButton = new Button("Apply");
@@ -109,11 +109,11 @@ public class ValueCell extends RowCell {
         buttonLayout = new HBox(applyButton, cancelButton);
         this.changeListener = new ChangedListener();
     }
-    
+
     @Override
     public void startEdit() {
         super.startEdit();
-        
+
         if (getItem() instanceof Leaf) {
             leaf = ((LeafContainer) getItem());
             if (((LeafContainer) getItem()).getEditable()) {
@@ -121,7 +121,7 @@ public class ValueCell extends RowCell {
             } else {
                 if ("unit_id".equals(leaf.getDescriptor())) {
                     Platform.runLater(new Runnable() {
-                        
+
                         @Override
                         public void run() {
                             try {
@@ -148,9 +148,9 @@ public class ValueCell extends RowCell {
             }
         }
     }
-    
+
     private javafx.scene.Node displayLabel;
-    
+
     private javafx.scene.control.Control getEditingGraphic() {
         displayLabel = getGraphic();
         graphic = null;
@@ -185,16 +185,16 @@ public class ValueCell extends RowCell {
         }
         return graphic;
     }
-    
+
     @Override
     public void cancelEdit() {
         super.cancelEdit();
     }
-    
+
     @Override
     public void updateItem(Node item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         if (empty) {
             setGraphic(null);
             setText("");
@@ -236,7 +236,7 @@ public class ValueCell extends RowCell {
                     text = ((Leaf) item).getValue().toString();
                 }
             }
-            
+
             if (((LeafContainer) item).getEditable()) {
 //                setText(text);
                 setGraphic(new Label(text));
@@ -265,16 +265,16 @@ public class ValueCell extends RowCell {
                 setGraphic(selectableLabel);
             }
         }
-        
+
         if (item instanceof GenericNodeContainer) {
             GenericNodeContainer container = (GenericNodeContainer) item;
             String text = getBuilderDescription(container.getBuilder());
             if (text != null) {
                 setGraphic(SelectableLabel.makeSelectable(new Label(text)));
             } else {
-                if (container.getValue() instanceof Vec3DDouble.Builder) {
-                    Vec3DDouble.Builder vector = (Vec3DDouble.Builder) container.getValue();
-                    setGraphic(SelectableLabel.makeSelectable(new Label("[" + vector.getX() + ", " + vector.getY() + ", " + vector.getZ() + "]")));
+                if (container.getDescriptor().equals("floor")) {
+                    Vec3DDouble.Builder vector = (Vec3DDouble.Builder) container.getBuilder();
+                    setGraphic(SelectableLabel.makeSelectable(new Label("[" + vector.getX() + "x, " + vector.getY() + "y, " + vector.getZ() + "z]")));
                 } else {
                     setText("");
                     setGraphic(null);
@@ -285,7 +285,7 @@ public class ValueCell extends RowCell {
                 if (container.hasChanged()) {
                     setGraphic(buttonLayout);
                 }
-                
+
                 try {
                     if ("".equals(ProtoBufFieldProcessor.getId(container.getBuilder()))) {
                         container.setChanged(true);
@@ -316,7 +316,7 @@ public class ValueCell extends RowCell {
         }
         // ============================================
     }
-    
+
     public String getBuilderDescription(Message.Builder builder) {
         if (builder instanceof EntryType.Entry.Builder) {
             EntryType.Entry.Builder entry = (EntryType.Entry.Builder) builder;
@@ -329,11 +329,11 @@ public class ValueCell extends RowCell {
         }
         return null;
     }
-    
+
     public LeafContainer getLeaf() {
         return leaf;
     }
-    
+
     private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
         if (changed != null) {
             changed.removeListener(changeListener);
@@ -343,50 +343,50 @@ public class ValueCell extends RowCell {
             changed.addListener(changeListener);
         }
     }
-    
+
     private class ApplyEventHandler implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             logger.info("new apply event");
             GlobalTextArea.getInstance().clearText();
             GenericNodeContainer container = (GenericNodeContainer) getItem();
             Builder builder = container.getBuilder();
-            
+
             if (!builder.isInitialized()) {
                 if (ProtoBufFieldProcessor.checkIfSomeButNotAllRequiredFieldsAreSet(builder)) {
                     List<String> missingFieldList = builder.findInitializationErrors();
                     String missingFields = "";
                     missingFields = missingFieldList.stream().map((error) -> error + "\n").reduce(missingFields, String::concat);
-                    
+
                     Alert alert = new Alert(AlertType.CONFIRMATION);
                     alert.setResizable(true);
                     alert.setTitle("Message initialization error!");
                     alert.setHeaderText("Missing some required fields!");
                     alert.setContentText("Initialize them with default values or clear them?");
-                    
+
                     ButtonType initButton = new ButtonType("Init");
                     ButtonType clearButton = new ButtonType("Clear");
                     ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
                     alert.getButtonTypes().setAll(initButton, clearButton, cancelButton);
-                    
+
                     TextArea textArea = new TextArea(missingFields);
                     textArea.setEditable(false);
                     textArea.setWrapText(true);
                     Label label = new Label("Missing fields:");
-                    
+
                     textArea.setMaxWidth(Double.MAX_VALUE);
                     textArea.setMaxHeight(Double.MAX_VALUE);
                     GridPane.setVgrow(textArea, Priority.ALWAYS);
                     GridPane.setHgrow(textArea, Priority.ALWAYS);
-                    
+
                     GridPane expContent = new GridPane();
                     expContent.setMaxWidth(Double.MAX_VALUE);
                     expContent.add(label, 0, 0);
                     expContent.add(textArea, 0, 1);
-                    
+
                     alert.getDialogPane().setExpandableContent(expContent);
-                    
+
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.get() == clearButton) {
                         ProtoBufFieldProcessor.clearRequiredFields(builder);
@@ -401,14 +401,14 @@ public class ValueCell extends RowCell {
                     }
                 }
             }
-            
+
             GlobalCachedExecutorService.submit(new Callable<Boolean>() {
-                
+
                 @Override
                 public Boolean call() throws Exception {
                     GenericNodeContainer container = (GenericNodeContainer) getItem();
                     Message msg;
-                    
+
                     try {
                         msg = container.getBuilder().build();
                         container.setChanged(false);
@@ -427,14 +427,14 @@ public class ValueCell extends RowCell {
             });
         }
     }
-    
+
     private class CancelEventHandler implements EventHandler<ActionEvent> {
-        
+
         @Override
         public void handle(ActionEvent event) {
             GlobalTextArea.getInstance().clearText();
             GlobalCachedExecutorService.submit(new Callable<Boolean>() {
-                
+
                 @Override
                 public Boolean call() throws Exception {
                     GenericNodeContainer container = (GenericNodeContainer) getItem();
@@ -456,13 +456,13 @@ public class ValueCell extends RowCell {
             });
         }
     }
-    
+
     private class ChangedListener implements ChangeListener<Boolean> {
-        
+
         @Override
         public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
             Platform.runLater(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     if (newValue) {
