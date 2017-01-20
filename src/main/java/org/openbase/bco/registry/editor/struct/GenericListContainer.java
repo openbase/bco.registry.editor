@@ -40,14 +40,14 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
  * @param <RFMB>
  */
 public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM extends GeneratedMessage, RFMB extends RFM.Builder<RFMB>> extends NodeContainer<MB> {
-
+    
     private final Descriptors.FieldDescriptor fieldDescriptor;
     private final boolean modifiable;
-
+    
     public GenericListContainer(int repeatedFieldNumber, final MB builder) throws InstantiationException {
         this(ProtoBufFieldProcessor.getFieldDescriptor(builder, repeatedFieldNumber), builder);
     }
-
+    
     public GenericListContainer(final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder) throws InstantiationException {
         super(repeatedFieldDescriptor.getName(), builder);
         modifiable = Configuration.isModifiableList(builder, repeatedFieldDescriptor.getName());
@@ -56,7 +56,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
                 throw new NotAvailableException("repeatedFieldDescriptor");
             }
             this.fieldDescriptor = repeatedFieldDescriptor;
-
+            
             if (repeatedFieldDescriptor.getType() == MESSAGE) {
                 for (GeneratedMessage.Builder childBuilder : BuilderProcessor.extractRepeatedFieldBuilderList(repeatedFieldDescriptor, builder)) {
                     registerElement((RFMB) childBuilder);
@@ -71,7 +71,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
             throw new InstantiationException(this, ex);
         }
     }
-
+    
     public GenericListContainer(final String descriptor, final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder, List<RFMB> childBuilderList) throws InstantiationException {
         super(descriptor, builder);
         modifiable = Configuration.isModifiableList(builder, repeatedFieldDescriptor.getName());
@@ -79,7 +79,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
             if (repeatedFieldDescriptor == null) {
                 throw new NotAvailableException("repeatedFieldDescriptor");
             }
-
+            
             this.fieldDescriptor = repeatedFieldDescriptor;
             for (GeneratedMessage.Builder childBuilder : childBuilderList) {
                 registerElement((RFMB) childBuilder);
@@ -88,7 +88,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
             throw new InstantiationException(this, ex);
         }
     }
-
+    
     public void addNewDefaultElement() throws CouldNotPerformException {
         try {
             switch (fieldDescriptor.getType()) {
@@ -119,7 +119,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
             throw new CouldNotPerformException("Could not add default element to field [" + fieldDescriptor.getName() + "]!", ex);
         }
     }
-
+    
     public void addElement(Object element) throws CouldNotPerformException {
         try {
             if (fieldDescriptor.getType() == MESSAGE) {
@@ -129,25 +129,26 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
                 builder.addRepeatedField(fieldDescriptor, element);
                 registerElement(element, builder.getRepeatedFieldCount(fieldDescriptor) - 1);
             }
+            this.getChildren().get(this.getChildren().size() - 1).setExpanded(true);
             setExpanded(true);
             setSendableChanged();
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not add element [" + element + "] to field [" + fieldDescriptor.getName() + "]!", ex);
         }
     }
-
+    
     public void registerElement(Object element) throws CouldNotPerformException {
         super.add(new GenericNodeContainer<>(fieldDescriptor, (RFMB) element));
     }
-
+    
     private void registerElement(Object element, int index) {
         super.add(new LeafContainer(element, fieldDescriptor.getName(), this, Configuration.isModifiableField(builder, descriptor), index));
     }
-
+    
     public boolean isModifiable() {
         return modifiable;
     }
-
+    
     public Descriptors.FieldDescriptor getFieldDescriptor() {
         return fieldDescriptor;
     }
