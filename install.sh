@@ -1,5 +1,5 @@
 #!/bin/bash
-APP_NAME='registry-editor'
+APP_NAME='bco-registry-editor'
 clear &&
 echo "=== clean ${APP_NAME} ===" &&
 mvn clean $@ &&
