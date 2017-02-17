@@ -28,7 +28,6 @@ import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.processing.StringProcessor;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 
 /**
  *
@@ -53,18 +52,6 @@ public class DescriptionCell extends RowCell {
             //TODO: thuxohl change this part
             if (item instanceof GenericNodeContainer) {
                 GenericNodeContainer container = (GenericNodeContainer) item;
-                if (container.getBuilder() instanceof UnitTemplate.Builder) {
-                    String type = null;
-                    try {
-                        type = getTypeAsString(container.getBuilder());
-                    } catch (CouldNotPerformException ex) {
-                    }
-
-                    if (type != null && !type.isEmpty()) {
-                        setText(type);
-                        return;
-                    }
-                }
 
                 String label = null;
                 try {

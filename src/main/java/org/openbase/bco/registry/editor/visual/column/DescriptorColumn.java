@@ -31,12 +31,12 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.bco.registry.editor.visual.cell.DescriptionCell;
 import static org.openbase.bco.registry.editor.visual.column.ValueColumn.VALUE_COLUMN_PROPORTION;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -72,13 +72,6 @@ public class DescriptorColumn extends Column {
 
             @Override
             public int compare(Node o1, Node o2) {
-                if (o1 instanceof NodeContainer && o2 instanceof NodeContainer) {
-                    String o1LabelOrId = getLabelOrId((NodeContainer) o1);
-                    String o2LabelOrId = getLabelOrId((NodeContainer) o2);
-                    if (!(o1LabelOrId.isEmpty() || o2LabelOrId.isEmpty())) {
-                        return o1LabelOrId.compareTo(o2LabelOrId);
-                    }
-                }
                 if (fieldPriorityMap.get(o1.getDescriptor()) != null && fieldPriorityMap.get(o2.getDescriptor()) == null) {
                     return -1;
                 } else if (fieldPriorityMap.get(o1.getDescriptor()) == null && fieldPriorityMap.get(o2.getDescriptor()) != null) {
