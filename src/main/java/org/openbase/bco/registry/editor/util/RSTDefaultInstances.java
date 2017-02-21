@@ -22,6 +22,7 @@ package org.openbase.bco.registry.editor.util;
  * #L%
  */
 import com.google.protobuf.GeneratedMessage.Builder;
+import org.openbase.jul.extension.rst.processing.TimestampProcessor;
 import rst.domotic.state.ActivationStateType.ActivationState;
 import rst.domotic.state.EnablingStateType.EnablingState;
 import rst.domotic.state.InventoryStateType.InventoryState;
@@ -53,7 +54,7 @@ import rst.timing.TimestampType.Timestamp;
 public class RSTDefaultInstances {
 
     public static Timestamp getDefaultTimestamp() {
-        return Timestamp.newBuilder().setTime(System.currentTimeMillis()).build();
+        return TimestampProcessor.getCurrentTimestamp();
     }
 
     public static InventoryState getDefaultInventoryState() {

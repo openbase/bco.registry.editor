@@ -37,6 +37,7 @@ import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import org.openbase.jul.extension.rst.processing.TimestampProcessor;
 import org.slf4j.LoggerFactory;
 import rst.domotic.service.ServiceConfigType.ServiceConfig;
 import rst.domotic.service.ServiceTemplateConfigType.ServiceTemplateConfig;
@@ -139,7 +140,7 @@ public class StructureConsistencyKeeper {
         StructureConsistencyKeeper.clearField(container, "timestamp");
 
         // create the new values for the field and add them to the builder
-        container.getBuilder().setTimestamp(Timestamp.newBuilder().setTime(System.currentTimeMillis()));
+        TimestampProcessor.updateTimestampWithCurrentTime(container.getBuilder(), logger);
 
         // create and add a new child node container representing these children
         Descriptors.FieldDescriptor field = ProtoBufFieldProcessor.getFieldDescriptor(container.getBuilder(), InventoryState.TIMESTAMP_FIELD_NUMBER);
