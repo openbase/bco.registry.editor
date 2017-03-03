@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -40,7 +40,6 @@ public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends N
     public GenericNodeContainer(String descriptor, final MB builder) throws InstantiationException {
         super(descriptor, builder);
         try {
-
             for (Entry<String, Object> entry : converter.getFields().entrySet()) {
                 if (converter instanceof DefaultConverter) {
                     registerElement(ProtoBufFieldProcessor.getFieldDescriptor(builder, entry.getKey()));
