@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.visual.cell;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -97,7 +97,7 @@ public class ValueCell extends RowCell {
         super();
         applyButton = new Button("Apply");
 //        ((RegistryTreeTableView) this.getTableColumn().getTreeTableView()).addDisconnectedObserver(new Observer<Boolean>() {
-//            
+//
 //            @Override
 //            public void update(Observable<Boolean> source, Boolean data) throws Exception {
 //                applyButton.setDisable(data);
@@ -229,6 +229,12 @@ public class ValueCell extends RowCell {
                 } else if ("device_class_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof DeviceConfig.Builder) {
                     try {
                         text = new DeviceClassComboBoxConverter().getText(remotePool.getDeviceRemote().getDeviceClassById((String) ((Leaf) item).getValue()));
+                    } catch (CouldNotPerformException ex) {
+                        text = ((Leaf) item).getValue().toString();
+                    }
+                } else if ("unit_host_id".equals(item.getDescriptor())) {
+                    try {
+                        text = ScopeGenerator.generateStringRep(remotePool.getUnitRemote().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
