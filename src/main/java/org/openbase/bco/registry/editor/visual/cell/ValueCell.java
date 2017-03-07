@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.visual.cell;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -27,10 +27,13 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -43,6 +46,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -92,6 +96,9 @@ public class ValueCell extends RowCell {
     protected SimpleObjectProperty<Boolean> changed = null;
     protected final ChangeListener<Boolean> changeListener;
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+    private Future registryTask = null;
+    private static final Map<Node, Future> TASK_MAP = new HashMap<>();
 
     public ValueCell() throws InterruptedException {
         super();
@@ -293,7 +300,8 @@ public class ValueCell extends RowCell {
                 }
 
                 try {
-                    if ("".equals(ProtoBufFieldProcessor.getId(container.getBuilder()))) {
+                    // do not show buttons during running registryTask
+                    if (!isUpdateTaskRunning() && ProtoBufFieldProcessor.getId(container.getBuilder()).isEmpty()) {
                         container.setChanged(true);
                     }
                 } catch (CouldNotPerformException ex) {
@@ -418,14 +426,32 @@ public class ValueCell extends RowCell {
                     try {
                         msg = container.getBuilder().build();
                         container.setChanged(false);
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                ProgressIndicator progressIndicator = new ProgressIndicator();
+                                progressIndicator.setMaxHeight(ValueCell.this.applyButton.getHeight());
+                                Label label = new Label("Waiting for registry update...");
+                                label.setMaxHeight(ValueCell.this.applyButton.getHeight());
+                                ValueCell.this.setGraphic(new HBox(progressIndicator, label));
+                            }
+                        });
                         if (remotePool.contains(msg)) {
-                            remotePool.update(msg).get();
+                            registryTask = remotePool.update(msg);
+                            addToTaskMap(container, registryTask);
+                            registryTask.get();
+                            removeFromTaskMap(container);
                         } else {
-                            remotePool.register(msg).get();
+                            registryTask = remotePool.register(msg);
+                            addToTaskMap(container, registryTask);
+                            registryTask.get();
+                            removeFromTaskMap(container);
+                            // remove temporally created node structure
                             container.getParent().getChildren().remove(container);
                         }
                     } catch (CouldNotPerformException | ExecutionException ex) {
                         RegistryEditor.printException(ex, logger, LogLevel.ERROR);
+                        registryTask = null;
                         container.setChanged(true);
                     }
                     return true;
@@ -471,13 +497,35 @@ public class ValueCell extends RowCell {
 
                 @Override
                 public void run() {
-                    if (newValue) {
+                    if (isUpdateTaskRunning()) {
+                        return;
+                    }
+
+                    if (newValue && (changed != null)) {
                         setGraphic(buttonLayout);
                     } else {
                         setGraphic(null);
                     }
                 }
             });
+        }
+    }
+
+    private boolean isUpdateTaskRunning() {
+        synchronized (TASK_MAP) {
+            return TASK_MAP.containsKey(this.getItem()) && !TASK_MAP.get(this.getItem()).isDone();
+        }
+    }
+
+    private void addToTaskMap(Node node, Future future) {
+        synchronized (TASK_MAP) {
+            TASK_MAP.put(node, future);
+        }
+    }
+
+    private void removeFromTaskMap(Node node) {
+        synchronized (TASK_MAP) {
+            TASK_MAP.remove(node);
         }
     }
 }

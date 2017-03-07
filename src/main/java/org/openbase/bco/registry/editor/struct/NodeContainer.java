@@ -105,6 +105,9 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
     public void setSendableChanged() {
         NodeContainer sendableNode = this;
         while (!sendableNode.isSendable()) {
+            if (sendableNode.getParent() == null) {
+                return;
+            }
             sendableNode = (NodeContainer) sendableNode.getParent().getValue();
         }
         ((NodeContainer) sendableNode).setChanged(true);

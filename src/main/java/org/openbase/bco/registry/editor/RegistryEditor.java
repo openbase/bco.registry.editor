@@ -83,6 +83,9 @@ import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
+import org.openbase.jul.extension.rsb.com.jp.JPRSBHost;
+import org.openbase.jul.extension.rsb.com.jp.JPRSBPort;
+import org.openbase.jul.extension.rsb.com.jp.JPRSBTransport;
 import org.openbase.jul.pattern.Observable;
 import org.openbase.jul.pattern.Observer;
 import org.openbase.jul.pattern.Remote.ConnectionState;
@@ -104,10 +107,10 @@ import rst.domotic.unit.device.DeviceClassType.DeviceClass;
  */
 public class RegistryEditor extends Application {
 
-    //TODO: 
+    //TODO:
     // - differentiate in every tab between read only registry and consistent
     // - when the remote is disconnected -> show that in the read only label and deactivate apply and cancel buttons
-    private static final Logger logger = LoggerFactory.getLogger(RegistryEditor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryEditor.class);
 
     public static final String APP_NAME = "RegistryView";
     public static final int RESOLUTION_WIDTH = 1024;
@@ -260,7 +263,7 @@ public class RegistryEditor extends Application {
                 try {
                     remote.requestData();
                 } catch (CouldNotPerformException ex) {
-                    printException(ex, logger, LogLevel.ERROR);
+                    printException(ex, LOGGER, LogLevel.ERROR);
                 }
             });
         });
@@ -270,14 +273,14 @@ public class RegistryEditor extends Application {
         menuBar = new MenuBar();
         menuBar.getMenus().add(fileMenu);
 
-        logger.info("Init finished");
+        LOGGER.info("Init finished");
     }
 
     private SplitPane splitPane;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        logger.info("Starting");
+        LOGGER.info("Starting");
         remotePool.getRemotes().stream().forEach((remote) -> {
             updateTab(remote);
         });
@@ -330,11 +333,11 @@ public class RegistryEditor extends Application {
 
         primaryStage.setTitle("Registry Editor");
         try {
-            logger.info("Try to load icon...");
+            LOGGER.info("Try to load icon...");
             primaryStage.getIcons().add(new Image("registry-editor.png"));
-            logger.info("App icon loaded...");
+            LOGGER.info("App icon loaded...");
         } catch (Exception ex) {
-            printException(ex, logger, LogLevel.WARN);
+            printException(ex, LOGGER, LogLevel.WARN);
         }
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -344,7 +347,7 @@ public class RegistryEditor extends Application {
                 try {
                     stop();
                 } catch (Exception ex) {
-                    printException(ex, logger, LogLevel.ERROR);
+                    printException(ex, LOGGER, LogLevel.ERROR);
                     System.exit(1);
                 }
             }
@@ -352,9 +355,9 @@ public class RegistryEditor extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        logger.info(APP_NAME + " successfully started.");
+        LOGGER.info(APP_NAME + " successfully started.");
 
-        logger.info("Register observer");
+        LOGGER.info("Register observer");
         registerObserver();
     }
 
@@ -372,9 +375,9 @@ public class RegistryEditor extends Application {
 
                             @Override
                             public void update(org.openbase.jul.pattern.Observable source, Object data) throws Exception {
-                                logger.info("Received update for [" + remote + "]");
+                                LOGGER.info("Received update for [" + remote + "]");
                                 if (data == null) {
-                                    logger.info("Data for remote [" + remote + "] is null!");
+                                    LOGGER.info("Data for remote [" + remote + "] is null!");
                                 }
                                 updateTab(remote);
                             }
@@ -388,7 +391,7 @@ public class RegistryEditor extends Application {
                         }
                         remote.activate();
                     } catch (InterruptedException | CouldNotPerformException ex) {
-                        printException(ex, logger, LogLevel.ERROR);
+                        printException(ex, LOGGER, LogLevel.ERROR);
                     }
                     return null;
                 }
@@ -398,7 +401,7 @@ public class RegistryEditor extends Application {
 
                 @Override
                 public void update(Observable<ConnectionState> source, ConnectionState data) throws Exception {
-                    logger.debug("Remote connection state has changed to: " + data);
+                    LOGGER.debug("Remote connection state has changed to: " + data);
                     Platform.runLater(new Runnable() {
 
                         @Override
@@ -452,7 +455,7 @@ public class RegistryEditor extends Application {
                         tab.setContent(updateTreeTableView(data));
                     }
                 } catch (CouldNotPerformException | InterruptedException ex) {
-                    ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), logger);
+                    ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), LOGGER);
                     tab.setContent(new Label("Error: " + ex.getMessage()));
                 }
             }
@@ -718,7 +721,7 @@ public class RegistryEditor extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        logger.info("Starting " + APP_NAME + "...");
+        LOGGER.info("Starting " + APP_NAME + "...");
 
         /* Setup JPService */
         JPService.setApplicationName(APP_NAME);
@@ -730,6 +733,9 @@ public class RegistryEditor extends Application {
         JPService.registerProperty(JPAppRegistryScope.class);
         JPService.registerProperty(JPUserRegistryScope.class);
         JPService.registerProperty(JPUnitRegistryScope.class);
+        JPService.registerProperty(JPRSBHost.class);
+        JPService.registerProperty(JPRSBPort.class);
+        JPService.registerProperty(JPRSBTransport.class);
         JPService.parseAndExitOnError(args);
 
         launch(args);
