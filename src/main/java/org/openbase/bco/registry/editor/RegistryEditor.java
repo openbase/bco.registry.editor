@@ -154,7 +154,6 @@ public class RegistryEditor extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        remotePool.init();
 
         registryTabPane = new TabPaneWithClearing();
         registryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -430,7 +429,6 @@ public class RegistryEditor extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        remotePool.shutdown();
         //TODO: search why it will not shutdown without system exit
         System.exit(0);
     }

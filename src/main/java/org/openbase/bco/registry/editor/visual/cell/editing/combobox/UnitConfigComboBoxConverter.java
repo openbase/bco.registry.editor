@@ -31,7 +31,7 @@ import rst.rsb.ScopeType.Scope;
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class LocationConfigComboBoxConverter implements MessageComboBoxConverter {
+public class UnitConfigComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
