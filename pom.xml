@@ -288,6 +288,11 @@
             <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.openbase</groupId>
+            <artifactId>jul.visual.swing</artifactId>
+            <version>${dependency.jul.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.openbase.bco</groupId>
             <artifactId>registry.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>

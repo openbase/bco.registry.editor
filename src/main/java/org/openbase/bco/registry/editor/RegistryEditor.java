@@ -23,11 +23,11 @@ package org.openbase.bco.registry.editor;
  */
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
+import com.sun.javafx.application.LauncherImpl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -36,6 +36,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -45,7 +46,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -83,6 +83,7 @@ import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
+import javafx.embed.swing.SwingFXUtils;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBHost;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBPort;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBTransport;
@@ -90,6 +91,7 @@ import org.openbase.jul.pattern.Observable;
 import org.openbase.jul.pattern.Observer;
 import org.openbase.jul.pattern.Remote.ConnectionState;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
+import org.openbase.jul.visual.swing.image.ImageLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.domotic.registry.AgentRegistryDataType.AgentRegistryData;
@@ -116,7 +118,7 @@ public class RegistryEditor extends Application {
     public static final int RESOLUTION_WIDTH = 1024;
     private final GlobalTextArea globalTextArea = GlobalTextArea.getInstance();
 
-    private final RemotePool remotePool;
+    private RemotePool remotePool;
     private MenuBar menuBar;
     private Menu fileMenu;
     private MenuItem resyncMenuItem;
@@ -137,9 +139,12 @@ public class RegistryEditor extends Application {
     private RegistryTreeTableView appConfigTreeTableView, appClassTreeTableView;
     private RegistryTreeTableView userConfigTreeTableView, authorizationGroupConfigTreeTableView;
     private RegistryTreeTableView dalUnitConfigTreeTableView, unitTemplateTreeTableView, unitGroupConfigTreeTableView;
-    private final Map<String, Boolean> intialized;
+    private Scene scene;
+    private Map<String, Boolean> intialized;
 
-    public RegistryEditor() throws InstantiationException, InterruptedException {
+    @Override
+    public void init() throws Exception {
+        super.init();
         remotePool = RemotePool.getInstance();
         intialized = new HashMap<>();
         intialized.put(DeviceRegistryData.class.getSimpleName(), Boolean.FALSE);
@@ -149,11 +154,6 @@ public class RegistryEditor extends Application {
         intialized.put(SceneRegistryData.class.getSimpleName(), Boolean.FALSE);
         intialized.put(UserRegistryData.class.getSimpleName(), Boolean.FALSE);
         intialized.put(UnitRegistryData.class.getSimpleName(), Boolean.FALSE);
-    }
-
-    @Override
-    public void init() throws Exception {
-        super.init();
 
         registryTabPane = new TabPaneWithClearing();
         registryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -256,6 +256,7 @@ public class RegistryEditor extends Application {
         sceneConfigTab.setContent(sceneConfigTreeTableView.getVBox());
         sceneRegistryTabPane.getTabs().addAll(sceneConfigTab);
 
+
         resyncMenuItem = new MenuItem("Resync");
         resyncMenuItem.setOnAction((ActionEvent event) -> {
             remotePool.getRemotes().stream().forEach((remote) -> {
@@ -272,17 +273,45 @@ public class RegistryEditor extends Application {
         menuBar = new MenuBar();
         menuBar.getMenus().add(fileMenu);
 
-        LOGGER.info("Init finished");
+        scene = buildScene();
+        registerObserver();
+        LOGGER.debug("Init finished");
     }
 
     private SplitPane splitPane;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        LOGGER.info("Starting");
-        remotePool.getRemotes().stream().forEach((remote) -> {
-            updateTab(remote);
+        primaryStage.setTitle("BCO Registry Editor");
+        try {
+            LOGGER.debug("Try to load icon...");
+            primaryStage.getIcons().add(SwingFXUtils.toFXImage(ImageLoader.getInstance().loadImage("registry-editor.png"), null));
+            LOGGER.debug("App icon loaded...");
+        } catch (Exception ex) {
+            printException(ex, LOGGER, LogLevel.WARN);
+        }
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+            @Override
+            public void handle(WindowEvent event) {
+                try {
+                    Platform.exit();
+                } catch (Exception ex) {
+                    printException(ex, LOGGER, LogLevel.ERROR);
+                    System.exit(1);
+                }
+            }
         });
+        
+        primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
+        primaryStage.show();
+    }
+
+    public Scene buildScene() {
+        LOGGER.info("Starting");
+        updateTabs();
 
         splitPane = new SplitPane(/*registryTabPane, globalTextArea*/);
         splitPane.getItems().addAll(registryTabPane, globalTextArea);
@@ -330,45 +359,22 @@ public class RegistryEditor extends Application {
         unitGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
         dalUnitConfigTreeTableView.addHeightProperty(scene.heightProperty());
 
-        primaryStage.setTitle("Registry Editor");
-        try {
-            LOGGER.info("Try to load icon...");
-            primaryStage.getIcons().add(new Image("registry-editor.png"));
-            LOGGER.info("App icon loaded...");
-        } catch (Exception ex) {
-            printException(ex, LOGGER, LogLevel.WARN);
-        }
-
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-
-            @Override
-            public void handle(WindowEvent event) {
-                try {
-                    stop();
-                } catch (Exception ex) {
-                    printException(ex, LOGGER, LogLevel.ERROR);
-                    System.exit(1);
-                }
-            }
-        });
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-        LOGGER.info(APP_NAME + " successfully started.");
-
-        LOGGER.info("Register observer");
-        registerObserver();
+        return scene;
     }
 
-    public void registerObserver() throws Exception {
+    private void updateTabs() {
+        remotePool.getRemotes().stream().forEach((remote) -> {
+            updateTab(remote);
+        });
+    }
 
-        final Map<RSBRemoteService, Future<Void>> registrationFutureMap = new HashMap<>();
+    public void registerObserver() {
+        GlobalCachedExecutorService.submit(() -> {
+            LOGGER.debug("Register observer");
+            final Map<RSBRemoteService, Future<Void>> registrationFutureMap = new HashMap<>();
 
-        for (RSBRemoteService remote : remotePool.getRemotes()) {
-            registrationFutureMap.put(remote, GlobalCachedExecutorService.submit(new Callable<Void>() {
-
-                @Override
-                public Void call() throws Exception {
+            for (RSBRemoteService remote : remotePool.getRemotes()) {
+                registrationFutureMap.put(remote, GlobalCachedExecutorService.submit(() -> {
                     try {
                         remote.addDataObserver(new Observer() {
 
@@ -381,49 +387,43 @@ public class RegistryEditor extends Application {
                                 updateTab(remote);
                             }
                         });
+                        updateTab(remote);
                         if (remote.equals(remotePool.getDeviceRemote()) || remote.equals(remotePool.getUnitRemote())) {
 //                            logger.info("Device tree cannot be created without activated location remote. Waiting for its activation...");
                             while (!registrationFutureMap.containsKey(remotePool.getLocationRemote())) {
-                                Thread.yield();
+                                Thread.sleep(10);
                             }
                             registrationFutureMap.get(remotePool.getLocationRemote()).get();
                         }
-                        remote.activate();
-                    } catch (InterruptedException | CouldNotPerformException ex) {
+                    } catch (Exception ex) {
                         printException(ex, LOGGER, LogLevel.ERROR);
                     }
                     return null;
-                }
-            }));
+                }));
 
-            remote.addConnectionStateObserver(new Observer<ConnectionState>() {
+                remote.addConnectionStateObserver(new Observer<ConnectionState>() {
 
-                @Override
-                public void update(Observable<ConnectionState> source, ConnectionState data) throws Exception {
-                    LOGGER.debug("Remote connection state has changed to: " + data);
-                    Platform.runLater(new Runnable() {
+                    @Override
+                    public void update(Observable<ConnectionState> source, ConnectionState data) throws Exception {
+                        LOGGER.debug("Remote connection state has changed to: " + data);
+                        Platform.runLater(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            boolean disonnected = false;
-                            if (data != ConnectionState.CONNECTED) {
-                                disonnected = true;
+                            @Override
+                            public void run() {
+                                boolean disonnected = false;
+                                if (data != ConnectionState.CONNECTED) {
+                                    disonnected = true;
+                                }
+
+                                for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
+                                    treeTable.setDisconnected(disonnected);
+                                }
                             }
-
-                            for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
-                                treeTable.setDisconnected(disonnected);
-                            }
-                        }
-                    });
-                }
-            });
-        }
-
-//        remotePool.getAgentRemote().isActive();
-//        for(Map.Entry<RSBRemoteService, Future<Void>> entry : registrationFutureMap.entrySet()) {
-//            entry.getValue().get();
-//        }
-//        registrationFutureMap.get(remotePool.getLocationRemote()).get();
+                        });
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -434,28 +434,34 @@ public class RegistryEditor extends Application {
     }
 
     private void updateTab(RSBRemoteService remote) {
-        Platform.runLater(new Runnable() {
+        GlobalCachedExecutorService.submit(() -> {
 
-            @Override
-            public void run() {
-                Tab tab = getRegistryTabByRemote(remote);
-                if (!remote.isConnected() || !remote.isActive()) {
-                    tab.setContent(getProgressindicatorByRemote(remote));
-                    return;
+            Tab tab = getRegistryTabByRemote(remote);
+            if (!remote.isConnected() || !remote.isActive()) {
+                final Node node = getProgressindicatorByRemote(remote);
+                Platform.runLater(() -> {
+                    tab.setContent(node);
+                });
+                return;
+            }
+            try {
+                GeneratedMessage data = remote.getData();
+                if (!intialized.get(data.getClass().getSimpleName())) {
+                    LOGGER.debug(data.getClass().getSimpleName() + " is not yet initialized");
+                    final Node node = fillTreeTableView(data);
+                    Platform.runLater(() -> {
+                        tab.setContent(node);
+                    });
+                } else {
+                    LOGGER.debug("Updating " + data.getClass().getSimpleName());
+                    final Node node = updateTreeTableView(data);
+                    Platform.runLater(() -> {
+                        tab.setContent(node);
+                    });
                 }
-                try {
-                    GeneratedMessage data = remote.getData();
-                    if (!intialized.get(data.getClass().getSimpleName())) {
-//                        logger.info(data.getClass().getSimpleName() + " is not yet initialized");
-                        tab.setContent(fillTreeTableView(data));
-                    } else {
-//                        logger.info("Updating " + data.getClass().getSimpleName());
-                        tab.setContent(updateTreeTableView(data));
-                    }
-                } catch (CouldNotPerformException | InterruptedException ex) {
-                    ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), LOGGER);
-                    tab.setContent(new Label("Error: " + ex.getMessage()));
-                }
+            } catch (CouldNotPerformException | InterruptedException ex) {
+                ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), LOGGER);
+                tab.setContent(new Label("Error: " + ex.getMessage()));
             }
         });
     }
@@ -735,8 +741,8 @@ public class RegistryEditor extends Application {
         JPService.registerProperty(JPRSBPort.class);
         JPService.registerProperty(JPRSBTransport.class);
         JPService.parseAndExitOnError(args);
-
-        launch(args);
+        LauncherImpl.launchApplication(RegistryEditor.class, RegistryEditorPreloader.class, args);
+        LOGGER.info(APP_NAME + " successfully started.");
     }
 
     public static void printException(Throwable th, Logger logger, LogLevel logLevel) {

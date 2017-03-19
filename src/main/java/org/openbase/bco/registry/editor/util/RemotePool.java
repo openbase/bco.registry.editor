@@ -55,6 +55,7 @@ import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 import rst.domotic.unit.scene.SceneConfigType.SceneConfig;
+import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 import rst.domotic.unit.user.UserConfigType.UserConfig;
 
 /**
@@ -86,13 +87,13 @@ public class RemotePool {
 
     public RemotePool() throws InstantiationException, InterruptedException {
         try {
-            this.deviceRemote = Registries.getDeviceRegistry();
+            this.unitRemote = Registries.getUnitRegistry();
             this.locationRemote = Registries.getLocationRegistry();
             this.sceneRemote = Registries.getSceneRegistry();
             this.agentRemote = Registries.getAgentRegistry();
             this.appRemote = Registries.getAppRegistry();
             this.userRemote = Registries.getUserRegistry();
-            this.unitRemote = Registries.getUnitRegistry();
+            this.deviceRemote = Registries.getDeviceRegistry();
         } catch (NotAvailableException ex) {
             throw new InstantiationException(RemotePool.class, ex);
         }
@@ -248,6 +249,8 @@ public class RemotePool {
                     return UserConfig.class.getSimpleName();
                 case AUTHORIZATION_GROUP:
                     return AuthorizationGroupConfig.class.getSimpleName();
+                case UNIT_GROUP:
+                    return UnitGroupConfig.class.getSimpleName();
                 default:
                     return UnitConfig.class.getSimpleName();
             }
