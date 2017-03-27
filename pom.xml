@@ -289,38 +289,13 @@
             <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.openbase.bco</groupId>
-            <artifactId>registry.device.remote</artifactId>
-            <version>${dependency.bco.registry.version}</version>
-            <type>jar</type>
+            <groupId>org.openbase</groupId>
+            <artifactId>jul.visual.swing</artifactId>
+            <version>${dependency.jul.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openbase.bco</groupId>
-            <artifactId>registry.location.remote</artifactId>
-            <version>${dependency.bco.registry.version}</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.openbase.bco</groupId>
-            <artifactId>registry.scene.remote</artifactId>
-            <version>${dependency.bco.registry.version}</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.openbase.bco</groupId>
-            <artifactId>registry.agent.remote</artifactId>
-            <version>${dependency.bco.registry.version}</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.openbase.bco</groupId>
-            <artifactId>registry.app.remote</artifactId>
-            <version>${dependency.bco.registry.version}</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.openbase.bco</groupId>
-            <artifactId>registry.user.remote</artifactId>
+            <artifactId>registry.remote</artifactId>
             <version>${dependency.bco.registry.version}</version>
             <type>jar</type>
         </dependency>

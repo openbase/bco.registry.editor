@@ -33,11 +33,11 @@ import org.openbase.bco.registry.agent.remote.AgentRegistryRemote;
 import org.openbase.bco.registry.app.remote.AppRegistryRemote;
 import org.openbase.bco.registry.device.remote.DeviceRegistryRemote;
 import org.openbase.bco.registry.location.remote.LocationRegistryRemote;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.bco.registry.scene.remote.SceneRegistryRemote;
 import org.openbase.bco.registry.unit.remote.UnitRegistryRemote;
 import org.openbase.bco.registry.user.remote.UserRegistryRemote;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
@@ -55,6 +55,7 @@ import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 import rst.domotic.unit.scene.SceneConfigType.SceneConfig;
+import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 import rst.domotic.unit.user.UserConfigType.UserConfig;
 
 /**
@@ -63,7 +64,7 @@ import rst.domotic.unit.user.UserConfigType.UserConfig;
  */
 public class RemotePool {
 
-    private static final Logger logger = LoggerFactory.getLogger(RemotePool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemotePool.class);
 
     private static RemotePool remotePool;
 
@@ -85,13 +86,17 @@ public class RemotePool {
     }
 
     public RemotePool() throws InstantiationException, InterruptedException {
-        this.deviceRemote = new DeviceRegistryRemote();
-        this.locationRemote = new LocationRegistryRemote();
-        this.sceneRemote = new SceneRegistryRemote();
-        this.agentRemote = new AgentRegistryRemote();
-        this.appRemote = new AppRegistryRemote();
-        this.userRemote = new UserRegistryRemote();
-        this.unitRemote = new UnitRegistryRemote();
+        try {
+            this.unitRemote = Registries.getUnitRegistry();
+            this.locationRemote = Registries.getLocationRegistry();
+            this.sceneRemote = Registries.getSceneRegistry();
+            this.agentRemote = Registries.getAgentRegistry();
+            this.appRemote = Registries.getAppRegistry();
+            this.userRemote = Registries.getUserRegistry();
+            this.deviceRemote = Registries.getDeviceRegistry();
+        } catch (NotAvailableException ex) {
+            throw new InstantiationException(RemotePool.class, ex);
+        }
         remotes.add(appRemote);
         remotes.add(agentRemote);
         remotes.add(locationRemote);
@@ -99,34 +104,6 @@ public class RemotePool {
         remotes.add(sceneRemote);
         remotes.add(userRemote);
         remotes.add(unitRemote);
-    }
-
-    public void init() throws InitializationException, InterruptedException {
-        deviceRemote.init();
-        locationRemote.init();
-        sceneRemote.init();
-        agentRemote.init();
-        appRemote.init();
-        userRemote.init();
-        unitRemote.init();
-    }
-
-    public void shutdown() {
-        remotes.stream().forEach((remote) -> {
-            remote.shutdown();
-        });
-    }
-
-    public void activate() throws InterruptedException, CouldNotPerformException {
-        for (RSBRemoteService remote : remotes) {
-            remote.activate();
-        }
-    }
-
-    public void deactivate() throws InterruptedException, CouldNotPerformException {
-        for (RSBRemoteService remote : remotes) {
-            remote.deactivate();
-        }
     }
 
     public <M extends Message> Future<M> register(Message msg) throws CouldNotPerformException {
@@ -272,6 +249,8 @@ public class RemotePool {
                     return UserConfig.class.getSimpleName();
                 case AUTHORIZATION_GROUP:
                     return AuthorizationGroupConfig.class.getSimpleName();
+                case UNIT_GROUP:
+                    return UnitGroupConfig.class.getSimpleName();
                 default:
                     return UnitConfig.class.getSimpleName();
             }

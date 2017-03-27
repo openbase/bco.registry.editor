@@ -139,27 +139,11 @@ public class ValueCell extends RowCell {
                         }
                     });
                 }
-//                if ("unit_id".equals(((LeafContainer) getItem()).getDescriptor())) {
-//                    Platform.runLater(new Runnable() {
-//
-//                        @Override
-//                        public void run() {
-//                            try {
-//                                ((RegistryTreeTableView) getTreeTableView()).getRegistryEditor().selectMessageById(SendableType.UNIT_CONFIG, (String) ((LeafContainer) getItem()).getValue());
-//                            } catch (CouldNotPerformException ex) {
-//                                RegistryEditor.printException(new CouldNotPerformException("Could not select message by id!"), logger, LogLevel.ERROR);
-//                            }
-//                        }
-//                    });
-//                }
             }
         }
     }
 
-    private javafx.scene.Node displayLabel;
-
     private javafx.scene.control.Control getEditingGraphic() {
-        displayLabel = getGraphic();
         graphic = null;
         Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor(), leaf.getParent().getBuilder());
         if (type != null) {
@@ -181,14 +165,6 @@ public class ValueCell extends RowCell {
         }
         if (graphic != null) {
             graphic.setPrefWidth(this.getWidth() * 5 / 8);
-            // if still not in focus -> wrap in platform run later
-//            Platform.runLater(new Runnable() {
-//
-//                @Override
-//                public void run() {
-//                    graphic.requestFocus();
-//                }
-//            });
         }
         return graphic;
     }
@@ -251,11 +227,9 @@ public class ValueCell extends RowCell {
             }
 
             if (((LeafContainer) item).getEditable()) {
-//                setText(text);
                 setGraphic(new Label(text));
             } else {
                 Label selectableLabel = SelectableLabel.makeSelectable(new Label(text));
-//                if ("unit_id".equals(item.getDescriptor())) {
                 if (item.getDescriptor().endsWith("unit_id")) {
                     try {
                         text = ScopeGenerator.generateStringRep(remotePool.getUnitRemote().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
@@ -268,13 +242,6 @@ public class ValueCell extends RowCell {
                             "-fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0; -fx-text-inner-color: blue;"
                     );
                 }
-//                selectableLabel.setOnMouseReleased(new EventHandler<MouseEvent>() {
-//
-//                    @Override
-//                    public void handle(MouseEvent event) {
-//                        logger.debug("MouseReleased on selectableLabel");
-//                    }
-//                });
                 setGraphic(selectableLabel);
             }
         }
@@ -309,6 +276,14 @@ public class ValueCell extends RowCell {
                 }
             } else {
                 updateButtonListener(null);
+            }
+
+            if (isUpdateTaskRunning()) {
+                ProgressIndicator progressIndicator = new ProgressIndicator();
+                progressIndicator.setPrefHeight(ValueCell.this.getHeight());
+                Label label = new Label("Waiting for registry update...");
+                label.setMaxHeight(ValueCell.this.applyButton.getHeight());
+                ValueCell.this.setGraphic(new HBox(progressIndicator, label));
             }
         } else {
             updateButtonListener(null);

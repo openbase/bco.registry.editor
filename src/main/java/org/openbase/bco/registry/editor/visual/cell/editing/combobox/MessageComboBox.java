@@ -78,9 +78,7 @@ public class MessageComboBox extends ComboBox<Message> {
             }
         });
         this.setButtonCell(new MessageComboBoxCell());
-        System.out.println("Before Sorted List set");
         this.setItems(sortedList(parentBuilder, fieldName, cell.getLeaf().getValue()));
-        System.out.println("Sorted List set");
         this.setStartingValue(cell.getLeaf().getValue());
         this.setOnAction(new EventHandler() {
 
@@ -112,7 +110,6 @@ public class MessageComboBox extends ComboBox<Message> {
         try {
             List<Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
             if (parentBuilder instanceof LocationConfig.Builder) {
-                System.out.println("case 1");
                 list.remove(RemotePool.getInstance().getById(ProtoBufFieldProcessor.getId(parentBuilder), parentBuilder));
                 for (String childId : ((LocationConfig.Builder) parentBuilder).getChildIdList()) {
                     if (childId.equals(leafValue)) {
@@ -122,7 +119,6 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             }
             if ("tile_id".equals(fieldName)) {
-                System.out.println("case 2");
                 for (int i = 0; i < list.size(); i++) {
                     UnitConfig location = (UnitConfig) list.get(i);
                     if (location.getLocationConfig().getType() != LocationConfig.LocationType.TILE) {
@@ -132,7 +128,6 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             }
             if (parentBuilder instanceof AuthorizationGroupConfig.Builder) {
-                System.out.println("case 3");
                 for (String memberId : ((AuthorizationGroupConfig.Builder) parentBuilder).getMemberIdList()) {
                     if (memberId.equals(leafValue)) {
                         continue;
@@ -141,22 +136,23 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             }
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
-                System.out.println("case 4");
                 List<ServiceTemplate.ServiceType> serviceTypes = new ArrayList<>();
                 for (ServiceTemplate serviceTemplate : ((UnitGroupConfig.Builder) parentBuilder).getServiceTemplateList()) {
                     serviceTypes.add(serviceTemplate.getType());
                 }
                 list.clear();
-                list.addAll(RemotePool.getInstance().getDeviceRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), serviceTypes));
+                // add all units which have the same serviveTypes as the group
+                list.addAll(RemotePool.getInstance().getUnitRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), serviceTypes));
+                // remove all units which are already members of the group
                 for (String memberId : ((UnitGroupConfig.Builder) parentBuilder).getMemberIdList()) {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }
                     list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()));
                 }
+                // TODO: remove all units which are not registered at the same location or a sub location of the unit group
             }
             if (parentBuilder instanceof ConnectionConfig.Builder && "unit_id".equals(fieldName)) {
-                System.out.println("case 5");
                 list.clear();
                 for (String tileId : ((ConnectionConfig.Builder) parentBuilder).getTileIdList()) {
                     list.addAll(RemotePool.getInstance().getLocationRemote().getUnitConfigsByLocation(tileId));
@@ -178,7 +174,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             });
             return FXCollections.observableArrayList(list);
-        } catch (Exception ex) {
+        } catch (InterruptedException | CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
         }
     }
@@ -197,7 +193,7 @@ public class MessageComboBox extends ComboBox<Message> {
                     if (parentBuilder instanceof AuthorizationGroupConfig.Builder) {
                         return SendableType.USER_CONFIG.getDefaultInstanceForType();
                     } else if (parentBuilder instanceof UnitGroupConfig.Builder) {
-                        return SendableType.UNIT_CONFIG.getDefaultInstanceForType();
+                        return SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType();
                     }
                 case "owner_id":
                     return SendableType.USER_CONFIG.getDefaultInstanceForType();
@@ -214,16 +210,18 @@ public class MessageComboBox extends ComboBox<Message> {
         return null;
     }
 
-    public MessageComboBoxConverter getConverterByMessageType(String fieldName, Message.Builder parentBuilder) {
+    private MessageComboBoxConverter getConverterByMessageType(final String fieldName, final Message.Builder parentBuilder) {
         GeneratedMessage msg = getMessageEnumBoxType(fieldName, parentBuilder);
         if (msg instanceof UnitConfig) {
             switch (((UnitConfig) msg).getType()) {
                 case LOCATION:
-                    return new LocationConfigComboBoxConverter();
+                    return new UnitConfigComboBoxConverter();
                 case USER:
                     return new UserConfigComboBoxConverter();
                 case CONNECTION:
-                    return new LocationConfigComboBoxConverter();
+                    return new UnitConfigComboBoxConverter();
+                case UNIT_GROUP:
+                    return new UnitConfigComboBoxConverter();
                 default:
                     return new DefaultMessageComboBoxConverter();
             }

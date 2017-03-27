@@ -174,9 +174,29 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
                 continue;
             }
             GenericListContainer parent = (GenericListContainer) nodeToRemove.getParent();
-            GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
-            expandEqually(nodeToRemove, updatedNode);
-            parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
+            GenericListContainer accordingParent = getAccordingParent(new ArrayList<>(this.getRoot().getChildren()), msg);
+            if (accordingParent != null) {
+                if (accordingParent.equals(parent)) {
+                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
+                    expandEqually(nodeToRemove, updatedNode);
+                    parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
+                } else {
+                    parent.getChildren().remove(nodeToRemove);
+                    accordingParent.registerElement(msg.toBuilder());
+                }
+            } else {
+                parent.getChildren().remove(nodeToRemove);
+                if (this.getRoot() instanceof GenericGroupContainer) {
+                    GenericGroupContainer rootNode = (GenericGroupContainer) this.getRoot();
+                    rootNode.addItemWithNewGroup(msg);
+                } else {
+                    if (getSendableType() == SendableType.UNIT_TEMPLATE) {
+                        ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((UnitTemplate) msg).getType().name());
+                    } else {
+                        ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder());
+                    }
+                }
+            }
         }
         for (T msg : listDiff.getNewMessageMap().getMessages()) {
             if (msg instanceof UnitConfig) {
