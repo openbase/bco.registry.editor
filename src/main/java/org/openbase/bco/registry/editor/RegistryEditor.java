@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -256,7 +259,6 @@ public class RegistryEditor extends Application {
         sceneConfigTab.setContent(sceneConfigTreeTableView.getVBox());
         sceneRegistryTabPane.getTabs().addAll(sceneConfigTab);
 
-
         resyncMenuItem = new MenuItem("Resync");
         resyncMenuItem.setOnAction((ActionEvent event) -> {
             remotePool.getRemotes().stream().forEach((remote) -> {
@@ -303,7 +305,7 @@ public class RegistryEditor extends Application {
                 }
             }
         });
-        
+
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
         primaryStage.show();
@@ -748,5 +750,32 @@ public class RegistryEditor extends Application {
     public static void printException(Throwable th, Logger logger, LogLevel logLevel) {
         GlobalTextArea.getInstance().printException(th);
         ExceptionPrinter.printHistory(th, logger, logLevel);
+    }
+
+    public static <V> Future<V> runOnFxThread(final Callable<V> callable) {
+        return runOnFxThread(callable, "task");
+    }
+
+    public static <V> Future<V> runOnFxThread(final Callable<V> callable, final String taskDescribtion) {
+        try {
+            if (Platform.isFxApplicationThread()) {
+                return CompletableFuture.completedFuture(callable.call());
+            }
+
+            FutureTask<V> future = new FutureTask(() -> {
+                try {
+                    return callable.call();
+                } catch (Exception ex) {
+                    throw ExceptionPrinter.printHistoryAndReturnThrowable(new CouldNotPerformException("Could not perform " + taskDescribtion + "!", ex), LOGGER);
+                }
+            });
+            Platform.runLater(future);
+            return future;
+        } catch (Exception ex) {
+            ExceptionPrinter.printHistory("Could not perform " + taskDescribtion + "!", ex, LOGGER);
+            final CompletableFuture<V> completableFuture = new CompletableFuture<>();
+            completableFuture.completeExceptionally(ex);
+            return completableFuture;
+        }
     }
 }
