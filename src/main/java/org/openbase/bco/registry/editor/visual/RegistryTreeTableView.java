@@ -295,51 +295,60 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
     }
 
     public void setReadOnlyMode(boolean readOnly) {
-        try {
-            if (!remotePool.isConsistent(type.getDefaultInstanceForType())) {
-                statusInfoLabel.setText("Registry inconsistent!");
-                statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");
-            } else {
-                statusInfoLabel.setText("Read-Only-Mode");
-                statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
+        RegistryEditor.runOnFxThread(() -> {
+            try {
+                if (!remotePool.isConsistent(type.getDefaultInstanceForType())) {
+                    statusInfoLabel.setText("Registry inconsistent!");
+                    statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");
+                } else {
+                    statusInfoLabel.setText("Read-Only-Mode");
+                    statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
+                }
+            } catch (CouldNotPerformException ex) {
+                ExceptionPrinter.printHistory("Failed to call is consistent for registry [" + type.name() + "]", ex, logger);
             }
-        } catch (CouldNotPerformException ex) {
-            ExceptionPrinter.printHistory("Failed to call is consistent for registry [" + type.name() + "]", ex, logger);
-        }
-        if (readOnly) {
-            getStylesheets().clear();
-            getStylesheets().add("read_only.css");
-            setContextMenu(null);
-        } else {
-            getStylesheets().clear();
-            getStylesheets().add("default.css");
-            setContextMenu(new TreeTableViewContextMenu(this, type));
-        }
-        setEditableWithReadOnlyLabel(!readOnly);
+            if (readOnly) {
+                getStylesheets().clear();
+                getStylesheets().add("read_only.css");
+                setContextMenu(null);
+            } else {
+                getStylesheets().clear();
+                getStylesheets().add("default.css");
+                setContextMenu(new TreeTableViewContextMenu(RegistryTreeTableView.this, type));
+            }
+            setEditableWithReadOnlyLabel(!readOnly);
+            return null;
+        });
     }
 
-    public void setEditableWithReadOnlyLabel(boolean editable) {
-        if (!editable) {
-            vBox.getChildren().clear();
-            vBox.getChildren().addAll(statusInfoLabel, this);
-        } else {
-            vBox.getChildren().remove(statusInfoLabel);
-        }
-        super.setEditable(editable);
+    public void setEditableWithReadOnlyLabel(final boolean editable) {
+        RegistryEditor.runOnFxThread(() -> {
+            if (!editable) {
+                vBox.getChildren().clear();
+                vBox.getChildren().addAll(statusInfoLabel, this);
+            } else {
+                vBox.getChildren().remove(statusInfoLabel);
+            }
+            super.setEditable(editable);
+            return null;
+        });
     }
 
     public void setDisconnected(boolean disconnected) {
-        if (disconnected) {
-            statusInfoLabel.setText("Registry disconnected!");
-            statusInfoLabel.setStyle("-fx-text-background-color: rgb(120,120,120); -fx-font-weight: bold;");
-            vBox.getChildren().clear();
-            vBox.getChildren().addAll(statusInfoLabel, this);
-        } else {
-            vBox.getChildren().clear();
-            vBox.getChildren().addAll(this);
-        }
+        RegistryEditor.runOnFxThread(() -> {
+            if (disconnected) {
+                statusInfoLabel.setText("Registry disconnected!");
+                statusInfoLabel.setStyle("-fx-text-background-color: rgb(120,120,120); -fx-font-weight: bold;");
+                vBox.getChildren().clear();
+                vBox.getChildren().addAll(statusInfoLabel, this);
+            } else {
+                vBox.getChildren().clear();
+                vBox.getChildren().addAll(this);
+            }
 
-        notifiyDisconnection(disconnected);
+            notifiyDisconnection(disconnected);
+            return null;
+        });
     }
 
     public void addDisconnectedObserver(Observer<Boolean> observer) {
