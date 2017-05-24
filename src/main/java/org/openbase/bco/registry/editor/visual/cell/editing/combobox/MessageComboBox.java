@@ -45,6 +45,7 @@ import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
+import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.agent.AgentClassType.AgentClass;
@@ -137,8 +138,8 @@ public class MessageComboBox extends ComboBox<Message> {
             }
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
                 List<ServiceTemplate.ServiceType> serviceTypes = new ArrayList<>();
-                for (ServiceTemplate serviceTemplate : ((UnitGroupConfig.Builder) parentBuilder).getServiceTemplateList()) {
-                    serviceTypes.add(serviceTemplate.getType());
+                for (ServiceDescription serviceDescription : ((UnitGroupConfig.Builder) parentBuilder).getServiceDescriptionList()) {
+                    serviceTypes.add(serviceDescription.getType());
                 }
                 list.clear();
                 // add all units which have the same serviveTypes as the group

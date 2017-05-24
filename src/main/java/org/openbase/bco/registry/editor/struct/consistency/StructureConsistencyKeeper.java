@@ -40,8 +40,8 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rst.processing.TimestampProcessor;
 import org.slf4j.LoggerFactory;
 import rst.domotic.service.ServiceConfigType.ServiceConfig;
+import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateConfigType.ServiceTemplateConfig;
-import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServiceType;
 import rst.domotic.state.InventoryStateType.InventoryState;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
@@ -94,8 +94,8 @@ public class StructureConsistencyKeeper {
 
             // filter so that every serviceType is only added once
             Map<String, ServiceType> serviceTypeMap = new HashMap();
-            for (ServiceTemplate serviceTemplate : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceTemplateList()) {
-                serviceTypeMap.put(serviceTemplate.getType().toString(), serviceTemplate.getType());
+            for (ServiceDescription serviceDescription : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceDescriptionList()) {
+                serviceTypeMap.put(serviceDescription.getType().toString(), serviceDescription.getType());
             }
 
             // create the new values for the field and add them to the builder
@@ -136,8 +136,8 @@ public class StructureConsistencyKeeper {
         } else if ("unit_type".equals(changedField)) {
             change = true;
             StructureConsistencyKeeper.clearField(container, "service_template");
-            container.getBuilder().addAllServiceTemplate(RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getUnitType()).getServiceTemplateList());
-            field = ProtoBufFieldProcessor.getFieldDescriptor(container.getBuilder(), UnitGroupConfig.SERVICE_TEMPLATE_FIELD_NUMBER);
+            container.getBuilder().addAllServiceDescription(RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getUnitType()).getServiceDescriptionList());
+            field = ProtoBufFieldProcessor.getFieldDescriptor(container.getBuilder(), UnitGroupConfig.SERVICE_DESCRIPTION_FIELD_NUMBER);
             container.add(new GenericListContainer<>(field, container.getBuilder()));
         }
 
@@ -149,7 +149,7 @@ public class StructureConsistencyKeeper {
                     UnitConfig unitConfig = RemotePool.getInstance().getDeviceRemote().getUnitConfigById(memberId);
                     boolean skip = false;
                     for (ServiceConfig serviceConfig : unitConfig.getServiceConfigList()) {
-                        if (!container.getBuilder().getServiceTemplateList().contains(serviceConfig.getServiceTemplate())) {
+                        if (!container.getBuilder().getServiceDescriptionList().contains(serviceConfig.getServiceDescription())) {
                             skip = true;
                         }
                     }
