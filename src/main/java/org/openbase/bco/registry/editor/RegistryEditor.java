@@ -565,7 +565,6 @@ public class RegistryEditor extends Application {
             unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType()));
             unitGroupConfigTreeTableView.getListDiff().diff(data.getUnitGroupUnitConfigList());
             
-            System.out.println(data.getServiceTemplateList());
             serviceTemplateTreeTableView.setRoot(new GenericListContainer<>("service_template", data.toBuilder()));
             serviceTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SERVICE_TEMPLATE.getDefaultInstanceForType()));
             serviceTemplateTreeTableView.update(data.getServiceTemplateList());
