@@ -36,6 +36,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -86,7 +87,6 @@ import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
-import javafx.embed.swing.SwingFXUtils;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBHost;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBPort;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBTransport;
@@ -133,7 +133,7 @@ public class RegistryEditor extends Application {
     private Tab agentClassTab, agentConfigTab;
     private Tab appClassTab, appConfigTab;
     private Tab sceneConfigTab;
-    private Tab unitConfigTab, unitTemplateTab, unitGroupTab;
+    private Tab unitConfigTab, unitTemplateTab, unitGroupTab, serviceTemplateTab;
     private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator, userRegistryProgessInidicator, unitRegistryProgressIndicator;
     private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView;
     private RegistryTreeTableView locationConfigTreeTableView, connectionConfigTreeTableView;
@@ -141,7 +141,7 @@ public class RegistryEditor extends Application {
     private RegistryTreeTableView agentConfigTreeTableView, agentClassTreeTableView;
     private RegistryTreeTableView appConfigTreeTableView, appClassTreeTableView;
     private RegistryTreeTableView userConfigTreeTableView, authorizationGroupConfigTreeTableView;
-    private RegistryTreeTableView dalUnitConfigTreeTableView, unitTemplateTreeTableView, unitGroupConfigTreeTableView;
+    private RegistryTreeTableView dalUnitConfigTreeTableView, unitTemplateTreeTableView, unitGroupConfigTreeTableView, serviceTemplateTreeTableView;
     private Scene scene;
     private Map<String, Boolean> intialized;
 
@@ -195,6 +195,7 @@ public class RegistryEditor extends Application {
         appConfigTreeTableView = new RegistryTreeTableView(SendableType.APP_CONFIG, this);
         appClassTreeTableView = new RegistryTreeTableView(SendableType.APP_CLASS, this);
         unitTemplateTreeTableView = new RegistryTreeTableView(SendableType.UNIT_TEMPLATE, this);
+        serviceTemplateTreeTableView = new RegistryTreeTableView(SendableType.SERVICE_TEMPLATE, this);
         userConfigTreeTableView = new RegistryTreeTableView(SendableType.USER_CONFIG, this);
         authorizationGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.AUTHORIZATION_GROUP_CONFIG, this);
         unitGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_GROUP_CONFIG, this);
@@ -204,12 +205,15 @@ public class RegistryEditor extends Application {
         unitRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         unitConfigTab = new Tab("UnitConfig");
         unitTemplateTab = new Tab("UnitTemplate");
+        serviceTemplateTab = new Tab("ServiceTemplate");
         unitGroupTab = new Tab("UnitGroup");
         unitConfigTab.setContent(dalUnitConfigTreeTableView.getVBox());
         unitTemplateTab.setContent(unitTemplateTreeTableView.getVBox());
+        serviceTemplateTab.setContent(serviceTemplateTreeTableView.getVBox());
         unitGroupTab.setContent(unitGroupConfigTreeTableView.getVBox());
         unitRegistryTabPane.addTab(unitConfigTab, SendableType.UNIT_CONFIG);
         unitRegistryTabPane.addTab(unitTemplateTab, SendableType.UNIT_TEMPLATE);
+        unitRegistryTabPane.addTab(serviceTemplateTab, SendableType.SERVICE_TEMPLATE);
         unitRegistryTabPane.addTab(unitGroupTab, SendableType.UNIT_GROUP_CONFIG);
 //        unitRegistryTabPane.getTabs().addAll(unitConfigTab, unitTemplateTab, unitGroupTab);
 
@@ -341,6 +345,7 @@ public class RegistryEditor extends Application {
         appConfigTreeTableView.addWidthProperty(scene.widthProperty());
         appClassTreeTableView.addWidthProperty(scene.widthProperty());
         unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
+        serviceTemplateTreeTableView.addWidthProperty(scene.widthProperty());
         userConfigTreeTableView.addWidthProperty(scene.widthProperty());
         authorizationGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
         unitGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
@@ -356,6 +361,7 @@ public class RegistryEditor extends Application {
         appConfigTreeTableView.addHeightProperty(scene.heightProperty());
         appClassTreeTableView.addHeightProperty(scene.heightProperty());
         unitTemplateTreeTableView.addHeightProperty(scene.heightProperty());
+        serviceTemplateTreeTableView.addHeightProperty(scene.heightProperty());
         userConfigTreeTableView.addHeightProperty(scene.heightProperty());
         authorizationGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
         unitGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
@@ -558,7 +564,12 @@ public class RegistryEditor extends Application {
             unitGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
             unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType()));
             unitGroupConfigTreeTableView.getListDiff().diff(data.getUnitGroupUnitConfigList());
-
+            
+            System.out.println(data.getServiceTemplateList());
+            serviceTemplateTreeTableView.setRoot(new GenericListContainer<>("service_template", data.toBuilder()));
+            serviceTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SERVICE_TEMPLATE.getDefaultInstanceForType()));
+            serviceTemplateTreeTableView.update(data.getServiceTemplateList());
+            
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
             return unitRegistryTabPane;
         }
@@ -601,6 +612,7 @@ public class RegistryEditor extends Application {
             dalUnitConfigTreeTableView.update(data.getDalUnitConfigList());
             unitTemplateTreeTableView.update(data.getUnitTemplateList());
             unitGroupConfigTreeTableView.update(data.getUnitGroupUnitConfigList());
+            serviceTemplateTreeTableView.update(data.getServiceTemplateList());
             return unitRegistryTabPane;
         }
         return null;
@@ -648,6 +660,7 @@ public class RegistryEditor extends Application {
             treeTableList.add(dalUnitConfigTreeTableView);
             treeTableList.add(unitGroupConfigTreeTableView);
             treeTableList.add(unitTemplateTreeTableView);
+            treeTableList.add(serviceTemplateTreeTableView);
         }
         return treeTableList;
     }
@@ -701,6 +714,8 @@ public class RegistryEditor extends Application {
                 return unitTemplateTreeTableView;
             case USER_CONFIG:
                 return userConfigTreeTableView;
+            case SERVICE_TEMPLATE:
+                return serviceTemplateTreeTableView;
             default:
                 return null;
         }

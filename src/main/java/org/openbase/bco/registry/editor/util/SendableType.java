@@ -23,6 +23,7 @@ package org.openbase.bco.registry.editor.util;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
+import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
@@ -49,7 +50,8 @@ public enum SendableType {
     USER_CONFIG(UnitConfig.newBuilder().setType(UnitType.USER).build()),
     AUTHORIZATION_GROUP_CONFIG(UnitConfig.newBuilder().setType(UnitType.AUTHORIZATION_GROUP).build()),
     UNIT_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNKNOWN).build()),
-    UNIT_GROUP_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNIT_GROUP).build());
+    UNIT_GROUP_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNIT_GROUP).build()),
+    SERVICE_TEMPLATE(ServiceTemplate.getDefaultInstance());
 
     private final GeneratedMessage defaultInstanceForType;
 
@@ -70,7 +72,9 @@ public enum SendableType {
             return DEVICE_CLASS;
         } else if (builder instanceof UnitTemplate.Builder) {
             return UNIT_TEMPLATE;
-        } else if (builder instanceof UnitConfig.Builder) {
+        } else if (builder instanceof ServiceTemplate.Builder) {
+            return SERVICE_TEMPLATE;
+        }  else if (builder instanceof UnitConfig.Builder) {
             switch (((UnitConfig.Builder) builder).getType()) {
                 case AGENT:
                     return AGENT_CONFIG;

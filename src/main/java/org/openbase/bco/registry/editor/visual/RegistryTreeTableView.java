@@ -55,6 +55,7 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.pattern.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 
@@ -216,6 +217,8 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
             } else {
                 if (getSendableType() == SendableType.UNIT_TEMPLATE) {
                     ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((UnitTemplate) msg).getType().name());
+                } else if (getSendableType() == SendableType.SERVICE_TEMPLATE) {
+                    ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((ServiceTemplate) msg).getType().name());
                 } else {
                     ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder());
                 }

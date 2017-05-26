@@ -43,6 +43,7 @@ import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 import rst.domotic.unit.agent.AgentClassType.AgentClass;
@@ -272,7 +273,9 @@ public class RemotePool {
             return appRemote;
         } else if (builder instanceof UnitTemplate.Builder) {
             return unitRemote;
-        } else if (builder instanceof UnitConfig.Builder) {
+        } else if (builder instanceof ServiceTemplate.Builder) {
+            return unitRemote;
+        }  else if (builder instanceof UnitConfig.Builder) {
             switch (((UnitConfig.Builder) builder).getType()) {
                 case AGENT:
                     return agentRemote;

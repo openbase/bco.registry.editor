@@ -63,6 +63,8 @@ public class Configuration {
     public static boolean isModifiableField(GeneratedMessage.Builder builder, String fieldName) {
         if (builder instanceof UnitTemplate.Builder) {
             return !("type".equals(fieldName) || "id".equals(fieldName));
+        } else if (builder instanceof ServiceTemplate.Builder) {
+            return !("type".equals(fieldName) || "id".equals(fieldName));
         } else if (builder instanceof DeviceClass.Builder) {
             if ("product_number".equals(fieldName)) {
                 return ((DeviceClass.Builder) builder).getProductNumber().isEmpty();
