@@ -193,7 +193,9 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
                 } else {
                     if (getSendableType() == SendableType.UNIT_TEMPLATE) {
                         ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((UnitTemplate) msg).getType().name());
-                    } else {
+                    } else if (getSendableType() == SendableType.SERVICE_TEMPLATE) {
+                        ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((ServiceTemplate) msg).getType().name());
+                    }  else {
                         ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder());
                     }
                 }

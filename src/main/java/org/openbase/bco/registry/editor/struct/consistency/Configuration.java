@@ -105,6 +105,7 @@ public class Configuration {
     public static boolean isSendable(Message.Builder builder) {
         return ((builder instanceof DeviceClass.Builder)
                 || (builder instanceof UnitTemplate.Builder)
+                || (builder instanceof ServiceTemplate.Builder)
                 || (builder instanceof AgentClass.Builder)
                 || (builder instanceof AppClass.Builder)
                 || (builder instanceof UnitConfig.Builder));

@@ -39,16 +39,16 @@ import org.slf4j.LoggerFactory;
  * @param <MB>
  */
 public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<Node> implements Node {
-
+    
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(NodeContainer.class);
-
+    
     protected final MB builder;
     protected final String descriptor;
     protected final Converter converter;
-
+    
     protected final boolean sendable;
     protected final SimpleObjectProperty<Boolean> changed;
-
+    
     public NodeContainer(String descriptor, MB builder) throws InstantiationException {
         assert builder != null;
         assert descriptor != null;
@@ -63,45 +63,45 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         }
         this.setValue(this);
     }
-
+    
     protected void add(LeafContainer leaf) {
         this.getChildren().add(new TreeItem<>(leaf));
     }
-
+    
     public void add(TreeItem<Node> node) {
         this.getChildren().add(node);
     }
-
+    
     @Override
     public String getDescriptor() {
         return descriptor;
     }
-
+    
     @Override
     public NodeContainer getContext() {
         return this;
     }
-
+    
     public MB getBuilder() {
         return builder;
     }
-
+    
     public boolean isSendable() {
         return sendable;
     }
-
+    
     public void setChanged(boolean change) {
         changed.set(change);
     }
-
+    
     public boolean hasChanged() {
         return changed.getValue();
     }
-
+    
     public SimpleObjectProperty<Boolean> getChanged() {
         return changed;
     }
-
+    
     public void setSendableChanged() {
         NodeContainer sendableNode = this;
         while (!sendableNode.isSendable()) {
@@ -112,7 +112,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         }
         ((NodeContainer) sendableNode).setChanged(true);
     }
-
+    
     public GeneratedMessage.Builder getSendableType() {
         NodeContainer sendableNode = this;
         while (!sendableNode.isSendable()) {
@@ -120,7 +120,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         }
         return ((NodeContainer) sendableNode).getBuilder();
     }
-
+    
     public void updateBuilder(String fieldName, Object value, int index) throws CouldNotPerformException, InterruptedException {
         if (index == -1) {
             converter.updateBuilder(fieldName, value);
