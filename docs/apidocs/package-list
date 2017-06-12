@@ -1,0 +1,12 @@
+org.openbase.bco.registry.editor
+org.openbase.bco.registry.editor.struct
+org.openbase.bco.registry.editor.struct.consistency
+org.openbase.bco.registry.editor.struct.converter
+org.openbase.bco.registry.editor.struct.converter.filter
+org.openbase.bco.registry.editor.util
+org.openbase.bco.registry.editor.visual
+org.openbase.bco.registry.editor.visual.cell
+org.openbase.bco.registry.editor.visual.cell.editing
+org.openbase.bco.registry.editor.visual.cell.editing.combobox
+org.openbase.bco.registry.editor.visual.column
+org.openbase.bco.registry.editor.visual.provider
