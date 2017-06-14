@@ -24,7 +24,6 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.user.UserConfigType.UserConfig;
 
 /**
  *
@@ -34,8 +33,7 @@ public class UserConfigComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        UserConfig userConfig = ((UnitConfig) msg).getUserConfig();
-        return userConfig.getUserName() + " (" + userConfig.getFirstName() + " " + userConfig.getFirstName() + ")";
+        return ((UnitConfig) msg).getLabel();
     }
 
     @Override
