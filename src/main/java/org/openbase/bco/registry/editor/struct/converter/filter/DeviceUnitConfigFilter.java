@@ -33,6 +33,6 @@ public class DeviceUnitConfigFilter extends NotDalUnitConfigFilter {
     @Override
     protected void registerFilteredFields() {
         super.registerFilteredFields();
-        removeFilteredField(UnitConfig.DEVICE_CONFIG_FIELD_NUMBER);
+        removeFilteredField(UnitConfig.DEVICE_CONFIG_FIELD_NUMBER, UnitConfig.BOUND_TO_UNIT_HOST_FIELD_NUMBER);
     }
 }
