@@ -36,6 +36,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
+import org.openbase.bco.registry.editor.struct.NodeContainer;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
@@ -45,6 +46,7 @@ import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
+import rst.domotic.authentication.PermissionConfigType.PermissionConfig;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
@@ -66,9 +68,11 @@ public class MessageComboBox extends ComboBox<Message> {
 
     private static final int DEFAULT_VISIBLE_ROW_COUNT = 5;
     private final MessageComboBoxConverter converter;
+    private final ValueCell cell;
 
     public MessageComboBox(ValueCell cell, Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         super();
+        this.cell = cell;
         this.setVisibleRowCount(DEFAULT_VISIBLE_ROW_COUNT);
         this.converter = getConverterByMessageType(fieldName, parentBuilder);
         this.setCellFactory(new Callback<ListView<Message>, ListCell<Message>>() {
@@ -159,6 +163,17 @@ public class MessageComboBox extends ComboBox<Message> {
                     list.addAll(RemotePool.getInstance().getLocationRemote().getUnitConfigsByLocation(tileId));
                 }
             }
+            if (parentBuilder instanceof PermissionConfig.MapFieldEntry.Builder) {
+                PermissionConfig.Builder permissionConfig = (PermissionConfig.Builder) ((NodeContainer) this.cell.getLeaf().getParent().getParent().getValue()).getBuilder();
+                for (PermissionConfig.MapFieldEntry entry : permissionConfig.getGroupPermissionList()) {
+                    if(leafValue.equals(entry.getGroupId())) {
+                        continue;
+                    }
+                    if (entry.hasGroupId() && !entry.getGroupId().isEmpty()) {
+                        list.remove(RemotePool.getInstance().getUserRemote().getAuthorizationGroupConfigById(entry.getGroupId()));
+                    }
+                }
+            }
             Collections.sort(list, new Comparator<Message>() {
 
                 @Override
@@ -206,6 +221,8 @@ public class MessageComboBox extends ComboBox<Message> {
                     if (parentBuilder instanceof ConnectionConfig.Builder) {
                         return SendableType.CONNECTION_CONFIG.getDefaultInstanceForType();
                     }
+                case "group_id":
+                    return SendableType.AUTHORIZATION_GROUP_CONFIG.getDefaultInstanceForType();
             }
         }
         return null;
@@ -223,6 +240,8 @@ public class MessageComboBox extends ComboBox<Message> {
                     return new UnitConfigComboBoxConverter();
                 case UNIT_GROUP:
                     return new UnitConfigComboBoxConverter();
+                case AUTHORIZATION_GROUP:
+                    return new AuthorizationGroupComboBoxConverter();
                 default:
                     return new DefaultMessageComboBoxConverter();
             }
