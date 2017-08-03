@@ -66,6 +66,7 @@ import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.GlobalTextArea;
 import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
 import org.openbase.bco.registry.editor.visual.TabPaneWithClearing;
+import org.openbase.bco.registry.editor.visual.provider.AgentClassItemDescriptorProvider;
 import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
 import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
 import org.openbase.bco.registry.editor.visual.provider.LocationItemDescriptorProvider;
@@ -525,7 +526,10 @@ public class RegistryEditor extends Application {
             return appRegistryTabPane;
         } else if (msg instanceof AgentRegistryData) {
             AgentRegistryData data = (AgentRegistryData) msg;
-            agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            TreeItemDescriptorProvider agentClassLabel = new AgentClassItemDescriptorProvider();
+            Descriptors.FieldDescriptor agentConfigfield = data.toBuilder().getDescriptorForType().findFieldByNumber(AgentRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER);
+//            agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            agentConfigTreeTableView.setRoot(new GenericGroupContainer<>(agentConfigfield.getName(), agentConfigfield, data.toBuilder(), data.toBuilder().getAgentUnitConfigBuilderList(), agentClassLabel));
             agentConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CONFIG.getDefaultInstanceForType()));
             agentConfigTreeTableView.getListDiff().diff(data.getAgentUnitConfigList());
 
