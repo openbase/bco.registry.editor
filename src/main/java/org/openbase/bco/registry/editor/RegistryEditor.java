@@ -528,7 +528,6 @@ public class RegistryEditor extends Application {
             AgentRegistryData data = (AgentRegistryData) msg;
             TreeItemDescriptorProvider agentClassLabel = new AgentClassItemDescriptorProvider();
             Descriptors.FieldDescriptor agentConfigfield = data.toBuilder().getDescriptorForType().findFieldByNumber(AgentRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER);
-//            agentConfigTreeTableView.setRoot(new GenericListContainer(AgentRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
             agentConfigTreeTableView.setRoot(new GenericGroupContainer<>(agentConfigfield.getName(), agentConfigfield, data.toBuilder(), data.toBuilder().getAgentUnitConfigBuilderList(), agentClassLabel));
             agentConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CONFIG.getDefaultInstanceForType()));
             agentConfigTreeTableView.getListDiff().diff(data.getAgentUnitConfigList());

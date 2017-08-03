@@ -29,11 +29,18 @@ package org.openbase.bco.registry.editor.struct;
 public interface Node {
 
     /**
-     * Get a description for this node displayed in the descriptor column.
+     * Get a description for this node displayed which is used to access the field of a builder.
      *
      * @return a description
      */
     String getDescriptor();
+    
+    /**
+     * Get a description for this node displayed in the descriptor column.
+     * 
+     * @return the displayed description
+     */
+    String getDisplayedDescriptor();
 
     /**
      * Used by the tree table column to fill its cells with values.

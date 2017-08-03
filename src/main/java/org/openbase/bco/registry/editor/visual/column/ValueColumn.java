@@ -22,12 +22,10 @@ package org.openbase.bco.registry.editor.visual.column;
  * #L%
  */
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
-import javafx.util.Callback;
 import org.openbase.bco.registry.editor.struct.Leaf;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
@@ -48,16 +46,12 @@ public class ValueColumn extends Column {
         this.setEditable(true);
         this.setSortable(false);
         this.setOnEditCommit(new EventHandlerImpl());
-        this.setCellFactory(new Callback<TreeTableColumn<Node, Node>, TreeTableCell<Node, Node>>() {
-
-            @Override
-            public TreeTableCell<Node, Node> call(TreeTableColumn<Node, Node> param) {
-                try {
-                    return new ValueCell();
-                } catch (InterruptedException ex) {
-                    ExceptionPrinter.printHistory(new CouldNotPerformException("Could not build description cell!", ex), logger, LogLevel.WARN);
-                    return new TreeTableCell();
-                }
+        this.setCellFactory((TreeTableColumn<Node, Node> param) -> {
+            try {
+                return new ValueCell();
+            } catch (InterruptedException ex) {
+                ExceptionPrinter.printHistory(new CouldNotPerformException("Could not build description cell!", ex), logger, LogLevel.WARN);
+                return new TreeTableCell();
             }
         });
     }
@@ -67,7 +61,6 @@ public class ValueColumn extends Column {
         @Override
         public void handle(CellEditEvent<Node, Node> event) {
             if (event.getRowValue().getValue() instanceof Leaf) {
-
                 try {
                     ((Leaf) event.getRowValue().getValue()).setValue(((Leaf) event.getNewValue()).getValue());
                 } catch (InterruptedException ex) {
@@ -79,12 +72,8 @@ public class ValueColumn extends Column {
 
     @Override
     public void addWidthProperty(ReadOnlyDoubleProperty widthProperty) {
-        widthProperty.addListener(new ChangeListener<Number>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                setPrefWidth(newValue.doubleValue() * VALUE_COLUMN_PROPORTION);
-            }
+        widthProperty.addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            setPrefWidth(newValue.doubleValue() * VALUE_COLUMN_PROPORTION);
         });
     }
 }

@@ -21,6 +21,7 @@ package org.openbase.bco.registry.editor.struct;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
@@ -31,6 +32,7 @@ import org.openbase.bco.registry.editor.struct.converter.ConverterSelector;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -44,6 +46,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
     
     protected final MB builder;
     protected final String descriptor;
+    protected String displayedDescriptor;
     protected final Converter converter;
     
     protected final boolean sendable;
@@ -62,6 +65,15 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
             sendable = false;
         }
         this.setValue(this);
+        this.setDisplayedDescriptor();
+    }
+    
+    private void setDisplayedDescriptor() {
+        try {
+            displayedDescriptor = ProtoBufFieldProcessor.getLabel(builder);
+        } catch(CouldNotPerformException ex) {
+            displayedDescriptor = StringProcessor.transformToCamelCase(descriptor).replace(",", " - ");
+        }
     }
     
     protected void add(LeafContainer leaf) {
@@ -75,6 +87,11 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
     @Override
     public String getDescriptor() {
         return descriptor;
+    }
+
+    @Override
+    public String getDisplayedDescriptor() {
+        return displayedDescriptor;
     }
     
     @Override

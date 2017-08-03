@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Column extends TreeTableColumn<Node, Node> {
 
-    protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(Column.class);
+    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
     public Column(String text) {
         super(text);

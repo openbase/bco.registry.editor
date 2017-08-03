@@ -60,6 +60,7 @@ public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM 
 
     public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {
         super(descriptor, builder);
+        this.displayedDescriptor = descriptor;
         this.groups = groups;
         this.treeItemDescriptorProvider = groups[0];
         this.fieldDescriptor = fieldDescriptor;

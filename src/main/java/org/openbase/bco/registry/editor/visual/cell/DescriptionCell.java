@@ -21,13 +21,7 @@ package org.openbase.bco.registry.editor.visual.cell;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import com.google.protobuf.Descriptors;
-import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Node;
-import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import org.openbase.jul.processing.StringProcessor;
 
 /**
  *
@@ -48,44 +42,7 @@ public class DescriptionCell extends RowCell {
             textProperty().setValue("");
             setContextMenu(null);
         } else if (item instanceof Node) {
-            setText(StringProcessor.transformToCamelCase(item.getDescriptor()).replace(",", " - "));
-            //TODO: thuxohl change this part
-            if (item instanceof GenericNodeContainer) {
-                GenericNodeContainer container = (GenericNodeContainer) item;
-
-                String label = null;
-                try {
-                    label = ProtoBufFieldProcessor.getLabel(container.getBuilder());
-                } catch (CouldNotPerformException ex) {
-                }
-
-                if (label != null && !label.isEmpty()) {
-                    setText(label);
-                }
-            }
+            setText(((Node) item).getDisplayedDescriptor());
         }
-    }
-
-    private String getTypeAsString(final Message.Builder msg) throws CouldNotPerformException {
-        try {
-            return ((Descriptors.EnumValueDescriptor) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(msg, "type"))).getName();
-        } catch (Exception ex) {
-            throw new CouldNotPerformException("Could not get label of [" + msg + "]", ex);
-        }
-    }
-
-    private String convertDescriptorToReadable(String descriptor) {
-        if (descriptor.equals("")) {
-            return descriptor;
-        }
-
-        descriptor = descriptor.toLowerCase();
-        String result = "";
-        String[] split = descriptor.split("_");
-        for (String split1 : split) {
-            result += Character.toUpperCase(split1.charAt(0));
-            result += split1.substring(1);
-        }
-        return result;
     }
 }

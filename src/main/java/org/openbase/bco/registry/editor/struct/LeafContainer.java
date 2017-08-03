@@ -25,6 +25,7 @@ import com.google.protobuf.ProtocolMessageEnum;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.printer.LogLevel;
+import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -37,6 +38,7 @@ public class LeafContainer implements Leaf {
 
     private final boolean editable;
     private final String fieldName;
+    private final String displayedDescriptor;
     private final NodeContainer parent;
     private final int index;
     private Object value;
@@ -59,6 +61,7 @@ public class LeafContainer implements Leaf {
         this.parent = parent;
         this.index = index;
         this.editable = editable;
+        this.displayedDescriptor = StringProcessor.transformToCamelCase(fieldName).replace(",", " - ");
     }
 
     @Override
@@ -69,6 +72,11 @@ public class LeafContainer implements Leaf {
     @Override
     public String getDescriptor() {
         return fieldName;
+    }
+
+    @Override
+    public String getDisplayedDescriptor() {
+        return displayedDescriptor;
     }
 
     public NodeContainer getParent() {
