@@ -29,11 +29,11 @@ import org.openbase.jul.exception.NotAvailableException;
  *
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
+ * @param <V> the type to convert.
  */
-public interface Converter {
+public interface Converter<V> {
 
-    //TODO Tamnio: Why is this converter not generic? -> Converter<V> -> updateBuilder(String fieldName, V value)
-    public void updateBuilder(String fieldName, Object value) throws CouldNotPerformException;
+    public void updateBuilder(final String fieldName, final V value) throws CouldNotPerformException;
 
     public Map<String, Object> getFields() throws NotAvailableException;
 }
