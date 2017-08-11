@@ -21,7 +21,6 @@ package org.openbase.bco.registry.editor.struct;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
@@ -47,7 +46,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
     protected final MB builder;
     protected final String descriptor;
     protected String displayedDescriptor;
-    protected final Converter converter;
+    protected final Converter<Object> converter;
     
     protected final boolean sendable;
     protected final SimpleObjectProperty<Boolean> changed;
