@@ -90,13 +90,16 @@ public class DecimalTextField extends TextField {
                             cell.getLeaf().setValue(parsedValue.floatValue());
                         } else if (cell.getLeaf().getValue() instanceof Double) {
                             cell.getLeaf().setValue(parsedValue);
+                        } else if(cell.getLeaf().getValue() instanceof Long) {
+                            cell.getLeaf().setValue(parsedValue.longValue());
                         }
                         // even though commit is called the text property won't change fast enough without this line?!?
-                        cell.setGraphic(new Label(Double.toString(parsedValue)));
+                        //cell.setGraphic(new Label(Double.toString(parsedValue)));
                         cell.commitEdit(cell.getLeaf());
+                        cell.updateItem(cell.getLeaf(), false);
                     }
                 } catch (InterruptedException ex) {
-                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
+                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handling skipped!", ex), logger, LogLevel.WARN);
                 }
             }
         });

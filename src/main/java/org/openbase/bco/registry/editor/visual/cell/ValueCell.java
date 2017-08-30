@@ -81,6 +81,7 @@ import rst.domotic.state.InventoryStateType.InventoryState;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.math.Vec3DDoubleType.Vec3DDouble;
+import rst.timing.TimestampType.Timestamp;
 
 /**
  *
@@ -127,15 +128,11 @@ public class ValueCell extends RowCell {
                 setGraphic(getEditingGraphic());
             } else {
                 if ("unit_id".equals(leaf.getDescriptor())) {
-                    Platform.runLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                ((RegistryTreeTableView) getTreeTableView()).getRegistryEditor().selectMessageById((String) leaf.getValue());
-                            } catch (CouldNotPerformException ex) {
-                                RegistryEditor.printException(new CouldNotPerformException("Could not select message by id!"), logger, LogLevel.ERROR);
-                            }
+                    Platform.runLater(() -> {
+                        try {
+                            ((RegistryTreeTableView) getTreeTableView()).getRegistryEditor().selectMessageById((String) leaf.getValue());
+                        } catch (CouldNotPerformException ex) {
+                            RegistryEditor.printException(new CouldNotPerformException("Could not select message by id!", ex), logger, LogLevel.ERROR);
                         }
                     });
                 }
@@ -159,7 +156,11 @@ public class ValueCell extends RowCell {
         } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
             graphic = new DecimalTextField(this, leaf.getValue().toString());
         } else if (leaf.getValue() instanceof Long) {
-            graphic = new LongDatePicker(this, (Long) leaf.getValue());
+            if (leaf.getParent().getBuilder() instanceof Timestamp.Builder) {
+                graphic = new LongDatePicker(this, (Long) leaf.getValue());
+            } else {
+                graphic = new DecimalTextField(this, leaf.getValue().toString());
+            }
         } else if (leaf.getValue() instanceof Boolean) {
             graphic = new ValueCheckBox(this, true, false);
         }
@@ -185,7 +186,11 @@ public class ValueCell extends RowCell {
         } else if (item instanceof Leaf) {
             String text = "";
             if (((Leaf) item).getValue() instanceof Long) {
-                text = LongDatePicker.DATE_CONVERTER.format(new Date((Long) ((Leaf) item).getValue()));
+                if (((LeafContainer) item).getParent().getBuilder() instanceof Timestamp.Builder) {
+                    text = LongDatePicker.DATE_CONVERTER.format(new Date((Long) ((Leaf) item).getValue()));
+                } else {
+                    text = ((Leaf) item).getValue().toString();
+                }
             } else if (((Leaf) item).getValue() instanceof Double) {
                 text = decimalFormat.format(((Double) ((Leaf) item).getValue()));
             } else if (((Leaf) item).getValue() instanceof EnumValueDescriptor) {
