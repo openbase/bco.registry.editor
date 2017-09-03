@@ -40,6 +40,7 @@ import org.openbase.bco.registry.user.remote.UserRegistryRemote;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.NotAvailableException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,14 +202,20 @@ public class RemotePool {
         }
     }
 
-    public Boolean isReadOnly(Message msg) throws CouldNotPerformException {
+    public Boolean isReadOnly(Message msg) {
         String methodName = getMethodName("is", "RegistryReadOnly", msg);
         try {
             RSBRemoteService remote = getRemoteByMessage(msg);
+
+            if (remote.isConnected() && remote.isDataAvailable()) {
+                
+            }
+            
             Method method = remote.getClass().getMethod(methodName);
             return (Boolean) method.invoke(remote);
         } catch (CouldNotPerformException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            throw new CouldNotPerformException(ex);
+            ExceptionPrinter.printHistory("Could not check read only state! Fallback is read only mode.", ex, LOGGER);
+            return true;
         }
     }
 
@@ -275,7 +282,7 @@ public class RemotePool {
             return unitRemote;
         } else if (builder instanceof ServiceTemplate.Builder) {
             return unitRemote;
-        }  else if (builder instanceof UnitConfig.Builder) {
+        } else if (builder instanceof UnitConfig.Builder) {
             switch (((UnitConfig.Builder) builder).getType()) {
                 case AGENT:
                     return agentRemote;

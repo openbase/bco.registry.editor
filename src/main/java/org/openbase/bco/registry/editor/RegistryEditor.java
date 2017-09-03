@@ -382,19 +382,15 @@ public class RegistryEditor extends Application {
             LOGGER.debug("Register observer");
             final Map<RSBRemoteService, Future<Void>> registrationFutureMap = new HashMap<>();
 
-            for (RSBRemoteService remote : remotePool.getRemotes()) {
+            for (final RSBRemoteService remote : remotePool.getRemotes()) {
                 registrationFutureMap.put(remote, GlobalCachedExecutorService.submit(() -> {
                     try {
-                        remote.addDataObserver(new Observer() {
-
-                            @Override
-                            public void update(org.openbase.jul.pattern.Observable source, Object data) throws Exception {
-                                LOGGER.info("Received update for [" + remote + "]");
-                                if (data == null) {
-                                    LOGGER.info("Data for remote [" + remote + "] is null!");
-                                }
-                                updateTab(remote);
+                        remote.addDataObserver((org.openbase.jul.pattern.Observable source, Object data) -> {
+                            LOGGER.info("Received update for [" + remote + "]");
+                            if (data == null) {
+                                LOGGER.warn("Data for remote [" + remote + "] is null!");
                             }
+                            updateTab(remote);
                         });
                         updateTab(remote);
                         if (remote.equals(remotePool.getDeviceRemote()) || remote.equals(remotePool.getUnitRemote())) {
@@ -413,20 +409,16 @@ public class RegistryEditor extends Application {
                 remote.addConnectionStateObserver(new Observer<ConnectionState>() {
 
                     @Override
-                    public void update(Observable<ConnectionState> source, ConnectionState data) throws Exception {
-                        LOGGER.debug("Remote connection state has changed to: " + data);
-                        Platform.runLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                boolean disonnected = false;
-                                if (data != ConnectionState.CONNECTED) {
-                                    disonnected = true;
-                                }
-
-                                for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
-                                    treeTable.setDisconnected(disonnected);
-                                }
+                    public void update(final Observable<ConnectionState> source, final ConnectionState connectionState) throws Exception {
+                        LOGGER.debug("Remote connection state has changed to: " + connectionState);
+                        Platform.runLater(() -> {
+                            boolean disonnected = false;
+                            if (connectionState != ConnectionState.CONNECTED) {
+                                disonnected = true;
+                            }
+                            
+                            for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
+                                treeTable.setDisconnected(disonnected);
                             }
                         });
                     }
