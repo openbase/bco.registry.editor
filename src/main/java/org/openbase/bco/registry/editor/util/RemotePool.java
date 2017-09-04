@@ -90,22 +90,23 @@ public class RemotePool {
     public RemotePool() throws InstantiationException, InterruptedException {
         try {
             this.unitRemote = Registries.getUnitRegistry();
+            this.unitRemote.waitForData();
             this.locationRemote = Registries.getLocationRegistry();
             this.sceneRemote = Registries.getSceneRegistry();
             this.agentRemote = Registries.getAgentRegistry();
             this.appRemote = Registries.getAppRegistry();
             this.userRemote = Registries.getUserRegistry();
             this.deviceRemote = Registries.getDeviceRegistry();
-        } catch (NotAvailableException ex) {
+        } catch (CouldNotPerformException ex) {
             throw new InstantiationException(RemotePool.class, ex);
         }
+        remotes.add(unitRemote);
         remotes.add(appRemote);
         remotes.add(agentRemote);
         remotes.add(locationRemote);
         remotes.add(deviceRemote);
         remotes.add(sceneRemote);
         remotes.add(userRemote);
-        remotes.add(unitRemote);
     }
 
     public <M extends Message> Future<M> register(Message msg) throws CouldNotPerformException {
