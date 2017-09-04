@@ -300,16 +300,12 @@ public class RegistryEditor extends Application {
             printException(ex, LOGGER, LogLevel.WARN);
         }
 
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-
-            @Override
-            public void handle(WindowEvent event) {
-                try {
-                    Platform.exit();
-                } catch (Exception ex) {
-                    printException(ex, LOGGER, LogLevel.ERROR);
-                    System.exit(1);
-                }
+        primaryStage.setOnCloseRequest((WindowEvent event) -> {
+            try {
+                Platform.exit();
+            } catch (Exception ex) {
+                printException(ex, LOGGER, LogLevel.ERROR);
+                System.exit(1);
             }
         });
 
@@ -320,63 +316,51 @@ public class RegistryEditor extends Application {
 
     public Scene buildScene() {
         LOGGER.info("Starting");
-        updateTabs();
-
         splitPane = new SplitPane(/*registryTabPane, globalTextArea*/);
         splitPane.getItems().addAll(registryTabPane, globalTextArea);
         globalTextArea.addParent(splitPane);
         splitPane.setOrientation(Orientation.VERTICAL);
 
         VBox vBox = new VBox(menuBar, splitPane);
-        Scene scene = new Scene(vBox, RESOLUTION_WIDTH, 576);
-        scene.heightProperty().addListener(new ChangeListener<Number>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                splitPane.setPrefHeight(newValue.doubleValue());
-                splitPane.setDividerPositions(1);
-            }
+        Scene buildScene = new Scene(vBox, RESOLUTION_WIDTH, 576);
+        buildScene.heightProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            splitPane.setPrefHeight(newValue.doubleValue());
+            splitPane.setDividerPositions(1);
         });
 
-        deviceClassTreeTableView.addWidthProperty(scene.widthProperty());
-        deviceConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        locationConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        connectionConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        sceneConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        agentConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        agentClassTreeTableView.addWidthProperty(scene.widthProperty());
-        appConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        appClassTreeTableView.addWidthProperty(scene.widthProperty());
-        unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
-        serviceTemplateTreeTableView.addWidthProperty(scene.widthProperty());
-        userConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        authorizationGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        unitGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        dalUnitConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        deviceClassTreeTableView.addWidthProperty(buildScene.widthProperty());
+        deviceConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        locationConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        connectionConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        sceneConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        agentConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        agentClassTreeTableView.addWidthProperty(buildScene.widthProperty());
+        appConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        appClassTreeTableView.addWidthProperty(buildScene.widthProperty());
+        unitTemplateTreeTableView.addWidthProperty(buildScene.widthProperty());
+        serviceTemplateTreeTableView.addWidthProperty(buildScene.widthProperty());
+        userConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        authorizationGroupConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        unitGroupConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        dalUnitConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
 
-        deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
-        deviceConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        locationConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        connectionConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        sceneConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        agentConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        agentClassTreeTableView.addHeightProperty(scene.heightProperty());
-        appConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        appClassTreeTableView.addHeightProperty(scene.heightProperty());
-        unitTemplateTreeTableView.addHeightProperty(scene.heightProperty());
-        serviceTemplateTreeTableView.addHeightProperty(scene.heightProperty());
-        userConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        authorizationGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        unitGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        dalUnitConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        deviceClassTreeTableView.addHeightProperty(buildScene.heightProperty());
+        deviceConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        locationConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        connectionConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        sceneConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        agentConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        agentClassTreeTableView.addHeightProperty(buildScene.heightProperty());
+        appConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        appClassTreeTableView.addHeightProperty(buildScene.heightProperty());
+        unitTemplateTreeTableView.addHeightProperty(buildScene.heightProperty());
+        serviceTemplateTreeTableView.addHeightProperty(buildScene.heightProperty());
+        userConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        authorizationGroupConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        unitGroupConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        dalUnitConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
 
-        return scene;
-    }
-
-    private void updateTabs() {
-        remotePool.getRemotes().stream().forEach((remote) -> {
-            updateTab(remote);
-        });
+        return buildScene;
     }
 
     public void registerObserver() {
@@ -439,6 +423,7 @@ public class RegistryEditor extends Application {
     }
 
     private void updateTab(final RSBRemoteService remote) {
+        LOGGER.debug("Update tab for remote [" + remote + "]");
         GlobalCachedExecutorService.submit(() -> {
             synchronized (remote) {
                 Tab tab = getRegistryTabByRemote(remote);
@@ -473,6 +458,7 @@ public class RegistryEditor extends Application {
     }
 
     private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException, InterruptedException {
+        LOGGER.debug("FillTreeTableView for [" + msg.getClass().getSimpleName() + "]");
         if (msg instanceof DeviceRegistryData) {
             DeviceRegistryData data = (DeviceRegistryData) msg;
             TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);
@@ -577,6 +563,7 @@ public class RegistryEditor extends Application {
     }
 
     private javafx.scene.Node updateTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException, InterruptedException {
+        LOGGER.debug("UpdateTreeTableView for [" + msg.getClass().getSimpleName() + "]");
         if (msg instanceof DeviceRegistryData) {
             DeviceRegistryData data = (DeviceRegistryData) msg;
             deviceClassTreeTableView.update(data.getDeviceClassList());
