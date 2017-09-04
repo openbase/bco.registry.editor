@@ -266,8 +266,10 @@ public class RegistryEditor extends Application {
 
         resyncMenuItem = new MenuItem("Resync");
         resyncMenuItem.setOnAction((ActionEvent event) -> {
+            LOGGER.info("resync triggered...");
             remotePool.getRemotes().stream().forEach((remote) -> {
                 try {
+                    LOGGER.info("request data for " + remote);
                     remote.requestData();
                 } catch (CouldNotPerformException ex) {
                     printException(ex, LOGGER, LogLevel.ERROR);
@@ -385,7 +387,9 @@ public class RegistryEditor extends Application {
             for (final RSBRemoteService remote : remotePool.getRemotes()) {
                 registrationFutureMap.put(remote, GlobalCachedExecutorService.submit(() -> {
                     try {
+                        LOGGER.info("Register observer for [" + remote + "]");
                         remote.addDataObserver((org.openbase.jul.pattern.Observable source, Object data) -> {
+                            assert remote.isDataAvailable();
                             LOGGER.info("Received update for [" + remote + "]");
                             if (data == null) {
                                 LOGGER.warn("Data for remote [" + remote + "] is null!");
@@ -416,7 +420,7 @@ public class RegistryEditor extends Application {
                             if (connectionState != ConnectionState.CONNECTED) {
                                 disonnected = true;
                             }
-                            
+
                             for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
                                 treeTable.setDisconnected(disonnected);
                             }
@@ -434,35 +438,36 @@ public class RegistryEditor extends Application {
         System.exit(0);
     }
 
-    private void updateTab(RSBRemoteService remote) {
+    private void updateTab(final RSBRemoteService remote) {
         GlobalCachedExecutorService.submit(() -> {
-
-            Tab tab = getRegistryTabByRemote(remote);
-            if (!remote.isConnected() || !remote.isActive()) {
-                final Node node = getProgressindicatorByRemote(remote);
-                Platform.runLater(() -> {
-                    tab.setContent(node);
-                });
-                return;
-            }
-            try {
-                GeneratedMessage data = remote.getData();
-                if (!intialized.get(data.getClass().getSimpleName())) {
-                    LOGGER.debug(data.getClass().getSimpleName() + " is not yet initialized");
-                    final Node node = fillTreeTableView(data);
+            synchronized (remote) {
+                Tab tab = getRegistryTabByRemote(remote);
+                if (!remote.isConnected() || !remote.isActive() || !remote.isDataAvailable()) {
+                    final Node node = getProgressindicatorByRemote(remote);
                     Platform.runLater(() -> {
                         tab.setContent(node);
                     });
-                } else {
-                    LOGGER.debug("Updating " + data.getClass().getSimpleName());
-                    final Node node = updateTreeTableView(data);
-                    Platform.runLater(() -> {
-                        tab.setContent(node);
-                    });
+                    return;
                 }
-            } catch (CouldNotPerformException | InterruptedException ex) {
-                ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), LOGGER);
-                tab.setContent(new Label("Error: " + ex.getMessage()));
+                try {
+                    GeneratedMessage data = remote.getData();
+                    if (!intialized.get(data.getClass().getSimpleName())) {
+                        LOGGER.debug(data.getClass().getSimpleName() + " is not yet initialized");
+                        final Node node = fillTreeTableView(data);
+                        Platform.runLater(() -> {
+                            tab.setContent(node);
+                        });
+                    } else {
+                        LOGGER.debug("Updating " + data.getClass().getSimpleName());
+                        final Node node = updateTreeTableView(data);
+                        Platform.runLater(() -> {
+                            tab.setContent(node);
+                        });
+                    }
+                } catch (CouldNotPerformException | InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), LOGGER);
+                    tab.setContent(new Label("Error: " + ex.getMessage()));
+                }
             }
         });
     }
@@ -559,11 +564,11 @@ public class RegistryEditor extends Application {
             unitGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
             unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType()));
             unitGroupConfigTreeTableView.getListDiff().diff(data.getUnitGroupUnitConfigList());
-            
+
             serviceTemplateTreeTableView.setRoot(new GenericListContainer<>("service_template", data.toBuilder()));
             serviceTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SERVICE_TEMPLATE.getDefaultInstanceForType()));
             serviceTemplateTreeTableView.update(data.getServiceTemplateList());
-            
+
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
             return unitRegistryTabPane;
         }
