@@ -266,8 +266,10 @@ public class RegistryEditor extends Application {
 
         resyncMenuItem = new MenuItem("Resync");
         resyncMenuItem.setOnAction((ActionEvent event) -> {
+            LOGGER.info("resync triggered...");
             remotePool.getRemotes().stream().forEach((remote) -> {
                 try {
+                    LOGGER.info("request data for " + remote);
                     remote.requestData();
                 } catch (CouldNotPerformException ex) {
                     printException(ex, LOGGER, LogLevel.ERROR);
@@ -298,16 +300,12 @@ public class RegistryEditor extends Application {
             printException(ex, LOGGER, LogLevel.WARN);
         }
 
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-
-            @Override
-            public void handle(WindowEvent event) {
-                try {
-                    Platform.exit();
-                } catch (Exception ex) {
-                    printException(ex, LOGGER, LogLevel.ERROR);
-                    System.exit(1);
-                }
+        primaryStage.setOnCloseRequest((WindowEvent event) -> {
+            try {
+                Platform.exit();
+            } catch (Exception ex) {
+                printException(ex, LOGGER, LogLevel.ERROR);
+                System.exit(1);
             }
         });
 
@@ -318,63 +316,51 @@ public class RegistryEditor extends Application {
 
     public Scene buildScene() {
         LOGGER.info("Starting");
-        updateTabs();
-
         splitPane = new SplitPane(/*registryTabPane, globalTextArea*/);
         splitPane.getItems().addAll(registryTabPane, globalTextArea);
         globalTextArea.addParent(splitPane);
         splitPane.setOrientation(Orientation.VERTICAL);
 
         VBox vBox = new VBox(menuBar, splitPane);
-        Scene scene = new Scene(vBox, RESOLUTION_WIDTH, 576);
-        scene.heightProperty().addListener(new ChangeListener<Number>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                splitPane.setPrefHeight(newValue.doubleValue());
-                splitPane.setDividerPositions(1);
-            }
+        Scene buildScene = new Scene(vBox, RESOLUTION_WIDTH, 576);
+        buildScene.heightProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            splitPane.setPrefHeight(newValue.doubleValue());
+            splitPane.setDividerPositions(1);
         });
 
-        deviceClassTreeTableView.addWidthProperty(scene.widthProperty());
-        deviceConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        locationConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        connectionConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        sceneConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        agentConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        agentClassTreeTableView.addWidthProperty(scene.widthProperty());
-        appConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        appClassTreeTableView.addWidthProperty(scene.widthProperty());
-        unitTemplateTreeTableView.addWidthProperty(scene.widthProperty());
-        serviceTemplateTreeTableView.addWidthProperty(scene.widthProperty());
-        userConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        authorizationGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        unitGroupConfigTreeTableView.addWidthProperty(scene.widthProperty());
-        dalUnitConfigTreeTableView.addWidthProperty(scene.widthProperty());
+        deviceClassTreeTableView.addWidthProperty(buildScene.widthProperty());
+        deviceConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        locationConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        connectionConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        sceneConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        agentConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        agentClassTreeTableView.addWidthProperty(buildScene.widthProperty());
+        appConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        appClassTreeTableView.addWidthProperty(buildScene.widthProperty());
+        unitTemplateTreeTableView.addWidthProperty(buildScene.widthProperty());
+        serviceTemplateTreeTableView.addWidthProperty(buildScene.widthProperty());
+        userConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        authorizationGroupConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        unitGroupConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
+        dalUnitConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
 
-        deviceClassTreeTableView.addHeightProperty(scene.heightProperty());
-        deviceConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        locationConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        connectionConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        sceneConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        agentConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        agentClassTreeTableView.addHeightProperty(scene.heightProperty());
-        appConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        appClassTreeTableView.addHeightProperty(scene.heightProperty());
-        unitTemplateTreeTableView.addHeightProperty(scene.heightProperty());
-        serviceTemplateTreeTableView.addHeightProperty(scene.heightProperty());
-        userConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        authorizationGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        unitGroupConfigTreeTableView.addHeightProperty(scene.heightProperty());
-        dalUnitConfigTreeTableView.addHeightProperty(scene.heightProperty());
+        deviceClassTreeTableView.addHeightProperty(buildScene.heightProperty());
+        deviceConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        locationConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        connectionConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        sceneConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        agentConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        agentClassTreeTableView.addHeightProperty(buildScene.heightProperty());
+        appConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        appClassTreeTableView.addHeightProperty(buildScene.heightProperty());
+        unitTemplateTreeTableView.addHeightProperty(buildScene.heightProperty());
+        serviceTemplateTreeTableView.addHeightProperty(buildScene.heightProperty());
+        userConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        authorizationGroupConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        unitGroupConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        dalUnitConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
 
-        return scene;
-    }
-
-    private void updateTabs() {
-        remotePool.getRemotes().stream().forEach((remote) -> {
-            updateTab(remote);
-        });
+        return buildScene;
     }
 
     public void registerObserver() {
@@ -382,19 +368,17 @@ public class RegistryEditor extends Application {
             LOGGER.debug("Register observer");
             final Map<RSBRemoteService, Future<Void>> registrationFutureMap = new HashMap<>();
 
-            for (RSBRemoteService remote : remotePool.getRemotes()) {
+            for (final RSBRemoteService remote : remotePool.getRemotes()) {
                 registrationFutureMap.put(remote, GlobalCachedExecutorService.submit(() -> {
                     try {
-                        remote.addDataObserver(new Observer() {
-
-                            @Override
-                            public void update(org.openbase.jul.pattern.Observable source, Object data) throws Exception {
-                                LOGGER.info("Received update for [" + remote + "]");
-                                if (data == null) {
-                                    LOGGER.info("Data for remote [" + remote + "] is null!");
-                                }
-                                updateTab(remote);
+                        LOGGER.info("Register observer for [" + remote + "]");
+                        remote.addDataObserver((org.openbase.jul.pattern.Observable source, Object data) -> {
+                            assert remote.isDataAvailable();
+                            LOGGER.info("Received update for [" + remote + "]");
+                            if (data == null) {
+                                LOGGER.warn("Data for remote [" + remote + "] is null!");
                             }
+                            updateTab(remote);
                         });
                         updateTab(remote);
                         if (remote.equals(remotePool.getDeviceRemote()) || remote.equals(remotePool.getUnitRemote())) {
@@ -413,20 +397,16 @@ public class RegistryEditor extends Application {
                 remote.addConnectionStateObserver(new Observer<ConnectionState>() {
 
                     @Override
-                    public void update(Observable<ConnectionState> source, ConnectionState data) throws Exception {
-                        LOGGER.debug("Remote connection state has changed to: " + data);
-                        Platform.runLater(new Runnable() {
+                    public void update(final Observable<ConnectionState> source, final ConnectionState connectionState) throws Exception {
+                        LOGGER.debug("Remote connection state has changed to: " + connectionState);
+                        Platform.runLater(() -> {
+                            boolean disonnected = false;
+                            if (connectionState != ConnectionState.CONNECTED) {
+                                disonnected = true;
+                            }
 
-                            @Override
-                            public void run() {
-                                boolean disonnected = false;
-                                if (data != ConnectionState.CONNECTED) {
-                                    disonnected = true;
-                                }
-
-                                for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
-                                    treeTable.setDisconnected(disonnected);
-                                }
+                            for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
+                                treeTable.setDisconnected(disonnected);
                             }
                         });
                     }
@@ -442,40 +422,43 @@ public class RegistryEditor extends Application {
         System.exit(0);
     }
 
-    private void updateTab(RSBRemoteService remote) {
+    private void updateTab(final RSBRemoteService remote) {
+        LOGGER.debug("Update tab for remote [" + remote + "]");
         GlobalCachedExecutorService.submit(() -> {
-
-            Tab tab = getRegistryTabByRemote(remote);
-            if (!remote.isConnected() || !remote.isActive()) {
-                final Node node = getProgressindicatorByRemote(remote);
-                Platform.runLater(() -> {
-                    tab.setContent(node);
-                });
-                return;
-            }
-            try {
-                GeneratedMessage data = remote.getData();
-                if (!intialized.get(data.getClass().getSimpleName())) {
-                    LOGGER.debug(data.getClass().getSimpleName() + " is not yet initialized");
-                    final Node node = fillTreeTableView(data);
+            synchronized (remote) {
+                Tab tab = getRegistryTabByRemote(remote);
+                if (!remote.isConnected() || !remote.isActive() || !remote.isDataAvailable()) {
+                    final Node node = getProgressindicatorByRemote(remote);
                     Platform.runLater(() -> {
                         tab.setContent(node);
                     });
-                } else {
-                    LOGGER.debug("Updating " + data.getClass().getSimpleName());
-                    final Node node = updateTreeTableView(data);
-                    Platform.runLater(() -> {
-                        tab.setContent(node);
-                    });
+                    return;
                 }
-            } catch (CouldNotPerformException | InterruptedException ex) {
-                ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), LOGGER);
-                tab.setContent(new Label("Error: " + ex.getMessage()));
+                try {
+                    GeneratedMessage data = remote.getData();
+                    if (!intialized.get(data.getClass().getSimpleName())) {
+                        LOGGER.debug(data.getClass().getSimpleName() + " is not yet initialized");
+                        final Node node = fillTreeTableView(data);
+                        Platform.runLater(() -> {
+                            tab.setContent(node);
+                        });
+                    } else {
+                        LOGGER.debug("Updating " + data.getClass().getSimpleName());
+                        final Node node = updateTreeTableView(data);
+                        Platform.runLater(() -> {
+                            tab.setContent(node);
+                        });
+                    }
+                } catch (CouldNotPerformException | InterruptedException ex) {
+                    ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), LOGGER);
+                    tab.setContent(new Label("Error: " + ex.getMessage()));
+                }
             }
         });
     }
 
     private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException, InterruptedException {
+        LOGGER.debug("FillTreeTableView for [" + msg.getClass().getSimpleName() + "]");
         if (msg instanceof DeviceRegistryData) {
             DeviceRegistryData data = (DeviceRegistryData) msg;
             TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);
@@ -567,11 +550,11 @@ public class RegistryEditor extends Application {
             unitGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
             unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType()));
             unitGroupConfigTreeTableView.getListDiff().diff(data.getUnitGroupUnitConfigList());
-            
+
             serviceTemplateTreeTableView.setRoot(new GenericListContainer<>("service_template", data.toBuilder()));
             serviceTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SERVICE_TEMPLATE.getDefaultInstanceForType()));
             serviceTemplateTreeTableView.update(data.getServiceTemplateList());
-            
+
             intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
             return unitRegistryTabPane;
         }
@@ -580,6 +563,7 @@ public class RegistryEditor extends Application {
     }
 
     private javafx.scene.Node updateTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException, InterruptedException {
+        LOGGER.debug("UpdateTreeTableView for [" + msg.getClass().getSimpleName() + "]");
         if (msg instanceof DeviceRegistryData) {
             DeviceRegistryData data = (DeviceRegistryData) msg;
             deviceClassTreeTableView.update(data.getDeviceClassList());
