@@ -25,7 +25,6 @@ import com.google.protobuf.GeneratedMessage;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -62,10 +61,12 @@ import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
+ * @param <T>
+ * @param <TB>
  */
 public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Builder<TB>> extends TreeTableView<Node> {
 
-    private static final Logger logger = LoggerFactory.getLogger(RegistryTreeTableView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryTreeTableView.class);
 
     private final DescriptorColumn descriptorColumn;
     private final SendableType type;
@@ -106,18 +107,14 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
     }
 
     public void addWidthProperty(ReadOnlyDoubleProperty widthProperty) {
-        for (Object column : getColumns()) {
+        getColumns().forEach((column) -> {
             ((Column) column).addWidthProperty(widthProperty);
-        }
+        });
     }
 
     public void addHeightProperty(ReadOnlyDoubleProperty heightProperty) {
-        heightProperty.addListener(new ChangeListener<Number>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                RegistryTreeTableView.this.setPrefHeight(newValue.doubleValue());
-            }
+        heightProperty.addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            RegistryTreeTableView.this.setPrefHeight(newValue.doubleValue());
         });
     }
 
@@ -164,10 +161,6 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
             }
         }
         for (T msg : listDiff.getUpdatedMessageMap().getMessages()) {
-            if (msg instanceof UnitConfig) {
-                UnitConfig a = (UnitConfig) msg;
-                logger.info("Message to update [" + a.getType().name() + ", " + a.getLabel() + "]");
-            }
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
@@ -186,25 +179,22 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
                     accordingParent.registerElement(msg.toBuilder());
                 }
             } else {
-                parent.getChildren().remove(nodeToRemove);
+                // according parent either is null if no group exists where aunit can be placed or there are no groups for this tableview
                 if (this.getRoot() instanceof GenericGroupContainer) {
+                    parent.getChildren().remove(nodeToRemove);
                     GenericGroupContainer rootNode = (GenericGroupContainer) this.getRoot();
                     rootNode.addItemWithNewGroup(msg);
                 } else {
-                    if (getSendableType() == SendableType.UNIT_TEMPLATE) {
-                        ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((UnitTemplate) msg).getType().name());
-                    } else if (getSendableType() == SendableType.SERVICE_TEMPLATE) {
-                        ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((ServiceTemplate) msg).getType().name());
-                    }  else {
-                        ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder());
-                    }
+                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
+                    expandEqually(nodeToRemove, updatedNode);
+                    parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
                 }
             }
         }
         for (T msg : listDiff.getNewMessageMap().getMessages()) {
             if (msg instanceof UnitConfig) {
                 UnitConfig a = (UnitConfig) msg;
-                logger.info("New Message [" + a.getType().name() + ", " + a.getLabel() + "]");
+                LOGGER.info("New Message [" + a.getType().name() + ", " + a.getLabel() + "]");
             }
             //logger.info("New message [" + message + "]");
             if (this.getRoot() instanceof GenericGroupContainer) {
@@ -310,7 +300,7 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
                     statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
                 }
             } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistory("Failed to call is consistent for registry [" + type.name() + "]", ex, logger);
+                ExceptionPrinter.printHistory("Failed to call is consistent for registry [" + type.name() + "]", ex, LOGGER);
             }
             if (readOnly) {
                 getStylesheets().clear();
@@ -369,7 +359,7 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
             try {
                 observer.update(null, connected);
             } catch (Exception ex) {
-                logger.warn("Could not notify connection to value cell!");
+                LOGGER.warn("Could not notify connection to value cell!");
             }
         }
     }
