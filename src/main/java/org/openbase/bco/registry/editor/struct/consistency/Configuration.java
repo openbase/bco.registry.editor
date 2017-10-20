@@ -35,6 +35,7 @@ import rst.domotic.unit.app.AppClassType.AppClass;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
+import rst.domotic.unit.location.TileConfigType.TileConfig;
 import rst.rsb.ScopeType.Scope;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
@@ -55,6 +56,8 @@ public class Configuration {
         } else if (builder instanceof DeviceRegistryData.Builder && "unit_template".equals(fieldName)) {
             return false;
         } else if (builder instanceof LocationConfig.Builder && "unit_id".equals(fieldName)) {
+            return false;
+        } else if (builder instanceof TileConfig.Builder && "connection_id".equals(fieldName)) {
             return false;
         }
         return true;
@@ -98,6 +101,8 @@ public class Configuration {
             return !("id".equals(fieldName));
         } else if (builder instanceof AgentClass.Builder) {
             return !("id".equals(fieldName));
+        } else if (builder instanceof TileConfig.Builder) {
+            return !("connection_id".equals(fieldName));
         }
         return true;
     }

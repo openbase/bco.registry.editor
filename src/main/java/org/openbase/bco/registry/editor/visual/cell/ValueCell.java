@@ -226,6 +226,12 @@ public class ValueCell extends RowCell {
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
+                } else if ("connection_id".equals(item.getDescriptor())) {
+                    try {
+                        text = ScopeGenerator.generateStringRep(remotePool.getLocationRemote().getConnectionConfigById((String) ((Leaf) item).getValue()).getScope());
+                    } catch (CouldNotPerformException ex) {
+                        text = ((Leaf) item).getValue().toString();
+                    }
                 } else {
                     text = ((Leaf) item).getValue().toString();
                 }
