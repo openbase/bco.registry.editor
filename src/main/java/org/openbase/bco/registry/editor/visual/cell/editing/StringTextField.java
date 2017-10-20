@@ -21,9 +21,8 @@ package org.openbase.bco.registry.editor.visual.cell.editing;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import javafx.beans.value.ChangeListener;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -45,37 +44,34 @@ public class StringTextField extends TextField {
     public StringTextField(ValueCell cell, String text) {
         super();
         setText(text);
-        focusedProperty().addListener(new ChangeListener<Boolean>() {
-
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                try {
-                    if (!newValue && !cell.getLeaf().getValue().equals(getText())) {
-                        cell.getLeaf().setValue(getText());
-                        // even though commit is called the text property won't change fast enough without this line?!?
-                        cell.setGraphic(new Label(getText()));
-                        cell.commitEdit(cell.getLeaf());
-                    }
-                } catch (InterruptedException ex) {
-                    RegistryEditor.printException(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
+        Platform.runLater(() -> {
+            requestFocus();
+        });
+        focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            try {
+                if (newValue) {
+                    selectAll();
+                } else {
+                    cell.getLeaf().setValue(getText());
+                    // even though commit is called the text property won't change fast enough without this line?!?
+                    cell.setGraphic(new Label(getText()));
+                    cell.commitEdit(cell.getLeaf());
                 }
+            } catch (InterruptedException ex) {
+                RegistryEditor.printException(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
             }
         });
-        setOnKeyReleased(new EventHandler<KeyEvent>() {
-
-            @Override
-            public void handle(KeyEvent event) {
-                try {
-                    if (event.getCode().equals(KeyCode.ESCAPE)) {
-                        cell.cancelEdit();
-                    } else if (event.getCode().equals(KeyCode.ENTER)) {
-                        cell.getLeaf().setValue(getText());
-                        cell.setGraphic(new Label(getText()));
-                        cell.commitEdit(cell.getLeaf());
-                    }
-                } catch (InterruptedException ex) {
-                    RegistryEditor.printException(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
+        setOnKeyReleased((KeyEvent event) -> {
+            try {
+                if (event.getCode().equals(KeyCode.ESCAPE)) {
+                    cell.cancelEdit();
+                } else if (event.getCode().equals(KeyCode.ENTER)) {
+                    cell.getLeaf().setValue(getText());
+                    cell.setGraphic(new Label(getText()));
+                    cell.commitEdit(cell.getLeaf());
                 }
+            } catch (InterruptedException ex) {
+                RegistryEditor.printException(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
             }
         });
     }

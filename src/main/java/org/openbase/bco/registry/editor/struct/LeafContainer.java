@@ -93,6 +93,11 @@ public class LeafContainer implements Leaf {
 
     @Override
     public void setValue(Object value) throws InterruptedException {
+        // do nothing if value did not change
+        if(this.value.equals(value)) {
+            return;
+        }
+        
         this.value = value;
 
         try {
