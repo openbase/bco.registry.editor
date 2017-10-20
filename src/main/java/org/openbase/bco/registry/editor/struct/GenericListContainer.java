@@ -52,7 +52,9 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
         super(descriptor, builder);
         this.fieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(builder, descriptor);
         this.modifiable = true;
-        this.displayedDescriptor = descriptor;
+        if (this.displayedDescriptor.isEmpty()) {
+            this.displayedDescriptor = descriptor;
+        }
     }
 
     public GenericListContainer(final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder) throws InstantiationException {
@@ -77,7 +79,9 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
         } catch (CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
         }
-        this.displayedDescriptor = descriptor;
+        if (this.displayedDescriptor.isEmpty()) {
+            this.displayedDescriptor = descriptor;
+        }
     }
 
     public GenericListContainer(final String descriptor, final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder, List<RFMB> childBuilderList) throws InstantiationException {
@@ -95,7 +99,9 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
         } catch (CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
         }
-        this.displayedDescriptor = descriptor;
+        if (this.displayedDescriptor.isEmpty()) {
+            this.displayedDescriptor = descriptor;
+        }
     }
 
     public void addNewDefaultElement() throws CouldNotPerformException {
