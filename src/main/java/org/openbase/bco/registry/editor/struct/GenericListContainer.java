@@ -31,6 +31,7 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import org.openbase.jul.processing.StringProcessor;
 
 /**
  *
@@ -52,9 +53,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
         super(descriptor, builder);
         this.fieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(builder, descriptor);
         this.modifiable = true;
-        if (this.displayedDescriptor.isEmpty()) {
-            this.displayedDescriptor = descriptor;
-        }
+        this.displayedDescriptor = StringProcessor.transformToCamelCase(descriptor);
     }
 
     public GenericListContainer(final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder) throws InstantiationException {
@@ -79,9 +78,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
         } catch (CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
         }
-        if (this.displayedDescriptor.isEmpty()) {
-            this.displayedDescriptor = descriptor;
-        }
+        this.displayedDescriptor = StringProcessor.transformToCamelCase(descriptor);
     }
 
     public GenericListContainer(final String descriptor, final Descriptors.FieldDescriptor repeatedFieldDescriptor, final MB builder, List<RFMB> childBuilderList) throws InstantiationException {
@@ -99,9 +96,7 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
         } catch (CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
         }
-        if (this.displayedDescriptor.isEmpty()) {
-            this.displayedDescriptor = descriptor;
-        }
+        this.displayedDescriptor = StringProcessor.transformToCamelCase(descriptor);
     }
 
     public void addNewDefaultElement() throws CouldNotPerformException {

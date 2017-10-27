@@ -21,9 +21,13 @@ package org.openbase.bco.registry.editor.visual;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
+import com.google.protobuf.MessageOrBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -51,12 +55,15 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.ProtobufListDiff;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import static org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor.getFieldDescriptor;
+import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import org.openbase.jul.pattern.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
+import rst.rsb.ScopeType.Scope;
 
 /**
  *
@@ -163,8 +170,15 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         for (T msg : listDiff.getUpdatedMessageMap().getMessages()) {
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
-                GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
-                GlobalTextArea.getInstance().putText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'");
+                Platform.runLater(() -> {
+                    GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
+                    String difference = diffString(nodeToRemove.getBuilder(), msg);
+                    try {
+                        GlobalTextArea.getInstance().putText("WARNING: Message [" + ScopeGenerator.generateStringRep(getScope(nodeToRemove.getBuilder())) + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'\nDifferences between local and gloabl:\n" + difference);
+                    } catch (CouldNotPerformException ex) {
+                        GlobalTextArea.getInstance().putText("WARNING: Message with descriptor [" + nodeToRemove.getDescriptor() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'\nDifferences between local and gloabl:\n" + difference);
+                    }
+                });
                 continue;
             }
             GenericListContainer parent = (GenericListContainer) nodeToRemove.getParent();
@@ -218,6 +232,65 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         }
 
         setReadOnlyMode(remotePool.isReadOnly(type.getDefaultInstanceForType()));
+    }
+
+    public String diffString(MessageOrBuilder origin, MessageOrBuilder updated) {
+        String res = "";
+        List<String> diff = diff(origin, updated);
+        for (int i = 0; i < diff.size(); i++) {
+            if (i == diff.size() - 1) {
+                res += diff.get(i);
+            } else {
+                res += diff.get(i) + "\n";
+            }
+        }
+        return res;
+    }
+
+    public List<String> diff(MessageOrBuilder origin, MessageOrBuilder updated) {
+        List<String> fieldDiffList = new ArrayList<>();
+        for (Descriptors.FieldDescriptor field : origin.getDescriptorForType().getFields()) {
+            String fieldName = field.getName();
+            if (field.isRepeated()) {
+                int originCount = origin.getRepeatedFieldCount(field);
+                int updatedCount = updated.getRepeatedFieldCount(field);
+                if (originCount != updatedCount) {
+                    fieldDiffList.add(fieldName + ": Different counts[" + originCount + ", " + updatedCount + "]. Difference may be incorrect!");
+                }
+                if (field.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
+                    for (int i = 0; i < Math.min(originCount, updatedCount); ++i) {
+                        for (String diff : diff((Message) origin.getRepeatedField(field, i), (Message) updated.getRepeatedField(field, i))) {
+                            fieldDiffList.add(fieldName + "[" + i + "]." + diff);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < Math.min(originCount, updatedCount); ++i) {
+                        if (!origin.getRepeatedField(field, i).equals(updated.getRepeatedField(field, i))) {
+                            fieldDiffList.add(fieldName + "[" + i + "]" + "\t[" + origin.getRepeatedField(field, i).toString() + "]\t[" + updated.getRepeatedField(field, i).toString() + "]");
+                        }
+                    }
+                }
+            } else {
+                if (field.getType() == Descriptors.FieldDescriptor.Type.MESSAGE) {
+                    for (String diff : diff((Message) origin.getField(field), (Message) updated.getField(field))) {
+                        fieldDiffList.add(fieldName + "." + diff);
+                    }
+                } else {
+                    if (!origin.getField(field).equals(updated.getField(field))) {
+                        fieldDiffList.add(fieldName + "\t[" + origin.getField(field).toString() + "]\t[" + updated.getField(field).toString() + "]");
+                    }
+                }
+            }
+        }
+        return fieldDiffList;
+    }
+
+    public Scope getScope(final MessageOrBuilder msg) throws CouldNotPerformException {
+        try {
+            return (Scope) msg.getField(getFieldDescriptor(msg, "scope"));
+        } catch (Exception ex) {
+            throw new CouldNotPerformException("Could not get label of [" + msg + "]", ex);
+        }
     }
 
     public void selectMessage(GeneratedMessage msg) throws CouldNotPerformException {
@@ -281,10 +354,10 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         if (origin.isExpanded()) {
             update.setExpanded(true);
         }
-        
-        for(TreeItem<Node> originChild : origin.getChildren()) {
-            for(TreeItem<Node> updatedChild : update.getChildren()) {
-                if(originChild.getValue().getDescriptor().equals(updatedChild.getValue().getDescriptor())) {
+
+        for (TreeItem<Node> originChild : origin.getChildren()) {
+            for (TreeItem<Node> updatedChild : update.getChildren()) {
+                if (originChild.getValue().getDescriptor().equals(updatedChild.getValue().getDescriptor())) {
                     expandEqually(originChild, updatedChild);
                 }
             }
