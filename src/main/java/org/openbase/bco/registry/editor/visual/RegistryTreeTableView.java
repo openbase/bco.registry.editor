@@ -277,14 +277,16 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         return null;
     }
 
-    public static void expandEqually(TreeItem origin, TreeItem update) {
+    public static void expandEqually(TreeItem<Node> origin, TreeItem<Node> update) {
         if (origin.isExpanded()) {
             update.setExpanded(true);
         }
-
-        for (int i = 0; i < origin.getChildren().size(); i++) {
-            if (i < update.getChildren().size()) {
-                expandEqually((TreeItem) origin.getChildren().get(i), (TreeItem) update.getChildren().get(i));
+        
+        for(TreeItem<Node> originChild : origin.getChildren()) {
+            for(TreeItem<Node> updatedChild : update.getChildren()) {
+                if(originChild.getValue().getDescriptor().equals(updatedChild.getValue().getDescriptor())) {
+                    expandEqually(originChild, updatedChild);
+                }
             }
         }
     }
