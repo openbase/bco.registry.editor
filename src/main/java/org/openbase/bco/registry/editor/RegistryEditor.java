@@ -566,30 +566,53 @@ public class RegistryEditor extends Application {
             DeviceRegistryData data = (DeviceRegistryData) msg;
             deviceClassTreeTableView.update(data.getDeviceClassList());
             deviceConfigTreeTableView.update(data.getDeviceUnitConfigList());
+
+            deviceClassTreeTableView.setReadOnlyMode(remotePool.getDeviceRemote().isDeviceClassRegistryReadOnly());
+            deviceConfigTreeTableView.setReadOnlyMode(remotePool.getDeviceRemote().isDeviceConfigRegistryReadOnly());
+
             return deviceRegistryTabPane;
         } else if (msg instanceof LocationRegistryData) {
             LocationRegistryData data = (LocationRegistryData) msg;
             locationConfigTreeTableView.update(data.getLocationUnitConfigList());
             connectionConfigTreeTableView.update(data.getConnectionUnitConfigList());
+
+            locationConfigTreeTableView.setReadOnlyMode(remotePool.getLocationRemote().isLocationConfigRegistryReadOnly());
+            connectionConfigTreeTableView.setReadOnlyMode(remotePool.getLocationRemote().isConnectionConfigRegistryReadOnly());
+
             return locationRegistryTabPane;
         } else if (msg instanceof SceneRegistryData) {
             SceneRegistryData data = (SceneRegistryData) msg;
             sceneConfigTreeTableView.update(data.getSceneUnitConfigList());
+
+            sceneConfigTreeTableView.setReadOnlyMode(remotePool.getSceneRemote().isSceneConfigRegistryReadOnly());
+
             return sceneRegistryTabPane;
         } else if (msg instanceof AppRegistryData) {
             AppRegistryData data = (AppRegistryData) msg;
             appConfigTreeTableView.update(data.getAppUnitConfigList());
             appClassTreeTableView.update(data.getAppClassList());
+
+            appConfigTreeTableView.setReadOnlyMode(remotePool.getAppRemote().isAppConfigRegistryReadOnly());
+            appClassTreeTableView.setReadOnlyMode(remotePool.getAppRemote().isAppClassRegistryReadOnly());
+
             return appRegistryTabPane;
         } else if (msg instanceof AgentRegistryData) {
             AgentRegistryData data = (AgentRegistryData) msg;
             agentConfigTreeTableView.update(data.getAgentUnitConfigList());
             agentClassTreeTableView.update(data.getAgentClassList());
+
+            agentConfigTreeTableView.setReadOnlyMode(remotePool.getAgentRemote().isAgentConfigRegistryReadOnly());
+            agentClassTreeTableView.setReadOnlyMode(remotePool.getAgentRemote().isAgentClassRegistryReadOnly());
+
             return agentRegistryTabPane;
         } else if (msg instanceof UserRegistryData) {
             UserRegistryData data = (UserRegistryData) msg;
             userConfigTreeTableView.update(data.getUserUnitConfigList());
             authorizationGroupConfigTreeTableView.update(data.getAuthorizationGroupUnitConfigList());
+
+            userConfigTreeTableView.setReadOnlyMode(remotePool.getUserRemote().isUserConfigRegistryReadOnly());
+            authorizationGroupConfigTreeTableView.setReadOnlyMode(remotePool.getUserRemote().isAuthorizationGroupConfigRegistryReadOnly());
+
             return userRegistryTabPane;
         } else if (msg instanceof UnitRegistryData) {
             UnitRegistryData data = (UnitRegistryData) msg;
@@ -597,6 +620,12 @@ public class RegistryEditor extends Application {
             unitTemplateTreeTableView.update(data.getUnitTemplateList());
             unitGroupConfigTreeTableView.update(data.getUnitGroupUnitConfigList());
             serviceTemplateTreeTableView.update(data.getServiceTemplateList());
+
+            dalUnitConfigTreeTableView.setReadOnlyMode(remotePool.getUnitRemote().isDalUnitConfigRegistryReadOnly());
+            unitTemplateTreeTableView.setReadOnlyMode(remotePool.getUnitRemote().isUnitTemplateRegistryReadOnly());
+            unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.getUnitRemote().isUnitGroupConfigRegistryReadOnly());
+            serviceTemplateTreeTableView.setReadOnlyMode(remotePool.getUnitRemote().isServiceTemplateRegistryReadOnly());
+
             return unitRegistryTabPane;
         }
         return null;
