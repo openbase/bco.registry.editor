@@ -94,7 +94,8 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         this.descriptorColumn = new DescriptorColumn();
         ValueColumn valueColumn = new ValueColumn();
         this.getColumns().addAll(descriptorColumn, valueColumn);
-        if (type != null) {
+        if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.USER_ACTIVITY_CLASS) {
+            System.out.println("Set Context Menu for type [" + type.name() + "]");
             this.setContextMenu(new TreeTableViewContextMenu(this, type));
         }
         setSortMode(TreeSortMode.ALL_DESCENDANTS);
@@ -384,7 +385,9 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
             } else {
                 getStylesheets().clear();
                 getStylesheets().add("default.css");
-                setContextMenu(new TreeTableViewContextMenu(RegistryTreeTableView.this, type));
+                if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.USER_ACTIVITY_CLASS) {
+                    setContextMenu(new TreeTableViewContextMenu(RegistryTreeTableView.this, type));
+                }
             }
             setEditableWithReadOnlyLabel(!readOnly);
             return null;

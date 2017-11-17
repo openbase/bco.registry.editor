@@ -46,6 +46,7 @@ import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
+import rst.domotic.activity.UserActivityClassType.UserActivityClass;
 import rst.domotic.authentication.PermissionConfigType.PermissionConfig;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
@@ -223,6 +224,8 @@ public class MessageComboBox extends ComboBox<Message> {
                     }
                 case "group_id":
                     return SendableType.AUTHORIZATION_GROUP_CONFIG.getDefaultInstanceForType();
+                case "user_activity_class_id":
+                    return SendableType.USER_ACTIVITY_CLASS.getDefaultInstanceForType();
             }
         }
         return null;
@@ -251,6 +254,8 @@ public class MessageComboBox extends ComboBox<Message> {
             return new AppClassComboBoxConverter();
         } else if (msg instanceof DeviceClass) {
             return new DeviceClassComboBoxConverter();
+        } else if (msg instanceof UserActivityClass) {
+            return new UserActivityClassComboBoxConverter();
         } else {
             return new DefaultMessageComboBoxConverter();
         }
