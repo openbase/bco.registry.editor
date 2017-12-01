@@ -458,12 +458,16 @@ public class ValueCell extends RowCell {
                     GenericNodeContainer container = (GenericNodeContainer) getItem();
                     try {
                         if ("".equals(ProtoBufFieldProcessor.getId(container.getBuilder()))) {
-                            container.getParent().getChildren().remove(container);
+                            Platform.runLater(() -> {
+                                container.getParent().getChildren().remove(container);
+                            });
                         } else {
                             int index = container.getParent().getChildren().indexOf(container);
                             GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), (GeneratedMessage.Builder) remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
                             RegistryTreeTableView.expandEqually(container, oldNode);
-                            container.getParent().getChildren().set(index, oldNode);
+                            Platform.runLater(() -> {
+                               container.getParent().getChildren().set(index, oldNode);
+                            });
                         }
                     } catch (Exception ex) {
                         RegistryEditor.printException(ex, logger, LogLevel.ERROR);

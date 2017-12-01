@@ -89,8 +89,10 @@ public class Configuration {
         } else if (builder instanceof UnitConfig.Builder) {
             if (((UnitConfig.Builder) builder).getType() == UnitTemplate.UnitType.USER && "label".equals(fieldName)) {
                 return false;
+            } else if ("type".equals(fieldName)) {
+                return ((UnitConfig.Builder) builder).getType() == UnitTemplate.UnitType.UNKNOWN;
             }
-            return !("id".equals(fieldName) || "unit_host_id".equals(fieldName) || "type".equals(fieldName) || "unit_template_config_id".equals(fieldName));
+            return !("id".equals(fieldName) || "unit_host_id".equals(fieldName) || "unit_template_config_id".equals(fieldName));
         } else if (builder instanceof ServiceConfig.Builder) {
             return !("type".equals(fieldName) || "unit_id".equals(fieldName));
         } else if (builder instanceof LocationConfig.Builder) {
