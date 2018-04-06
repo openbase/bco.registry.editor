@@ -102,9 +102,6 @@ import java.util.concurrent.FutureTask;
  */
 public class RegistryEditor extends Application {
 
-    //TODO:
-    // - differentiate in every tab between read only registry and consistent
-    // - when the remote is disconnected -> show that in the read only label and deactivate apply and cancel buttons
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryEditor.class);
 
     public static final String APP_NAME = "RegistryView";
@@ -427,7 +424,8 @@ public class RegistryEditor extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        //TODO: search why it will not shutdown without system exit
+
+        // Call system exit to trigger all shutdown daemons.
         System.exit(0);
     }
 
