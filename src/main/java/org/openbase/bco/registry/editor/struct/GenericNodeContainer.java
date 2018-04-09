@@ -23,17 +23,18 @@ package org.openbase.bco.registry.editor.struct;
  */
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
-import java.util.Map.Entry;
 import org.openbase.bco.registry.editor.struct.consistency.Configuration;
 import org.openbase.bco.registry.editor.struct.converter.DefaultConverter;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 
+import java.util.Map.Entry;
+
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
- * @param <MB>
+ * @param <MB> The message builder type to use.
  */
 public class GenericNodeContainer<MB extends GeneratedMessage.Builder> extends NodeContainer<MB> {
 

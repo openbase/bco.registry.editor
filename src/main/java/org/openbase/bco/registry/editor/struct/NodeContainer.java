@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
- * @param <MB>
+ * @param <MB> The message builder type to use.
  */
 public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<Node> implements Node {
     

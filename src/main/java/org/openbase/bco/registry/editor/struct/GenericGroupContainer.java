@@ -35,9 +35,9 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
- * @param <MB>
- * @param <RFM>
- * @param <RFMB>
+ * @param <MB> The message builder of the message containing the repeated filed.
+ * @param <RFM> The repeated field message type to use.
+ * @param <RFMB> The repeated field message builder type to use.
  */
 public class GenericGroupContainer<MB extends GeneratedMessage.Builder<MB>, RFM extends GeneratedMessage, RFMB extends RFM.Builder<RFMB>> extends NodeContainer<MB> {
 

@@ -68,16 +68,16 @@ import rst.rsb.ScopeType.Scope;
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
- * @param <T>
- * @param <TB>
+ * @param <M> The message type to use.
+ * @param <MB> The message builder type to use.
  */
-public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Builder<TB>> extends TreeTableView<Node> {
+public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Builder<MB>> extends TreeTableView<Node> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryTreeTableView.class);
 
     private final DescriptorColumn descriptorColumn;
     private final SendableType type;
-    private final ProtobufListDiff<?, T, ?> listDiff;
+    private final ProtobufListDiff<?, M, ?> listDiff;
     private final VBox vBox;
     private final RemotePool remotePool;
     private final Label statusInfoLabel;
@@ -134,7 +134,7 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         return type;
     }
 
-    public void update(List<T> messageList) throws CouldNotPerformException, InterruptedException {
+    public void update(List<M> messageList) throws CouldNotPerformException, InterruptedException {
         // TODO tamino: fix update issue and remove workaround.
         // Workaround: Hack for registry restart bug, should be removed after fixing update because empty registries can not be displayed anymore.
         while (true) {
@@ -150,7 +150,7 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
         // get all changes
         listDiff.diff(messageList);
         // Remove all removed messages
-        for (T msg : listDiff.getRemovedMessageMap().getMessages()) {
+        for (M msg : listDiff.getRemovedMessageMap().getMessages()) {
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
                 GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
@@ -168,7 +168,7 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
                 }
             }
         }
-        for (T msg : listDiff.getUpdatedMessageMap().getMessages()) {
+        for (M msg : listDiff.getUpdatedMessageMap().getMessages()) {
             NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
             if (nodeToRemove.hasChanged()) {
                 Platform.runLater(() -> {
@@ -206,7 +206,7 @@ public class RegistryTreeTableView<T extends GeneratedMessage, TB extends T.Buil
                 }
             }
         }
-        for (T msg : listDiff.getNewMessageMap().getMessages()) {
+        for (M msg : listDiff.getNewMessageMap().getMessages()) {
             if (msg instanceof UnitConfig) {
                 UnitConfig a = (UnitConfig) msg;
                 LOGGER.info("New Message [" + a.getType().name() + ", " + a.getLabel() + "]");
