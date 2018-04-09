@@ -21,42 +21,25 @@ package org.openbase.bco.registry.editor.visual.cell;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.openbase.bco.registry.editor.RegistryEditor;
-import org.openbase.bco.registry.editor.struct.GenericGroupContainer;
-import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
-import org.openbase.bco.registry.editor.struct.Leaf;
-import org.openbase.bco.registry.editor.struct.LeafContainer;
-import org.openbase.bco.registry.editor.struct.Node;
+import org.openbase.bco.registry.editor.struct.*;
 import org.openbase.bco.registry.editor.struct.consistency.Configuration;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
 import org.openbase.bco.registry.editor.visual.GlobalTextArea;
@@ -83,8 +66,13 @@ import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.math.Vec3DDoubleType.Vec3DDouble;
 import rst.timing.TimestampType.Timestamp;
 
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class ValueCell extends RowCell {
@@ -412,21 +400,29 @@ public class ValueCell extends RowCell {
                     try {
                         msg = container.getBuilder().build();
                         container.setChanged(false);
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                ProgressIndicator progressIndicator = new ProgressIndicator();
-                                progressIndicator.setMaxHeight(ValueCell.this.applyButton.getHeight());
-                                Label label = new Label("Waiting for registry update...");
-                                label.setMaxHeight(ValueCell.this.applyButton.getHeight());
-                                ValueCell.this.setGraphic(new HBox(progressIndicator, label));
-                            }
+                        Platform.runLater(() -> {
+                            ProgressIndicator progressIndicator = new ProgressIndicator();
+                            progressIndicator.setMaxHeight(ValueCell.this.applyButton.getHeight());
+                            Label label = new Label("Waiting for registry update...");
+                            label.setMaxHeight(ValueCell.this.applyButton.getHeight());
+                            ValueCell.this.setGraphic(new HBox(progressIndicator, label));
                         });
                         if (remotePool.contains(msg)) {
+                            // save original value from model
+                            final Message original = remotePool.getById(ProtoBufFieldProcessor.getId(msg));
+
                             registryTask = remotePool.update(msg);
                             addToTaskMap(container, registryTask);
-                            registryTask.get();
+                            // save update
+                            final Message update = (Message) registryTask.get();
                             removeFromTaskMap(container);
+
+                            // check if update and original are the same, then the changed values where reset and a registry update is not triggered
+                            if (original.equals(update)) {
+                                // reset the container to its old value
+                                resetContainer();
+                            }
+
                         } else {
                             registryTask = remotePool.register(msg);
                             addToTaskMap(container, registryTask);
@@ -446,6 +442,18 @@ public class ValueCell extends RowCell {
         }
     }
 
+    public void resetContainer() throws CouldNotPerformException {
+        final GenericNodeContainer container = (GenericNodeContainer) getItem();
+
+        final int index = container.getParent().getChildren().indexOf(container);
+        final GenericNodeContainer resetNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(),
+                (GeneratedMessage.Builder) remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
+        RegistryTreeTableView.expandEqually(container, resetNode);
+        Platform.runLater(() -> {
+            container.getParent().getChildren().set(index, resetNode);
+        });
+    }
+
     private class CancelEventHandler implements EventHandler<ActionEvent> {
 
         @Override
@@ -462,12 +470,13 @@ public class ValueCell extends RowCell {
                                 container.getParent().getChildren().remove(container);
                             });
                         } else {
-                            int index = container.getParent().getChildren().indexOf(container);
-                            GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), (GeneratedMessage.Builder) remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
-                            RegistryTreeTableView.expandEqually(container, oldNode);
-                            Platform.runLater(() -> {
-                               container.getParent().getChildren().set(index, oldNode);
-                            });
+                            resetContainer();
+//                            int index = container.getParent().getChildren().indexOf(container);
+//                            GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), (GeneratedMessage.Builder) remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
+//                            RegistryTreeTableView.expandEqually(container, oldNode);
+//                            Platform.runLater(() -> {
+//                                container.getParent().getChildren().set(index, oldNode);
+//                            });
                         }
                     } catch (Exception ex) {
                         RegistryEditor.printException(ex, logger, LogLevel.ERROR);

@@ -21,17 +21,10 @@ package org.openbase.bco.registry.editor;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.sun.javafx.application.LauncherImpl;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -40,14 +33,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -64,12 +50,7 @@ import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.GlobalTextArea;
 import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
 import org.openbase.bco.registry.editor.visual.TabPaneWithClearing;
-import org.openbase.bco.registry.editor.visual.provider.AgentClassItemDescriptorProvider;
-import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
-import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
-import org.openbase.bco.registry.editor.visual.provider.LocationItemDescriptorProvider;
-import org.openbase.bco.registry.editor.visual.provider.TreeItemDescriptorProvider;
-import org.openbase.bco.registry.editor.visual.provider.UnitTypeItemDescriptorProvider;
+import org.openbase.bco.registry.editor.visual.provider.*;
 import org.openbase.bco.registry.location.lib.jp.JPLocationRegistryScope;
 import org.openbase.bco.registry.location.remote.LocationRegistryRemote;
 import org.openbase.bco.registry.scene.lib.jp.JPSceneRegistryScope;
@@ -107,15 +88,20 @@ import rst.domotic.registry.UserActivityRegistryDataType.UserActivityRegistryDat
 import rst.domotic.registry.UserRegistryDataType.UserRegistryData;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class RegistryEditor extends Application {
 
-    //TODO:
-    // - differentiate in every tab between read only registry and consistent
-    // - when the remote is disconnected -> show that in the read only label and deactivate apply and cancel buttons
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryEditor.class);
 
     public static final String APP_NAME = "RegistryView";
@@ -420,13 +406,13 @@ public class RegistryEditor extends Application {
                     public void update(final Observable<ConnectionState> source, final ConnectionState connectionState) throws Exception {
                         LOGGER.debug("Remote connection state has changed to: " + connectionState);
                         Platform.runLater(() -> {
-                            boolean disonnected = false;
+                            boolean disconnected = false;
                             if (connectionState != ConnectionState.CONNECTED) {
-                                disonnected = true;
+                                disconnected = true;
                             }
 
                             for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
-                                treeTable.setDisconnected(disonnected);
+                                treeTable.setDisconnected(disconnected);
                             }
                         });
                     }
@@ -438,16 +424,18 @@ public class RegistryEditor extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-        //TODO: search why it will not shutdown without system exit
+
+        // Call system exit to trigger all shutdown daemons.
         System.exit(0);
     }
 
     private void updateTab(final RSBRemoteService remote) {
-        LOGGER.debug("Update tab for remote [" + remote + "]");
+        LOGGER.info("Update tab for remote [" + remote + "]");
         GlobalCachedExecutorService.submit(() -> {
             synchronized (remote) {
                 Tab tab = getRegistryTabByRemote(remote);
                 if (!remote.isConnected() || !remote.isActive() || !remote.isDataAvailable()) {
+                    LOGGER.info("Set progress indicator for remote[" + remote + "] because [" + !remote.isConnected() + ", " + !remote.isActive() + ", " + !remote.isDataAvailable() + "]");
                     final Node node = getProgressindicatorByRemote(remote);
                     Platform.runLater(() -> {
                         tab.setContent(node);
@@ -482,8 +470,8 @@ public class RegistryEditor extends Application {
         if (msg instanceof DeviceRegistryData) {
             DeviceRegistryData data = (DeviceRegistryData) msg;
             TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);
-            Descriptors.FieldDescriptor deviceClassfield = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistryData.DEVICE_CLASS_FIELD_NUMBER);
-            deviceClassTreeTableView.setRoot(new GenericGroupContainer<>(deviceClassfield.getName(), deviceClassfield, data.toBuilder(), data.toBuilder().getDeviceClassBuilderList(), company));
+            Descriptors.FieldDescriptor deviceClassField = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistryData.DEVICE_CLASS_FIELD_NUMBER);
+            deviceClassTreeTableView.setRoot(new GenericGroupContainer<>(deviceClassField.getName(), deviceClassField, data.toBuilder(), data.toBuilder().getDeviceClassBuilderList(), company));
             deviceClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CLASS.getDefaultInstanceForType()));
             deviceClassTreeTableView.getListDiff().diff(data.getDeviceClassList());
 
