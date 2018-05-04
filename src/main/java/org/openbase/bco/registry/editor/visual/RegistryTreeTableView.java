@@ -21,29 +21,20 @@ package org.openbase.bco.registry.editor.visual;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeSortMode;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import org.openbase.bco.registry.device.remote.CachedDeviceRegistryRemote;
 import org.openbase.bco.registry.editor.RegistryEditor;
-import org.openbase.bco.registry.editor.struct.GenericGroupContainer;
-import org.openbase.bco.registry.editor.struct.GenericListContainer;
-import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
-import org.openbase.bco.registry.editor.struct.Node;
-import org.openbase.bco.registry.editor.struct.NodeContainer;
+import org.openbase.bco.registry.editor.struct.*;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.column.Column;
@@ -55,7 +46,6 @@ import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.ProtobufListDiff;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import static org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor.getFieldDescriptor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import org.openbase.jul.pattern.Observer;
 import org.slf4j.Logger;
@@ -65,11 +55,15 @@ import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 import rst.rsb.ScopeType.Scope;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor.getFieldDescriptor;
+
 /**
- *
- * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
- * @param <M> The message type to use.
+ * @param <M>  The message type to use.
  * @param <MB> The message builder type to use.
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Builder<MB>> extends TreeTableView<Node> {
 
@@ -309,6 +303,13 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         }
 
         try {
+            // if the search has progressed too far leaf containers can be under the searched nodes
+            // they are ignored and the remaining nodes are tested
+            if (!(nodes.get(0) instanceof NodeContainer)) {
+                nodes.remove(0);
+                return getNodeByMessage(nodes, msg);
+            }
+            
             if (ProtoBufFieldProcessor.getId(msg).equals(ProtoBufFieldProcessor.getId(((NodeContainer) nodes.get(0)).getBuilder()))) {
                 return (NodeContainer) nodes.get(0);
             } else {
