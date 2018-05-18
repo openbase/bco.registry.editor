@@ -95,9 +95,9 @@ public class RemotePool {
         try {
             this.unitRemote = Registries.getUnitRegistry();
             this.unitRemote.waitForData();
-            this.locationRemote = Registries.getLocationRegistry();
+            this.locationRemote = Registries.getUnitRegistry();
             this.sceneRemote = Registries.getSceneRegistry();
-            this.agentRemote = Registries.getAgentRegistry();
+            this.agentRemote = Registries.getUnitRegistry();
             this.appRemote = Registries.getAppRegistry();
             this.userRemote = Registries.getUserRegistry();
             this.deviceRemote = Registries.getDeviceRegistry();
