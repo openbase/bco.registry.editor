@@ -25,25 +25,25 @@ package org.openbase.bco.registry.editor.visual.provider;
 import com.google.protobuf.Message;
 import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.jul.exception.CouldNotPerformException;
-import rst.domotic.activity.UserActivityClassType.UserActivityClass;
-import rst.domotic.activity.UserActivityConfigType.UserActivityConfig;
+import rst.domotic.activity.ActivityClassType.ActivityClass;
+import rst.domotic.activity.ActivityConfigType.ActivityConfig;
 
 /**
  *
  * @author <a href="mailto:pLeminoq@openbase.org">Tamino Huxohl</a>
  */
-public class UserActivityClassItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
+public class ActivityClassItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
 
     FieldDescriptorGroup fieldGroup;
 
-    public UserActivityClassItemDescriptorProvider() {
-        fieldGroup = new FieldDescriptorGroup(UserActivityConfig.newBuilder(), UserActivityConfig.USER_ACTIVITY_CLASS_ID_FIELD_NUMBER);
+    public ActivityClassItemDescriptorProvider() {
+        fieldGroup = new FieldDescriptorGroup(ActivityConfig.newBuilder(), ActivityConfig.USER_ACTIVITY_CLASS_ID_FIELD_NUMBER);
     }
 
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
-        UserActivityClass userActivityClass = RemotePool.getInstance().getUserActivityRemote().getUserActivityClassById((String) fieldGroup.getValue(builder));
-        return userActivityClass.getLabel();
+        ActivityClass activityClass = RemotePool.getInstance().getActivityRemote().getActivityClassById((String) fieldGroup.getValue(builder));
+        return activityClass.getLabel();
     }
 
     @Override

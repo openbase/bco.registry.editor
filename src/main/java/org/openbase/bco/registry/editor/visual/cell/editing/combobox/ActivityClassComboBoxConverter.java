@@ -24,22 +24,22 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
 
 import com.google.protobuf.Message;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.domotic.activity.UserActivityClassType.UserActivityClass;
+import rst.domotic.activity.ActivityClassType.ActivityClass;
 
 /**
  *
  * @author <a href="mailto:pLeminoq@openbase.org">Tamino Huxohl</a>
  */
-public class UserActivityClassComboBoxConverter implements MessageComboBoxConverter {
+public class ActivityClassComboBoxConverter implements MessageComboBoxConverter {
 
     @Override
     public String getText(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UserActivityClass.getDefaultInstance(), UserActivityClass.LABEL_FIELD_NUMBER));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(ActivityClass.getDefaultInstance(), ActivityClass.LABEL_FIELD_NUMBER));
     }
 
     @Override
     public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UserActivityClass.getDefaultInstance(), UserActivityClass.ID_FIELD_NUMBER));
+        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(ActivityClass.getDefaultInstance(), ActivityClass.ID_FIELD_NUMBER));
     }
 
 }

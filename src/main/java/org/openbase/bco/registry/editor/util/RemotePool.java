@@ -36,7 +36,7 @@ import org.openbase.bco.registry.location.remote.LocationRegistryRemote;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.bco.registry.scene.remote.SceneRegistryRemote;
 import org.openbase.bco.registry.unit.remote.UnitRegistryRemote;
-import org.openbase.bco.registry.user.activity.remote.UserActivityRegistryRemote;
+import org.openbase.bco.registry.user.activity.remote.ActivityRegistryRemote;
 import org.openbase.bco.registry.user.remote.UserRegistryRemote;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
@@ -45,8 +45,8 @@ import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.domotic.activity.UserActivityClassType.UserActivityClass;
-import rst.domotic.activity.UserActivityConfigType.UserActivityConfig;
+import rst.domotic.activity.ActivityClassType.ActivityClass;
+import rst.domotic.activity.ActivityConfigType.ActivityConfig;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
@@ -80,7 +80,7 @@ public class RemotePool {
     private final AppRegistryRemote appRemote;
     private final UserRegistryRemote userRemote;
     private final UnitRegistryRemote unitRemote;
-    private final UserActivityRegistryRemote userActivityRemote;
+    private final ActivityRegistryRemote activityRemote;
 
     private final List<RSBRemoteService> remotes = new ArrayList();
 
@@ -101,7 +101,7 @@ public class RemotePool {
             this.appRemote = Registries.getAppRegistry();
             this.userRemote = Registries.getUserRegistry();
             this.deviceRemote = Registries.getDeviceRegistry();
-            this.userActivityRemote = Registries.getUserActivityRegistry();
+            this.activityRemote = Registries.getActivityRegistry();
         } catch (CouldNotPerformException ex) {
             throw new InstantiationException(RemotePool.class, ex);
         }
@@ -112,7 +112,7 @@ public class RemotePool {
         remotes.add(deviceRemote);
         remotes.add(sceneRemote);
         remotes.add(userRemote);
-        remotes.add(userActivityRemote);
+        remotes.add(activityRemote);
     }
 
     public <M extends Message> Future<M> register(Message msg) throws CouldNotPerformException {
@@ -197,7 +197,7 @@ public class RemotePool {
 
     public <M extends Message> List<M> getMessageList(Message msg) throws CouldNotPerformException {
         String methodName = getMethodName("get", "s", msg);
-        if (msg instanceof DeviceClass || msg instanceof AgentClass || msg instanceof AppClass || msg instanceof UserActivityClass) {
+        if (msg instanceof DeviceClass || msg instanceof AgentClass || msg instanceof AppClass || msg instanceof ActivityClass) {
             methodName = getMethodName("get", "es", msg);
         }
         try {
@@ -310,8 +310,8 @@ public class RemotePool {
                 default:
                     return unitRemote;
             }
-        } else if (builder instanceof UserActivityClass.Builder || builder instanceof UserActivityConfig.Builder) {
-            return userActivityRemote;
+        } else if (builder instanceof ActivityClass.Builder || builder instanceof ActivityConfig.Builder) {
+            return activityRemote;
         } else {
             throw new CouldNotPerformException("No matching remote for type [" + builder.getDescriptorForType().getName() + "]found");
         }
@@ -345,8 +345,8 @@ public class RemotePool {
         return unitRemote;
     }
 
-    public UserActivityRegistryRemote getUserActivityRemote() {
-        return userActivityRemote;
+    public ActivityRegistryRemote getActivityRemote() {
+        return activityRemote;
     }
 
     public Collection<RSBRemoteService> getRemotes() {

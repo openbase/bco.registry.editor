@@ -23,8 +23,8 @@ package org.openbase.bco.registry.editor.struct.consistency;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import rst.domotic.activity.UserActivityClassType.UserActivityClass;
-import rst.domotic.activity.UserActivityConfigType.UserActivityConfig;
+import rst.domotic.activity.ActivityClassType.ActivityClass;
+import rst.domotic.activity.ActivityConfigType.ActivityConfig;
 import rst.domotic.registry.DeviceRegistryDataType.DeviceRegistryData;
 import rst.domotic.service.ServiceConfigType.ServiceConfig;
 import rst.domotic.service.ServiceTemplateConfigType.ServiceTemplateConfig;
@@ -107,9 +107,9 @@ public class Configuration {
             return !("id".equals(fieldName));
         } else if (builder instanceof TileConfig.Builder) {
             return !("connection_id".equals(fieldName));
-        } else if (builder instanceof UserActivityClass.Builder) {
+        } else if (builder instanceof ActivityClass.Builder) {
             return !("id".equals(fieldName) || "type".equals(fieldName));
-        } else if (builder instanceof UserActivityConfig.Builder) {
+        } else if (builder instanceof ActivityConfig.Builder) {
             return !("id".equals(fieldName));
         }
         return true;
@@ -122,7 +122,7 @@ public class Configuration {
                 || (builder instanceof AgentClass.Builder)
                 || (builder instanceof AppClass.Builder)
                 || (builder instanceof UnitConfig.Builder))
-                || (builder instanceof UserActivityClass.Builder)
-                || (builder instanceof UserActivityConfig.Builder);
+                || (builder instanceof ActivityClass.Builder)
+                || (builder instanceof ActivityConfig.Builder);
     }
 }
