@@ -40,7 +40,7 @@ import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.column.Column;
 import org.openbase.bco.registry.editor.visual.column.DescriptorColumn;
 import org.openbase.bco.registry.editor.visual.column.ValueColumn;
-import org.openbase.bco.registry.location.remote.CachedLocationRegistryRemote;
+
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
@@ -132,7 +132,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         // TODO tamino: fix update issue and remove workaround.
         // Workaround: Hack for registry restart bug, should be removed after fixing update because empty registries can not be displayed anymore.
         while (true) {
-            CachedLocationRegistryRemote.getRegistry().waitForData();
+            Registries.getUnitRegistry().waitForData();
             CachedDeviceRegistryRemote.getRegistry().waitForData();
             if (CachedDeviceRegistryRemote.getRegistry().getData().getDeviceUnitConfigCount() != 0) {
                 break;
