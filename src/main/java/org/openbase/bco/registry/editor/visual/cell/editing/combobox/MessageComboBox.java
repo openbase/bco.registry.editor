@@ -21,12 +21,9 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -37,20 +34,21 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
-import rst.domotic.activity.ActivityClassType.ActivityClass;
+import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
 import rst.domotic.authentication.PermissionConfigType.PermissionConfig;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.domotic.unit.agent.AgentClassType.AgentClass;
 import rst.domotic.unit.app.AppClassType.AppClass;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
@@ -59,8 +57,12 @@ import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class MessageComboBox extends ComboBox<Message> {
@@ -114,14 +116,14 @@ public class MessageComboBox extends ComboBox<Message> {
 
     private ObservableList<Message> sortedList(Message.Builder parentBuilder, String fieldName, Object leafValue) throws InstantiationException {
         try {
-            List<Message> list = RemotePool.getInstance().getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
+            List<Message> list = Registries.getMessageList(getMessageEnumBoxType(fieldName, parentBuilder));
             if (parentBuilder instanceof LocationConfig.Builder) {
-                list.remove(RemotePool.getInstance().getById(ProtoBufFieldProcessor.getId(parentBuilder), parentBuilder));
+                list.remove(Registries.getById(ProtoBufFieldProcessor.getId(parentBuilder), parentBuilder));
                 for (String childId : ((LocationConfig.Builder) parentBuilder).getChildIdList()) {
                     if (childId.equals(leafValue)) {
                         continue;
                     }
-                    list.remove(RemotePool.getInstance().getById(childId, parentBuilder));
+                    list.remove(Registries.getById(childId, parentBuilder));
                 }
             }
             if ("tile_id".equals(fieldName)) {
@@ -138,7 +140,7 @@ public class MessageComboBox extends ComboBox<Message> {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }
-                    list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()));
+                    list.remove(Registries.getById(memberId, UnitConfig.newBuilder()));
                 }
             }
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
@@ -148,30 +150,30 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
                 list.clear();
                 // add all units which have the same serviveTypes as the group
-                list.addAll(RemotePool.getInstance().getUnitRemote().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), serviceTypes));
+                list.addAll(Registries.getUnitRegistry().getUnitConfigsByUnitTypeAndServiceTypes(((UnitGroupConfig.Builder) parentBuilder).getUnitType(), serviceTypes));
                 // remove all units which are already members of the group
                 for (String memberId : ((UnitGroupConfig.Builder) parentBuilder).getMemberIdList()) {
                     if (memberId.equals(leafValue)) {
                         continue;
                     }
-                    list.remove(RemotePool.getInstance().getById(memberId, UnitConfig.newBuilder()));
+                    list.remove(Registries.getById(memberId, UnitConfig.newBuilder()));
                 }
                 // TODO: remove all units which are not registered at the same location or a sub location of the unit group
             }
             if (parentBuilder instanceof ConnectionConfig.Builder && "unit_id".equals(fieldName)) {
                 list.clear();
                 for (String tileId : ((ConnectionConfig.Builder) parentBuilder).getTileIdList()) {
-                    list.addAll(RemotePool.getInstance().getLocationRemote().getUnitConfigsByLocation(tileId));
+                    list.addAll(Registries.getUnitRegistry().getUnitConfigsByLocation(tileId));
                 }
             }
             if (parentBuilder instanceof PermissionConfig.MapFieldEntry.Builder) {
                 PermissionConfig.Builder permissionConfig = (PermissionConfig.Builder) ((NodeContainer) this.cell.getLeaf().getParent().getParent().getValue()).getBuilder();
                 for (PermissionConfig.MapFieldEntry entry : permissionConfig.getGroupPermissionList()) {
-                    if(leafValue.equals(entry.getGroupId())) {
+                    if (leafValue.equals(entry.getGroupId())) {
                         continue;
                     }
                     if (entry.hasGroupId() && !entry.getGroupId().isEmpty()) {
-                        list.remove(RemotePool.getInstance().getUserRemote().getAuthorizationGroupConfigById(entry.getGroupId()));
+                        list.remove(Registries.getUnitRegistry().getUnitConfigById(entry.getGroupId(), UnitType.AUTHORIZATION_GROUP));
                     }
                 }
             }
@@ -191,7 +193,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 }
             });
             return FXCollections.observableArrayList(list);
-        } catch (InterruptedException | CouldNotPerformException ex) {
+        } catch (CouldNotPerformException ex) {
             throw new InstantiationException(this, ex);
         }
     }
@@ -225,7 +227,7 @@ public class MessageComboBox extends ComboBox<Message> {
                 case "group_id":
                     return SendableType.AUTHORIZATION_GROUP_CONFIG.getDefaultInstanceForType();
                 case "user_activity_class_id":
-                    return SendableType.USER_ACTIVITY_CLASS.getDefaultInstanceForType();
+                    return SendableType.ACTIVITY_TEMPLATE.getDefaultInstanceForType();
             }
         }
         return null;
@@ -254,8 +256,8 @@ public class MessageComboBox extends ComboBox<Message> {
             return new AppClassComboBoxConverter();
         } else if (msg instanceof DeviceClass) {
             return new DeviceClassComboBoxConverter();
-        } else if (msg instanceof ActivityClass) {
-            return new ActivityClassComboBoxConverter();
+        } else if (msg instanceof ActivityTemplate) {
+            return new ActivityTemplateComboBoxConverter();
         } else {
             return new DefaultMessageComboBoxConverter();
         }

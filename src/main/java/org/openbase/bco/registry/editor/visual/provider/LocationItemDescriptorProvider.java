@@ -22,10 +22,11 @@ package org.openbase.bco.registry.editor.visual.provider;
  * #L%
  */
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.util.RemotePool;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
@@ -42,7 +43,7 @@ public class LocationItemDescriptorProvider extends AbstractTreeItemDescriptorPr
 
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
-        UnitConfig location = RemotePool.getInstance().getLocationRemote().getLocationConfigById((String) fieldGroup.getValue(builder));
+        UnitConfig location = Registries.getUnitRegistry().getUnitConfigById((String) fieldGroup.getValue(builder), UnitType.LOCATION);
         return ScopeGenerator.generateStringRep(location.getScope());
     }
 

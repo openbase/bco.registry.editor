@@ -40,10 +40,9 @@ import org.openbase.bco.registry.editor.struct.LeafContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
 import org.openbase.bco.registry.editor.util.RSTDefaultInstances;
-import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
@@ -62,17 +61,10 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
 
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(RowCell.class);
 
-    protected RemotePool remotePool;
     private final ContextMenu contextMenu;
     private final MenuItem addMenuItem, removeMenuItem;
 
-    public RowCell() throws InterruptedException {
-        try {
-            remotePool = RemotePool.getInstance();
-        } catch (InstantiationException ex) {
-            RegistryEditor.printException(ex, logger, LogLevel.WARN);
-        }
-
+    public RowCell() {
         addMenuItem = new MenuItem("Add");
         removeMenuItem = new MenuItem("Remove");
         contextMenu = new ContextMenu(addMenuItem, removeMenuItem);
@@ -194,9 +186,9 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                 try {
                     String id = ProtoBufFieldProcessor.getId(removed.getBuilder());
                     logger.debug("Removing message with Id [" + id + "]");
-                    if (!"".equals(id) && remotePool.containsById(removed.getBuilder(), id)) {
+                    if (!"".equals(id) && Registries.containsById(id, removed.getBuilder())) {
                         // always remove by id to ignore not initialized fields of the builder
-                        remotePool.remove(remotePool.getById(id, removed.getBuilder()));
+                        Registries.remove(Registries.getById(id, removed.getBuilder()));
                     }
                 } catch (CouldNotPerformException ex) {
                     RegistryEditor.printException(ex, logger, LogLevel.WARN);

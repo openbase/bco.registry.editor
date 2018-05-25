@@ -37,55 +37,41 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.openbase.bco.registry.agent.lib.jp.JPAgentRegistryScope;
-import org.openbase.bco.registry.agent.remote.AgentRegistryRemote;
-import org.openbase.bco.registry.app.lib.jp.JPAppRegistryScope;
-import org.openbase.bco.registry.app.remote.AppRegistryRemote;
-import org.openbase.bco.registry.device.lib.jp.JPDeviceRegistryScope;
-import org.openbase.bco.registry.device.remote.DeviceRegistryRemote;
+import org.openbase.bco.registry.activity.lib.jp.JPActivityRegistryScope;
+import org.openbase.bco.registry.activity.remote.ActivityRegistryRemote;
+import org.openbase.bco.registry.clazz.lib.jp.JPClassRegistryScope;
+import org.openbase.bco.registry.clazz.remote.ClassRegistryRemote;
 import org.openbase.bco.registry.editor.struct.GenericGroupContainer;
 import org.openbase.bco.registry.editor.struct.GenericListContainer;
-import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.GlobalTextArea;
 import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
 import org.openbase.bco.registry.editor.visual.TabPaneWithClearing;
 import org.openbase.bco.registry.editor.visual.provider.*;
-import org.openbase.bco.registry.location.lib.jp.JPLocationRegistryScope;
-import org.openbase.bco.registry.location.remote.LocationRegistryRemote;
-import org.openbase.bco.registry.scene.lib.jp.JPSceneRegistryScope;
-import org.openbase.bco.registry.scene.remote.SceneRegistryRemote;
+import org.openbase.bco.registry.remote.Registries;
+import org.openbase.bco.registry.template.lib.jp.JPTemplateRegistryScope;
+import org.openbase.bco.registry.template.remote.TemplateRegistryRemote;
 import org.openbase.bco.registry.unit.lib.jp.JPUnitRegistryScope;
 import org.openbase.bco.registry.unit.remote.UnitRegistryRemote;
-import org.openbase.bco.registry.user.activity.remote.ActivityRegistryRemote;
-import org.openbase.bco.registry.user.lib.jp.JPUserRegistryScope;
-import org.openbase.bco.registry.user.remote.UserRegistryRemote;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPReadOnly;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
-import org.openbase.jul.extension.rsb.com.RSBRemoteService;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBHost;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBPort;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBTransport;
-import org.openbase.jul.pattern.Observable;
-import org.openbase.jul.pattern.Observer;
 import org.openbase.jul.pattern.Remote.ConnectionState;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
+import org.openbase.jul.storage.registry.RegistryRemote;
 import org.openbase.jul.visual.swing.image.ImageLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.domotic.registry.AgentRegistryDataType.AgentRegistryData;
-import rst.domotic.registry.AppRegistryDataType.AppRegistryData;
-import rst.domotic.registry.DeviceRegistryDataType.DeviceRegistryData;
-import rst.domotic.registry.LocationRegistryDataType.LocationRegistryData;
-import rst.domotic.registry.SceneRegistryDataType.SceneRegistryData;
-import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
 import rst.domotic.registry.ActivityRegistryDataType.ActivityRegistryData;
-import rst.domotic.registry.UserRegistryDataType.UserRegistryData;
+import rst.domotic.registry.ClassRegistryDataType.ClassRegistryData;
+import rst.domotic.registry.TemplateRegistryDataType.TemplateRegistryData;
+import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 
 import java.util.ArrayList;
@@ -108,181 +94,133 @@ public class RegistryEditor extends Application {
     public static final int RESOLUTION_WIDTH = 1024;
     private final GlobalTextArea globalTextArea = GlobalTextArea.getInstance();
 
-    private RemotePool remotePool;
+    private final List<RegistryTreeTableView> registryTreeTableViewList = new ArrayList<>();
+
     private MenuBar menuBar;
-    private Menu fileMenu;
     private MenuItem resyncMenuItem;
-    private TabPaneWithClearing registryTabPane, deviceRegistryTabPane, locationRegistryTabPane, userRegistryTabPane, agentRegistryTabPane, appRegistryTabPane, sceneRegistryTabPane, unitRegistryTabPane, activityRegistryTabPane;
-    private Tab deviceRegistryTab, locationRegistryTab, sceneRegistryTab, agentRegistryTab, appRegistryTab, userRegistryTab, unitRegistryTab, activityRegistryTab;
-    private Tab deviceClassTab, deviceConfigTab;
-    private Tab locationConfigTab, connectionConfigTab;
-    private Tab userConfigTab, userGroupConfigTab;
-    private Tab agentClassTab, agentConfigTab;
-    private Tab appClassTab, appConfigTab;
-    private Tab sceneConfigTab;
-    private Tab unitConfigTab, unitTemplateTab, unitGroupTab, serviceTemplateTab;
-    private Tab activityClassTab, activityConfigTab;
-    private ProgressIndicator deviceRegistryProgressIndicator, locationRegistryprogressIndicator, appRegistryprogressIndicator, agentRegistryProgressIndicator, sceneRegistryprogressIndicator, userRegistryProgessInidicator, unitRegistryProgressIndicator, activityRegistryProgressIndicator;
-    private RegistryTreeTableView deviceClassTreeTableView, deviceConfigTreeTableView;
-    private RegistryTreeTableView locationConfigTreeTableView, connectionConfigTreeTableView;
-    private RegistryTreeTableView sceneConfigTreeTableView;
-    private RegistryTreeTableView agentConfigTreeTableView, agentClassTreeTableView;
-    private RegistryTreeTableView appConfigTreeTableView, appClassTreeTableView;
-    private RegistryTreeTableView userConfigTreeTableView, authorizationGroupConfigTreeTableView;
-    private RegistryTreeTableView dalUnitConfigTreeTableView, unitTemplateTreeTableView, unitGroupConfigTreeTableView, serviceTemplateTreeTableView;
-    private RegistryTreeTableView activityClassTreeTableView, activityConfigTreeTableView;
+    private TabPaneWithClearing globalTabPane, unitRegistryTabPane, classRegistryTabPane,
+            templateRegistryTabPane, activityRegistryTabPane;
+    private Tab classRegistryTab, templateRegistryTab, unitRegistryTab, activityRegistryTab;
+    private ProgressIndicator classRegistryProgressIndicator, templateRegistryProgressIndicator,
+            unitRegistryProgressIndicator, activityRegistryProgressIndicator;
+
+    private RegistryTreeTableView deviceClassTreeTableView, appClassTreeTableView, agentClassTreeTableView;
+    private RegistryTreeTableView unitTemplateTreeTableView, serviceTemplateTreeTableView, activityTemplateTreeTableView;
+    private RegistryTreeTableView dalUnitConfigTreeTableView, deviceConfigTreeTableView, locationConfigTreeTableView,
+            connectionConfigTreeTableView, unitGroupConfigTreeTableView, appConfigTreeTableView,
+            agentConfigTreeTableView, sceneConfigTreeTableView, userConfigTreeTableView, authorizationGroupConfigTreeTableView;
+    private RegistryTreeTableView activityConfigTreeTableView;
+
     private Scene scene;
-    private Map<String, Boolean> intialized;
+    private Map<String, Boolean> initialized;
 
     @Override
     public void init() throws Exception {
         super.init();
-        remotePool = RemotePool.getInstance();
-        intialized = new HashMap<>();
-        intialized.put(DeviceRegistryData.class.getSimpleName(), Boolean.FALSE);
-        intialized.put(LocationRegistryData.class.getSimpleName(), Boolean.FALSE);
-        intialized.put(AgentRegistryData.class.getSimpleName(), Boolean.FALSE);
-        intialized.put(AppRegistryData.class.getSimpleName(), Boolean.FALSE);
-        intialized.put(SceneRegistryData.class.getSimpleName(), Boolean.FALSE);
-        intialized.put(UserRegistryData.class.getSimpleName(), Boolean.FALSE);
-        intialized.put(UnitRegistryData.class.getSimpleName(), Boolean.FALSE);
-        intialized.put(ActivityRegistryData.class.getSimpleName(), Boolean.FALSE);
+        initialized = new HashMap<>();
+        initialized.put(ClassRegistryData.class.getSimpleName(), Boolean.FALSE);
+        initialized.put(TemplateRegistryData.class.getSimpleName(), Boolean.FALSE);
+        initialized.put(UnitRegistryData.class.getSimpleName(), Boolean.FALSE);
+        initialized.put(ActivityRegistryData.class.getSimpleName(), Boolean.FALSE);
 
-        registryTabPane = new TabPaneWithClearing();
-        registryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        globalTabPane = new TabPaneWithClearing();
+        globalTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-        deviceRegistryTab = new Tab("DeviceRegistry");
-        locationRegistryTab = new Tab("LocationRegistry");
-        sceneRegistryTab = new Tab("SceneRegistry");
-        agentRegistryTab = new Tab("AgentRegistry");
-        appRegistryTab = new Tab("AppRegistry");
-        userRegistryTab = new Tab("UserRegistry");
+        templateRegistryTab = new Tab("TemplateRegistry");
+        classRegistryTab = new Tab("ClassRegistry");
         unitRegistryTab = new Tab("UnitRegistry");
         activityRegistryTab = new Tab("ActivityRegistry");
 
-        registryTabPane.addTab(unitRegistryTab, SendableType.UNIT_CONFIG);
-        registryTabPane.addTab(deviceRegistryTab, SendableType.DEVICE_CONFIG);
-        registryTabPane.addTab(locationRegistryTab, SendableType.LOCATION_CONFIG);
-        registryTabPane.addTab(sceneRegistryTab, SendableType.SCENE_CONFIG);
-        registryTabPane.addTab(appRegistryTab, SendableType.APP_CONFIG);
-        registryTabPane.addTab(agentRegistryTab, SendableType.AGENT_CONFIG);
-        registryTabPane.addTab(userRegistryTab, SendableType.USER_CONFIG);
-        registryTabPane.addTab(activityRegistryTab, SendableType.USER_ACTIVITY_CONFIG);
+        globalTabPane.getTabs().addAll(unitRegistryTab, classRegistryTab, templateRegistryTab, activityRegistryTab);
 
-        deviceRegistryProgressIndicator = new ProgressIndicator();
-        locationRegistryprogressIndicator = new ProgressIndicator();
-        appRegistryprogressIndicator = new ProgressIndicator();
-        agentRegistryProgressIndicator = new ProgressIndicator();
-        sceneRegistryprogressIndicator = new ProgressIndicator();
-        userRegistryProgessInidicator = new ProgressIndicator();
+        classRegistryProgressIndicator = new ProgressIndicator();
+        templateRegistryProgressIndicator = new ProgressIndicator();
         unitRegistryProgressIndicator = new ProgressIndicator();
         activityRegistryProgressIndicator = new ProgressIndicator();
 
+        unitTemplateTreeTableView = new RegistryTreeTableView(SendableType.UNIT_TEMPLATE, this);
+        serviceTemplateTreeTableView = new RegistryTreeTableView(SendableType.SERVICE_TEMPLATE, this);
+        activityTemplateTreeTableView = new RegistryTreeTableView(SendableType.ACTIVITY_TEMPLATE, this);
+
         deviceClassTreeTableView = new RegistryTreeTableView(SendableType.DEVICE_CLASS, this);
+        appClassTreeTableView = new RegistryTreeTableView(SendableType.APP_CLASS, this);
+        agentClassTreeTableView = new RegistryTreeTableView(SendableType.AGENT_CLASS, this);
+
+        dalUnitConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_CONFIG, this);
         deviceConfigTreeTableView = new RegistryTreeTableView(SendableType.DEVICE_CONFIG, this);
         locationConfigTreeTableView = new RegistryTreeTableView(SendableType.LOCATION_CONFIG, this);
         connectionConfigTreeTableView = new RegistryTreeTableView(SendableType.CONNECTION_CONFIG, this);
-        sceneConfigTreeTableView = new RegistryTreeTableView(SendableType.SCENE_CONFIG, this);
         agentConfigTreeTableView = new RegistryTreeTableView(SendableType.AGENT_CONFIG, this);
-        agentClassTreeTableView = new RegistryTreeTableView(SendableType.AGENT_CLASS, this);
         appConfigTreeTableView = new RegistryTreeTableView(SendableType.APP_CONFIG, this);
-        appClassTreeTableView = new RegistryTreeTableView(SendableType.APP_CLASS, this);
-        unitTemplateTreeTableView = new RegistryTreeTableView(SendableType.UNIT_TEMPLATE, this);
-        serviceTemplateTreeTableView = new RegistryTreeTableView(SendableType.SERVICE_TEMPLATE, this);
+        sceneConfigTreeTableView = new RegistryTreeTableView(SendableType.SCENE_CONFIG, this);
+        unitGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_GROUP_CONFIG, this);
         userConfigTreeTableView = new RegistryTreeTableView(SendableType.USER_CONFIG, this);
         authorizationGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.AUTHORIZATION_GROUP_CONFIG, this);
-        unitGroupConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_GROUP_CONFIG, this);
-        dalUnitConfigTreeTableView = new RegistryTreeTableView(SendableType.UNIT_CONFIG, this);
-        activityClassTreeTableView = new RegistryTreeTableView(SendableType.USER_ACTIVITY_CLASS, this);
-        activityConfigTreeTableView = new RegistryTreeTableView(SendableType.USER_ACTIVITY_CONFIG, this);
+
+        activityConfigTreeTableView = new RegistryTreeTableView(SendableType.ACTIVITY_CONFIG, this);
+
+        registryTreeTableViewList.add(unitTemplateTreeTableView);
+        registryTreeTableViewList.add(serviceTemplateTreeTableView);
+        registryTreeTableViewList.add(activityTemplateTreeTableView);
+        registryTreeTableViewList.add(deviceClassTreeTableView);
+        registryTreeTableViewList.add(appClassTreeTableView);
+        registryTreeTableViewList.add(agentClassTreeTableView);
+        registryTreeTableViewList.add(dalUnitConfigTreeTableView);
+        registryTreeTableViewList.add(deviceConfigTreeTableView);
+        registryTreeTableViewList.add(locationConfigTreeTableView);
+        registryTreeTableViewList.add(connectionConfigTreeTableView);
+        registryTreeTableViewList.add(agentConfigTreeTableView);
+        registryTreeTableViewList.add(appConfigTreeTableView);
+        registryTreeTableViewList.add(sceneConfigTreeTableView);
+        registryTreeTableViewList.add(unitGroupConfigTreeTableView);
+        registryTreeTableViewList.add(userConfigTreeTableView);
+        registryTreeTableViewList.add(authorizationGroupConfigTreeTableView);
+        registryTreeTableViewList.add(activityConfigTreeTableView);
 
         unitRegistryTabPane = new TabPaneWithClearing();
-        unitRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        unitConfigTab = new Tab("UnitConfig");
-        unitTemplateTab = new Tab("UnitTemplate");
-        serviceTemplateTab = new Tab("ServiceTemplate");
-        unitGroupTab = new Tab("UnitGroup");
-        unitConfigTab.setContent(dalUnitConfigTreeTableView.getVBox());
-        unitTemplateTab.setContent(unitTemplateTreeTableView.getVBox());
-        serviceTemplateTab.setContent(serviceTemplateTreeTableView.getVBox());
-        unitGroupTab.setContent(unitGroupConfigTreeTableView.getVBox());
-        unitRegistryTabPane.addTab(unitConfigTab, SendableType.UNIT_CONFIG);
-        unitRegistryTabPane.addTab(unitTemplateTab, SendableType.UNIT_TEMPLATE);
-        unitRegistryTabPane.addTab(serviceTemplateTab, SendableType.SERVICE_TEMPLATE);
-        unitRegistryTabPane.addTab(unitGroupTab, SendableType.UNIT_GROUP_CONFIG);
-//        unitRegistryTabPane.getTabs().addAll(unitConfigTab, unitTemplateTab, unitGroupTab);
+        unitRegistryTabPane.addTab("DALUnitConfig", dalUnitConfigTreeTableView);
+        unitRegistryTabPane.addTab("DeviceUnitConfig", deviceConfigTreeTableView);
+        unitRegistryTabPane.addTab("LocationUnitConfig", locationConfigTreeTableView);
+        unitRegistryTabPane.addTab("ConnectionUnitConfig", connectionConfigTreeTableView);
+        unitRegistryTabPane.addTab("AgentUnitConfig", agentConfigTreeTableView);
+        unitRegistryTabPane.addTab("AppUnitConfig", appConfigTreeTableView);
+        unitRegistryTabPane.addTab("SceneUnitConfig", sceneConfigTreeTableView);
+        unitRegistryTabPane.addTab("UnitGroupUnitConfig", unitGroupConfigTreeTableView);
+        unitRegistryTabPane.addTab("UserUnitConfig", userConfigTreeTableView);
+        unitRegistryTabPane.addTab("AuthorizationUnitConfig", authorizationGroupConfigTreeTableView);
 
-        deviceRegistryTabPane = new TabPaneWithClearing();
-        deviceRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        deviceClassTab = new Tab("DeviceClass");
-        deviceConfigTab = new Tab("DeviceConfig");
-        deviceClassTab.setContent(deviceClassTreeTableView.getVBox());
-        deviceConfigTab.setContent(deviceConfigTreeTableView.getVBox());
-        deviceRegistryTabPane.getTabs().addAll(deviceConfigTab, deviceClassTab);
+        classRegistryTabPane = new TabPaneWithClearing();
+        classRegistryTabPane.addTab("DeviceClass", deviceClassTreeTableView);
+        classRegistryTabPane.addTab("AppClass", appClassTreeTableView);
+        classRegistryTabPane.addTab("AgentClass", agentClassTreeTableView);
 
-        locationRegistryTabPane = new TabPaneWithClearing();
-        locationRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        locationConfigTab = new Tab("LocationConfig");
-        locationConfigTab.setContent(locationConfigTreeTableView.getVBox());
-        connectionConfigTab = new Tab("ConnectionConfig");
-        connectionConfigTab.setContent(connectionConfigTreeTableView.getVBox());
-        locationRegistryTabPane.getTabs().addAll(locationConfigTab, connectionConfigTab);
-
-        userRegistryTabPane = new TabPaneWithClearing();
-        userRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        userConfigTab = new Tab("UserConfig");
-        userConfigTab.setContent(userConfigTreeTableView.getVBox());
-        userGroupConfigTab = new Tab("AuthorizationGroupConfig");
-        userGroupConfigTab.setContent(authorizationGroupConfigTreeTableView.getVBox());
-        userRegistryTabPane.getTabs().addAll(userConfigTab, userGroupConfigTab);
-
-        agentRegistryTabPane = new TabPaneWithClearing();
-        agentRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        agentClassTab = new Tab("AgentClass");
-        agentClassTab.setContent(agentClassTreeTableView.getVBox());
-        agentConfigTab = new Tab("AgentConfig");
-        agentConfigTab.setContent(agentConfigTreeTableView.getVBox());
-        agentRegistryTabPane.getTabs().addAll(agentConfigTab, agentClassTab);
-
-        appRegistryTabPane = new TabPaneWithClearing();
-        appRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        appClassTab = new Tab("AppClass");
-        appClassTab.setContent(appClassTreeTableView.getVBox());
-        appConfigTab = new Tab("AppConfig");
-        appConfigTab.setContent(appConfigTreeTableView.getVBox());
-        appRegistryTabPane.getTabs().addAll(appConfigTab, appClassTab);
-
-        sceneRegistryTabPane = new TabPaneWithClearing();
-        sceneRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        sceneConfigTab = new Tab("SceneConfig");
-        sceneConfigTab.setContent(sceneConfigTreeTableView.getVBox());
-        sceneRegistryTabPane.getTabs().addAll(sceneConfigTab);
+        templateRegistryTabPane = new TabPaneWithClearing();
+        templateRegistryTabPane.addTab("UnitTemplate", unitTemplateTreeTableView);
+        templateRegistryTabPane.addTab("ServiceTemplate", serviceTemplateTreeTableView);
+        templateRegistryTabPane.addTab("ActivityTemplate", activityTemplateTreeTableView);
 
         activityRegistryTabPane = new TabPaneWithClearing();
-        activityRegistryTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        activityClassTab = new Tab("ActivityClass");
-        activityClassTab.setContent(activityClassTreeTableView.getVBox());
-        activityConfigTab = new Tab("ActivityConfig");
-        activityConfigTab.setContent(activityConfigTreeTableView.getVBox());
-        activityRegistryTabPane.getTabs().addAll(activityConfigTab, activityClassTab);
+        activityRegistryTabPane.addTab("ActivityConfig", activityConfigTreeTableView);
 
         resyncMenuItem = new MenuItem("Resync");
         resyncMenuItem.setOnAction((ActionEvent event) -> {
             LOGGER.info("resync triggered...");
-            remotePool.getRemotes().stream().forEach((remote) -> {
-                try {
-                    LOGGER.info("request data for " + remote);
-                    remote.requestData();
-                } catch (CouldNotPerformException ex) {
-                    printException(ex, LOGGER, LogLevel.ERROR);
-                }
-            });
-        });
-        fileMenu = new Menu("Registry");
 
-        fileMenu.getItems().addAll(resyncMenuItem);
+            try {
+                for (RegistryRemote registryRemote : Registries.getRegistries()) {
+                    LOGGER.info("request data for " + registryRemote);
+                    registryRemote.requestData();
+                }
+            } catch (CouldNotPerformException ex) {
+                printException(ex, LOGGER, LogLevel.ERROR);
+            }
+        });
+
+        final Menu registryMenu = new Menu("Registry");
+
+        registryMenu.getItems().addAll(resyncMenuItem);
         menuBar = new MenuBar();
-        menuBar.getMenus().add(fileMenu);
+        menuBar.getMenus().add(registryMenu);
 
         scene = buildScene();
         registerObserver();
@@ -292,7 +230,7 @@ public class RegistryEditor extends Application {
     private SplitPane splitPane;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         primaryStage.setTitle("BCO Registry Editor");
         try {
             LOGGER.debug("Try to load icon...");
@@ -316,10 +254,10 @@ public class RegistryEditor extends Application {
         primaryStage.show();
     }
 
-    public Scene buildScene() {
+    private Scene buildScene() {
         LOGGER.info("Starting");
-        splitPane = new SplitPane(/*registryTabPane, globalTextArea*/);
-        splitPane.getItems().addAll(registryTabPane, globalTextArea);
+        splitPane = new SplitPane();
+        splitPane.getItems().addAll(globalTabPane, globalTextArea);
         globalTextArea.addParent(splitPane);
         splitPane.setOrientation(Orientation.VERTICAL);
 
@@ -330,80 +268,42 @@ public class RegistryEditor extends Application {
             splitPane.setDividerPositions(1);
         });
 
-        deviceClassTreeTableView.addWidthProperty(buildScene.widthProperty());
-        deviceConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        locationConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        connectionConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        sceneConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        agentConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        agentClassTreeTableView.addWidthProperty(buildScene.widthProperty());
-        appConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        appClassTreeTableView.addWidthProperty(buildScene.widthProperty());
-        unitTemplateTreeTableView.addWidthProperty(buildScene.widthProperty());
-        serviceTemplateTreeTableView.addWidthProperty(buildScene.widthProperty());
-        userConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        authorizationGroupConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        unitGroupConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        dalUnitConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-        activityClassTreeTableView.addWidthProperty(buildScene.widthProperty());
-        activityConfigTreeTableView.addWidthProperty(buildScene.widthProperty());
-
-        deviceClassTreeTableView.addHeightProperty(buildScene.heightProperty());
-        deviceConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        locationConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        connectionConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        sceneConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        agentConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        agentClassTreeTableView.addHeightProperty(buildScene.heightProperty());
-        appConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        appClassTreeTableView.addHeightProperty(buildScene.heightProperty());
-        unitTemplateTreeTableView.addHeightProperty(buildScene.heightProperty());
-        serviceTemplateTreeTableView.addHeightProperty(buildScene.heightProperty());
-        userConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        authorizationGroupConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        unitGroupConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        dalUnitConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
-        activityClassTreeTableView.addHeightProperty(buildScene.heightProperty());
-        activityConfigTreeTableView.addHeightProperty(buildScene.heightProperty());
+        for (RegistryTreeTableView registryTreeTableView : registryTreeTableViewList) {
+            registryTreeTableView.addWidthProperty(buildScene.widthProperty());
+            registryTreeTableView.addHeightProperty(buildScene.heightProperty());
+        }
 
         return buildScene;
     }
 
-    public void registerObserver() {
+    private void registerObserver() {
         GlobalCachedExecutorService.submit(() -> {
             LOGGER.debug("Register observer");
-            final Map<RSBRemoteService, Future<Void>> registrationFutureMap = new HashMap<>();
+            final Map<RegistryRemote, Future<Void>> registrationFutureMap = new HashMap<>();
 
-            for (final RSBRemoteService remote : remotePool.getRemotes()) {
-                registrationFutureMap.put(remote, GlobalCachedExecutorService.submit(() -> {
-                    try {
-                        LOGGER.info("Register observer for [" + remote + "]");
-                        remote.addDataObserver((org.openbase.jul.pattern.Observable source, Object data) -> {
-                            assert remote.isDataAvailable();
-                            LOGGER.info("Received update for [" + remote + "]");
-                            if (data == null) {
-                                LOGGER.warn("Data for remote [" + remote + "] is null!");
+            try {
+                for (final RegistryRemote registryRemote : Registries.getRegistries()) {
+                    registrationFutureMap.put(registryRemote, GlobalCachedExecutorService.submit(() -> {
+                        try {
+                            LOGGER.info("Register observer for [" + registryRemote + "]");
+                            registryRemote.addDataObserver((org.openbase.jul.pattern.Observable source, Object data) -> {
+                                assert registryRemote.isDataAvailable();
+                                LOGGER.info("Received update for [" + registryRemote + "]");
+                                if (data == null) {
+                                    LOGGER.warn("Data for remote [" + registryRemote + "] is null!");
+                                }
+                                updateTab(registryRemote);
+                            });
+                            if (registryRemote.isDataAvailable()) {
+                                updateTab(registryRemote);
                             }
-                            updateTab(remote);
-                        });
-                        updateTab(remote);
-                        if (remote.equals(remotePool.getDeviceRemote()) || remote.equals(remotePool.getUnitRemote())) {
-//                            logger.info("Device tree cannot be created without activated location remote. Waiting for its activation...");
-                            while (!registrationFutureMap.containsKey(remotePool.getLocationRemote())) {
-                                Thread.sleep(10);
-                            }
-                            registrationFutureMap.get(remotePool.getLocationRemote()).get();
+                        } catch (Exception ex) {
+                            printException(ex, LOGGER, LogLevel.ERROR);
                         }
-                    } catch (Exception ex) {
-                        printException(ex, LOGGER, LogLevel.ERROR);
-                    }
-                    return null;
-                }));
+                        return null;
+                    }));
 
-                remote.addConnectionStateObserver(new Observer<ConnectionState>() {
-
-                    @Override
-                    public void update(final Observable<ConnectionState> source, final ConnectionState connectionState) throws Exception {
+                    registryRemote.addConnectionStateObserver((source, connectionState) -> {
                         LOGGER.debug("Remote connection state has changed to: " + connectionState);
                         Platform.runLater(() -> {
                             boolean disconnected = false;
@@ -411,14 +311,17 @@ public class RegistryEditor extends Application {
                                 disconnected = true;
                             }
 
-                            for (RegistryTreeTableView treeTable : getTreeTablesByRemote(remote)) {
+                            for (RegistryTreeTableView treeTable : getTreeTablesByRemote(registryRemote)) {
                                 treeTable.setDisconnected(disconnected);
                             }
                         });
-                    }
-                });
+                    });
+                }
+            } catch (CouldNotPerformException ex) {
+                printException(new CouldNotPerformException("Could not register observer", ex));
             }
         });
+
     }
 
     @Override
@@ -429,22 +332,22 @@ public class RegistryEditor extends Application {
         System.exit(0);
     }
 
-    private void updateTab(final RSBRemoteService remote) {
-        LOGGER.info("Update tab for remote [" + remote + "]");
+    private void updateTab(final RegistryRemote registryRemote) {
+        LOGGER.info("Update tab for remote [" + registryRemote + "]");
         GlobalCachedExecutorService.submit(() -> {
-            synchronized (remote) {
-                Tab tab = getRegistryTabByRemote(remote);
-                if (!remote.isConnected() || !remote.isActive() || !remote.isDataAvailable()) {
-                    LOGGER.info("Set progress indicator for remote[" + remote + "] because [" + !remote.isConnected() + ", " + !remote.isActive() + ", " + !remote.isDataAvailable() + "]");
-                    final Node node = getProgressindicatorByRemote(remote);
+            synchronized (registryRemote) {
+                Tab tab = getRegistryTabByRemote(registryRemote);
+                if (!registryRemote.isConnected() || !registryRemote.isActive() || !registryRemote.isDataAvailable()) {
+                    LOGGER.info("Set progress indicator for remote[" + registryRemote + "] because [" + !registryRemote.isConnected() + ", " + !registryRemote.isActive() + ", " + !registryRemote.isDataAvailable() + "]");
+                    final Node node = getProgressIndicatorByRemote(registryRemote);
                     Platform.runLater(() -> {
                         tab.setContent(node);
                     });
                     return;
                 }
                 try {
-                    GeneratedMessage data = remote.getData();
-                    if (!intialized.get(data.getClass().getSimpleName())) {
+                    GeneratedMessage data = (GeneratedMessage) registryRemote.getData();
+                    if (!initialized.get(data.getClass().getSimpleName())) {
                         LOGGER.debug(data.getClass().getSimpleName() + " is not yet initialized");
                         final Node node = fillTreeTableView(data);
                         Platform.runLater(() -> {
@@ -465,272 +368,213 @@ public class RegistryEditor extends Application {
         });
     }
 
-    private javafx.scene.Node fillTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException, InterruptedException {
-        LOGGER.debug("FillTreeTableView for [" + msg.getClass().getSimpleName() + "]");
-        if (msg instanceof DeviceRegistryData) {
-            DeviceRegistryData data = (DeviceRegistryData) msg;
+    private javafx.scene.Node fillTreeTableView(GeneratedMessage registryData) throws CouldNotPerformException, InterruptedException {
+        LOGGER.debug("FillTreeTableView for [" + registryData.getClass().getSimpleName() + "]");
+        if (registryData instanceof ClassRegistryData) {
+            ClassRegistryData data = (ClassRegistryData) registryData;
             TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);
-            Descriptors.FieldDescriptor deviceClassField = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistryData.DEVICE_CLASS_FIELD_NUMBER);
+            Descriptors.FieldDescriptor deviceClassField = data.toBuilder().getDescriptorForType().findFieldByNumber(ClassRegistryData.DEVICE_CLASS_FIELD_NUMBER);
             deviceClassTreeTableView.setRoot(new GenericGroupContainer<>(deviceClassField.getName(), deviceClassField, data.toBuilder(), data.toBuilder().getDeviceClassBuilderList(), company));
-            deviceClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CLASS.getDefaultInstanceForType()));
+            deviceClassTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.DEVICE_CLASS.getDefaultInstanceForType()));
             deviceClassTreeTableView.getListDiff().diff(data.getDeviceClassList());
 
-            TreeItemDescriptorProvider deviceClassId = new DeviceClassItemDescriptorProvider();
-            TreeItemDescriptorProvider locationId = new LocationItemDescriptorProvider();
-            Descriptors.FieldDescriptor deviceConfigfield = data.toBuilder().getDescriptorForType().findFieldByNumber(DeviceRegistryData.DEVICE_UNIT_CONFIG_FIELD_NUMBER);
-            deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(deviceConfigfield.getName(), deviceConfigfield, data.toBuilder(), data.toBuilder().getDeviceUnitConfigBuilderList(), deviceClassId, locationId));
-            deviceConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.DEVICE_CONFIG.getDefaultInstanceForType()));
-            deviceConfigTreeTableView.getListDiff().diff(data.getDeviceUnitConfigList());
-
-            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return deviceRegistryTabPane;
-        } else if (msg instanceof LocationRegistryData) {
-            LocationRegistryData data = (LocationRegistryData) msg;
-            locationConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistryData.LOCATION_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            locationConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.LOCATION_CONFIG.getDefaultInstanceForType()));
-            locationConfigTreeTableView.getListDiff().diff(data.getLocationUnitConfigList());
-
-            connectionConfigTreeTableView.setRoot(new GenericListContainer<>(LocationRegistryData.CONNECTION_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            connectionConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.CONNECTION_CONFIG.getDefaultInstanceForType()));
-            connectionConfigTreeTableView.getListDiff().diff(data.getConnectionUnitConfigList());
-
-            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return locationRegistryTabPane;
-        } else if (msg instanceof SceneRegistryData) {
-            SceneRegistryData data = (SceneRegistryData) msg;
-            sceneConfigTreeTableView.setRoot(new GenericListContainer(SceneRegistryData.SCENE_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            sceneConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SCENE_CONFIG.getDefaultInstanceForType()));
-            sceneConfigTreeTableView.getListDiff().diff(data.getSceneUnitConfigList());
-            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return sceneRegistryTabPane;
-        } else if (msg instanceof AppRegistryData) {
-            AppRegistryData data = (AppRegistryData) msg;
-            appConfigTreeTableView.setRoot(new GenericListContainer(AppRegistryData.APP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            appConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.APP_CONFIG.getDefaultInstanceForType()));
-            appConfigTreeTableView.getListDiff().diff(data.getAppUnitConfigList());
-
-            appClassTreeTableView.setRoot(new GenericListContainer(AppRegistryData.APP_CLASS_FIELD_NUMBER, data.toBuilder()));
-            appClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.APP_CLASS.getDefaultInstanceForType()));
+            appClassTreeTableView.setRoot(new GenericListContainer(ClassRegistryData.APP_CLASS_FIELD_NUMBER, data.toBuilder()));
+            appClassTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.APP_CLASS.getDefaultInstanceForType()));
             appClassTreeTableView.getListDiff().diff(data.getAppClassList());
 
-            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return appRegistryTabPane;
-        } else if (msg instanceof AgentRegistryData) {
-            AgentRegistryData data = (AgentRegistryData) msg;
-            TreeItemDescriptorProvider agentClassLabel = new AgentClassItemDescriptorProvider();
-            Descriptors.FieldDescriptor agentConfigfield = data.toBuilder().getDescriptorForType().findFieldByNumber(AgentRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER);
-            agentConfigTreeTableView.setRoot(new GenericGroupContainer<>(agentConfigfield.getName(), agentConfigfield, data.toBuilder(), data.toBuilder().getAgentUnitConfigBuilderList(), agentClassLabel));
-            agentConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CONFIG.getDefaultInstanceForType()));
-            agentConfigTreeTableView.getListDiff().diff(data.getAgentUnitConfigList());
-
-            agentClassTreeTableView.setRoot(new GenericListContainer(AgentRegistryData.AGENT_CLASS_FIELD_NUMBER, data.toBuilder()));
-            agentClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AGENT_CLASS.getDefaultInstanceForType()));
+            agentClassTreeTableView.setRoot(new GenericListContainer(ClassRegistryData.AGENT_CLASS_FIELD_NUMBER, data.toBuilder()));
+            agentClassTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.AGENT_CLASS.getDefaultInstanceForType()));
             agentClassTreeTableView.getListDiff().diff(data.getAgentClassList());
 
-            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return agentRegistryTabPane;
-        } else if (msg instanceof UserRegistryData) {
-            UserRegistryData data = (UserRegistryData) msg;
-            userConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistryData.USER_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            userConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_CONFIG.getDefaultInstanceForType()));
-            userConfigTreeTableView.getListDiff().diff(data.getUserUnitConfigList());
+            initialized.put(data.getClass().getSimpleName(), Boolean.TRUE);
+            return classRegistryTabPane;
+        } else if (registryData instanceof TemplateRegistryData) {
+            TemplateRegistryData data = (TemplateRegistryData) registryData;
 
-            authorizationGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UserRegistryData.AUTHORIZATION_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            authorizationGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.AUTHORIZATION_GROUP_CONFIG.getDefaultInstanceForType()));
-            authorizationGroupConfigTreeTableView.getListDiff().diff(data.getAuthorizationGroupUnitConfigList());
+            unitTemplateTreeTableView.setRoot(new GenericListContainer<>(TemplateRegistryData.UNIT_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
+            unitTemplateTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.UNIT_TEMPLATE.getDefaultInstanceForType()));
+            unitTemplateTreeTableView.update(data.getUnitTemplateList());
 
-            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
-            return userRegistryTabPane;
-        } else if (msg instanceof UnitRegistryData) {
-            UnitRegistryData data = (UnitRegistryData) msg;
+            serviceTemplateTreeTableView.setRoot(new GenericListContainer<>(TemplateRegistryData.SERVICE_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
+            serviceTemplateTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.SERVICE_TEMPLATE.getDefaultInstanceForType()));
+            serviceTemplateTreeTableView.update(data.getServiceTemplateList());
+
+            activityTemplateTreeTableView.setRoot(new GenericListContainer<>(TemplateRegistryData.ACTIVITY_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
+            activityTemplateTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.ACTIVITY_TEMPLATE.getDefaultInstanceForType()));
+            activityTemplateTreeTableView.update(data.getActivityTemplateList());
+
+            initialized.put(data.getClass().getSimpleName(), Boolean.TRUE);
+            return templateRegistryTabPane;
+        } else if (registryData instanceof UnitRegistryData) {
+            UnitRegistryData data = (UnitRegistryData) registryData;
 
             TreeItemDescriptorProvider locationDescriptor = new LocationItemDescriptorProvider();
             TreeItemDescriptorProvider unitTypeDescriptor = new UnitTypeItemDescriptorProvider();
             Descriptors.FieldDescriptor dalUnitConfigField = data.toBuilder().getDescriptorForType().findFieldByNumber(UnitRegistryData.DAL_UNIT_CONFIG_FIELD_NUMBER);
             dalUnitConfigTreeTableView.setRoot(new GenericGroupContainer<>(dalUnitConfigField.getName(), dalUnitConfigField, data.toBuilder(), data.toBuilder().getDalUnitConfigBuilderList(), locationDescriptor, unitTypeDescriptor));
-            dalUnitConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_TEMPLATE.getDefaultInstanceForType()));
+            dalUnitConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.UNIT_TEMPLATE.getDefaultInstanceForType()));
             dalUnitConfigTreeTableView.getListDiff().diff(data.getDalUnitConfigList());
 
-            unitTemplateTreeTableView.setRoot(new GenericListContainer<>("unit_template", data.toBuilder()));
-            unitTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_TEMPLATE.getDefaultInstanceForType()));
-            unitTemplateTreeTableView.update(data.getUnitTemplateList());
-
             unitGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.UNIT_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
-            unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType()));
+            unitGroupConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.UNIT_GROUP_CONFIG.getDefaultInstanceForType()));
             unitGroupConfigTreeTableView.getListDiff().diff(data.getUnitGroupUnitConfigList());
 
-            serviceTemplateTreeTableView.setRoot(new GenericListContainer<>("service_template", data.toBuilder()));
-            serviceTemplateTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.SERVICE_TEMPLATE.getDefaultInstanceForType()));
-            serviceTemplateTreeTableView.update(data.getServiceTemplateList());
+            TreeItemDescriptorProvider deviceClassId = new DeviceClassItemDescriptorProvider();
+            TreeItemDescriptorProvider locationId = new LocationItemDescriptorProvider();
+            Descriptors.FieldDescriptor deviceConfigfield = data.toBuilder().getDescriptorForType().findFieldByNumber(UnitRegistryData.DEVICE_UNIT_CONFIG_FIELD_NUMBER);
+            deviceConfigTreeTableView.setRoot(new GenericGroupContainer<>(deviceConfigfield.getName(), deviceConfigfield, data.toBuilder(), data.toBuilder().getDeviceUnitConfigBuilderList(), deviceClassId, locationId));
+            deviceConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.DEVICE_CONFIG.getDefaultInstanceForType()));
+            deviceConfigTreeTableView.getListDiff().diff(data.getDeviceUnitConfigList());
 
-            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
+            locationConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.LOCATION_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            locationConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.LOCATION_CONFIG.getDefaultInstanceForType()));
+            locationConfigTreeTableView.getListDiff().diff(data.getLocationUnitConfigList());
+
+            connectionConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.CONNECTION_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            connectionConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.CONNECTION_CONFIG.getDefaultInstanceForType()));
+            connectionConfigTreeTableView.getListDiff().diff(data.getConnectionUnitConfigList());
+
+            sceneConfigTreeTableView.setRoot(new GenericListContainer(UnitRegistryData.SCENE_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            sceneConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.SCENE_CONFIG.getDefaultInstanceForType()));
+            sceneConfigTreeTableView.getListDiff().diff(data.getSceneUnitConfigList());
+
+            appConfigTreeTableView.setRoot(new GenericListContainer(UnitRegistryData.APP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            appConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.APP_CONFIG.getDefaultInstanceForType()));
+            appConfigTreeTableView.getListDiff().diff(data.getAppUnitConfigList());
+
+            TreeItemDescriptorProvider agentClassLabel = new AgentClassItemDescriptorProvider();
+            Descriptors.FieldDescriptor agentConfigfield = data.toBuilder().getDescriptorForType().findFieldByNumber(UnitRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER);
+            agentConfigTreeTableView.setRoot(new GenericGroupContainer<>(agentConfigfield.getName(), agentConfigfield, data.toBuilder(), data.toBuilder().getAgentUnitConfigBuilderList(), agentClassLabel));
+            agentConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.AGENT_CONFIG.getDefaultInstanceForType()));
+            agentConfigTreeTableView.getListDiff().diff(data.getAgentUnitConfigList());
+
+            userConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.USER_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            userConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.USER_CONFIG.getDefaultInstanceForType()));
+            userConfigTreeTableView.getListDiff().diff(data.getUserUnitConfigList());
+
+            authorizationGroupConfigTreeTableView.setRoot(new GenericListContainer<>(UnitRegistryData.AUTHORIZATION_GROUP_UNIT_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            authorizationGroupConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.AUTHORIZATION_GROUP_CONFIG.getDefaultInstanceForType()));
+            authorizationGroupConfigTreeTableView.getListDiff().diff(data.getAuthorizationGroupUnitConfigList());
+
+            initialized.put(data.getClass().getSimpleName(), Boolean.TRUE);
             return unitRegistryTabPane;
-        } else if (msg instanceof ActivityRegistryData) {
-            ActivityRegistryData data = (ActivityRegistryData) msg;
+        } else if (registryData instanceof ActivityRegistryData) {
+            ActivityRegistryData data = (ActivityRegistryData) registryData;
 
-//            TreeItemDescriptorProvider activityClassProvider = new ActivityClassItemDescriptorProvider();
-//            Descriptors.FieldDescriptor activityConfigField = data.toBuilder().getDescriptorForType().findFieldByNumber(ActivityRegistryData.USER_ACTIVITY_CONFIG_FIELD_NUMBER);
-//            activityConfigTreeTableView.setRoot(new GenericGroupContainer<>(activityConfigField.getName(), activityConfigField, data.toBuilder(), data.toBuilder().getActivityConfigList(), activityClassProvider));
-            activityConfigTreeTableView.setRoot(new GenericListContainer<>("user_activity_config", data.toBuilder()));
-            activityConfigTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_ACTIVITY_CONFIG.getDefaultInstanceForType()));
+            activityConfigTreeTableView.setRoot(new GenericListContainer<>(ActivityRegistryData.ACTIVITY_CONFIG_FIELD_NUMBER, data.toBuilder()));
+            activityConfigTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.ACTIVITY_CONFIG.getDefaultInstanceForType()));
             activityConfigTreeTableView.getListDiff().diff(data.getActivityConfigList());
 
-            activityClassTreeTableView.setRoot(new GenericListContainer<>("user_activity_class", data.toBuilder()));
-            activityClassTreeTableView.setReadOnlyMode(remotePool.isReadOnly(SendableType.USER_ACTIVITY_CLASS.getDefaultInstanceForType()));
-            activityClassTreeTableView.update(data.getActivityClassList());
-
-            intialized.put(msg.getClass().getSimpleName(), Boolean.TRUE);
+            initialized.put(data.getClass().getSimpleName(), Boolean.TRUE);
             return activityRegistryTabPane;
         }
 
         return null;
     }
 
-    private javafx.scene.Node updateTreeTableView(GeneratedMessage msg) throws InstantiationException, CouldNotPerformException, InterruptedException {
+    private javafx.scene.Node updateTreeTableView(GeneratedMessage msg) throws CouldNotPerformException, InterruptedException {
         LOGGER.debug("UpdateTreeTableView for [" + msg.getClass().getSimpleName() + "]");
-        if (msg instanceof DeviceRegistryData) {
-            DeviceRegistryData data = (DeviceRegistryData) msg;
+        if (msg instanceof ClassRegistryData) {
+            ClassRegistryData data = (ClassRegistryData) msg;
             deviceClassTreeTableView.update(data.getDeviceClassList());
-            deviceConfigTreeTableView.update(data.getDeviceUnitConfigList());
-
-            deviceClassTreeTableView.setReadOnlyMode(remotePool.getDeviceRemote().isDeviceClassRegistryReadOnly());
-            deviceConfigTreeTableView.setReadOnlyMode(remotePool.getDeviceRemote().isDeviceConfigRegistryReadOnly());
-
-            return deviceRegistryTabPane;
-        } else if (msg instanceof LocationRegistryData) {
-            LocationRegistryData data = (LocationRegistryData) msg;
-            locationConfigTreeTableView.update(data.getLocationUnitConfigList());
-            connectionConfigTreeTableView.update(data.getConnectionUnitConfigList());
-
-            locationConfigTreeTableView.setReadOnlyMode(remotePool.getLocationRemote().isLocationConfigRegistryReadOnly());
-            connectionConfigTreeTableView.setReadOnlyMode(remotePool.getLocationRemote().isConnectionConfigRegistryReadOnly());
-
-            return locationRegistryTabPane;
-        } else if (msg instanceof SceneRegistryData) {
-            SceneRegistryData data = (SceneRegistryData) msg;
-            sceneConfigTreeTableView.update(data.getSceneUnitConfigList());
-
-            sceneConfigTreeTableView.setReadOnlyMode(remotePool.getSceneRemote().isSceneConfigRegistryReadOnly());
-
-            return sceneRegistryTabPane;
-        } else if (msg instanceof AppRegistryData) {
-            AppRegistryData data = (AppRegistryData) msg;
-            appConfigTreeTableView.update(data.getAppUnitConfigList());
+            agentClassTreeTableView.update(data.getAgentClassList());
             appClassTreeTableView.update(data.getAppClassList());
 
-            appConfigTreeTableView.setReadOnlyMode(remotePool.getAppRemote().isAppConfigRegistryReadOnly());
-            appClassTreeTableView.setReadOnlyMode(remotePool.getAppRemote().isAppClassRegistryReadOnly());
+            deviceClassTreeTableView.setReadOnlyMode(Registries.getClassRegistry().isDeviceClassRegistryReadOnly());
+            agentClassTreeTableView.setReadOnlyMode(Registries.getClassRegistry().isAgentClassRegistryReadOnly());
+            appClassTreeTableView.setReadOnlyMode(Registries.getClassRegistry().isAppClassRegistryReadOnly());
 
-            return appRegistryTabPane;
-        } else if (msg instanceof AgentRegistryData) {
-            AgentRegistryData data = (AgentRegistryData) msg;
-            agentConfigTreeTableView.update(data.getAgentUnitConfigList());
-            agentClassTreeTableView.update(data.getAgentClassList());
+            return classRegistryTabPane;
+        } else if (msg instanceof TemplateRegistryData) {
+            TemplateRegistryData data = (TemplateRegistryData) msg;
 
-            agentConfigTreeTableView.setReadOnlyMode(remotePool.getAgentRemote().isAgentConfigRegistryReadOnly());
-            agentClassTreeTableView.setReadOnlyMode(remotePool.getAgentRemote().isAgentClassRegistryReadOnly());
+            unitTemplateTreeTableView.update(data.getUnitTemplateList());
+            serviceTemplateTreeTableView.update(data.getServiceTemplateList());
+            activityTemplateTreeTableView.update(data.getActivityTemplateList());
 
-            return agentRegistryTabPane;
-        } else if (msg instanceof UserRegistryData) {
-            UserRegistryData data = (UserRegistryData) msg;
-            userConfigTreeTableView.update(data.getUserUnitConfigList());
-            authorizationGroupConfigTreeTableView.update(data.getAuthorizationGroupUnitConfigList());
+            unitTemplateTreeTableView.setReadOnlyMode(Registries.getTemplateRegistry().isUnitTemplateRegistryReadOnly());
+            serviceTemplateTreeTableView.setReadOnlyMode(Registries.getTemplateRegistry().isServiceTemplateRegistryReadOnly());
+            activityTemplateTreeTableView.setReadOnlyMode(Registries.getTemplateRegistry().isActivityTemplateRegistryReadOnly());
 
-            userConfigTreeTableView.setReadOnlyMode(remotePool.getUserRemote().isUserConfigRegistryReadOnly());
-            authorizationGroupConfigTreeTableView.setReadOnlyMode(remotePool.getUserRemote().isAuthorizationGroupConfigRegistryReadOnly());
-
-            return userRegistryTabPane;
+            return templateRegistryTabPane;
         } else if (msg instanceof UnitRegistryData) {
             UnitRegistryData data = (UnitRegistryData) msg;
             dalUnitConfigTreeTableView.update(data.getDalUnitConfigList());
-            unitTemplateTreeTableView.update(data.getUnitTemplateList());
             unitGroupConfigTreeTableView.update(data.getUnitGroupUnitConfigList());
-            serviceTemplateTreeTableView.update(data.getServiceTemplateList());
+            deviceConfigTreeTableView.update(data.getDeviceUnitConfigList());
+            locationConfigTreeTableView.update(data.getLocationUnitConfigList());
+            connectionConfigTreeTableView.update(data.getConnectionUnitConfigList());
+            sceneConfigTreeTableView.update(data.getSceneUnitConfigList());
+            userConfigTreeTableView.update(data.getUserUnitConfigList());
+            authorizationGroupConfigTreeTableView.update(data.getAuthorizationGroupUnitConfigList());
 
-            dalUnitConfigTreeTableView.setReadOnlyMode(remotePool.getUnitRemote().isDalUnitConfigRegistryReadOnly());
-            unitTemplateTreeTableView.setReadOnlyMode(remotePool.getUnitRemote().isUnitTemplateRegistryReadOnly());
-            unitGroupConfigTreeTableView.setReadOnlyMode(remotePool.getUnitRemote().isUnitGroupConfigRegistryReadOnly());
-            serviceTemplateTreeTableView.setReadOnlyMode(remotePool.getUnitRemote().isServiceTemplateRegistryReadOnly());
+            dalUnitConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isDalUnitConfigRegistryReadOnly());
+            unitGroupConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isUnitGroupConfigRegistryReadOnly());
+            deviceConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isDeviceUnitRegistryReadOnly());
+            locationConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isLocationUnitRegistryReadOnly());
+            connectionConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isConnectionUnitRegistryReadOnly());
+            sceneConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isSceneUnitRegistryReadOnly());
+            agentConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isAgentUnitRegistryReadOnly());
+            appConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isAppUnitRegistryReadOnly());
+            userConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isUserUnitRegistryReadOnly());
+            authorizationGroupConfigTreeTableView.setReadOnlyMode(Registries.getUnitRegistry().isAuthorizationGroupUnitRegistryReadOnly());
 
             return unitRegistryTabPane;
         } else if (msg instanceof ActivityRegistryData) {
             ActivityRegistryData data = (ActivityRegistryData) msg;
-            activityClassTreeTableView.update(data.getActivityClassList());
             activityConfigTreeTableView.update(data.getActivityConfigList());
 
-            activityClassTreeTableView.setReadOnlyMode(remotePool.getActivityRemote().isActivityClassRegistryReadOnly());
-            activityConfigTreeTableView.setReadOnlyMode(remotePool.getActivityRemote().isActivityConfigRegistryReadOnly());
+            activityConfigTreeTableView.setReadOnlyMode(Registries.getActivityRegistry().isActivityConfigRegistryReadOnly());
 
             return activityRegistryTabPane;
         }
         return null;
     }
 
-    private Tab getRegistryTabByRemote(RSBRemoteService remote) {
-        if (remote instanceof DeviceRegistryRemote) {
-            return deviceRegistryTab;
-        } else if (remote instanceof LocationRegistryRemote) {
-            return locationRegistryTab;
-        } else if (remote instanceof SceneRegistryRemote) {
-            return sceneRegistryTab;
-        } else if (remote instanceof AppRegistryRemote) {
-            return appRegistryTab;
-        } else if (remote instanceof AgentRegistryRemote) {
-            return agentRegistryTab;
-        } else if (remote instanceof UserRegistryRemote) {
-            return userRegistryTab;
-        } else if (remote instanceof UnitRegistryRemote) {
+    private Tab getRegistryTabByRemote(final RegistryRemote registryRemote) {
+        if (registryRemote instanceof ClassRegistryRemote) {
+            return classRegistryTab;
+        } else if (registryRemote instanceof TemplateRegistryRemote) {
+            return templateRegistryTab;
+        } else if (registryRemote instanceof UnitRegistryRemote) {
             return unitRegistryTab;
-        } else if (remote instanceof ActivityRegistryRemote) {
+        } else if (registryRemote instanceof ActivityRegistryRemote) {
             return activityRegistryTab;
         }
         return null;
     }
 
-    private List<RegistryTreeTableView> getTreeTablesByRemote(RSBRemoteService remote) {
+    private List<RegistryTreeTableView> getTreeTablesByRemote(final RegistryRemote registryRemote) {
         List<RegistryTreeTableView> treeTableList = new ArrayList<>();
-        if (remote instanceof DeviceRegistryRemote) {
+        if (registryRemote instanceof ClassRegistryRemote) {
             treeTableList.add(deviceClassTreeTableView);
-            treeTableList.add(deviceConfigTreeTableView);
-        } else if (remote instanceof LocationRegistryRemote) {
-            treeTableList.add(locationConfigTreeTableView);
-            treeTableList.add(connectionConfigTreeTableView);
-        } else if (remote instanceof SceneRegistryRemote) {
-            treeTableList.add(sceneConfigTreeTableView);
-        } else if (remote instanceof AppRegistryRemote) {
-            treeTableList.add(appClassTreeTableView);
-            treeTableList.add(appConfigTreeTableView);
-        } else if (remote instanceof AgentRegistryRemote) {
             treeTableList.add(agentClassTreeTableView);
-            treeTableList.add(agentConfigTreeTableView);
-        } else if (remote instanceof UserRegistryRemote) {
-            treeTableList.add(userConfigTreeTableView);
-            treeTableList.add(authorizationGroupConfigTreeTableView);
-        } else if (remote instanceof UnitRegistryRemote) {
-            treeTableList.add(dalUnitConfigTreeTableView);
-            treeTableList.add(unitGroupConfigTreeTableView);
+            treeTableList.add(appClassTreeTableView);
+        } else if (registryRemote instanceof TemplateRegistryRemote) {
             treeTableList.add(unitTemplateTreeTableView);
             treeTableList.add(serviceTemplateTreeTableView);
-        } else if (remote instanceof ActivityRegistryRemote) {
-            treeTableList.add(activityClassTreeTableView);
+            treeTableList.add(activityTemplateTreeTableView);
+        } else if (registryRemote instanceof UnitRegistryRemote) {
+            treeTableList.add(dalUnitConfigTreeTableView);
+            treeTableList.add(deviceConfigTreeTableView);
+            treeTableList.add(locationConfigTreeTableView);
+            treeTableList.add(connectionConfigTreeTableView);
+            treeTableList.add(sceneConfigTreeTableView);
+            treeTableList.add(appConfigTreeTableView);
+            treeTableList.add(agentConfigTreeTableView);
+            treeTableList.add(userConfigTreeTableView);
+            treeTableList.add(authorizationGroupConfigTreeTableView);
+        } else if (registryRemote instanceof ActivityRegistryRemote) {
             treeTableList.add(activityConfigTreeTableView);
         }
         return treeTableList;
     }
 
-    private ProgressIndicator getProgressindicatorByRemote(RSBRemoteService remote) {
-        if (remote instanceof DeviceRegistryRemote) {
-            return deviceRegistryProgressIndicator;
-        } else if (remote instanceof LocationRegistryRemote) {
-            return locationRegistryprogressIndicator;
-        } else if (remote instanceof SceneRegistryRemote) {
-            return sceneRegistryprogressIndicator;
-        } else if (remote instanceof AppRegistryRemote) {
-            return appRegistryprogressIndicator;
-        } else if (remote instanceof AgentRegistryRemote) {
-            return agentRegistryProgressIndicator;
-        } else if (remote instanceof UserRegistryRemote) {
-            return userRegistryProgessInidicator;
+    private ProgressIndicator getProgressIndicatorByRemote(RegistryRemote remote) {
+        if (remote instanceof ClassRegistryRemote) {
+            return classRegistryProgressIndicator;
+        } else if (remote instanceof TemplateRegistryRemote) {
+            return templateRegistryProgressIndicator;
         } else if (remote instanceof UnitRegistryRemote) {
             return unitRegistryProgressIndicator;
         } else if (remote instanceof ActivityRegistryRemote) {
@@ -771,9 +615,9 @@ public class RegistryEditor extends Application {
                 return userConfigTreeTableView;
             case SERVICE_TEMPLATE:
                 return serviceTemplateTreeTableView;
-            case USER_ACTIVITY_CLASS:
-                return activityClassTreeTableView;
-            case USER_ACTIVITY_CONFIG:
+            case ACTIVITY_TEMPLATE:
+                return activityTemplateTreeTableView;
+            case ACTIVITY_CONFIG:
                 return activityConfigTreeTableView;
             default:
                 return null;
@@ -791,7 +635,7 @@ public class RegistryEditor extends Application {
     }
 
     public void selectMessageById(String id) throws CouldNotPerformException {
-        GeneratedMessage msg = (GeneratedMessage) remotePool.getById(id);
+        GeneratedMessage msg = (GeneratedMessage) Registries.getById(id);
         SendableType sendableType = SendableType.getTypeToMessage(msg);
         selectTabBySendableType(sendableType);
         getTreeTableViewBySendableType(sendableType).selectMessage(msg);
@@ -806,12 +650,9 @@ public class RegistryEditor extends Application {
         /* Setup JPService */
         JPService.setApplicationName(APP_NAME);
         JPService.registerProperty(JPReadOnly.class);
-        JPService.registerProperty(JPDeviceRegistryScope.class);
-        JPService.registerProperty(JPLocationRegistryScope.class);
-        JPService.registerProperty(JPSceneRegistryScope.class);
-        JPService.registerProperty(JPAgentRegistryScope.class);
-        JPService.registerProperty(JPAppRegistryScope.class);
-        JPService.registerProperty(JPUserRegistryScope.class);
+        JPService.registerProperty(JPClassRegistryScope.class);
+        JPService.registerProperty(JPTemplateRegistryScope.class);
+        JPService.registerProperty(JPActivityRegistryScope.class);
         JPService.registerProperty(JPUnitRegistryScope.class);
         JPService.registerProperty(JPRSBHost.class);
         JPService.registerProperty(JPRSBPort.class);
@@ -821,16 +662,29 @@ public class RegistryEditor extends Application {
         LOGGER.info(APP_NAME + " successfully started.");
     }
 
-    public static void printException(Throwable th, Logger logger, LogLevel logLevel) {
-        GlobalTextArea.getInstance().printException(th);
-        ExceptionPrinter.printHistory(th, logger, logLevel);
+    /**
+     * Print a throwable using the logger of the RegistryEditor class.
+     *
+     * @param throwable the throwable printed
+     */
+    public static void printException(final Throwable throwable) {
+        printException(throwable, LOGGER);
+    }
+
+    public static void printException(final Throwable throwable, final Logger logger) {
+        printException(throwable, logger, LogLevel.ERROR);
+    }
+
+    public static void printException(final Throwable throwable, final Logger logger, final LogLevel logLevel) {
+        GlobalTextArea.getInstance().printException(throwable);
+        ExceptionPrinter.printHistory(throwable, logger, logLevel);
     }
 
     public static <V> Future<V> runOnFxThread(final Callable<V> callable) {
         return runOnFxThread(callable, "task");
     }
 
-    public static <V> Future<V> runOnFxThread(final Callable<V> callable, final String taskDescribtion) {
+    public static <V> Future<V> runOnFxThread(final Callable<V> callable, final String taskDescription) {
         try {
             if (Platform.isFxApplicationThread()) {
                 return CompletableFuture.completedFuture(callable.call());
@@ -840,13 +694,13 @@ public class RegistryEditor extends Application {
                 try {
                     return callable.call();
                 } catch (Exception ex) {
-                    throw ExceptionPrinter.printHistoryAndReturnThrowable(new CouldNotPerformException("Could not perform " + taskDescribtion + "!", ex), LOGGER);
+                    throw ExceptionPrinter.printHistoryAndReturnThrowable(new CouldNotPerformException("Could not perform " + taskDescription + "!", ex), LOGGER);
                 }
             });
             Platform.runLater(future);
             return future;
         } catch (Exception ex) {
-            ExceptionPrinter.printHistory("Could not perform " + taskDescribtion + "!", ex, LOGGER);
+            ExceptionPrinter.printHistory("Could not perform " + taskDescription + "!", ex, LOGGER);
             final CompletableFuture<V> completableFuture = new CompletableFuture<>();
             completableFuture.completeExceptionally(ex);
             return completableFuture;

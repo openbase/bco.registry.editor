@@ -33,7 +33,7 @@ import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.LeafContainer;
 import org.openbase.bco.registry.editor.struct.Node;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
-import org.openbase.bco.registry.editor.util.RemotePool;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
@@ -48,6 +48,7 @@ import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
+import sun.reflect.generics.visitor.Reifier;
 
 /**
  *
@@ -94,7 +95,7 @@ public class StructureConsistencyKeeper {
 
             // filter so that every serviceType is only added once
             Map<String, ServiceType> serviceTypeMap = new HashMap();
-            for (ServiceDescription serviceDescription : RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getType()).getServiceDescriptionList()) {
+            for (ServiceDescription serviceDescription : Registries.getTemplateRegistry().getUnitTemplateByType(container.getBuilder().getType()).getServiceDescriptionList()) {
                 serviceTypeMap.put(serviceDescription.getType().toString(), serviceDescription.getType());
             }
 
@@ -136,7 +137,7 @@ public class StructureConsistencyKeeper {
         } else if ("unit_type".equals(changedField)) {
             change = true;
             StructureConsistencyKeeper.clearField(container, "service_template");
-            container.getBuilder().addAllServiceDescription(RemotePool.getInstance().getDeviceRemote().getUnitTemplateByType(container.getBuilder().getUnitType()).getServiceDescriptionList());
+            container.getBuilder().addAllServiceDescription(Registries.getTemplateRegistry().getUnitTemplateByType(container.getBuilder().getUnitType()).getServiceDescriptionList());
             field = ProtoBufFieldProcessor.getFieldDescriptor(container.getBuilder(), UnitGroupConfig.SERVICE_DESCRIPTION_FIELD_NUMBER);
             container.add(new GenericListContainer<>(field, container.getBuilder()));
         }
@@ -146,7 +147,7 @@ public class StructureConsistencyKeeper {
             if (container.getBuilder().getUnitType() == UnitType.UNKNOWN) {
                 //check if every unit hast all given services
                 for (String memberId : container.getBuilder().getMemberIdList()) {
-                    UnitConfig unitConfig = RemotePool.getInstance().getDeviceRemote().getUnitConfigById(memberId);
+                    UnitConfig unitConfig = Registries.getUnitRegistry().getUnitConfigById(memberId);
                     boolean skip = false;
                     for (ServiceConfig serviceConfig : unitConfig.getServiceConfigList()) {
                         if (!container.getBuilder().getServiceDescriptionList().contains(serviceConfig.getServiceDescription())) {
@@ -160,8 +161,8 @@ public class StructureConsistencyKeeper {
                 }
             } else {
                 for (String memberId : container.getBuilder().getMemberIdList()) {
-                    UnitType unitType = RemotePool.getInstance().getDeviceRemote().getUnitConfigById(memberId).getType();
-                    if (unitType == container.getBuilder().getUnitType() || RemotePool.getInstance().getDeviceRemote().getSubUnitTypesOfUnitType(container.getBuilder().getUnitType()).contains(unitType)) {
+                    UnitType unitType = Registries.getUnitRegistry().getUnitConfigById(memberId).getType();
+                    if (unitType == container.getBuilder().getUnitType() || Registries.getTemplateRegistry().getSubUnitTypes(container.getBuilder().getUnitType()).contains(unitType)) {
                         memberIds.add(memberId);
                     }
                 }

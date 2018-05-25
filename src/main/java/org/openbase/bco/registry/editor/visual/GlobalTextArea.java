@@ -52,15 +52,9 @@ public class GlobalTextArea extends TextArea {
         super();
         this.parent = null;
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem clear = new MenuItem("Clear");
-        clear.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                clearText();
-            }
-        });
-        contextMenu.getItems().add(clear);
+        MenuItem clearMenuItem = new MenuItem("Clear");
+        clearMenuItem.setOnAction(event -> clearText());
+        contextMenu.getItems().add(clearMenuItem);
 
         this.setContextMenu(contextMenu);
         this.setEditable(false);

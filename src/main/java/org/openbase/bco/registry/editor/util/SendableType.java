@@ -23,8 +23,8 @@ package org.openbase.bco.registry.editor.util;
  */
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import rst.domotic.activity.ActivityClassType.ActivityClass;
 import rst.domotic.activity.ActivityConfigType.ActivityConfig;
+import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
@@ -54,12 +54,12 @@ public enum SendableType {
     UNIT_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNKNOWN).build()),
     UNIT_GROUP_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNIT_GROUP).build()),
     SERVICE_TEMPLATE(ServiceTemplate.getDefaultInstance()),
-    USER_ACTIVITY_CLASS(ActivityClass.getDefaultInstance()),
-    USER_ACTIVITY_CONFIG(ActivityConfig.getDefaultInstance());
+    ACTIVITY_TEMPLATE(ActivityTemplate.getDefaultInstance()),
+    ACTIVITY_CONFIG(ActivityConfig.getDefaultInstance());
 
     private final GeneratedMessage defaultInstanceForType;
 
-    private SendableType(GeneratedMessage message) {
+    SendableType(GeneratedMessage message) {
         defaultInstanceForType = message;
     }
 
@@ -101,10 +101,10 @@ public enum SendableType {
                 default:
                     return UNIT_CONFIG;
             }
-        } else if (builder instanceof ActivityClass.Builder) {
-            return USER_ACTIVITY_CLASS;
+        } else if (builder instanceof ActivityTemplate.Builder) {
+            return ACTIVITY_TEMPLATE;
         } else if (builder instanceof ActivityConfig.Builder) {
-            return USER_ACTIVITY_CONFIG;
+            return ACTIVITY_CONFIG;
         } else {
             return null;
         }

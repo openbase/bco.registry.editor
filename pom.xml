@@ -87,13 +87,6 @@
                     <programs>
                         <program>
                             <mainClass>org.openbase.bco.registry.editor.RegistryEditor</mainClass>
-                            <id>registry-editor</id>
-                            <platforms>
-                                <platform>unix</platform>
-                            </platforms>
-                        </program>
-                        <program>
-                            <mainClass>org.openbase.bco.registry.editor.RegistryEditor</mainClass>
                             <id>bco-registry-editor</id>
                             <platforms>
                                 <platform>unix</platform>

@@ -32,15 +32,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import org.openbase.bco.registry.device.remote.CachedDeviceRegistryRemote;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.struct.*;
-import org.openbase.bco.registry.editor.util.RemotePool;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.column.Column;
 import org.openbase.bco.registry.editor.visual.column.DescriptorColumn;
 import org.openbase.bco.registry.editor.visual.column.ValueColumn;
 
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
@@ -73,7 +72,6 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
     private final SendableType type;
     private final ProtobufListDiff<?, M, ?> listDiff;
     private final VBox vBox;
-    private final RemotePool remotePool;
     private final Label statusInfoLabel;
     private final List<Observer<Boolean>> disconnectionObserver;
     private final RegistryEditor registryEditor;
@@ -88,7 +86,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         this.descriptorColumn = new DescriptorColumn();
         ValueColumn valueColumn = new ValueColumn();
         this.getColumns().addAll(descriptorColumn, valueColumn);
-        if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.USER_ACTIVITY_CLASS) {
+        if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.ACTIVITY_TEMPLATE) {
             System.out.println("Set Context Menu for type [" + type.name() + "]");
             this.setContextMenu(new TreeTableViewContextMenu(this, type));
         }
@@ -102,8 +100,6 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         this.vBox = new VBox();
         this.vBox.setAlignment(Pos.CENTER);
         this.vBox.getChildren().addAll(statusInfoLabel, this);
-
-        this.remotePool = RemotePool.getInstance();
 
         this.registryEditor = registryEditor;
     }
@@ -133,8 +129,8 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         // Workaround: Hack for registry restart bug, should be removed after fixing update because empty registries can not be displayed anymore.
         while (true) {
             Registries.getUnitRegistry().waitForData();
-            CachedDeviceRegistryRemote.getRegistry().waitForData();
-            if (CachedDeviceRegistryRemote.getRegistry().getData().getDeviceUnitConfigCount() != 0) {
+            Registries.getRegistries(true);
+            if (Registries.getUnitRegistry().getData().getDeviceUnitConfigCount() != 0) {
                 break;
             }
             Thread.sleep(100);
@@ -226,7 +222,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
             }
         }
 
-        setReadOnlyMode(remotePool.isReadOnly(type.getDefaultInstanceForType()));
+        setReadOnlyMode(Registries.isReadOnly(type.getDefaultInstanceForType()));
     }
 
     public String diffString(MessageOrBuilder origin, MessageOrBuilder updated) {
@@ -369,7 +365,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
     public void setReadOnlyMode(boolean readOnly) {
         RegistryEditor.runOnFxThread(() -> {
             try {
-                if (!remotePool.isConsistent(type.getDefaultInstanceForType())) {
+                if (!Registries.isConsistent(type.getDefaultInstanceForType())) {
                     statusInfoLabel.setText("Registry inconsistent!");
                     statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");
                 } else {
@@ -386,7 +382,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
             } else {
                 getStylesheets().clear();
                 getStylesheets().add("default.css");
-                if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.USER_ACTIVITY_CLASS) {
+                if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.ACTIVITY_TEMPLATE) {
                     setContextMenu(new TreeTableViewContextMenu(RegistryTreeTableView.this, type));
                 }
             }

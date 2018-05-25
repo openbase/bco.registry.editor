@@ -22,7 +22,7 @@ package org.openbase.bco.registry.editor.visual.provider;
  * #L%
  */
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.util.RemotePool;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
@@ -42,7 +42,7 @@ public class DeviceClassItemDescriptorProvider extends AbstractTreeItemDescripto
 
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
-        DeviceClass deviceClass = RemotePool.getInstance().getDeviceRemote().getDeviceClassById((String) fieldGroup.getValue(builder));
+        DeviceClass deviceClass = Registries.getClassRegistry().getDeviceClassById((String) fieldGroup.getValue(builder));
         return deviceClass.getLabel();
     }
 

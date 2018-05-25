@@ -53,6 +53,7 @@ import org.openbase.bco.registry.editor.visual.cell.editing.combobox.EnumComboBo
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.MessageComboBox;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.UserConfigComboBoxConverter;
 import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.LogLevel;
@@ -61,6 +62,7 @@ import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import rst.configuration.EntryType;
 import rst.domotic.state.InventoryStateType.InventoryState;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
 import rst.math.Vec3DDoubleType.Vec3DDouble;
@@ -186,37 +188,37 @@ public class ValueCell extends RowCell {
             } else if ((((Leaf) item).getValue() != null)) {
                 if ("location_id".equals(item.getDescriptor()) || "parent_id".equals(item.getDescriptor()) || "child_id".equals(item.getDescriptor()) || "tile_id".equals(item.getDescriptor())) {
                     try {
-                        text = ScopeGenerator.generateStringRep(remotePool.getLocationRemote().getLocationConfigById((String) ((Leaf) item).getValue()).getScope());
+                        text = ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.LOCATION).getScope());
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
                 } else if ("member_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof AuthorizationGroupConfig.Builder) {
                     try {
-                        text = new UserConfigComboBoxConverter().getText(remotePool.getUserRemote().getUserConfigById((String) ((Leaf) item).getValue()));
+                        text = new UserConfigComboBoxConverter().getText(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.USER));
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
                 } else if ("owner_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof InventoryState.Builder) {
                     try {
-                        text = new UserConfigComboBoxConverter().getText(remotePool.getUserRemote().getUserConfigById((String) ((Leaf) item).getValue()));
+                        text = new UserConfigComboBoxConverter().getText(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.USER));
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
                 } else if ("device_class_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof DeviceConfig.Builder) {
                     try {
-                        text = new DeviceClassComboBoxConverter().getText(remotePool.getDeviceRemote().getDeviceClassById((String) ((Leaf) item).getValue()));
+                        text = new DeviceClassComboBoxConverter().getText(Registries.getClassRegistry().getDeviceClassById((String) ((Leaf) item).getValue()));
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
                 } else if ("unit_host_id".equals(item.getDescriptor())) {
                     try {
-                        text = ScopeGenerator.generateStringRep(remotePool.getUnitRemote().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
+                        text = ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
                 } else if ("connection_id".equals(item.getDescriptor())) {
                     try {
-                        text = ScopeGenerator.generateStringRep(remotePool.getLocationRemote().getConnectionConfigById((String) ((Leaf) item).getValue()).getScope());
+                        text = ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.CONNECTION).getScope());
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
@@ -231,7 +233,7 @@ public class ValueCell extends RowCell {
                 Label selectableLabel = SelectableLabel.makeSelectable(new Label(text));
                 if (item.getDescriptor().endsWith("unit_id")) {
                     try {
-                        text = ScopeGenerator.generateStringRep(remotePool.getUnitRemote().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
+                        text = ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
                     } catch (CouldNotPerformException ex) {
                         logger.warn("Could not retrieve unitConfig with id [" + ((Leaf) item).getValue() + "]", ex);
                     }
@@ -294,7 +296,7 @@ public class ValueCell extends RowCell {
                 GenericGroupContainer parent = (GenericGroupContainer) ((GenericGroupContainer) item).getParent().getValue();
                 if (parent.getFieldGroup() instanceof DeviceClassItemDescriptorProvider) {
                     try {
-                        String text = remotePool.getDeviceRemote().getDeviceClassById((String) parent.getValueMap().get(getItem())).getDescription();
+                        String text = Registries.getClassRegistry().getDeviceClassById((String) parent.getValueMap().get(getItem())).getDescription();
                         setGraphic(SelectableLabel.makeSelectable(new Label(text)));
                     } catch (CouldNotPerformException ex) {
                         RegistryEditor.printException(ex, logger, LogLevel.DEBUG);
@@ -407,11 +409,11 @@ public class ValueCell extends RowCell {
                             label.setMaxHeight(ValueCell.this.applyButton.getHeight());
                             ValueCell.this.setGraphic(new HBox(progressIndicator, label));
                         });
-                        if (remotePool.contains(msg)) {
+                        if (Registries.contains(msg)) {
                             // save original value from model
-                            final Message original = remotePool.getById(ProtoBufFieldProcessor.getId(msg));
+                            final Message original = Registries.getById(ProtoBufFieldProcessor.getId(msg));
 
-                            registryTask = remotePool.update(msg);
+                            registryTask = Registries.update(msg);
                             addToTaskMap(container, registryTask);
                             // save update
                             final Message update = (Message) registryTask.get();
@@ -424,7 +426,7 @@ public class ValueCell extends RowCell {
                             }
 
                         } else {
-                            registryTask = remotePool.register(msg);
+                            registryTask = Registries.register(msg);
                             addToTaskMap(container, registryTask);
                             registryTask.get();
                             removeFromTaskMap(container);
@@ -447,7 +449,7 @@ public class ValueCell extends RowCell {
 
         final int index = container.getParent().getChildren().indexOf(container);
         final GenericNodeContainer resetNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(),
-                (GeneratedMessage.Builder) remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
+                (GeneratedMessage.Builder) Registries.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
         RegistryTreeTableView.expandEqually(container, resetNode);
         Platform.runLater(() -> {
             container.getParent().getChildren().set(index, resetNode);

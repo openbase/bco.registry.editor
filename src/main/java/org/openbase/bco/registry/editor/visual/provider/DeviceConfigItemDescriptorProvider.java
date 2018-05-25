@@ -22,10 +22,11 @@ package org.openbase.bco.registry.editor.visual.provider;
  * #L%
  */
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.util.RemotePool;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 
 /**
@@ -35,17 +36,15 @@ import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 public class DeviceConfigItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
 
     private final FieldDescriptorGroup fieldGroup;
-    private final RemotePool remotePool;
 
     public DeviceConfigItemDescriptorProvider() throws InstantiationException, InterruptedException {
         fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.UNIT_HOST_ID_FIELD_NUMBER);
-        remotePool = RemotePool.getInstance();
     }
 
     @Override
     public String getDescriptor(Message.Builder msg) throws CouldNotPerformException, InterruptedException {
-        UnitConfig deviceUnitConfig = remotePool.getDeviceRemote().getDeviceConfigById(((UnitConfig.Builder) msg).getUnitHostId());
-        DeviceClass deviceClass = remotePool.getDeviceRemote().getDeviceClassById(deviceUnitConfig.getDeviceConfig().getDeviceClassId());
+        UnitConfig deviceUnitConfig = Registries.getUnitRegistry().getUnitConfigById(((UnitConfig.Builder) msg).getUnitHostId(), UnitType.DEVICE);
+        DeviceClass deviceClass = Registries.getClassRegistry().getDeviceClassById(deviceUnitConfig.getDeviceConfig().getDeviceClassId());
         return deviceClass.getLabel() + " , " + deviceUnitConfig.getLabel();
     }
 

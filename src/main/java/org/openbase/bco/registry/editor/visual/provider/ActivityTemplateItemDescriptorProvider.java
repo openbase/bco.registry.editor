@@ -23,27 +23,26 @@ package org.openbase.bco.registry.editor.visual.provider;
  */
 
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.util.RemotePool;
+import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import rst.domotic.activity.ActivityClassType.ActivityClass;
 import rst.domotic.activity.ActivityConfigType.ActivityConfig;
+import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
 
 /**
- *
  * @author <a href="mailto:pLeminoq@openbase.org">Tamino Huxohl</a>
  */
-public class ActivityClassItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
+public class ActivityTemplateItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
 
     FieldDescriptorGroup fieldGroup;
 
-    public ActivityClassItemDescriptorProvider() {
-        fieldGroup = new FieldDescriptorGroup(ActivityConfig.newBuilder(), ActivityConfig.USER_ACTIVITY_CLASS_ID_FIELD_NUMBER);
+    public ActivityTemplateItemDescriptorProvider() {
+        fieldGroup = new FieldDescriptorGroup(ActivityConfig.newBuilder(), ActivityConfig.ACTIVITY_TEMPLATE_ID_FIELD_NUMBER);
     }
 
     @Override
-    public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
-        ActivityClass activityClass = RemotePool.getInstance().getActivityRemote().getActivityClassById((String) fieldGroup.getValue(builder));
-        return activityClass.getLabel();
+    public String getDescriptor(Message.Builder builder) throws CouldNotPerformException {
+        ActivityTemplate activityTemplate = Registries.getTemplateRegistry().getActivityTemplateById((String) fieldGroup.getValue(builder));
+        return activityTemplate.getLabel();
     }
 
     @Override
@@ -60,5 +59,5 @@ public class ActivityClassItemDescriptorProvider extends AbstractTreeItemDescrip
     public boolean hasEqualValue(Message.Builder msg, Object value) throws CouldNotPerformException {
         return value.equals(getValue(msg));
     }
-    
+
 }

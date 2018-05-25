@@ -21,11 +21,12 @@ package org.openbase.bco.registry.editor.struct.consistency;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import rst.domotic.activity.ActivityClassType.ActivityClass;
 import rst.domotic.activity.ActivityConfigType.ActivityConfig;
-import rst.domotic.registry.DeviceRegistryDataType.DeviceRegistryData;
+import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
+import rst.domotic.registry.TemplateRegistryDataType.TemplateRegistryData;
 import rst.domotic.service.ServiceConfigType.ServiceConfig;
 import rst.domotic.service.ServiceTemplateConfigType.ServiceTemplateConfig;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
@@ -55,7 +56,7 @@ public class Configuration {
             return false;
         } else if (builder instanceof UnitConfig.Builder && "service_config".equals(fieldName)) {
             return false;
-        } else if (builder instanceof DeviceRegistryData.Builder && "unit_template".equals(fieldName)) {
+        } else if (builder instanceof TemplateRegistryData.Builder && "unit_template".equals(fieldName)) {
             return false;
         } else if (builder instanceof LocationConfig.Builder && "unit_id".equals(fieldName)) {
             return false;
@@ -107,7 +108,7 @@ public class Configuration {
             return !("id".equals(fieldName));
         } else if (builder instanceof TileConfig.Builder) {
             return !("connection_id".equals(fieldName));
-        } else if (builder instanceof ActivityClass.Builder) {
+        } else if (builder instanceof ActivityTemplate.Builder) {
             return !("id".equals(fieldName) || "type".equals(fieldName));
         } else if (builder instanceof ActivityConfig.Builder) {
             return !("id".equals(fieldName));
@@ -122,7 +123,7 @@ public class Configuration {
                 || (builder instanceof AgentClass.Builder)
                 || (builder instanceof AppClass.Builder)
                 || (builder instanceof UnitConfig.Builder))
-                || (builder instanceof ActivityClass.Builder)
+                || (builder instanceof ActivityTemplate.Builder)
                 || (builder instanceof ActivityConfig.Builder);
     }
 }
