@@ -39,20 +39,20 @@ import rst.domotic.unit.device.DeviceClassType.DeviceClass;
  */
 public enum SendableType {
 
-    AGENT_CONFIG(UnitConfig.newBuilder().setType(UnitType.AGENT).build()),
+    AGENT_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.AGENT).build()),
     AGENT_CLASS(AgentClass.getDefaultInstance()),
-    APP_CONFIG(UnitConfig.newBuilder().setType(UnitType.APP).build()),
+    APP_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.APP).build()),
     APP_CLASS(AppClass.getDefaultInstance()),
     DEVICE_CLASS(DeviceClass.getDefaultInstance()),
-    DEVICE_CONFIG(UnitConfig.newBuilder().setType(UnitType.DEVICE).build()),
-    LOCATION_CONFIG(UnitConfig.newBuilder().setType(UnitType.LOCATION).build()),
-    CONNECTION_CONFIG(UnitConfig.newBuilder().setType(UnitType.CONNECTION).build()),
-    SCENE_CONFIG(UnitConfig.newBuilder().setType(UnitType.SCENE).build()),
+    DEVICE_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.DEVICE).build()),
+    LOCATION_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.LOCATION).build()),
+    CONNECTION_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.CONNECTION).build()),
+    SCENE_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.SCENE).build()),
     UNIT_TEMPLATE(UnitTemplate.getDefaultInstance()),
-    USER_CONFIG(UnitConfig.newBuilder().setType(UnitType.USER).build()),
-    AUTHORIZATION_GROUP_CONFIG(UnitConfig.newBuilder().setType(UnitType.AUTHORIZATION_GROUP).build()),
-    UNIT_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNKNOWN).build()),
-    UNIT_GROUP_CONFIG(UnitConfig.newBuilder().setType(UnitType.UNIT_GROUP).build()),
+    USER_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.USER).build()),
+    AUTHORIZATION_GROUP_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.AUTHORIZATION_GROUP).build()),
+    UNIT_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.UNKNOWN).build()),
+    UNIT_GROUP_CONFIG(UnitConfig.newBuilder().setUnitType(UnitType.UNIT_GROUP).build()),
     SERVICE_TEMPLATE(ServiceTemplate.getDefaultInstance()),
     ACTIVITY_TEMPLATE(ActivityTemplate.getDefaultInstance()),
     ACTIVITY_CONFIG(ActivityConfig.getDefaultInstance());
@@ -79,7 +79,7 @@ public enum SendableType {
         } else if (builder instanceof ServiceTemplate.Builder) {
             return SERVICE_TEMPLATE;
         } else if (builder instanceof UnitConfig.Builder) {
-            switch (((UnitConfig.Builder) builder).getType()) {
+            switch (((UnitConfig.Builder) builder).getUnitType()) {
                 case AGENT:
                     return AGENT_CONFIG;
                 case APP:

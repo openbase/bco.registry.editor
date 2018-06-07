@@ -96,7 +96,7 @@ public class StructureConsistencyKeeper {
             // filter so that every serviceType is only added once
             Map<String, ServiceType> serviceTypeMap = new HashMap();
             for (ServiceDescription serviceDescription : Registries.getTemplateRegistry().getUnitTemplateByType(container.getBuilder().getType()).getServiceDescriptionList()) {
-                serviceTypeMap.put(serviceDescription.getType().toString(), serviceDescription.getType());
+                serviceTypeMap.put(serviceDescription.getServiceType().toString(), serviceDescription.getServiceType());
             }
 
             // create the new values for the field and add them to the builder
@@ -161,7 +161,7 @@ public class StructureConsistencyKeeper {
                 }
             } else {
                 for (String memberId : container.getBuilder().getMemberIdList()) {
-                    UnitType unitType = Registries.getUnitRegistry().getUnitConfigById(memberId).getType();
+                    UnitType unitType = Registries.getUnitRegistry().getUnitConfigById(memberId).getUnitType();
                     if (unitType == container.getBuilder().getUnitType() || Registries.getTemplateRegistry().getSubUnitTypes(container.getBuilder().getUnitType()).contains(unitType)) {
                         memberIds.add(memberId);
                     }

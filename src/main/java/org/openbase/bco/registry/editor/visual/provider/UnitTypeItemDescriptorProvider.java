@@ -36,7 +36,7 @@ public class UnitTypeItemDescriptorProvider extends AbstractTreeItemDescriptorPr
     FieldDescriptorGroup fieldGroup;
 
     public UnitTypeItemDescriptorProvider() {
-        fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.TYPE_FIELD_NUMBER);
+        fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.UNIT_TYPE_FIELD_NUMBER);
     }
 
     @Override

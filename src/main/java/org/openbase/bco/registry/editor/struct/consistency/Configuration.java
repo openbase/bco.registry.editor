@@ -88,10 +88,10 @@ public class Configuration {
         } else if (builder instanceof Scope.Builder) {
             return !("scope".equals(fieldName));
         } else if (builder instanceof UnitConfig.Builder) {
-            if (((UnitConfig.Builder) builder).getType() == UnitTemplate.UnitType.USER && "label".equals(fieldName)) {
+            if (((UnitConfig.Builder) builder).getUnitType() == UnitTemplate.UnitType.USER && "label".equals(fieldName)) {
                 return false;
             } else if ("type".equals(fieldName)) {
-                return ((UnitConfig.Builder) builder).getType() == UnitTemplate.UnitType.UNKNOWN;
+                return ((UnitConfig.Builder) builder).getUnitType() == UnitTemplate.UnitType.UNKNOWN;
             }
             return !("id".equals(fieldName) || "unit_host_id".equals(fieldName) || "unit_template_config_id".equals(fieldName));
         } else if (builder instanceof ServiceConfig.Builder) {

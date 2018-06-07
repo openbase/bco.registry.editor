@@ -25,6 +25,7 @@ package org.openbase.bco.registry.editor.visual.provider;
 import com.google.protobuf.Message;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.extension.rst.processing.LabelProcessor;
 import rst.domotic.activity.ActivityConfigType.ActivityConfig;
 import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
 
@@ -42,7 +43,7 @@ public class ActivityTemplateItemDescriptorProvider extends AbstractTreeItemDesc
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException {
         ActivityTemplate activityTemplate = Registries.getTemplateRegistry().getActivityTemplateById((String) fieldGroup.getValue(builder));
-        return activityTemplate.getLabel();
+        return LabelProcessor.getFirstLabel(activityTemplate.getLabel());
     }
 
     @Override

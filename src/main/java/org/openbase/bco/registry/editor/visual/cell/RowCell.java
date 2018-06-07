@@ -141,8 +141,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                             addGroupValues(parentNode, addedBuilder, ((NodeContainer) parentNode.getChildren().get(0)).getBuilder());
                         }
                         if (addedBuilder instanceof UnitConfig.Builder) {
-                            UnitType unitType = ((UnitConfig) ((RegistryTreeTableView) RowCell.this.getTreeTableView()).getSendableType().getDefaultInstanceForType()).getType();
-                            ((UnitConfig.Builder) addedBuilder).setType(unitType);
+                            UnitType unitType = ((UnitConfig) ((RegistryTreeTableView) RowCell.this.getTreeTableView()).getSendableType().getDefaultInstanceForType()).getUnitType();
+                            ((UnitConfig.Builder) addedBuilder).setUnitType(unitType);
                         }
                         parentNode.addElement(addedBuilder);
                     } else {
@@ -157,8 +157,8 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                     }
                     addGroupValues(container, addedBuilder, child.getBuilder());
                     if (addedBuilder instanceof UnitConfig.Builder) {
-                        UnitType unitType = ((UnitConfig) ((RegistryTreeTableView) RowCell.this.getTreeTableView()).getSendableType().getDefaultInstanceForType()).getType();
-                        ((UnitConfig.Builder) addedBuilder).setType(unitType);
+                        UnitType unitType = ((UnitConfig) ((RegistryTreeTableView) RowCell.this.getTreeTableView()).getSendableType().getDefaultInstanceForType()).getUnitType();
+                        ((UnitConfig.Builder) addedBuilder).setUnitType(unitType);
                     }
                     container.add(new GenericNodeContainer("", addedBuilder));
                     container.setExpanded(true);

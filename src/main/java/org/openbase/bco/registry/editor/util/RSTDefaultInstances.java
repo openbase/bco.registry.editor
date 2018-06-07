@@ -161,25 +161,25 @@ public class RSTDefaultInstances {
         } else if (builderType instanceof DeviceClass.Builder) {
             return getDefaultDeviceClass();
         } else if (builderType instanceof UnitConfig.Builder) {
-            switch (((UnitConfig.Builder) builderType).getType()) {
+            switch (((UnitConfig.Builder) builderType).getUnitType()) {
                 case AUTHORIZATION_GROUP:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.AUTHORIZATION_GROUP);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.AUTHORIZATION_GROUP);
                 case AGENT:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.AGENT);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.AGENT);
                 case APP:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.APP);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.APP);
                 case CONNECTION:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.CONNECTION);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.CONNECTION);
                 case DEVICE:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.DEVICE);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.DEVICE);
                 case LOCATION:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.LOCATION);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.LOCATION);
                 case SCENE:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.SCENE);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.SCENE);
                 case UNIT_GROUP:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.UNIT_GROUP);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.UNIT_GROUP);
                 case USER:
-                    return UnitConfig.getDefaultInstance().toBuilder().setType(UnitType.USER);
+                    return UnitConfig.getDefaultInstance().toBuilder().setUnitType(UnitType.USER);
                 default:
                     return UnitConfig.getDefaultInstance().toBuilder();
             }

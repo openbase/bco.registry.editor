@@ -199,7 +199,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         for (M msg : listDiff.getNewMessageMap().getMessages()) {
             if (msg instanceof UnitConfig) {
                 UnitConfig a = (UnitConfig) msg;
-                LOGGER.info("New Message [" + a.getType().name() + ", " + a.getLabel() + "]");
+                LOGGER.info("New Message [" + a.getUnitType().name() + ", " + a.getLabel() + "]");
             }
             //logger.info("New message [" + message + "]");
             if (this.getRoot() instanceof GenericGroupContainer) {

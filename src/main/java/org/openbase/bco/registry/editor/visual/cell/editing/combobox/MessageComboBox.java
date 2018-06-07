@@ -146,7 +146,7 @@ public class MessageComboBox extends ComboBox<Message> {
             if (parentBuilder instanceof UnitGroupConfig.Builder) {
                 List<ServiceTemplate.ServiceType> serviceTypes = new ArrayList<>();
                 for (ServiceDescription serviceDescription : ((UnitGroupConfig.Builder) parentBuilder).getServiceDescriptionList()) {
-                    serviceTypes.add(serviceDescription.getType());
+                    serviceTypes.add(serviceDescription.getServiceType());
                 }
                 list.clear();
                 // add all units which have the same serviveTypes as the group
@@ -236,7 +236,7 @@ public class MessageComboBox extends ComboBox<Message> {
     private MessageComboBoxConverter getConverterByMessageType(final String fieldName, final Message.Builder parentBuilder) {
         GeneratedMessage msg = getMessageEnumBoxType(fieldName, parentBuilder);
         if (msg instanceof UnitConfig) {
-            switch (((UnitConfig) msg).getType()) {
+            switch (((UnitConfig) msg).getUnitType()) {
                 case LOCATION:
                     return new UnitConfigComboBoxConverter();
                 case USER:

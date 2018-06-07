@@ -53,7 +53,7 @@ public class ConverterSelector {
             return new EnablingStateConverter((EnablingState.Builder) builder);
         } else if (builder instanceof UnitConfig.Builder) {
             Filter filter;
-            switch (((UnitConfig.Builder) builder).getType()) {
+            switch (((UnitConfig.Builder) builder).getUnitType()) {
                 case AGENT:
                     filter = new AgentUnitConfigFilter();
                     break;
