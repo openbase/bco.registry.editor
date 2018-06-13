@@ -1,6 +1,6 @@
-package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter;
 
-/*
+/*-
  * #%L
  * BCO Registry Editor
  * %%
@@ -21,29 +21,31 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.Message;
+import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.rsb.ScopeType.Scope;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class UnitConfigComboBoxConverter implements MessageComboBoxConverter {
+public class ScopeComboBoxConverter<MSG extends Message> extends AbstractComboBoxConverter<MSG> {
 
     @Override
-    public String getText(Message msg) {
+    public String getText(MSG message) {
         try {
-            return ScopeGenerator.generateStringRep((Scope) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.SCOPE_FIELD_NUMBER)));
+            final Object value = message.getField(ProtoBufFieldProcessor.getFieldDescriptor(message, "scope"));
+            if (value instanceof Scope) {
+                return ScopeGenerator.generateStringRep((Scope) value);
+            } else {
+                throw new CouldNotPerformException("Unexpected scope type[" + value.getClass().getName() + "]");
+            }
         } catch (Exception ex) {
-            return "?";
+            ExceptionPrinter.printHistory(new CouldNotPerformException("Could not resolve scope of [" + message.getClass().getSimpleName() + "]", ex), logger);
+            return getValue(message);
         }
-    }
-
-    @Override
-    public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.ID_FIELD_NUMBER));
     }
 }

@@ -36,6 +36,10 @@ import javafx.util.Callback;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.DeviceClassComboBoxConverter;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.LabelComboBoxConverter;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.MessageComboBoxConverter;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.ScopeComboBoxConverter;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
@@ -43,14 +47,11 @@ import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.slf4j.LoggerFactory;
-import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
 import rst.domotic.authentication.PermissionConfigType.PermissionConfig;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
-import rst.domotic.unit.app.AppClassType.AppClass;
 import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
 import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
@@ -58,8 +59,6 @@ import rst.domotic.unit.location.LocationConfigType.LocationConfig;
 import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -177,19 +176,15 @@ public class MessageComboBox extends ComboBox<Message> {
                     }
                 }
             }
-            Collections.sort(list, new Comparator<Message>() {
-
-                @Override
-                public int compare(Message o1, Message o2) {
-                    if (o1 == null && o2 == null) {
-                        return 0;
-                    } else if (o1 == null) {
-                        return 1;
-                    } else if (o2 == null) {
-                        return -1;
-                    } else {
-                        return converter.getText(o1).compareTo(converter.getText(o2));
-                    }
+            list.sort((o1, o2) -> {
+                if (o1 == null && o2 == null) {
+                    return 0;
+                } else if (o1 == null) {
+                    return 1;
+                } else if (o2 == null) {
+                    return -1;
+                } else {
+                    return converter.getText(o1).compareTo(converter.getText(o2));
                 }
             });
             return FXCollections.observableArrayList(list);
@@ -238,29 +233,16 @@ public class MessageComboBox extends ComboBox<Message> {
         if (msg instanceof UnitConfig) {
             switch (((UnitConfig) msg).getUnitType()) {
                 case LOCATION:
-                    return new UnitConfigComboBoxConverter();
-                case USER:
-                    return new UserConfigComboBoxConverter();
                 case CONNECTION:
-                    return new UnitConfigComboBoxConverter();
                 case UNIT_GROUP:
-                    return new UnitConfigComboBoxConverter();
-                case AUTHORIZATION_GROUP:
-                    return new AuthorizationGroupComboBoxConverter();
+                    return new ScopeComboBoxConverter();
                 default:
-                    return new DefaultMessageComboBoxConverter();
+                    return new LabelComboBoxConverter();
             }
-        } else if (msg instanceof AgentClass) {
-            return new AgentClassComboBoxConverter();
-        } else if (msg instanceof AppClass) {
-            return new AppClassComboBoxConverter();
         } else if (msg instanceof DeviceClass) {
             return new DeviceClassComboBoxConverter();
-        } else if (msg instanceof ActivityTemplate) {
-            return new ActivityTemplateComboBoxConverter();
-        } else {
-            return new DefaultMessageComboBoxConverter();
         }
+        return new LabelComboBoxConverter();
     }
 
     private class MessageComboBoxCell extends ListCell<Message> {

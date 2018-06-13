@@ -32,6 +32,7 @@ import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.processing.StringProcessor;
+import rst.domotic.registry.TemplateRegistryDataType.TemplateRegistryData;
 
 /**
  *

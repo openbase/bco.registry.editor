@@ -1,11 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter;
 
-/*-
+/*
  * #%L
  * BCO Registry Editor
  * %%
@@ -26,23 +21,27 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.Message;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.domotic.unit.app.AppClassType.AppClass;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class AppClassComboBoxConverter implements MessageComboBoxConverter {
+public interface MessageComboBoxConverter<MSG extends Message> {
 
-    @Override
-    public String getText(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AppClass.getDefaultInstance(), AppClass.LABEL_FIELD_NUMBER));
-    }
+    /**
+     * Return the text displayed for the message in the combo box.
+     *
+     * @param message
+     * @return
+     */
+    String getText(MSG message);
 
-    @Override
-    public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AppClass.getDefaultInstance(), AppClass.ID_FIELD_NUMBER));
-    }
+    /**
+     * Return the value for the message which is set when it is clicked in the combo box.
+     *
+     * @param message
+     * @return
+     */
+    String getValue(MSG message);
 }

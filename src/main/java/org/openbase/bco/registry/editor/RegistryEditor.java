@@ -340,9 +340,7 @@ public class RegistryEditor extends Application {
                 if (!registryRemote.isConnected() || !registryRemote.isActive() || !registryRemote.isDataAvailable()) {
                     LOGGER.info("Set progress indicator for remote[" + registryRemote + "] because [" + !registryRemote.isConnected() + ", " + !registryRemote.isActive() + ", " + !registryRemote.isDataAvailable() + "]");
                     final Node node = getProgressIndicatorByRemote(registryRemote);
-                    Platform.runLater(() -> {
-                        tab.setContent(node);
-                    });
+                    Platform.runLater(() -> tab.setContent(node));
                     return;
                 }
                 try {
@@ -350,15 +348,11 @@ public class RegistryEditor extends Application {
                     if (!initialized.get(data.getClass().getSimpleName())) {
                         LOGGER.debug(data.getClass().getSimpleName() + " is not yet initialized");
                         final Node node = fillTreeTableView(data);
-                        Platform.runLater(() -> {
-                            tab.setContent(node);
-                        });
+                        Platform.runLater(() -> tab.setContent(node));
                     } else {
                         LOGGER.debug("Updating " + data.getClass().getSimpleName());
                         final Node node = updateTreeTableView(data);
-                        Platform.runLater(() -> {
-                            tab.setContent(node);
-                        });
+                        Platform.runLater(() -> tab.setContent(node));
                     }
                 } catch (CouldNotPerformException | InterruptedException ex) {
                     ExceptionPrinter.printHistory(new NotAvailableException("Registry", ex), LOGGER);
@@ -393,15 +387,15 @@ public class RegistryEditor extends Application {
 
             unitTemplateTreeTableView.setRoot(new GenericListContainer<>(TemplateRegistryData.UNIT_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
             unitTemplateTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.UNIT_TEMPLATE.getDefaultInstanceForType()));
-            unitTemplateTreeTableView.update(data.getUnitTemplateList());
+            unitTemplateTreeTableView.getListDiff().diff(data.getUnitTemplateList());
 
             serviceTemplateTreeTableView.setRoot(new GenericListContainer<>(TemplateRegistryData.SERVICE_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
             serviceTemplateTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.SERVICE_TEMPLATE.getDefaultInstanceForType()));
-            serviceTemplateTreeTableView.update(data.getServiceTemplateList());
+            serviceTemplateTreeTableView.getListDiff().diff(data.getServiceTemplateList());
 
             activityTemplateTreeTableView.setRoot(new GenericListContainer<>(TemplateRegistryData.ACTIVITY_TEMPLATE_FIELD_NUMBER, data.toBuilder()));
             activityTemplateTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.ACTIVITY_TEMPLATE.getDefaultInstanceForType()));
-            activityTemplateTreeTableView.update(data.getActivityTemplateList());
+            activityTemplateTreeTableView.getListDiff().diff(data.getActivityTemplateList());
 
             initialized.put(data.getClass().getSimpleName(), Boolean.TRUE);
             return templateRegistryTabPane;

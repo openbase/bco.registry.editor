@@ -21,25 +21,15 @@ package org.openbase.bco.registry.editor.struct.converter;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.GeneratedMessage;
-import org.openbase.bco.registry.editor.struct.converter.filter.AgentUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.AppUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.AuthorizationGroupUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.ConnectionUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.DalUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.DeviceUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.Filter;
-import org.openbase.bco.registry.editor.struct.converter.filter.LocationUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.SceneUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.UnitGroupUnitConfigFilter;
-import org.openbase.bco.registry.editor.struct.converter.filter.UserUnitConfigFilter;
+import org.openbase.bco.registry.editor.struct.converter.filter.*;
 import rst.domotic.state.EnablingStateType.EnablingState;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.geometry.RotationType.Rotation;
 import rst.rsb.ScopeType.Scope;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class ConverterSelector {
@@ -81,6 +71,8 @@ public class ConverterSelector {
                 case USER:
                     filter = new UserUnitConfigFilter();
                     break;
+                case OBJECT:
+                    filter = new ObjectUnitConfigFilter();
                 default:
                     filter = new DalUnitConfigFilter();
                     break;

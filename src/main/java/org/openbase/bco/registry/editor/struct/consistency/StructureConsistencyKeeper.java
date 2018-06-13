@@ -21,18 +21,11 @@ package org.openbase.bco.registry.editor.struct.consistency;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.openbase.bco.registry.editor.struct.GenericListContainer;
-import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
-import org.openbase.bco.registry.editor.struct.LeafContainer;
-import org.openbase.bco.registry.editor.struct.Node;
-import org.openbase.bco.registry.editor.struct.NodeContainer;
+import org.openbase.bco.registry.editor.struct.*;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
@@ -48,7 +41,11 @@ import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
-import sun.reflect.generics.visitor.Reifier;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *

@@ -21,6 +21,8 @@ package org.openbase.bco.registry.editor.struct;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.GeneratedMessage;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
@@ -30,27 +32,29 @@ import org.openbase.bco.registry.editor.struct.converter.Converter;
 import org.openbase.bco.registry.editor.struct.converter.ConverterSelector;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import org.openbase.jul.extension.rst.processing.LabelProcessor;
 import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.LoggerFactory;
+import rst.configuration.LabelType;
 
 /**
- *
- * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  * @param <MB> The message builder type to use.
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<Node> implements Node {
-    
+
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(NodeContainer.class);
-    
+
     protected final MB builder;
     protected final String descriptor;
     protected String displayedDescriptor;
     protected final Converter<Object> converter;
-    
+
     protected final boolean sendable;
     protected final SimpleObjectProperty<Boolean> changed;
-    
+
     public NodeContainer(String descriptor, MB builder) throws InstantiationException {
         assert builder != null;
         assert descriptor != null;
@@ -66,23 +70,36 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         this.setValue(this);
         this.setDisplayedDescriptor();
     }
-    
+
     private void setDisplayedDescriptor() {
         try {
-            displayedDescriptor = ProtoBufFieldProcessor.getLabel(builder);
-        } catch(CouldNotPerformException ex) {
+            FieldDescriptor labelField = ProtoBufFieldProcessor.getFieldDescriptor(builder, "label");
+            if (labelField != null) {
+                final Object label = builder.getField(labelField);
+                if (label instanceof LabelType.Label) {
+                    displayedDescriptor = LabelProcessor.getFirstLabel((LabelType.Label) label);
+                    return;
+                } else if (label instanceof String) {
+                    displayedDescriptor = (String) label;
+                    return;
+                } else {
+                    logger.warn("Unknown label type [" + label.getClass().getSimpleName() + "]");
+                }
+            }
+            displayedDescriptor = StringProcessor.transformToCamelCase(descriptor).replace(",", " - ");
+        } catch (Exception ex) {
             displayedDescriptor = StringProcessor.transformToCamelCase(descriptor).replace(",", " - ");
         }
     }
-    
+
     protected void add(LeafContainer leaf) {
         this.getChildren().add(new TreeItem<>(leaf));
     }
-    
+
     public void add(TreeItem<Node> node) {
         this.getChildren().add(node);
     }
-    
+
     @Override
     public String getDescriptor() {
         return descriptor;
@@ -92,32 +109,32 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
     public String getDisplayedDescriptor() {
         return displayedDescriptor;
     }
-    
+
     @Override
     public NodeContainer getContext() {
         return this;
     }
-    
+
     public MB getBuilder() {
         return builder;
     }
-    
+
     public boolean isSendable() {
         return sendable;
     }
-    
+
     public void setChanged(boolean change) {
         changed.set(change);
     }
-    
+
     public boolean hasChanged() {
         return changed.getValue();
     }
-    
+
     public SimpleObjectProperty<Boolean> getChanged() {
         return changed;
     }
-    
+
     public void setSendableChanged() {
         NodeContainer sendableNode = this;
         while (!sendableNode.isSendable()) {
@@ -128,7 +145,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         }
         ((NodeContainer) sendableNode).setChanged(true);
     }
-    
+
     public GeneratedMessage.Builder getSendableType() {
         NodeContainer sendableNode = this;
         while (!sendableNode.isSendable()) {
@@ -136,7 +153,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         }
         return ((NodeContainer) sendableNode).getBuilder();
     }
-    
+
     public void updateBuilder(String fieldName, Object value, int index) throws CouldNotPerformException, InterruptedException {
         if (index == -1) {
             converter.updateBuilder(fieldName, value);

@@ -48,10 +48,10 @@ import org.openbase.bco.registry.editor.visual.cell.editing.DecimalTextField;
 import org.openbase.bco.registry.editor.visual.cell.editing.LongDatePicker;
 import org.openbase.bco.registry.editor.visual.cell.editing.StringTextField;
 import org.openbase.bco.registry.editor.visual.cell.editing.ValueCheckBox;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.DeviceClassComboBoxConverter;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.EnumComboBox;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.MessageComboBox;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.UserConfigComboBoxConverter;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.DeviceClassComboBoxConverter;
+import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.LabelComboBoxConverter;
 import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
@@ -194,13 +194,13 @@ public class ValueCell extends RowCell {
                     }
                 } else if ("member_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof AuthorizationGroupConfig.Builder) {
                     try {
-                        text = new UserConfigComboBoxConverter().getText(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.USER));
+                        text = new LabelComboBoxConverter<>().getText(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.USER));
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }
                 } else if ("owner_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof InventoryState.Builder) {
                     try {
-                        text = new UserConfigComboBoxConverter().getText(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.USER));
+                        text = new LabelComboBoxConverter().getText(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.USER));
                     } catch (CouldNotPerformException ex) {
                         text = ((Leaf) item).getValue().toString();
                     }

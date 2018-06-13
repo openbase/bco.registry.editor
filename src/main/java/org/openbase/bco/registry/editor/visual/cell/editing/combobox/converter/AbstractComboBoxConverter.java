@@ -1,11 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter;
 
-/*-
+/*
  * #%L
  * BCO Registry Editor
  * %%
@@ -26,23 +21,30 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 import com.google.protobuf.Message;
+import org.openbase.bco.registry.editor.RegistryEditor;
+import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.FatalImplementationErrorException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class AgentClassComboBoxConverter implements MessageComboBoxConverter {
+public abstract class AbstractComboBoxConverter<MSG extends Message> implements MessageComboBoxConverter<MSG> {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String getText(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AgentClass.getDefaultInstance(), AgentClass.LABEL_FIELD_NUMBER));
+    public String getValue(MSG message) {
+        try {
+            return ProtoBufFieldProcessor.getId(message);
+        } catch (CouldNotPerformException ex) {
+            RegistryEditor.printException(new FatalImplementationErrorException("Id for message[" + message.getClass().getName() + "] not available", this, ex));
+            return "";
+        }
     }
 
-    @Override
-    public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(AgentClass.getDefaultInstance(), AgentClass.ID_FIELD_NUMBER));
-    }
 }

@@ -41,7 +41,8 @@ public class DalUnitConfigFilter extends UnitConfigFilter {
                 UnitConfig.LOCATION_CONFIG_FIELD_NUMBER,
                 UnitConfig.SCENE_CONFIG_FIELD_NUMBER,
                 UnitConfig.UNIT_GROUP_CONFIG_FIELD_NUMBER,
-                UnitConfig.USER_CONFIG_FIELD_NUMBER);
+                UnitConfig.USER_CONFIG_FIELD_NUMBER,
+                UnitConfig.OBJECT_CONFIG_FIELD_NUMBER);
     }
 
 }

@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
+package org.openbase.bco.registry.editor.struct.converter.filter;
 
 /*-
  * #%L
@@ -22,28 +22,16 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
  * #L%
  */
 
-import com.google.protobuf.Message;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 
 /**
- *
- * @author <a href="mailto:thuxohl@techfak.uni-bielefeld.de">Tamino Huxohl</a>
+ * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class AuthorizationGroupComboBoxConverter implements MessageComboBoxConverter {
+public class ObjectUnitConfigFilter extends NotDalUnitConfigFilter {
 
     @Override
-    public String getText(Message msg) {
-        try {
-            return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.LABEL_FIELD_NUMBER));
-        } catch (Exception ex) {
-            return "?";
-        }
+    protected void registerFilteredFields() {
+        super.registerFilteredFields();
+        removeFilteredField(UnitConfig.OBJECT_CONFIG_FIELD_NUMBER);
     }
-
-    @Override
-    public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(UnitConfig.getDefaultInstance(), UnitConfig.ID_FIELD_NUMBER));
-    }
-    
 }

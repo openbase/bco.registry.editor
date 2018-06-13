@@ -41,8 +41,8 @@ public class DescriptionCell extends RowCell {
             graphicProperty().setValue(null);
             textProperty().setValue("");
             setContextMenu(null);
-        } else if (item instanceof Node) {
-            setText(((Node) item).getDisplayedDescriptor());
+        } else {
+            setText(item.getDisplayedDescriptor());
         }
     }
 }

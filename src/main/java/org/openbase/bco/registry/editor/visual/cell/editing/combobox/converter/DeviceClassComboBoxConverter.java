@@ -1,6 +1,6 @@
-package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
+package org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter;
 
-/*
+/*-
  * #%L
  * BCO Registry Editor
  * %%
@@ -21,23 +21,23 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import com.google.protobuf.Message;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+
+import org.openbase.jul.exception.NotAvailableException;
+import org.openbase.jul.extension.rst.processing.LabelProcessor;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class DefaultMessageComboBoxConverter implements MessageComboBoxConverter {
-
+public class DeviceClassComboBoxConverter extends AbstractComboBoxConverter<DeviceClass> {
     @Override
-    public String getText(Message msg) {
-        return getValue(msg);
+    public String getText(DeviceClass message) {
+        try {
+            final String label = LabelProcessor.getFirstLabel(message.getLabel());
+            return message.getCompany() + " - " + label;
+        } catch (NotAvailableException ex) {
+            logger.error("Label for deviceClass[" + message + "] not available", ex);
+            return message.getCompany() + " - " + message.getId();
+        }
     }
-
-    @Override
-    public String getValue(Message msg) {
-        return (String) msg.getField(ProtoBufFieldProcessor.getFieldDescriptor(msg.toBuilder(), "id"));
-    }
-
 }
