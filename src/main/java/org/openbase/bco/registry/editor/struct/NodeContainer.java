@@ -32,7 +32,6 @@ import org.openbase.bco.registry.editor.struct.converter.Converter;
 import org.openbase.bco.registry.editor.struct.converter.ConverterSelector;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
-import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
 import org.openbase.jul.processing.StringProcessor;

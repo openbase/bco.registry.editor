@@ -1,6 +1,6 @@
-package org.openbase.bco.registry.editor.visual.column;
+package org.openbase.bco.registry.editor.struct;
 
-/*
+/*-
  * #%L
  * BCO Registry Editor
  * %%
@@ -22,25 +22,22 @@ package org.openbase.bco.registry.editor.visual.column;
  * #L%
  */
 
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.cell.TreeItemPropertyValueFactory;
-import org.openbase.bco.registry.editor.struct.Node;
-import org.slf4j.LoggerFactory;
+import com.google.protobuf.Descriptors.FieldDescriptor;
+import javafx.event.EventHandler;
+import rst.domotic.state.InventoryStateType.InventoryState;
+import rst.domotic.state.InventoryStateType.InventoryState.Builder;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public abstract class Column extends TreeTableColumn<Node, Node> {
+public class InventoryStateTreeItem extends BuilderTreeItem<InventoryState.Builder> {
 
-    protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    public InventoryStateTreeItem(FieldDescriptor fieldDescriptor, Builder builder) {
+        super(fieldDescriptor, builder);
 
-    public Column(String text) {
-        super(text);
-        this.setCellValueFactory(new TreeItemPropertyValueFactory<>("context"));
+        this.addEventHandler(valueChangedEvent(), event -> {
+            // TODO: if value die not come from timestamp, update the timestamp to now
+
+        });
     }
-
-    public abstract void addWidthProperty(ReadOnlyDoubleProperty widthProperty);
 }

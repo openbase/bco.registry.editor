@@ -117,6 +117,7 @@ public class RegistryEditor extends Application {
     @Override
     public void init() throws Exception {
         super.init();
+
         initialized = new HashMap<>();
         initialized.put(ClassRegistryData.class.getSimpleName(), Boolean.FALSE);
         initialized.put(TemplateRegistryData.class.getSimpleName(), Boolean.FALSE);
