@@ -27,6 +27,7 @@ import com.google.protobuf.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import org.openbase.jul.exception.CouldNotPerformException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,32 +42,40 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractTreeIte
     }
 
     @Override
-    protected ObservableList<TreeItem<ValueType>> createChildren() {
+    protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException {
         ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
 
         //TODO:
-        // special tree items via class loading
         // complete conversion?
         Set<Integer> filteredFields = getFilteredFields();
-        for (FieldDescriptor fieldDescriptor : getBuilder().getDescriptorForType().getFields()) {
-            if (filteredFields.contains(fieldDescriptor.getNumber())) {
+        for (FieldDescriptor field : getBuilder().getDescriptorForType().getFields()) {
+            if (filteredFields.contains(field.getNumber())) {
                 continue;
             }
 
-            if (fieldDescriptor.isRepeated()) {
-                // TODO: add builder for repeated field
-            } else {
-                switch (fieldDescriptor.getType()) {
-                    case MESSAGE:
-//                            getClass().getClassLoader().loadClass(getClass().getPackage().getName())
-                        childList.add(new BuilderTreeItem(fieldDescriptor, getBuilder().getFieldBuilder(fieldDescriptor)));
-                    default:
-                        // TODO: add leaf
-                }
-            }
+            childList.add(createChild(field));
         }
 
         return childList;
+    }
+
+    protected TreeItem<ValueType> createChild(final FieldDescriptor field) throws CouldNotPerformException {
+        if (field.isRepeated()) {
+            return new ListTreeItem<>(field, getBuilder(), true);
+        } else {
+            switch (field.getType()) {
+                case MESSAGE:
+                    return loadTreeItem(field, getBuilder().getFieldBuilder(field));
+                default:
+                    // TODO: add leaf
+                    try {
+                        return new GenericTreeItem<>(field, getBuilder().getField(field));
+                    } catch (IllegalArgumentException ex) {
+                        logger.info("Could not create leaf for[" + field.getName() + ", " + getBuilder().getClass().getName() + "]");
+                        return null;
+                    }
+            }
+        }
     }
 
     /**

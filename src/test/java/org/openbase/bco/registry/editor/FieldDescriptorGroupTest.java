@@ -165,6 +165,9 @@ public class FieldDescriptorGroupTest {
     public void testTest() throws Exception {
         Class clazz = UnitConfig.Builder.class;
 
+        System.out.println(getClass().getName());
+        System.out.println(getClass().getPackage().getName());
+
         String name = clazz.getName();
         for (String sp : name.split("\\$")) {
             System.out.println(sp);
@@ -189,19 +192,5 @@ public class FieldDescriptorGroupTest {
         root.getChildren().add(new TreeItem<>("test"));
 
         child.getChildren().add(new TreeItem<>("hahah"));
-
-        UnitConfig.Builder unitConfig = UnitConfig.newBuilder().setId("asdf").setUnitType(UnitType.LOCATION);
-        unitConfig.addServiceConfigBuilder().getServiceDescriptionBuilder().setServiceType(ServiceType.COLOR_STATE_SERVICE);
-        unitConfig.addServiceConfigBuilder().getServiceDescriptionBuilder().setServiceType(ServiceType.POWER_STATE_SERVICE);
-
-        System.out.println(unitConfig.build());
-
-        FieldDescriptor fieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(unitConfig, UnitConfig.SERVICE_CONFIG_FIELD_NUMBER);
-
-        ServiceConfig.Builder serviceConfig = ServiceConfig.newBuilder();
-        serviceConfig.getServiceDescriptionBuilder().setServiceType(ServiceType.TARGET_TEMPERATURE_STATE_SERVICE);
-
-        Builder builder = unitConfig.addRepeatedField(fieldDescriptor, serviceConfig.build());
-        System.out.println(builder.build());
     }
 }

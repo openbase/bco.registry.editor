@@ -32,13 +32,14 @@ public class ListTreeItem<MB extends Message.Builder> extends AbstractTreeItem<M
 
     @Override
     protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException {
+        System.out.println("Create children for list");
         ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
 
         if (fieldDescriptor.getType() == MESSAGE) {
             // TODO: BuilderProcessor should work on messages and not generated messages
             for (Message.Builder childBuilder : BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, (Builder) getBuilder())) {
-                // TODO: load tree item type from childBuilder class, should be a functionality of the super class
-                childList.add(new BuilderTreeItem<>(fieldDescriptor, childBuilder));
+                System.out.println("add new message");
+                childList.add(loadTreeItem(fieldDescriptor, childBuilder));
             }
         } else {
             for (int i = 0; i < getBuilder().getRepeatedFieldCount(fieldDescriptor); i++) {
@@ -53,7 +54,8 @@ public class ListTreeItem<MB extends Message.Builder> extends AbstractTreeItem<M
         try {
             switch (fieldDescriptor.getType()) {
                 case MESSAGE:
-//                    registerElement((RFMB) BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, getBuilder()));
+                    Message.Builder defaultInstance = BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor.getName(), (GeneratedMessage.Builder) getBuilder());
+                    getChildren().add(loadTreeItem(fieldDescriptor, getBuilder()));
                     break;
                 case STRING:
                     addElement("");
@@ -87,8 +89,7 @@ public class ListTreeItem<MB extends Message.Builder> extends AbstractTreeItem<M
                 // extract the last value from the builder list which should be the new value
                 Builder builder = BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, (Builder) getBuilder()).get(getBuilder().getRepeatedFieldCount(fieldDescriptor) - 1);
                 // create tree item and add it
-                //TODO: load tree item type by builder class
-                getChildren().add(new BuilderTreeItem<>(fieldDescriptor, builder));
+                getChildren().add(loadTreeItem(fieldDescriptor, builder));
                 getChildren().get(this.getChildren().size() - 1).setExpanded(true);
             } else {
                 // add to repeated field

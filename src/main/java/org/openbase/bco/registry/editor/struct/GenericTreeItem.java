@@ -2,6 +2,9 @@ package org.openbase.bco.registry.editor.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.scene.control.TreeItem;
+import org.openbase.bco.registry.editor.struct.value.DefaultDescriptionGenerator;
+import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
+import org.openbase.bco.registry.editor.struct.value.EditingGraphicFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +18,19 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
 
     public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value) {
         this.fieldDescriptor = fieldDescriptor;
-
-        // TODO: build default value type
-        this.setValue(new ValueType<>(value));
+        this.setValue(new ValueType<>(value, true, getEditingGraphicFactory(), getDescriptionGenerator()));
     }
 
     @SuppressWarnings("unchecked")
-    public V getInternalValue() {
+    V getInternalValue() {
         return (V) getValue().getValue();
+    }
+
+    protected EditingGraphicFactory<V> getEditingGraphicFactory() {
+        return null;
+    }
+
+    protected DescriptionGenerator<V> getDescriptionGenerator() {
+        return new DefaultDescriptionGenerator<>(fieldDescriptor);
     }
 }

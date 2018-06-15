@@ -24,8 +24,9 @@ package org.openbase.bco.registry.editor.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.beans.property.SimpleObjectProperty;
-import org.openbase.jul.exception.NotAvailableException;
-import org.openbase.jul.extension.rst.processing.LabelProcessor;
+import javafx.scene.control.TreeItem;
+import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
+import org.openbase.jul.exception.CouldNotPerformException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitConfigType.UnitConfig.Builder;
 
@@ -56,15 +57,14 @@ public class UnitConfigTreeItem extends BuilderTreeItem<UnitConfig.Builder> {
         });
     }
 
-//    @Override
-//    public String getDescription() {
-//        try {
-//            return LabelProcessor.getFirstLabel(getValue().getBuilder().getLabel());
-//        } catch (NotAvailableException ex) {
-//            logger.warn("Unit[" + getValue().getBuilder().getAlias(0) + "] without a label", ex);
-//            return super.getDescription();
-//        }
-//    }
+    @Override
+    protected TreeItem<ValueType> createChild(final FieldDescriptor field) throws CouldNotPerformException {
+        if (field.getNumber() == UnitConfig.SERVICE_CONFIG_FIELD_NUMBER) {
+            return new ListTreeItem<>(field, getBuilder(), false);
+        }
+
+        return super.createChild(field);
+    }
 
     public SimpleObjectProperty<Boolean> getChangedProperty() {
         return changedProperty;
@@ -132,5 +132,20 @@ public class UnitConfigTreeItem extends BuilderTreeItem<UnitConfig.Builder> {
         }
 
         return filteredFieldSet;
+    }
+
+    @Override
+    protected DescriptionGenerator<Builder> getDescriptionGenerator() {
+        return new DescriptionGenerator<Builder>() {
+            @Override
+            public String getValueDescription(Builder value) {
+                return value.getDescription();
+            }
+
+            @Override
+            public String getDescription(Builder value) {
+                return "UnitConfig";
+            }
+        };
     }
 }
