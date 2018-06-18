@@ -10,47 +10,37 @@ package org.openbase.bco.registry.editor;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
-import com.google.protobuf.Descriptors.FieldDescriptor;
-import com.google.protobuf.Message;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
 import org.junit.*;
-import org.openbase.bco.registry.editor.visual.provider.FieldDescriptorGroup;
+import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.exception.JPServiceException;
 import org.openbase.jul.exception.InstantiationException;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.domotic.service.ServiceConfigType.ServiceConfig;
-import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServiceType;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.UnitConfigType.UnitConfig.Builder;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.spatial.PlacementConfigType.PlacementConfig;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class FieldDescriptorGroupTest {
+public class FieldDescriptorPathTest {
 
-    private final FieldDescriptorGroup group;
+    private final FieldDescriptorPath group;
 
     private final String homeID = "home";
     private final String kitchenID = "kitchen";
@@ -62,8 +52,8 @@ public class FieldDescriptorGroupTest {
     private final UnitConfig.Builder device2;
     private final UnitConfig.Builder device3;
 
-    public FieldDescriptorGroupTest() throws InstantiationException {
-        group = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+    public FieldDescriptorPathTest() throws InstantiationException {
+        group = new FieldDescriptorPath(UnitConfig.newBuilder(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
 
         home = PlacementConfig.newBuilder().setLocationId(homeID).build();
         kitchen = PlacementConfig.newBuilder().setLocationId(kitchenID).build();
@@ -91,26 +81,6 @@ public class FieldDescriptorGroupTest {
     }
 
     /**
-     * Test of getFieldValues method, of class FieldGroup.
-     *
-     * @throws java.lang.Exception
-     */
-    @Test(timeout = 5000)
-    public void testGetFieldValues() throws Exception {
-        System.out.println("getFieldValues");
-
-        List<Message.Builder> builderList = new ArrayList<>();
-        builderList.add(device1);
-        builderList.add(device2);
-        builderList.add(device3);
-        List<Object> expResult = new ArrayList<>();
-        expResult.add(homeID);
-        expResult.add(kitchenID);
-        List<Object> result = group.getValueList(builderList);
-        assertEquals(expResult, result);
-    }
-
-    /**
      * Test of getValue method, of class FieldGroup.
      *
      * @throws java.lang.Exception
@@ -125,25 +95,6 @@ public class FieldDescriptorGroupTest {
 
         expResult = kitchenID;
         result = group.getValue(device3);
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of hasEqualValue method, of class FieldGroup.
-     *
-     * @throws java.lang.Exception
-     */
-    @Test(timeout = 5000)
-    public void testHasEqualValue() throws Exception {
-        System.out.println("hasEqualValue");
-
-        Object value = homeID;
-        boolean expResult = false;
-        boolean result = group.hasEqualValue(device3, value);
-        assertEquals(expResult, result);
-
-        expResult = true;
-        result = group.hasEqualValue(device2, value);
         assertEquals(expResult, result);
     }
 

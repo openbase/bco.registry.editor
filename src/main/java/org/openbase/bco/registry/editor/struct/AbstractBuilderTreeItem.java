@@ -1,5 +1,27 @@
 package org.openbase.bco.registry.editor.struct;
 
+/*-
+ * #%L
+ * BCO Registry Editor
+ * %%
+ * Copyright (C) 2014 - 2018 openbase.org
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import javafx.collections.ObservableList;
@@ -14,16 +36,14 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public abstract class AbstractTreeItem<MB extends Message.Builder> extends GenericTreeItem<MB> {
+public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extends GenericTreeItem<MB> {
 
     private boolean childrenInitialized;
 
-
-    public AbstractTreeItem(final FieldDescriptor fieldDescriptor, final MB value) {
+    public AbstractBuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB value) {
         super(fieldDescriptor, value);
 
         this.childrenInitialized = false;
-
         this.expandedProperty().addListener((observable, oldValue, newValue) -> {
             // initialize children of children as soon as this item is expanded
             // this way the view knows can see which tree items are leaves and which are not
@@ -31,6 +51,10 @@ public abstract class AbstractTreeItem<MB extends Message.Builder> extends Gener
                 getChildren().forEach(TreeItem::getChildren);
             }
         });
+    }
+
+    public MB getBuilder() {
+        return getInternalValue();
     }
 
     @Override
@@ -42,7 +66,7 @@ public abstract class AbstractTreeItem<MB extends Message.Builder> extends Gener
                 super.getChildren().addAll(createChildren());
             } catch (CouldNotPerformException ex) {
                 ExceptionPrinter.printHistory(new CouldNotPerformException(
-                        "Could not generate child items for field[" + fieldDescriptor.getName() + "] of message[" + extractMessageClass() + "]", ex), logger);
+                        "Could not generate child items for[" + getClass().getSimpleName() + "] with value type[" + getInternalValue().getClass().getSimpleName() + "]", ex), logger);
             }
         }
         return super.getChildren();
@@ -50,15 +74,7 @@ public abstract class AbstractTreeItem<MB extends Message.Builder> extends Gener
 
     abstract protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException;
 
-    public MB getBuilder() {
-        return getInternalValue();
-    }
-
-    private String extractMessageClass() {
-        return extractMessageClass(getBuilder());
-    }
-
-    private String extractMessageClass(final Message.Builder builder) {
+    protected String extractMessageClass(final Message.Builder builder) {
         return builder.getClass().getName().split("\\$")[1];
     }
 
@@ -83,5 +99,4 @@ public abstract class AbstractTreeItem<MB extends Message.Builder> extends Gener
             throw ExceptionPrinter.printHistoryAndReturnThrowable(new FatalImplementationErrorException("Could not invoke constructor[" + className + "] for type[" + extractMessageClass(builder) + "]", this, ex), logger);
         }
     }
-
 }

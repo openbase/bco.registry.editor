@@ -367,9 +367,9 @@ public class RegistryEditor extends Application {
         LOGGER.debug("FillTreeTableView for [" + registryData.getClass().getSimpleName() + "]");
         if (registryData instanceof ClassRegistryData) {
             ClassRegistryData data = (ClassRegistryData) registryData;
-            TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);
+//            TreeItemDescriptorProvider company = new FieldDescriptorGroup(DeviceClass.newBuilder(), DeviceClass.COMPANY_FIELD_NUMBER);
             Descriptors.FieldDescriptor deviceClassField = data.toBuilder().getDescriptorForType().findFieldByNumber(ClassRegistryData.DEVICE_CLASS_FIELD_NUMBER);
-            deviceClassTreeTableView.setRoot(new GenericGroupContainer<>(deviceClassField.getName(), deviceClassField, data.toBuilder(), data.toBuilder().getDeviceClassBuilderList(), company));
+//            deviceClassTreeTableView.setRoot(new GenericGroupContainer<>(deviceClassField.getName(), deviceClassField, data.toBuilder(), data.toBuilder().getDeviceClassBuilderList(), company));
             deviceClassTreeTableView.setReadOnlyMode(Registries.isReadOnly(SendableType.DEVICE_CLASS.getDefaultInstanceForType()));
             deviceClassTreeTableView.getListDiff().diff(data.getDeviceClassList());
 

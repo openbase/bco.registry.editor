@@ -23,6 +23,7 @@ package org.openbase.bco.registry.editor.visual.provider;
  */
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Message;
+import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.processing.StringProcessor;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
@@ -33,10 +34,10 @@ import rst.domotic.unit.UnitConfigType.UnitConfig;
  */
 public class UnitTypeItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
 
-    FieldDescriptorGroup fieldGroup;
+    FieldDescriptorPath fieldGroup;
 
     public UnitTypeItemDescriptorProvider() {
-        fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.UNIT_TYPE_FIELD_NUMBER);
+        fieldGroup = new FieldDescriptorPath(UnitConfig.newBuilder(), UnitConfig.UNIT_TYPE_FIELD_NUMBER);
     }
 
     @Override

@@ -149,19 +149,19 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
                         parentNode.addNewDefaultElement();
                     }
                 } else if (add instanceof GenericGroupContainer) {
-                    GenericGroupContainer container = (GenericGroupContainer) add;
-                    GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(container.getFieldDescriptor(), container.getBuilder()));
-                    NodeContainer child = (NodeContainer) container.getChildren().get(0);
-                    while (child instanceof GenericGroupContainer || child instanceof GenericListContainer) {
-                        child = (NodeContainer) child.getChildren().get(0);
-                    }
-                    addGroupValues(container, addedBuilder, child.getBuilder());
-                    if (addedBuilder instanceof UnitConfig.Builder) {
-                        UnitType unitType = ((UnitConfig) ((RegistryTreeTableView) RowCell.this.getTreeTableView()).getSendableType().getDefaultInstanceForType()).getUnitType();
-                        ((UnitConfig.Builder) addedBuilder).setUnitType(unitType);
-                    }
-                    container.add(new GenericNodeContainer("", addedBuilder));
-                    container.setExpanded(true);
+//                    GenericGroupContainer container = (GenericGroupContainer) add;
+//                    GeneratedMessage.Builder addedBuilder = RSTDefaultInstances.getDefaultBuilder(BuilderProcessor.addDefaultInstanceToRepeatedField(container.getFieldDescriptor(), container.getBuilder()));
+//                    NodeContainer child = (NodeContainer) container.getChildren().get(0);
+//                    while (child instanceof GenericGroupContainer || child instanceof GenericListContainer) {
+//                        child = (NodeContainer) child.getChildren().get(0);
+//                    }
+//                    addGroupValues(container, addedBuilder, child.getBuilder());
+//                    if (addedBuilder instanceof UnitConfig.Builder) {
+//                        UnitType unitType = ((UnitConfig) ((RegistryTreeTableView) RowCell.this.getTreeTableView()).getSendableType().getDefaultInstanceForType()).getUnitType();
+//                        ((UnitConfig.Builder) addedBuilder).setUnitType(unitType);
+//                    }
+//                    container.add(new GenericNodeContainer("", addedBuilder));
+//                    container.setExpanded(true);
                 }
             } catch (CouldNotPerformException ex) {
                 RegistryEditor.printException(ex, logger, LogLevel.ERROR);

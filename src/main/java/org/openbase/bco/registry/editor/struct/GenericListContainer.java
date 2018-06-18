@@ -67,9 +67,9 @@ public class GenericListContainer<MB extends GeneratedMessage.Builder<MB>, RFM e
             this.fieldDescriptor = repeatedFieldDescriptor;
 
             if (repeatedFieldDescriptor.getType() == MESSAGE) {
-                for (GeneratedMessage.Builder childBuilder : BuilderProcessor.extractRepeatedFieldBuilderList(repeatedFieldDescriptor, builder)) {
-                    registerElement((RFMB) childBuilder);
-                }
+//                for (GeneratedMessage.Builder childBuilder : BuilderProcessor.extractRepeatedFieldBuilderList(repeatedFieldDescriptor, builder)) {
+//                    registerElement((RFMB) childBuilder);
+//                }
             } else {
                 List<Object> valueList = (List<Object>) builder.getField(repeatedFieldDescriptor);
                 for (int i = 0; i < valueList.size(); i++) {

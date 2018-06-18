@@ -1,134 +1,137 @@
 package org.openbase.bco.registry.editor.struct;
 
-import com.google.protobuf.Descriptors;
+/*-
+ * #%L
+ * BCO Registry Editor
+ * %%
+ * Copyright (C) 2014 - 2018 openbase.org
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * #L%
+ */
+
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-import org.openbase.bco.registry.editor.visual.provider.TreeItemDescriptorProvider;
+import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
+import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
+import org.openbase.jul.exception.InitializationException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class GroupTreeItem<MB extends Message.Builder> extends AbstractTreeItem<MB> {
+public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeItem<MB> {
 
-    /**
-     * A group of field after which values the builder list will be grouped.
-     */
-    private final TreeItemDescriptorProvider treeItemDescriptorProvider;
-    /**
-     * A list for all the values in the group.
-     */
-    private final List values;
-    private final Map<NodeContainer, Object> valueMap = new HashMap<>();
-    private final TreeItemDescriptorProvider[] groups;
-    private final TreeItemDescriptorProvider[] childGroups;
-    private final Descriptors.FieldDescriptor fieldDescriptor;
+    private final Object value;
+    private final FieldPathDescriptionProvider groupValueProvider;
+    private final FieldPathDescriptionProvider[] childGroupValueProviders;
+    private final Map<Object, BuilderListTreeItem> valueChildMap;
 
-    public GroupTreeItem(FieldDescriptor fieldDescriptor, MB value, List<Builder> builderList, TreeItemDescriptorProvider... groups) {
-        super(fieldDescriptor, value);
+    public GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
+        super(fieldDescriptor, builder, modifiable);
+
+        this.value = null;
+        this.groupValueProvider = null;
+        this.childGroupValueProviders = groupValueProviders;
+        this.valueChildMap = new HashMap<>();
     }
 
+    private GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final List<Message.Builder> builderList, final Object value, final FieldPathDescriptionProvider groupValueProvider, FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
+        super(fieldDescriptor, builder, modifiable, builderList);
+
+        this.value = value;
+        this.groupValueProvider = groupValueProvider;
+        this.childGroupValueProviders = groupValueProviders;
+        this.valueChildMap = new HashMap<>();
+    }
+
+
+    @SuppressWarnings("unchecked")
     @Override
     protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException {
-        return null;
-    }
-
-
-
-    public GenericGroupContainer(String descriptor, int fieldNumber, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {
-        this(descriptor, ProtoBufFieldProcessor.getFieldDescriptor(builder, fieldNumber), builder, builderList, groups);
-    }
-
-    public GenericGroupContainer(String descriptor, Descriptors.FieldDescriptor fieldDescriptor, MB builder, List<RFMB> builderList, TreeItemDescriptorProvider... groups) throws InstantiationException, InterruptedException {
-        super(descriptor, builder);
-        this.displayedDescriptor = descriptor;
-        this.groups = groups;
-        this.treeItemDescriptorProvider = groups[0];
-        this.fieldDescriptor = fieldDescriptor;
-        this.childGroups = new TreeItemDescriptorProvider[groups.length - 1];
-        for (int i = 1; i < groups.length; i++) {
-            this.childGroups[i - 1] = groups[i];
+        final ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
+        final FieldPathDescriptionProvider[] childGroups = new FieldPathDescriptionProvider[childGroupValueProviders.length - 1];
+        if (childGroupValueProviders.length > 1) {
+            System.arraycopy(childGroupValueProviders, 1, childGroups, 0, childGroups.length);
         }
-        try {
-            List<RFMB> groupBuilderList = new ArrayList<>();
-            values = treeItemDescriptorProvider.getValueList(new ArrayList<>(builderList));
-            for (Object value : values) {
-                for (RFMB messageBuilder : builderList) {
-                    if (treeItemDescriptorProvider.hasEqualValue(messageBuilder, value)) {
-                        groupBuilderList.add(messageBuilder);
+
+        for (final Entry<Object, List<Builder>> entry : childGroupValueProviders[0].getValueBuilderMap(getBuilderList()).entrySet()) {
+            BuilderListTreeItem childTreeItem;
+            if (childGroups.length == 0) {
+                childTreeItem = new BuilderListTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue()) {
+
+                    @Override
+                    protected DescriptionGenerator getDescriptionGenerator() {
+                        return new GroupDescriptionGenerator(childGroupValueProviders[0], entry.getKey());
                     }
-                }
-                if (groups.length == 1 && !groupBuilderList.isEmpty()) {
-                    GenericListContainer<MB, GeneratedMessage, RFMB> genericListContainer = new GenericListContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList);
-                    valueMap.put(genericListContainer, value);
-                    super.add(genericListContainer);
-                } else {
-                    GenericGroupContainer<MB, GeneratedMessage, RFMB> genericGroupContainer = new GenericGroupContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList, childGroups);
-                    valueMap.put(genericGroupContainer, value);
-                    super.add(genericGroupContainer);
-                }
-                groupBuilderList.clear();
-            }
-        } catch (CouldNotPerformException ex) {
-            throw new org.openbase.jul.exception.InstantiationException(this, ex);
-        }
-    }
-
-    public void addItemWithNewGroup(RFM msg) throws CouldNotPerformException {
-        try {
-            Object value = treeItemDescriptorProvider.getValue(msg);
-            values.add(value);
-            List<RFMB> groupBuilderList = new ArrayList<>();
-            groupBuilderList.add((RFMB) msg.toBuilder());
-            if (groups.length == 1) {
-                GenericListContainer<MB, GeneratedMessage, RFMB> genericListContainer = new GenericListContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList);
-                valueMap.put(genericListContainer, value);
-                super.add(genericListContainer);
+                };
             } else {
-                GenericGroupContainer<MB, GeneratedMessage, RFMB> genericGroupContainer = new GenericGroupContainer<>(treeItemDescriptorProvider.getDescriptor(groupBuilderList.get(0)), fieldDescriptor, builder, groupBuilderList, childGroups);
-                valueMap.put(genericGroupContainer, value);
-                super.add(genericGroupContainer);
+                childTreeItem = new GroupTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue(), entry.getKey(), childGroupValueProviders[0], childGroups){
+
+                    @Override
+                    protected DescriptionGenerator getDescriptionGenerator() {
+                        return new GroupDescriptionGenerator(childGroupValueProviders[0], entry.getKey());
+                    }
+                };
             }
-        } catch (CouldNotPerformException | InterruptedException ex) {
-            throw new CouldNotPerformException("Could not add message with new value for this group", ex);
+            childList.add(childTreeItem);
+            valueChildMap.put(entry.getKey(), childTreeItem);
+        }
+        return childList;
+    }
+
+    public void updateElement(final Message.Builder builder) {
+        // ignore topmost group
+        if (groupValueProvider == null) {
+            return;
+        }
+
+        // update with value
+        groupValueProvider.setValue(builder, value);
+
+        // update with value from parent
+        if (getParent() instanceof GroupTreeItem) {
+            ((GroupTreeItem) getParent()).updateElement(builder);
         }
     }
 
-    public TreeItemDescriptorProvider getFieldGroup() {
-        return treeItemDescriptorProvider;
-    }
+    public class GroupDescriptionGenerator<MB> implements DescriptionGenerator<MB> {
 
-    public List getValues() {
-        return values;
-    }
+        final String description;
 
-    public Descriptors.FieldDescriptor getFieldDescriptor() {
-        return fieldDescriptor;
-    }
+        public GroupDescriptionGenerator(final FieldPathDescriptionProvider groupValueProvider, final Object value) {
+            this.description = value == null ? "" : groupValueProvider.generateDescription(value);
+        }
 
-    public boolean isLastGroup() {
-        return groups.length == 1;
-    }
+        @Override
+        public String getValueDescription(MB value) {
+            return "";
+        }
 
-    public TreeItemDescriptorProvider[] getGroups() {
-        return groups;
-    }
-
-    public TreeItemDescriptorProvider[] getChildGroups() {
-        return childGroups;
-    }
-
-    public Map<NodeContainer, Object> getValueMap() {
-        return valueMap;
+        @Override
+        public String getDescription(MB value) {
+            return description;
+        }
     }
 }

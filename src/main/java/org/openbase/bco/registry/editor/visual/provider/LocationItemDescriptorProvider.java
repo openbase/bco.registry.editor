@@ -22,6 +22,7 @@ package org.openbase.bco.registry.editor.visual.provider;
  * #L%
  */
 import com.google.protobuf.Message;
+import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
@@ -35,10 +36,10 @@ import rst.spatial.PlacementConfigType.PlacementConfig;
  */
 public class LocationItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
 
-    FieldDescriptorGroup fieldGroup;
+    FieldDescriptorPath fieldGroup;
 
     public LocationItemDescriptorProvider() {
-        fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
+        fieldGroup = new FieldDescriptorPath(UnitConfig.newBuilder(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER);
     }
 
     @Override

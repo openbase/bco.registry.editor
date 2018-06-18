@@ -22,6 +22,7 @@ package org.openbase.bco.registry.editor.visual.provider;
  * #L%
  */
 import com.google.protobuf.Message;
+import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
@@ -35,10 +36,10 @@ import rst.domotic.unit.device.DeviceClassType.DeviceClass;
  */
 public class DeviceConfigItemDescriptorProvider extends AbstractTreeItemDescriptorProvider {
 
-    private final FieldDescriptorGroup fieldGroup;
+    private final FieldDescriptorPath fieldGroup;
 
     public DeviceConfigItemDescriptorProvider() throws InstantiationException, InterruptedException {
-        fieldGroup = new FieldDescriptorGroup(UnitConfig.newBuilder(), UnitConfig.UNIT_HOST_ID_FIELD_NUMBER);
+        fieldGroup = new FieldDescriptorPath(UnitConfig.newBuilder(), UnitConfig.UNIT_HOST_ID_FIELD_NUMBER);
     }
 
     @Override

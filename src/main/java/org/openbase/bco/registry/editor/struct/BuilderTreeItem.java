@@ -35,7 +35,7 @@ import java.util.Set;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class BuilderTreeItem<MB extends Message.Builder> extends AbstractTreeItem<MB> {
+public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilderTreeItem<MB> {
 
     public BuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB builder) {
         super(fieldDescriptor, builder);
@@ -43,12 +43,12 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractTreeIte
 
     @Override
     protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException {
-        ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
+        final ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
 
         //TODO:
         // complete conversion?
-        Set<Integer> filteredFields = getFilteredFields();
-        for (FieldDescriptor field : getBuilder().getDescriptorForType().getFields()) {
+        final Set<Integer> filteredFields = getFilteredFields();
+        for (final FieldDescriptor field : getBuilder().getDescriptorForType().getFields()) {
             if (filteredFields.contains(field.getNumber())) {
                 continue;
             }
@@ -61,7 +61,13 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractTreeIte
 
     protected TreeItem<ValueType> createChild(final FieldDescriptor field) throws CouldNotPerformException {
         if (field.isRepeated()) {
-            return new ListTreeItem<>(field, getBuilder(), true);
+            switch (field.getType()) {
+                case MESSAGE:
+                    return new BuilderListTreeItem<>(field, getBuilder(), true);
+                default:
+                    //TODO: leaf type
+                    return new GenericTreeItem<>(field, getBuilder().getField(field));
+            }
         } else {
             switch (field.getType()) {
                 case MESSAGE:
