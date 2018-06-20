@@ -65,6 +65,10 @@ public class ValueType<V extends Object> {
         this.value.set(value);
     }
 
+    public SimpleObjectProperty<V> valueProperty() {
+        return value;
+    }
+
     public Control getEditingGraphic(final TreeTableCell<ValueType<V>, ValueType<V>> cell) {
         return editingGraphFactory.getEditingGraphic(this, cell);
     }

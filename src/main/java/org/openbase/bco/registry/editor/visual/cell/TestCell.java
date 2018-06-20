@@ -23,20 +23,42 @@ package org.openbase.bco.registry.editor.visual.cell;
  */
 
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.util.SelectableLabel;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class TestCell extends TreeTableCell<ValueType, ValueType> {
 
+    private final Label label;
+    private final Label selectableLabel;
+
+    public TestCell() {
+        super();
+        this.label = new Label();
+        this.selectableLabel = SelectableLabel.makeSelectable(new Label());
+    }
+
     @Override
     protected void updateItem(ValueType item, boolean empty) {
         super.updateItem(item, empty);
 
         if (!empty && item != null) {
-            setText(item.getValueDescription());
+            // set text by updating the selectable label
+            if (item.isEditable()) {
+                label.setText(item.getValueDescription());
+                setGraphic(label);
+            } else {
+                selectableLabel.setText(item.getValueDescription());
+                setGraphic(selectableLabel);
+            }
+        } else {
+            // reset text if now empty
+            label.setText("");
+            setGraphic(label);
         }
     }
 
@@ -44,12 +66,17 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
     public void startEdit() {
         super.startEdit();
 
-        System.out.println("Start edit for cell with tree item[" + getTreeTableRow().getTreeItem().getClass().getSimpleName() + "]");
-
         @SuppressWarnings("unchecked") final Control editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
         if (editingGraphic != null) {
             // editing graphic equals null means not editable
             setGraphic(editingGraphic);
         }
+    }
+
+    @Override
+    public void commitEdit(ValueType newValue) {
+        super.commitEdit(newValue);
+
+        updateItem(newValue, false);
     }
 }
