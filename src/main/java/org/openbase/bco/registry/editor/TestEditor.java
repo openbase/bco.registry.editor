@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -31,6 +31,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.stage.Stage;
 import org.openbase.bco.registry.editor.struct.GroupTreeItem;
+import org.openbase.bco.registry.editor.struct.ScopeTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.visual.cell.SecondCell;
@@ -72,7 +73,6 @@ public class TestEditor extends Application {
         treeTableView.showRootProperty().setValue(false);
         treeTableView.setEditable(true);
 
-
         FieldDescriptor fieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(UnitRegistryData.getDefaultInstance(), UnitRegistryData.DAL_UNIT_CONFIG_FIELD_NUMBER);
 
         FieldPathDescriptionProvider locationIdProvider = new FieldPathDescriptionProvider(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER)) {
@@ -96,7 +96,11 @@ public class TestEditor extends Application {
         GroupTreeItem<Builder> root = new GroupTreeItem<>(fieldDescriptor, Registries.getUnitRegistry(true).getData().toBuilder(), true, locationIdProvider, unitTypeProvider);
 //        printTypes(4, root);
         root.setExpanded(true);
-        treeTableView.setRoot(root);
+//        treeTableView.setRoot(root);
+        treeTableView.setShowRoot(true);
+        final UnitConfig unitConfig = Registries.getUnitRegistry().getDalUnitConfigs().get(0);
+        FieldDescriptor descriptor = ProtoBufFieldProcessor.getFieldDescriptor(unitConfig, UnitConfig.SCOPE_FIELD_NUMBER);
+        treeTableView.setRoot(new ScopeTreeItem(descriptor, unitConfig.toBuilder().getScopeBuilder()));
 
         final Scene scene = new Scene(treeTableView, 1024, 768);
         primaryStage.setScene(scene);

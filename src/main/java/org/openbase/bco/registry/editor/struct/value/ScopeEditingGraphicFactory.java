@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct.value;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -75,31 +75,45 @@ public class ScopeEditingGraphicFactory implements EditingGraphicFactory<Scope.B
                     // came into focus so select all text
                     selectAll();
                 } else {
-                    valueType.setValue(convertToScope(getText()));
-                    cell.commitEdit(valueType);
+                    System.out.println("ScopeTextField commit because lost focus");
+                    commitEdit(convertToScope(getText()), valueType, cell);
                 }
             });
             setOnKeyReleased((KeyEvent event) -> {
                 if (event.getCode().equals(KeyCode.ESCAPE)) {
+                    System.out.println("ScopeTextField cancelEdit");
                     cell.cancelEdit();
                 } else if (event.getCode().equals(KeyCode.ENTER)) {
+                    System.out.println("ScopeTextField commit because enter released");
+                    commitEdit(convertToScope(getText()), valueType, cell);
 //                    valueType.setValue(convertToScope(getText()));
-                    cell.commitEdit(valueType);
+//                    cell.commitEdit(valueType);
                 }
             });
         }
 
         private Scope.Builder convertToScope(final String text) {
-            System.out.println("Convert text[" + text + "] into scope");
             final Scope.Builder scope = Scope.newBuilder();
             for (final String component : text.split("/")) {
-                if(component.isEmpty()) {
+                if (component.isEmpty()) {
                     // ignore empty components
                     continue;
                 }
                 scope.addComponent(ScopeGenerator.convertIntoValidScopeComponent(component));
             }
             return scope;
+        }
+
+        private boolean commited = false;
+
+        private void commitEdit(final Scope.Builder newValue, final ValueType<Scope.Builder> valueType, final TreeTableCell cell) {
+            System.out.println("ScopeTextField commitEdit[" + commited + "]");
+            if (!commited) {
+                commited = true;
+                final ValueType<Scope.Builder> newX = new ValueType<>(newValue, valueType.isEditable(), valueType.getEditingGraphFactory(), valueType.getDescriptionGenerator());
+//                valueType.setValue(newValue);
+                cell.commitEdit(valueType);
+            }
         }
     }
 }

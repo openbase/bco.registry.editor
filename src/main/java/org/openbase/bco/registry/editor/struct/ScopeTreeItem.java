@@ -32,14 +32,13 @@ import org.openbase.bco.registry.editor.struct.value.ScopeEditingGraphicFactory;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import rst.rsb.ScopeType.Scope;
-import rst.rsb.ScopeType.Scope.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class ScopeTreeItem extends BuilderTreeItem<Scope.Builder> {
 
-    public ScopeTreeItem(FieldDescriptor fieldDescriptor, Builder builder) {
+    public ScopeTreeItem(FieldDescriptor fieldDescriptor, Scope.Builder builder) {
         super(fieldDescriptor, builder);
     }
 
@@ -50,11 +49,11 @@ public class ScopeTreeItem extends BuilderTreeItem<Scope.Builder> {
     }
 
     @Override
-    protected DescriptionGenerator<Builder> getDescriptionGenerator() {
+    protected DescriptionGenerator<Scope.Builder> getDescriptionGenerator() {
         //TODO: maybe descriptor can just be a helper class so that not that many will be generated?
-        return new DescriptionGenerator<Builder>() {
+        return new DescriptionGenerator<Scope.Builder>() {
             @Override
-            public String getValueDescription(Builder value) {
+            public String getValueDescription(Scope.Builder value) {
                 try {
                     return ScopeGenerator.generateStringRep(value.build());
                 } catch (CouldNotPerformException ex) {
@@ -64,14 +63,14 @@ public class ScopeTreeItem extends BuilderTreeItem<Scope.Builder> {
             }
 
             @Override
-            public String getDescription(Builder value) {
+            public String getDescription(Scope.Builder value) {
                 return getFieldDescriptor().getName();
             }
         };
     }
 
     @Override
-    protected EditingGraphicFactory<Builder> getEditingGraphicFactory() {
+    protected EditingGraphicFactory<Scope.Builder> getEditingGraphicFactory() {
         return ScopeEditingGraphicFactory.getInstance();
     }
 }

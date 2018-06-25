@@ -35,6 +35,7 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
 
     private final Label label;
     private final Label selectableLabel;
+    private Control editingGraphic;
 
     public TestCell() {
         super();
@@ -44,9 +45,18 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
 
     @Override
     protected void updateItem(ValueType item, boolean empty) {
+        System.out.println("Update item");
         super.updateItem(item, empty);
 
         if (!empty && item != null) {
+            if(isEditing()) {
+                if(editingGraphic != null) {
+                    setGraphic(editingGraphic);
+                }
+
+                return;
+            }
+
             // set text by updating the selectable label
             if (item.isEditable()) {
                 label.setText(item.getValueDescription());
@@ -66,7 +76,7 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
     public void startEdit() {
         super.startEdit();
 
-        @SuppressWarnings("unchecked") final Control editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
+        editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
         if (editingGraphic != null) {
             // editing graphic equals null means not editable
             setGraphic(editingGraphic);
@@ -75,8 +85,13 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
 
     @Override
     public void commitEdit(ValueType newValue) {
+        System.out.println("TestCell CommitEdit");
         super.commitEdit(newValue);
+    }
 
-        updateItem(newValue, false);
+    @Override
+    public void cancelEdit() {
+        System.out.println("TestCell CancelEdit");
+        super.cancelEdit();
     }
 }

@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -27,6 +27,9 @@ import javafx.scene.control.Control;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
 import org.openbase.bco.registry.editor.struct.value.EditingGraphicFactory;
+import org.openbase.jul.exception.StackTracePrinter;
+import org.openbase.jul.exception.printer.LogLevel;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -62,6 +65,7 @@ public class ValueType<V extends Object> {
     }
 
     public void setValue(V value) {
+//        StackTracePrinter.printStackTrace("Set value to[" + value + "]", Thread.currentThread().getStackTrace(), LoggerFactory.getLogger(ValueType.class), LogLevel.INFO);
         this.value.set(value);
     }
 
@@ -70,6 +74,9 @@ public class ValueType<V extends Object> {
     }
 
     public Control getEditingGraphic(final TreeTableCell<ValueType<V>, ValueType<V>> cell) {
+        if(editingGraphFactory == null) {
+            return null;
+        }
         return editingGraphFactory.getEditingGraphic(this, cell);
     }
 
@@ -79,5 +86,13 @@ public class ValueType<V extends Object> {
 
     public SimpleObjectProperty<V> getValueProperty() {
         return value;
+    }
+
+    public DescriptionGenerator<V> getDescriptionGenerator() {
+        return descriptionGenerator;
+    }
+
+    public EditingGraphicFactory<V> getEditingGraphFactory() {
+        return editingGraphFactory;
     }
 }
