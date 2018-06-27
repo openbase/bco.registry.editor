@@ -22,10 +22,13 @@ package org.openbase.bco.registry.editor.visual.cell;
  * #L%
  */
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.struct.value.ScopeEditingGraphicFactory;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
 
 /**
@@ -49,8 +52,8 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
         super.updateItem(item, empty);
 
         if (!empty && item != null) {
-            if(isEditing()) {
-                if(editingGraphic != null) {
+            if (isEditing()) {
+                if (editingGraphic != null) {
                     setGraphic(editingGraphic);
                 }
 
@@ -72,12 +75,28 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
         }
     }
 
+    boolean editCanceled = false;
+
     @Override
     public void startEdit() {
         super.startEdit();
 
+        editCanceled = false;
         editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
         if (editingGraphic != null) {
+            editingGraphic.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    // lost focus and editing is not canceled yet
+                    if (!newValue && !editCanceled) {
+                        System.out.println("Commit because lost focus");
+                        ScopeEditingGraphicFactory.ScopeTextField test = (ScopeEditingGraphicFactory.ScopeTextField) TestCell.this.editingGraphic;
+                        commitEdit(test.getUpdated());
+                    } else {
+                        System.out.println("Skip commit after focus loss");
+                    }
+                }
+            });
             // editing graphic equals null means not editable
             setGraphic(editingGraphic);
         }
@@ -92,6 +111,7 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
     @Override
     public void cancelEdit() {
         System.out.println("TestCell CancelEdit");
+        editCanceled = true;
         super.cancelEdit();
     }
 }

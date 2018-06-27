@@ -41,12 +41,6 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
 
     public BuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB builder) {
         super(fieldDescriptor, builder);
-        getValueCasted().getValueProperty().addListener(new ChangeListener<MB>() {
-            @Override
-            public void changed(ObservableValue<? extends MB> observable, MB oldValue, MB newValue) {
-                logger.info("Changed value property with value: [" + newValue.build() + "]");
-            }
-        });
     }
 
     @Override

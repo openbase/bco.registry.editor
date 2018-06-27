@@ -33,10 +33,10 @@ import javafx.stage.Stage;
 import org.openbase.bco.registry.editor.struct.GroupTreeItem;
 import org.openbase.bco.registry.editor.struct.ScopeTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.visual.cell.SecondCell;
 import org.openbase.bco.registry.editor.visual.cell.TestCell;
-import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPVerbose;
@@ -47,7 +47,6 @@ import org.openbase.jul.processing.StringProcessor;
 import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
 import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData.Builder;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
@@ -61,6 +60,11 @@ public class TestEditor extends Application {
         JPService.parseAndExitOnError(args);
         final TreeTableColumn<ValueType, ValueType> descriptionColumn = new TreeTableColumn<>();
         final TreeTableColumn<ValueType, ValueType> valueColumn = new TreeTableColumn<>();
+
+        valueColumn.setOnEditCommit(event -> {
+            System.out.println("Set value for treeItem[" + event.getRowValue().getClass().getSimpleName() + "] to [" + event.getNewValue().getValue() + "]");
+            event.getRowValue().setValue(event.getNewValue());
+        });
 
         descriptionColumn.setPrefWidth(400);
         valueColumn.setPrefWidth(368);

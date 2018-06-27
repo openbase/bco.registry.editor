@@ -59,8 +59,12 @@ public class ScopeEditingGraphicFactory implements EditingGraphicFactory<Scope.B
 
     public class ScopeTextField extends TextField {
 
+        boolean canceled = false;
+        private final ValueType<Scope.Builder> valueX;
+
         ScopeTextField(final ValueType<Scope.Builder> valueType, final TreeTableCell<ValueType<Scope.Builder>, ValueType<Scope.Builder>> cell) {
             super();
+            valueX = valueType;
             this.setPrefWidth(cell.getTableColumn().getPrefWidth());
 
             try {
@@ -74,14 +78,13 @@ public class ScopeEditingGraphicFactory implements EditingGraphicFactory<Scope.B
                 if (newValue) {
                     // came into focus so select all text
                     selectAll();
-                } else {
-                    System.out.println("ScopeTextField commit because lost focus");
-                    commitEdit(convertToScope(getText()), valueType, cell);
                 }
             });
             setOnKeyReleased((KeyEvent event) -> {
+                System.out.println("Scope text cell received event from key[" + event.getCode().name() + "]");
                 if (event.getCode().equals(KeyCode.ESCAPE)) {
                     System.out.println("ScopeTextField cancelEdit");
+                    canceled = true;
                     cell.cancelEdit();
                 } else if (event.getCode().equals(KeyCode.ENTER)) {
                     System.out.println("ScopeTextField commit because enter released");
@@ -107,13 +110,20 @@ public class ScopeEditingGraphicFactory implements EditingGraphicFactory<Scope.B
         private boolean commited = false;
 
         private void commitEdit(final Scope.Builder newValue, final ValueType<Scope.Builder> valueType, final TreeTableCell cell) {
-            System.out.println("ScopeTextField commitEdit[" + commited + "]");
-            if (!commited) {
+            System.out.println("ScopeTextField commitEdit[" + commited + ", " + canceled + "]");
+            if (!canceled && !commited) {
                 commited = true;
-                final ValueType<Scope.Builder> newX = new ValueType<>(newValue, valueType.isEditable(), valueType.getEditingGraphFactory(), valueType.getDescriptionGenerator());
+                valueType.setValue(newValue);
 //                valueType.setValue(newValue);
                 cell.commitEdit(valueType);
+            } else {
+                System.out.println("Skip commiting");
             }
+        }
+
+        public ValueType<Scope.Builder> getUpdated() {
+            valueX.setValue(convertToScope(getText()));
+            return valueX;
         }
     }
 }
