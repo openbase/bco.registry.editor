@@ -325,8 +325,8 @@ public class RegistryEditor extends Application {
                     showLoginDialog(ex.getMessage());
                 }
             } catch (CouldNotPerformException | InterruptedException ex) {
-                showLoginDialog("Login failed. Stack has been printed!");
                 ExceptionPrinter.printHistory("Could not login", ex, LOGGER);
+                showLoginDialog("Login failed. Stack has been printed!");
             }
         });
     }
