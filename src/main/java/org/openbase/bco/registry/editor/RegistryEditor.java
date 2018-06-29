@@ -37,6 +37,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.openbase.bco.authentication.lib.jp.JPAuthentication;
 import org.openbase.bco.registry.activity.lib.jp.JPActivityRegistryScope;
 import org.openbase.bco.registry.activity.remote.ActivityRegistryRemote;
 import org.openbase.bco.registry.clazz.lib.jp.JPClassRegistryScope;
@@ -648,6 +649,7 @@ public class RegistryEditor extends Application {
         JPService.registerProperty(JPTemplateRegistryScope.class);
         JPService.registerProperty(JPActivityRegistryScope.class);
         JPService.registerProperty(JPUnitRegistryScope.class);
+        JPService.registerProperty(JPAuthentication.class);
         JPService.registerProperty(JPRSBHost.class);
         JPService.registerProperty(JPRSBPort.class);
         JPService.registerProperty(JPRSBTransport.class);
