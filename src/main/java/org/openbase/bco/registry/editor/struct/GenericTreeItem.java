@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -23,12 +23,12 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TreeItem;
+import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
 import org.openbase.bco.registry.editor.struct.value.DefaultDescriptionGenerator;
 import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
-import org.openbase.bco.registry.editor.struct.value.EditingGraphicFactory;
+import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +40,13 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final FieldDescriptor fieldDescriptor;
 
-    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value) {
-        this.fieldDescriptor = fieldDescriptor;
-        this.setValue(new ValueType<>(value, isEditable(), getEditingGraphicFactory(), getDescriptionGenerator()));
-
-        getValueCasted().getValueProperty().addListener(new ChangeListener<V>() {
-            @Override
-            public void changed(ObservableValue<? extends V> observable, V oldValue, V newValue) {
-                setValue(new ValueType(newValue, isEditable(), getEditingGraphicFactory(), getDescriptionGenerator()));
-            }
-        });
+    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value) throws InitializationException {
+        try {
+            this.fieldDescriptor = fieldDescriptor;
+            this.setValue(new ValueType<>(value, isEditable(), getEditingGraphicFactory(), getDescriptionGenerator()));
+        } catch (CouldNotPerformException ex) {
+            throw new InitializationException(this, ex);
+        }
     }
 
     public FieldDescriptor getFieldDescriptor() {
@@ -61,7 +58,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
         return (V) getValue().getValue();
     }
 
-    protected EditingGraphicFactory<V> getEditingGraphicFactory() {
+    protected EditingGraphicFactory getEditingGraphicFactory() throws CouldNotPerformException {
         return null;
     }
 
@@ -73,6 +70,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     protected ValueType<V> getValueCasted() {
         return (ValueType<V>) getValue();
     }

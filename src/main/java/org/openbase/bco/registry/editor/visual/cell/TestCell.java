@@ -22,19 +22,21 @@ package org.openbase.bco.registry.editor.visual.cell;
  * #L%
  */
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.value.ScopeEditingGraphicFactory;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
+import org.openbase.jul.exception.CouldNotPerformException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class TestCell extends TreeTableCell<ValueType, ValueType> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestCell.class);
 
     private final Label label;
     private final Label selectableLabel;
@@ -48,7 +50,6 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
 
     @Override
     protected void updateItem(ValueType item, boolean empty) {
-        System.out.println("Update item");
         super.updateItem(item, empty);
 
         if (!empty && item != null) {
@@ -75,43 +76,26 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
         }
     }
 
-    boolean editCanceled = false;
-
     @Override
     public void startEdit() {
         super.startEdit();
 
-        editCanceled = false;
-        editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
-        if (editingGraphic != null) {
-            editingGraphic.focusedProperty().addListener(new ChangeListener<Boolean>() {
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    // lost focus and editing is not canceled yet
-                    if (!newValue && !editCanceled) {
-                        System.out.println("Commit because lost focus");
-                        ScopeEditingGraphicFactory.ScopeTextField test = (ScopeEditingGraphicFactory.ScopeTextField) TestCell.this.editingGraphic;
-                        commitEdit(test.getUpdated());
-                    } else {
-                        System.out.println("Skip commit after focus loss");
-                    }
-                }
-            });
-            // editing graphic equals null means not editable
-            setGraphic(editingGraphic);
+        System.out.println("Start editing");
+        try {
+            editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
+            if (editingGraphic != null) {
+                // editing graphic equals null means not editable
+                setGraphic(editingGraphic);
+            }
+        } catch (CouldNotPerformException ex) {
+            LOGGER.error("Could not create editing graphic", ex);
+            cancelEdit();
         }
     }
 
     @Override
-    public void commitEdit(ValueType newValue) {
-        System.out.println("TestCell CommitEdit");
-        super.commitEdit(newValue);
-    }
-
-    @Override
     public void cancelEdit() {
-        System.out.println("TestCell CancelEdit");
-        editCanceled = true;
         super.cancelEdit();
+        updateItem(getItem(), getItem() == null);
     }
 }

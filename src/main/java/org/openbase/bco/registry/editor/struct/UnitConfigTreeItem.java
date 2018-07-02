@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -27,7 +27,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
 import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.exception.InitializationException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitConfigType.UnitConfig.Builder;
 
@@ -42,17 +42,13 @@ public class UnitConfigTreeItem extends BuilderTreeItem<UnitConfig.Builder> {
 
     private final SimpleObjectProperty<Boolean> changedProperty;
 
-    public UnitConfigTreeItem(FieldDescriptor fieldDescriptor, Builder builder) {
+    public UnitConfigTreeItem(FieldDescriptor fieldDescriptor, Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);
 
         this.changedProperty = new SimpleObjectProperty<>(false);
 
         this.addEventHandler(valueChangedEvent(), event -> {
-            try {
-                logger.info("Received changed event for unit: [" + ScopeGenerator.generateStringRep(getBuilder().getScope()) + "]");
-            } catch (CouldNotPerformException e) {
-                e.printStackTrace();
-            }
+            logger.info("Received changed event for unit: [" + getBuilder().getScope() + "]");
             // this is triggered when the value of this node or one of its children changes
             changedProperty.set(true);
         });

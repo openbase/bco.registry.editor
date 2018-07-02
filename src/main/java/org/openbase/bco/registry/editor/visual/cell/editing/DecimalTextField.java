@@ -111,6 +111,7 @@ public class DecimalTextField extends TextField {
             super.replaceText(start, end, text);
         }
         validateDecimalField();
+        super.replaceText(start, end, text);
     }
 
     @Override

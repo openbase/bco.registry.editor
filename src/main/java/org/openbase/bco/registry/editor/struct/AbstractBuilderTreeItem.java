@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -28,6 +28,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.FatalImplementationErrorException;
+import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 
 import java.lang.reflect.Constructor;
@@ -40,7 +41,7 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
 
     private boolean childrenInitialized;
 
-    public AbstractBuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB value) {
+    public AbstractBuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB value) throws InitializationException {
         super(fieldDescriptor, value);
 
         this.childrenInitialized = false;

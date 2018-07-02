@@ -23,15 +23,14 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
+import org.openbase.bco.registry.editor.struct.editing.ScopeEditingGraphic;
 import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
-import org.openbase.bco.registry.editor.struct.value.EditingGraphicFactory;
-import org.openbase.bco.registry.editor.struct.value.ScopeEditingGraphicFactory;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import rst.rsb.ScopeType.Scope;
 
@@ -40,14 +39,8 @@ import rst.rsb.ScopeType.Scope;
  */
 public class ScopeTreeItem extends BuilderTreeItem<Scope.Builder> {
 
-    public ScopeTreeItem(FieldDescriptor fieldDescriptor, Scope.Builder builder) {
+    public ScopeTreeItem(FieldDescriptor fieldDescriptor, Scope.Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);
-        this.valueProperty().addListener(new ChangeListener<ValueType>() {
-            @Override
-            public void changed(ObservableValue<? extends ValueType> observable, ValueType oldValue, ValueType newValue) {
-                logger.info("Value has changed to[" + newValue.getValue() + "]");
-            }
-        });
     }
 
     @Override
@@ -78,7 +71,7 @@ public class ScopeTreeItem extends BuilderTreeItem<Scope.Builder> {
     }
 
     @Override
-    protected EditingGraphicFactory<Scope.Builder> getEditingGraphicFactory() {
-        return ScopeEditingGraphicFactory.getInstance();
+    protected EditingGraphicFactory getEditingGraphicFactory() throws CouldNotPerformException {
+        return EditingGraphicFactory.getInstance(ScopeEditingGraphic.class);
     }
 }

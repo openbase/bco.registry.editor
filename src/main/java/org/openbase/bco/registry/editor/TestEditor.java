@@ -41,9 +41,11 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPVerbose;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
 import org.openbase.jul.processing.StringProcessor;
+import org.slf4j.LoggerFactory;
 import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
 import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData.Builder;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
@@ -55,60 +57,64 @@ import rst.spatial.PlacementConfigType.PlacementConfig;
 public class TestEditor extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        JPService.registerProperty(JPVerbose.class, true);
-        String[] args = {"-v"};
-        JPService.parseAndExitOnError(args);
-        final TreeTableColumn<ValueType, ValueType> descriptionColumn = new TreeTableColumn<>();
-        final TreeTableColumn<ValueType, ValueType> valueColumn = new TreeTableColumn<>();
+        try {
+            JPService.registerProperty(JPVerbose.class, true);
+            String[] args = {"-v"};
+            JPService.parseAndExitOnError(args);
+            final TreeTableColumn<ValueType, ValueType> descriptionColumn = new TreeTableColumn<>();
+            final TreeTableColumn<ValueType, ValueType> valueColumn = new TreeTableColumn<>();
 
-        valueColumn.setOnEditCommit(event -> {
-            System.out.println("Set value for treeItem[" + event.getRowValue().getClass().getSimpleName() + "] to [" + event.getNewValue().getValue() + "]");
-            event.getRowValue().setValue(event.getNewValue());
-        });
+//            valueColumn.setOnEditCommit(event -> {
+//                System.out.println("Set value for treeItem[" + event.getRowValue().getClass().getSimpleName() + "] to [" + event.getNewValue().getValue() + "]");
+//                event.getRowValue().setValue(event.getNewValue());
+//            });
 
-        descriptionColumn.setPrefWidth(400);
-        valueColumn.setPrefWidth(368);
-        descriptionColumn.setCellValueFactory(param -> param.getValue().valueProperty());
-        valueColumn.setCellValueFactory(param -> param.getValue().valueProperty());
-        descriptionColumn.setCellFactory(param -> new SecondCell());
-        valueColumn.setCellFactory(param -> new TestCell());
-        final TreeTableView<ValueType> treeTableView = new TreeTableView<>();
-        treeTableView.getColumns().addAll(descriptionColumn, valueColumn);
-        treeTableView.showRootProperty().setValue(false);
-        treeTableView.setEditable(true);
+            descriptionColumn.setPrefWidth(400);
+            valueColumn.setPrefWidth(368);
+            descriptionColumn.setCellValueFactory(param -> param.getValue().valueProperty());
+            valueColumn.setCellValueFactory(param -> param.getValue().valueProperty());
+            descriptionColumn.setCellFactory(param -> new SecondCell());
+            valueColumn.setCellFactory(param -> new TestCell());
+            final TreeTableView<ValueType> treeTableView = new TreeTableView<>();
+            treeTableView.getColumns().addAll(descriptionColumn, valueColumn);
+            treeTableView.showRootProperty().setValue(false);
+            treeTableView.setEditable(true);
 
-        FieldDescriptor fieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(UnitRegistryData.getDefaultInstance(), UnitRegistryData.DAL_UNIT_CONFIG_FIELD_NUMBER);
+            FieldDescriptor fieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(UnitRegistryData.getDefaultInstance(), UnitRegistryData.DAL_UNIT_CONFIG_FIELD_NUMBER);
 
-        FieldPathDescriptionProvider locationIdProvider = new FieldPathDescriptionProvider(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER)) {
-            @Override
-            public String generateDescription(Object value) {
-                final String locationId = (String) value;
-                try {
-                    return LabelProcessor.getBestMatch(Registries.getUnitRegistry().getUnitConfigById(locationId).getLabel());
-                } catch (CouldNotPerformException ex) {
-                    return locationId;
+            FieldPathDescriptionProvider locationIdProvider = new FieldPathDescriptionProvider(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER)) {
+                @Override
+                public String generateDescription(Object value) {
+                    final String locationId = (String) value;
+                    try {
+                        return LabelProcessor.getBestMatch(Registries.getUnitRegistry().getUnitConfigById(locationId).getLabel());
+                    } catch (CouldNotPerformException ex) {
+                        return locationId;
+                    }
                 }
-            }
-        };
-        FieldPathDescriptionProvider unitTypeProvider = new FieldPathDescriptionProvider(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.UNIT_TYPE_FIELD_NUMBER)) {
-            @Override
-            public String generateDescription(Object value) {
-                final EnumValueDescriptor unitType = (EnumValueDescriptor) value;
-                return StringProcessor.transformUpperCaseToCamelCase(unitType.getName());
-            }
-        };
-        GroupTreeItem<Builder> root = new GroupTreeItem<>(fieldDescriptor, Registries.getUnitRegistry(true).getData().toBuilder(), true, locationIdProvider, unitTypeProvider);
+            };
+            FieldPathDescriptionProvider unitTypeProvider = new FieldPathDescriptionProvider(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.UNIT_TYPE_FIELD_NUMBER)) {
+                @Override
+                public String generateDescription(Object value) {
+                    final EnumValueDescriptor unitType = (EnumValueDescriptor) value;
+                    return StringProcessor.transformUpperCaseToCamelCase(unitType.getName());
+                }
+            };
+            GroupTreeItem<Builder> root = new GroupTreeItem<>(fieldDescriptor, Registries.getUnitRegistry(true).getData().toBuilder(), true, locationIdProvider, unitTypeProvider);
 //        printTypes(4, root);
-        root.setExpanded(true);
-//        treeTableView.setRoot(root);
-        treeTableView.setShowRoot(true);
-        final UnitConfig unitConfig = Registries.getUnitRegistry().getDalUnitConfigs().get(0);
-        FieldDescriptor descriptor = ProtoBufFieldProcessor.getFieldDescriptor(unitConfig, UnitConfig.SCOPE_FIELD_NUMBER);
-        treeTableView.setRoot(new ScopeTreeItem(descriptor, unitConfig.toBuilder().getScopeBuilder()));
+            root.setExpanded(true);
+        treeTableView.setRoot(root);
+//            treeTableView.setShowRoot(true);
+//            final UnitConfig unitConfig = Registries.getUnitRegistry().getDalUnitConfigs().get(0);
+//            FieldDescriptor descriptor = ProtoBufFieldProcessor.getFieldDescriptor(unitConfig, UnitConfig.SCOPE_FIELD_NUMBER);
+//            treeTableView.setRoot(new ScopeTreeItem(descriptor, unitConfig.toBuilder().getScopeBuilder()));
 
-        final Scene scene = new Scene(treeTableView, 1024, 768);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            final Scene scene = new Scene(treeTableView, 1024, 768);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (Exception ex) {
+            ExceptionPrinter.printHistoryAndReturnThrowable(ex, LoggerFactory.getLogger(TestEditor.class));
+        }
     }
 
     private void printTypes(int depth, TreeItem<?> treeItem) {

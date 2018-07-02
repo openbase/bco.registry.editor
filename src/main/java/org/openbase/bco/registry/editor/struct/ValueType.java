@@ -10,46 +10,47 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.TreeTableCell;
+import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
 import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
-import org.openbase.bco.registry.editor.struct.value.EditingGraphicFactory;
-import org.openbase.jul.exception.StackTracePrinter;
-import org.openbase.jul.exception.printer.LogLevel;
-import org.slf4j.LoggerFactory;
+import org.openbase.jul.exception.CouldNotPerformException;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class ValueType<V extends Object> {
 
-    private SimpleObjectProperty<V> value;
+    private V value;
     private final DescriptionGenerator<V> descriptionGenerator;
-    private final EditingGraphicFactory<V> editingGraphFactory;
+    private final EditingGraphicFactory editingGraphFactory;
     private final boolean editable;
 
     public ValueType(
             final V value,
             final boolean editable,
-            final EditingGraphicFactory<V> editingGraphFactory,
+            final EditingGraphicFactory editingGraphFactory,
             final DescriptionGenerator<V> descriptionGenerator) {
-        this.value = new SimpleObjectProperty<>(value);
+        this.value = value;
         this.editable = editable;
         this.descriptionGenerator = descriptionGenerator;
         this.editingGraphFactory = editingGraphFactory;
+    }
+
+    public ValueType<V> createNew(final V value) {
+        return new ValueType<>(value, editable, editingGraphFactory, descriptionGenerator);
     }
 
     public String getDescription() {
@@ -61,20 +62,16 @@ public class ValueType<V extends Object> {
     }
 
     public V getValue() {
-        return value.getValue();
-    }
-
-    public void setValue(V value) {
-//        StackTracePrinter.printStackTrace("Set value to[" + value + "]", Thread.currentThread().getStackTrace(), LoggerFactory.getLogger(ValueType.class), LogLevel.INFO);
-        this.value.set(value);
-    }
-
-    public SimpleObjectProperty<V> valueProperty() {
         return value;
     }
 
-    public Control getEditingGraphic(final TreeTableCell<ValueType<V>, ValueType<V>> cell) {
-        if(editingGraphFactory == null) {
+    public void setValue(V value) {
+        this.value = value;
+    }
+
+    public Control getEditingGraphic(final TreeTableCell<ValueType<V>, ValueType<V>> cell) throws CouldNotPerformException {
+        if (editingGraphFactory == null) {
+            System.out.println("Editing graphic factory is null");
             return null;
         }
         return editingGraphFactory.getEditingGraphic(this, cell);
@@ -82,17 +79,5 @@ public class ValueType<V extends Object> {
 
     public boolean isEditable() {
         return editable;
-    }
-
-    public SimpleObjectProperty<V> getValueProperty() {
-        return value;
-    }
-
-    public DescriptionGenerator<V> getDescriptionGenerator() {
-        return descriptionGenerator;
-    }
-
-    public EditingGraphicFactory<V> getEditingGraphFactory() {
-        return editingGraphFactory;
     }
 }
