@@ -43,7 +43,7 @@ public class ActivityTemplateItemDescriptorProvider extends AbstractTreeItemDesc
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException {
         ActivityTemplate activityTemplate = Registries.getTemplateRegistry().getActivityTemplateById((String) fieldGroup.getValue(builder));
-        return LabelProcessor.getFirstLabel(activityTemplate.getLabel());
+        return LabelProcessor.getBestMatch(activityTemplate.getLabel());
     }
 
     @Override

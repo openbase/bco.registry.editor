@@ -44,7 +44,7 @@ public class DeviceClassItemDescriptorProvider extends AbstractTreeItemDescripto
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
         DeviceClass deviceClass = Registries.getClassRegistry().getDeviceClassById((String) fieldGroup.getValue(builder));
-        return LabelProcessor.getFirstLabel(deviceClass.getLabel());
+        return LabelProcessor.getBestMatch(deviceClass.getLabel());
     }
 
     @Override
