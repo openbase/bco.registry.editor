@@ -74,13 +74,7 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
                 case MESSAGE:
                     return loadTreeItem(field, getBuilder().getFieldBuilder(field));
                 default:
-                    // TODO: add leaf
-                    try {
-                        return new GenericTreeItem<>(field, getBuilder().getField(field));
-                    } catch (IllegalArgumentException ex) {
-                        logger.info("Could not create leaf for[" + field.getName() + ", " + getBuilder().getClass().getName() + "]");
-                        return null;
-                    }
+                    return new LeafTreeItem<>(field, getBuilder().getField(field), getBuilder());
             }
         }
     }

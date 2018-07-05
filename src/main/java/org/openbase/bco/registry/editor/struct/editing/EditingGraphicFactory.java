@@ -43,7 +43,7 @@ public class EditingGraphicFactory<V, EG extends AbstractEditingGraphic> {
         if (editingGraphicMap.containsKey(editingGraphicClass)) {
             return editingGraphicMap.get(editingGraphicClass);
         }
-        final EditingGraphicFactory editingGraphicFactory = new EditingGraphicFactory(editingGraphicClass);
+        final EditingGraphicFactory editingGraphicFactory = new EditingGraphicFactory<>(editingGraphicClass);
         editingGraphicMap.put(editingGraphicClass, editingGraphicFactory);
         return editingGraphicFactory;
     }

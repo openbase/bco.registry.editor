@@ -39,11 +39,17 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final FieldDescriptor fieldDescriptor;
+    private boolean editable;
 
     public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value) throws InitializationException {
+        this(fieldDescriptor, value, true);
+    }
+
+    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value, final boolean editable) throws InitializationException {
         try {
             this.fieldDescriptor = fieldDescriptor;
-            this.setValue(new ValueType<>(value, isEditable(), getEditingGraphicFactory(), getDescriptionGenerator()));
+            this.setValue(new ValueType<>(value, editable, getEditingGraphicFactory(), getDescriptionGenerator()));
+            this.editable = editable;
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
         }
@@ -67,7 +73,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     }
 
     protected boolean isEditable() {
-        return true;
+        return editable;
     }
 
     @SuppressWarnings("unchecked")

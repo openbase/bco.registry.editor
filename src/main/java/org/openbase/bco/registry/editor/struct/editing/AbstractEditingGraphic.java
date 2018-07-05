@@ -40,17 +40,18 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Control, V> {
     private final ValueType<V> valueType;
     private final TreeTableCell<Object, Object> treeTableCell;
 
-    public AbstractEditingGraphic(final GRAPHIC control, final ValueType<V> valueType, final TreeTableCell<Object, Object> treeTableCell) {
+    AbstractEditingGraphic(final GRAPHIC control, final ValueType<V> valueType, final TreeTableCell<Object, Object> treeTableCell) {
         this.control = control;
         this.valueType = valueType;
         this.treeTableCell = treeTableCell;
         this.init(valueType.getValue());
-        this.control.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                System.out.println("Commit because of focus loss");
-                commitEdit();
-            }
-        });
+        //TODO: reactivate after fixing commit on focus loss
+//        this.control.focusedProperty().addListener((observable, oldValue, newValue) -> {
+//            if (!newValue) {
+//                System.out.println("Commit because of focus loss");
+//                commitEdit();
+//            }
+//        });
 
         Platform.runLater(() -> getControl().requestFocus());
     }

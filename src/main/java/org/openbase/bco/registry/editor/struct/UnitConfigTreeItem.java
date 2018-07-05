@@ -61,11 +61,14 @@ public class UnitConfigTreeItem extends BuilderTreeItem<UnitConfig.Builder> {
 
     @Override
     protected TreeItem<ValueType> createChild(final FieldDescriptor field) throws CouldNotPerformException {
-        if (field.getNumber() == UnitConfig.SERVICE_CONFIG_FIELD_NUMBER) {
-            return new BuilderListTreeItem<>(field, getBuilder(), false);
+        switch (field.getNumber()) {
+            case UnitConfig.SERVICE_CONFIG_FIELD_NUMBER:
+                return new BuilderListTreeItem<>(field, getBuilder(), false);
+            case UnitConfig.ID_FIELD_NUMBER:
+                return new LeafTreeItem<>(field, getBuilder().getId(), getBuilder(), false);
+            default:
+                return super.createChild(field);
         }
-
-        return super.createChild(field);
     }
 
     public SimpleObjectProperty<Boolean> getChangedProperty() {

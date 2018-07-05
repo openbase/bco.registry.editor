@@ -7,9 +7,9 @@ import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextFi
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class NumberEditingGraphic extends AbstractTextEditingGraphic<NumberFilteredTextField, Double> {
+public class DoubleEditingGraphic extends AbstractTextEditingGraphic<NumberFilteredTextField, Double> {
 
-    public NumberEditingGraphic(ValueType<Double> valueType, TreeTableCell<Object, Object> treeTableCell) {
+    public DoubleEditingGraphic(ValueType<Double> valueType, TreeTableCell<Object, Object> treeTableCell) {
         super(new NumberFilteredTextField(), valueType, treeTableCell);
     }
 
