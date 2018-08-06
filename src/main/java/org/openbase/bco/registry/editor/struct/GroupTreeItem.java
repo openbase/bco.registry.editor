@@ -116,7 +116,7 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
         }
     }
 
-    public class GroupDescriptionGenerator<MB> implements DescriptionGenerator<MB> {
+    public class GroupDescriptionGenerator implements DescriptionGenerator<MB> {
 
         final String description;
 

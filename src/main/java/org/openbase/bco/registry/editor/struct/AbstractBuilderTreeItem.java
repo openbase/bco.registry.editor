@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -99,5 +99,9 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
             // could not get or invoke constructor which is only the case on an implementation error
             throw ExceptionPrinter.printHistoryAndReturnThrowable(new FatalImplementationErrorException("Could not invoke constructor[" + className + "] for type[" + extractMessageClass(builder) + "]", this, ex), logger);
         }
+    }
+
+    public void update(MB builder) {
+        //TODO
     }
 }
