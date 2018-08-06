@@ -39,7 +39,7 @@ public class LabelComboBoxConverter<MSG extends Message> extends AbstractComboBo
         try {
             final Object value = message.getField(ProtoBufFieldProcessor.getFieldDescriptor(message, "label"));
             if (value instanceof Label) {
-                return LabelProcessor.getFirstLabel((Label) value);
+                return LabelProcessor.getBestMatch((Label) value);
             } else if (value instanceof String) {
                 return (String) value;
             } else {

@@ -44,7 +44,7 @@ public class AgentClassItemDescriptorProvider extends AbstractTreeItemDescriptor
 
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
-        return LabelProcessor.getFirstLabel(Registries.getClassRegistry().getAgentClassById((String) fieldGroup.getValue(builder)).getLabel());
+        return LabelProcessor.getBestMatch(Registries.getClassRegistry().getAgentClassById((String) fieldGroup.getValue(builder)).getLabel());
     }
 
     @Override

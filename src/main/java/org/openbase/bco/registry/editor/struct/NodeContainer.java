@@ -76,7 +76,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
             if (labelField != null) {
                 final Object label = builder.getField(labelField);
                 if (label instanceof LabelType.Label) {
-                    displayedDescriptor = LabelProcessor.getFirstLabel((LabelType.Label) label);
+                    displayedDescriptor = LabelProcessor.getBestMatch((LabelType.Label) label);
                     return;
                 } else if (label instanceof String) {
                     displayedDescriptor = (String) label;

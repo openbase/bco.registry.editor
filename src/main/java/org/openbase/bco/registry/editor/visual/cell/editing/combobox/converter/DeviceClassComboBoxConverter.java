@@ -33,7 +33,7 @@ public class DeviceClassComboBoxConverter extends AbstractComboBoxConverter<Devi
     @Override
     public String getText(DeviceClass message) {
         try {
-            final String label = LabelProcessor.getFirstLabel(message.getLabel());
+            final String label = LabelProcessor.getBestMatch(message.getLabel());
             return message.getCompany() + " - " + label;
         } catch (NotAvailableException ex) {
             logger.error("Label for deviceClass[" + message + "] not available", ex);
