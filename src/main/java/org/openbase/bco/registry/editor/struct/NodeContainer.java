@@ -42,7 +42,7 @@ import rst.configuration.LabelType;
  * @param <MB> The message builder type to use.
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<Node> implements Node {
+public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends TreeItem<NodeInterface> implements NodeInterface {
 
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(NodeContainer.class);
 
@@ -95,7 +95,7 @@ public abstract class NodeContainer<MB extends GeneratedMessage.Builder> extends
         this.getChildren().add(new TreeItem<>(leaf));
     }
 
-    public void add(TreeItem<Node> node) {
+    public void add(TreeItem<NodeInterface> node) {
         this.getChildren().add(node);
     }
 

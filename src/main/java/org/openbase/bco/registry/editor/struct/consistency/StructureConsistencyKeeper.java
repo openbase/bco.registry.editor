@@ -72,7 +72,7 @@ public class StructureConsistencyKeeper {
     public static void clearField(NodeContainer<? extends Message.Builder> container, String fieldName) {
         GeneratedMessage.Builder builder = container.getBuilder();
         for (int i = 0; i < container.getChildren().size(); i++) {
-            Node item = container.getChildren().get(i).getValue();
+            NodeInterface item = container.getChildren().get(i).getValue();
             if (item instanceof NodeContainer && ((NodeContainer) item).getDescriptor().equals(fieldName)) {
                 container.getChildren().remove(i);
                 i--;

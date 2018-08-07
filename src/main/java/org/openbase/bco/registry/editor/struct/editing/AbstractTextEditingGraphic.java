@@ -31,7 +31,7 @@ import org.openbase.bco.registry.editor.struct.ValueType;
  */
 abstract class AbstractTextEditingGraphic<TF extends TextField, V> extends AbstractEditingGraphic<TF, V> {
 
-    AbstractTextEditingGraphic(final TF textfield, final ValueType<V> valueType, final TreeTableCell<Object, Object> treeTableCell) {
+    AbstractTextEditingGraphic(final TF textfield, final ValueType<V> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(textfield, valueType, treeTableCell);
         getControl().focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {

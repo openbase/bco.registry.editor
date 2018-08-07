@@ -22,25 +22,26 @@ package org.openbase.bco.registry.editor;
  * #L%
  */
 
-import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
+import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
+import org.openbase.bco.registry.editor.util.fieldpath.*;
 import org.openbase.bco.registry.editor.visual.RegistryRemoteTab;
 import org.openbase.bco.registry.remote.Registries;
-import org.openbase.bco.registry.unit.remote.UnitRegistryRemote;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPVerbose;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
-import org.openbase.jul.storage.registry.RegistryRemote;
 import org.slf4j.LoggerFactory;
+import rst.domotic.registry.ClassRegistryDataType.ClassRegistryData;
 import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -106,8 +107,8 @@ public class TestEditor extends Application {
             unitPriorityList.add(UnitRegistryData.DEVICE_UNIT_CONFIG_FIELD_NUMBER);
 
             final TabPane globalTabPane = new TabPane();
-            globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getUnitRegistry(), unitPriorityList));
-            globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getClassRegistry()));
+            globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getUnitRegistry(), getUnitRegistryGrouping(), unitPriorityList));
+            globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getClassRegistry(), getClassRegistryGrouping()));
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getTemplateRegistry()));
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getActivityRegistry()));
 
@@ -119,6 +120,37 @@ public class TestEditor extends Application {
         } catch (Exception ex) {
             ExceptionPrinter.printHistoryAndReturnThrowable(ex, LoggerFactory.getLogger(TestEditor.class));
         }
+    }
+
+    private Map<Integer, FieldPathDescriptionProvider[]> getUnitRegistryGrouping() {
+        final AgentUnitAgentClassFieldPath agentUnitAgentClassFieldPath = new AgentUnitAgentClassFieldPath();
+        final DeviceUnitDeviceClassFieldPath deviceUnitDeviceClassFieldPath = new DeviceUnitDeviceClassFieldPath();
+        final UnitLocationFieldPath unitLocationFieldPath = new UnitLocationFieldPath();
+        final UnitTypeFieldPath unitTypeFieldPath = new UnitTypeFieldPath();
+
+        final Map<Integer, FieldPathDescriptionProvider[]> unitRegistryGroupingMap = new HashMap<>();
+
+        final FieldPathDescriptionProvider[] dalUnitGrouping = {unitLocationFieldPath, unitTypeFieldPath};
+        unitRegistryGroupingMap.put(UnitRegistryData.DAL_UNIT_CONFIG_FIELD_NUMBER, dalUnitGrouping);
+
+        final FieldPathDescriptionProvider[] deviceUnitGrouping = {deviceUnitDeviceClassFieldPath, unitLocationFieldPath};
+        unitRegistryGroupingMap.put(UnitRegistryData.DEVICE_UNIT_CONFIG_FIELD_NUMBER, deviceUnitGrouping);
+
+        final FieldPathDescriptionProvider[] agentUnitGrouping = {agentUnitAgentClassFieldPath};
+        unitRegistryGroupingMap.put(UnitRegistryData.AGENT_UNIT_CONFIG_FIELD_NUMBER, agentUnitGrouping);
+
+        return unitRegistryGroupingMap;
+    }
+
+    private Map<Integer, FieldPathDescriptionProvider[]> getClassRegistryGrouping() {
+        final DeviceClassCompanyFieldPath deviceClassCompanyFieldPath = new DeviceClassCompanyFieldPath();
+
+        final Map<Integer, FieldPathDescriptionProvider[]> classRegistryGroupingMap = new HashMap<>();
+
+        final FieldPathDescriptionProvider[] deviceClassGrouping = {deviceClassCompanyFieldPath};
+        classRegistryGroupingMap.put(ClassRegistryData.DEVICE_CLASS_FIELD_NUMBER, deviceClassGrouping);
+
+        return classRegistryGroupingMap;
     }
 
     private void printTypes(int depth, TreeItem<?> treeItem) {

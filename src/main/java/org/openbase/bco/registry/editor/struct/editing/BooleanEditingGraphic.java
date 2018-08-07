@@ -31,7 +31,7 @@ import org.openbase.bco.registry.editor.struct.ValueType;
  */
 public class BooleanEditingGraphic extends AbstractEditingGraphic<CheckBox, Boolean> {
 
-    public BooleanEditingGraphic(final ValueType<Boolean> valueType, final TreeTableCell<Object, Object> treeTableCell) {
+    public BooleanEditingGraphic(final ValueType<Boolean> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new CheckBox(), valueType, treeTableCell);
         getControl().setOnAction((event) -> commitEdit());
     }

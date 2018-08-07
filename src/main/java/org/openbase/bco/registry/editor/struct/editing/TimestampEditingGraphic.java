@@ -36,7 +36,7 @@ import java.util.Date;
  */
 public class TimestampEditingGraphic extends AbstractEditingGraphic<DatePicker, Timestamp.Builder> {
 
-    public TimestampEditingGraphic(final ValueType<Timestamp.Builder> valueType, final TreeTableCell<Object, Object> treeTableCell) {
+    public TimestampEditingGraphic(final ValueType<Timestamp.Builder> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new DatePicker(), valueType, treeTableCell);
         getControl().setOnAction((event) -> commitEdit());
     }

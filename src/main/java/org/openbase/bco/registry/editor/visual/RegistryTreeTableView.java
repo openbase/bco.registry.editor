@@ -64,7 +64,7 @@ import static org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProces
  * @param <MB> The message builder type to use.
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Builder<MB>> extends TreeTableView<Node> {
+public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Builder<MB>> extends TreeTableView<NodeInterface> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryTreeTableView.class);
 
@@ -147,10 +147,10 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
                 GlobalTextArea.getInstance().putText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been removed from the global database!");
                 continue;
             }
-            TreeItem<Node> parent = nodeToRemove.getParent();
+            TreeItem<NodeInterface> parent = nodeToRemove.getParent();
             parent.getChildren().remove(nodeToRemove);
             if (SendableType.getTypeToMessage(msg) != null) {
-                TreeItem<Node> removed;
+                TreeItem<NodeInterface> removed;
                 while (parent.getChildren().isEmpty() && parent.getParent() != null) {
                     removed = parent;
                     parent = (NodeContainer) parent.getParent();
@@ -293,7 +293,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         }
     }
 
-    private NodeContainer getNodeByMessage(List<TreeItem<Node>> nodes, GeneratedMessage msg) {
+    private NodeContainer getNodeByMessage(List<TreeItem<NodeInterface>> nodes, GeneratedMessage msg) {
         if (nodes.isEmpty()) {
             return null;
         }
@@ -321,7 +321,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         }
     }
 
-    private GenericListContainer getAccordingParent(List<TreeItem<Node>> nodes, GeneratedMessage msg) throws CouldNotPerformException, InterruptedException {
+    private GenericListContainer getAccordingParent(List<TreeItem<NodeInterface>> nodes, GeneratedMessage msg) throws CouldNotPerformException, InterruptedException {
         if (nodes.isEmpty()) {
             return null;
         }
@@ -348,13 +348,13 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         return null;
     }
 
-    public static void expandEqually(TreeItem<Node> origin, TreeItem<Node> update) {
+    public static void expandEqually(TreeItem<NodeInterface> origin, TreeItem<NodeInterface> update) {
         if (origin.isExpanded()) {
             update.setExpanded(true);
         }
 
-        for (TreeItem<Node> originChild : origin.getChildren()) {
-            for (TreeItem<Node> updatedChild : update.getChildren()) {
+        for (TreeItem<NodeInterface> originChild : origin.getChildren()) {
+            for (TreeItem<NodeInterface> updatedChild : update.getChildren()) {
                 if (originChild.getValue().getDescriptor().equals(updatedChild.getValue().getDescriptor())) {
                     expandEqually(originChild, updatedChild);
                 }

@@ -29,7 +29,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableView;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
-import org.openbase.bco.registry.editor.struct.Node;
+import org.openbase.bco.registry.editor.struct.NodeInterface;
 import org.openbase.bco.registry.editor.util.SendableType;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class TreeTableViewContextMenu extends ContextMenu {
 
     private final MenuItem addMenuItem;
 
-    public TreeTableViewContextMenu(TreeTableView<Node> treeTableView, SendableType type) {
+    public TreeTableViewContextMenu(TreeTableView<NodeInterface> treeTableView, SendableType type) {
         addMenuItem = new MenuItem("Add");
         this.getItems().add(addMenuItem);
         addMenuItem.setOnAction(new EventHandler<ActionEvent>() {

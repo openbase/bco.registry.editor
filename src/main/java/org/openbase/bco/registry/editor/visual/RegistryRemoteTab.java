@@ -29,12 +29,12 @@ import javafx.application.Platform;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.pattern.Remote.ConnectionState;
 import org.openbase.jul.processing.StringProcessor;
-import org.openbase.jul.storage.registry.Registry;
 import org.openbase.jul.storage.registry.RegistryRemote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,15 +59,21 @@ public class RegistryRemoteTab<RD extends Message> extends TabWithStatusLabel {
     private boolean onceSelected = false;
 
     private List<Integer> sortOrder;
+    private Map<Integer, FieldPathDescriptionProvider[]> groupingMap;
 
     public RegistryRemoteTab(final RegistryRemote<RD> registryRemote) {
         this(registryRemote, null);
     }
 
-    public RegistryRemoteTab(final RegistryRemote<RD> registryRemote, final List<Integer> sortOrder) {
+    public RegistryRemoteTab(final RegistryRemote<RD> registryRemote, final Map<Integer, FieldPathDescriptionProvider[]> groupingMap) {
+        this(registryRemote, groupingMap, null);
+    }
+
+    public RegistryRemoteTab(final RegistryRemote<RD> registryRemote, final Map<Integer, FieldPathDescriptionProvider[]> groupingMap, final List<Integer> sortOrder) {
         super(registryRemote.getClass().getSimpleName().replace("Remote", ""));
         this.registryRemote = registryRemote;
         this.sortOrder = sortOrder;
+        this.groupingMap = groupingMap;
 
         this.tabPane = new TabPane();
         this.tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
@@ -83,11 +89,11 @@ public class RegistryRemoteTab<RD extends Message> extends TabWithStatusLabel {
             }
         });
         this.registryRemote.addConnectionStateObserver((source, data) -> {
-            LOGGER.warn(this + ": receive connection state update to[" + data.name() + "]");
             if (data != ConnectionState.CONNECTED) {
-                setStatusText(registryRemote.getName().replace(Registry.class.getSimpleName(), "") + " "
-                        + StringProcessor.transformUpperCaseToCamelCase(data.name()) + "!");
-                // TODO: make tabs uneditable or at least not applyable
+                Platform.runLater(() -> setStatusText(StringProcessor.transformUpperCaseToCamelCase(data.name()) + "!"));
+                // TODO: make tabs uneditable or at least changes cannot be applied, also update status label style
+            } else {
+                Platform.runLater(this::clearStatusLabel);
             }
         });
 
@@ -126,7 +132,12 @@ public class RegistryRemoteTab<RD extends Message> extends TabWithStatusLabel {
                 }
 
                 for (FieldDescriptor field : fieldDescriptorList) {
-                    final RegistryTab<RD> registryTab = new RegistryTab<>(field, data);
+                    final RegistryTab<RD> registryTab;
+                    if (groupingMap != null && groupingMap.containsKey(field.getNumber())) {
+                        registryTab = new RegistryTab<>(field, data, groupingMap.get(field.getNumber()));
+                    } else {
+                        registryTab = new RegistryTab<>(field, data);
+                    }
                     registryTab.getContent().prefHeight(tabPane.getHeight());
                     tabPane.getTabs().add(registryTab);
                     // this is done in its own method because adding the first tab will select it but the tab pane

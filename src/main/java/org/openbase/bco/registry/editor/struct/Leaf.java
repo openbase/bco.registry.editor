@@ -26,7 +26,7 @@ package org.openbase.bco.registry.editor.struct;
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public interface Leaf extends Node {
+public interface Leaf extends NodeInterface {
 
     public Object getValue();
 

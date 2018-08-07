@@ -24,9 +24,12 @@ package org.openbase.bco.registry.editor.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
+import javafx.scene.Node;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.editing.*;
-import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
-import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.bco.registry.editor.util.SelectableLabel;
 import org.openbase.jul.exception.InitializationException;
 
 /**
@@ -46,19 +49,20 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
         valueProperty().addListener((observable, oldValue, newValue) -> parentBuilder.setField(getFieldDescriptor(), newValue.getValue()));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected EditingGraphicFactory getEditingGraphicFactory() throws CouldNotPerformException {
+    public Control getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
         switch (getFieldDescriptor().getType()) {
             case BOOL:
-                return EditingGraphicFactory.getInstance(BooleanEditingGraphic.class);
+                return new BooleanEditingGraphic(getValue(), cell).getControl();
             case ENUM:
-                return EditingGraphicFactory.getInstance(EnumEditingGraphic.class);
+                return new EnumEditingGraphic(getValue(), cell).getControl();
             case FLOAT:
-                return EditingGraphicFactory.getInstance(FloatEditingGraphic.class);
+                return new FloatEditingGraphic(getValue(), cell).getControl();
             case DOUBLE:
-                return EditingGraphicFactory.getInstance(DoubleEditingGraphic.class);
+                return new DoubleEditingGraphic(getValue(), cell).getControl();
             case STRING:
-                return EditingGraphicFactory.getInstance(StringEditingGraphic.class);
+                return new StringEditingGraphic(getValue(), cell).getControl();
             default:
                 logger.warn("Editing not supported for field with type[" + getFieldDescriptor().getType().name() + "]");
                 return null;
@@ -66,17 +70,11 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
     }
 
     @Override
-    protected DescriptionGenerator<V> getDescriptionGenerator() {
-        return new DescriptionGenerator<V>() {
-            @Override
-            public String getValueDescription(V value) {
-                return value.toString();
-            }
-
-            @Override
-            public String getDescription(V value) {
-                return getFieldDescriptor().getName();
-            }
-        };
+    public Node getValueGraphic() {
+        if (isEditable()) {
+            return new Label(getInternalValue().toString());
+        } else {
+            return SelectableLabel.makeSelectable(new Label(getInternalValue().toString()));
+        }
     }
 }

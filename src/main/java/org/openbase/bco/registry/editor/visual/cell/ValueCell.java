@@ -89,7 +89,7 @@ public class ValueCell extends RowCell {
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     private Future registryTask = null;
-    private static final Map<Node, Future> TASK_MAP = new HashMap<>();
+    private static final Map<NodeInterface, Future> TASK_MAP = new HashMap<>();
 
     public ValueCell() throws InterruptedException {
         super();
@@ -166,7 +166,7 @@ public class ValueCell extends RowCell {
     }
 
     @Override
-    public void updateItem(Node item, boolean empty) {
+    public void updateItem(NodeInterface item, boolean empty) {
         super.updateItem(item, empty);
 
         if (empty) {
@@ -518,13 +518,13 @@ public class ValueCell extends RowCell {
         }
     }
 
-    private void addToTaskMap(Node node, Future future) {
+    private void addToTaskMap(NodeInterface node, Future future) {
         synchronized (TASK_MAP) {
             TASK_MAP.put(node, future);
         }
     }
 
-    private void removeFromTaskMap(Node node) {
+    private void removeFromTaskMap(NodeInterface node) {
         synchronized (TASK_MAP) {
             TASK_MAP.remove(node);
         }

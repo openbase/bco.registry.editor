@@ -21,7 +21,7 @@ package org.openbase.bco.registry.editor.visual.cell;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import org.openbase.bco.registry.editor.struct.Node;
+import org.openbase.bco.registry.editor.struct.NodeInterface;
 
 /**
  *
@@ -34,7 +34,7 @@ public class DescriptionCell extends RowCell {
     }
 
     @Override
-    public void updateItem(Node item, boolean empty) {
+    public void updateItem(NodeInterface item, boolean empty) {
         super.updateItem(item, empty);
 
         if (empty) {

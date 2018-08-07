@@ -27,6 +27,8 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
@@ -82,16 +84,16 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
                 childTreeItem = new BuilderListTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue()) {
 
                     @Override
-                    protected DescriptionGenerator getDescriptionGenerator() {
-                        return new GroupDescriptionGenerator(childGroupValueProviders[0], entry.getKey());
+                    public Node getDescriptionGraphic() {
+                        return new Label(entry.getKey() == null ? "" : childGroupValueProviders[0].generateDescription(entry.getKey()));
                     }
                 };
             } else {
-                childTreeItem = new GroupTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue(), entry.getKey(), childGroupValueProviders[0], childGroups){
+                childTreeItem = new GroupTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue(), entry.getKey(), childGroupValueProviders[0], childGroups) {
 
                     @Override
-                    protected DescriptionGenerator getDescriptionGenerator() {
-                        return new GroupDescriptionGenerator(childGroupValueProviders[0], entry.getKey());
+                    public Node getDescriptionGraphic() {
+                        return new Label(entry.getKey() == null ? "" : childGroupValueProviders[0].generateDescription(entry.getKey()));
                     }
                 };
             }

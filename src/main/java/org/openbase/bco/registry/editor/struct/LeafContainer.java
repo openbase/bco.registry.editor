@@ -112,7 +112,7 @@ public class LeafContainer implements Leaf {
     }
 
     @Override
-    public Node getContext() {
+    public NodeInterface getContext() {
         return this;
     }
 }

@@ -26,7 +26,7 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
-import org.openbase.bco.registry.editor.struct.Node;
+import org.openbase.bco.registry.editor.struct.NodeInterface;
 import org.openbase.bco.registry.editor.visual.cell.DescriptionCell;
 import static org.openbase.bco.registry.editor.visual.column.ValueColumn.VALUE_COLUMN_PROPORTION;
 import org.openbase.jul.exception.CouldNotPerformException;
@@ -48,7 +48,7 @@ public class DescriptorColumn extends Column {
 
         this.setSortable(true);
         this.setSortType(SortType.ASCENDING);
-        this.setCellFactory((TreeTableColumn<Node, Node> param) -> {
+        this.setCellFactory((TreeTableColumn<NodeInterface, NodeInterface> param) -> {
             try {
                 return new DescriptionCell();
             } catch (InterruptedException ex) {
@@ -56,7 +56,7 @@ public class DescriptorColumn extends Column {
                 return new TreeTableCell();
             }
         });
-        setComparator((Node o1, Node o2) -> {
+        setComparator((NodeInterface o1, NodeInterface o2) -> {
             if (fieldPriorityMap.get(o1.getDisplayedDescriptor()) != null && fieldPriorityMap.get(o2.getDisplayedDescriptor()) == null) {
                 return -1;
             } else if (fieldPriorityMap.get(o1.getDisplayedDescriptor()) == null && fieldPriorityMap.get(o2.getDisplayedDescriptor()) != null) {

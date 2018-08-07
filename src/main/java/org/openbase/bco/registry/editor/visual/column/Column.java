@@ -23,17 +23,16 @@ package org.openbase.bco.registry.editor.visual.column;
  */
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
-import org.openbase.bco.registry.editor.struct.Node;
+import org.openbase.bco.registry.editor.struct.NodeInterface;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public abstract class Column extends TreeTableColumn<Node, Node> {
+public abstract class Column extends TreeTableColumn<NodeInterface, NodeInterface> {
 
     protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 

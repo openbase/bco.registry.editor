@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.visual.cell;
+package org.openbase.bco.registry.editor.util.fieldpath;
 
 /*-
  * #%L
@@ -22,27 +22,21 @@ package org.openbase.bco.registry.editor.visual.cell;
  * #L%
  */
 
-import javafx.scene.control.Label;
-import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
+import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
+import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class SecondCell extends TreeTableCell<ValueType, ValueType> {
+public class DeviceClassCompanyFieldPath extends FieldPathDescriptionProvider {
 
-    public SecondCell() {
-        super();
+    public DeviceClassCompanyFieldPath() {
+        super(new FieldDescriptorPath(DeviceClass.getDefaultInstance(), DeviceClass.COMPANY_FIELD_NUMBER));
     }
 
     @Override
-    protected void updateItem(ValueType item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (!empty && item != null) {
-            setGraphic(item.getDescriptionGraphic());
-        } else {
-            setGraphic(new Label(""));
-        }
+    public String generateDescription(final Object value) {
+        return (String) value;
     }
 }

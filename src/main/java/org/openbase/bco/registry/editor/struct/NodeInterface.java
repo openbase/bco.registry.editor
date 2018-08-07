@@ -26,7 +26,7 @@ package org.openbase.bco.registry.editor.struct;
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public interface Node {
+public interface NodeInterface {
 
     /**
      * Get a description for this node displayed which is used to access the field of a builder.
@@ -47,5 +47,5 @@ public interface Node {
      *
      * @return itself
      */
-    Node getContext();
+    NodeInterface getContext();
 }

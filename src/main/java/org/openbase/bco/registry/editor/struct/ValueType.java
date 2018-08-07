@@ -22,43 +22,33 @@ package org.openbase.bco.registry.editor.struct;
  * #L%
  */
 
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
-import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
-import org.openbase.jul.exception.CouldNotPerformException;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class ValueType<V extends Object> {
 
+    private final GenericTreeItem treeItem;
     private V value;
-    private final DescriptionGenerator<V> descriptionGenerator;
-    private final EditingGraphicFactory editingGraphFactory;
-    private final boolean editable;
 
-    public ValueType(
-            final V value,
-            final boolean editable,
-            final EditingGraphicFactory editingGraphFactory,
-            final DescriptionGenerator<V> descriptionGenerator) {
+    public ValueType(final V value, final GenericTreeItem treeItem) {
         this.value = value;
-        this.editable = editable;
-        this.descriptionGenerator = descriptionGenerator;
-        this.editingGraphFactory = editingGraphFactory;
+        this.treeItem = treeItem;
     }
 
     public ValueType<V> createNew(final V value) {
-        return new ValueType<>(value, editable, editingGraphFactory, descriptionGenerator);
+        return new ValueType<>(value, treeItem);
     }
 
-    public String getDescription() {
-        return descriptionGenerator.getDescription(getValue());
+    public Node getDescriptionGraphic() {
+        return treeItem.getDescriptionGraphic();
     }
 
-    public String getValueDescription() {
-        return descriptionGenerator.getValueDescription(getValue());
+    public Node getValueGraphic() {
+        return treeItem.getValueGraphic();
     }
 
     public V getValue() {
@@ -69,15 +59,11 @@ public class ValueType<V extends Object> {
         this.value = value;
     }
 
-    public Control getEditingGraphic(final TreeTableCell<ValueType<V>, ValueType<V>> cell) throws CouldNotPerformException {
-        if (editingGraphFactory == null) {
-            System.out.println("Editing graphic factory is null");
-            return null;
-        }
-        return editingGraphFactory.getEditingGraphic(this, cell);
+    public Control getEditingGraphic(final TreeTableCell<ValueType<V>, ValueType<V>> cell) {
+        return treeItem.getEditingGraphic(cell);
     }
 
     public boolean isEditable() {
-        return editable;
+        return treeItem.isEditable();
     }
 }

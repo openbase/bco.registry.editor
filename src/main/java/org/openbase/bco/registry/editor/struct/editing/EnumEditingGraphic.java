@@ -40,7 +40,7 @@ import java.util.List;
  */
 public class EnumEditingGraphic extends AbstractEditingGraphic<ComboBox<EnumValueDescriptor>, EnumValueDescriptor> {
 
-    public EnumEditingGraphic(final ValueType<EnumValueDescriptor> valueType, final TreeTableCell<Object, Object> treeTableCell) {
+    public EnumEditingGraphic(final ValueType<EnumValueDescriptor> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new ComboBox<>(), valueType, treeTableCell);
         getControl().setVisibleRowCount(10);
         getControl().setCellFactory(param -> new EnumValueDescriptorCell());

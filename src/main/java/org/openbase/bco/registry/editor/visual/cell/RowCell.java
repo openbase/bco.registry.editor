@@ -37,14 +37,13 @@ import org.openbase.bco.registry.editor.struct.GenericListContainer;
 import org.openbase.bco.registry.editor.struct.GenericNodeContainer;
 import org.openbase.bco.registry.editor.struct.Leaf;
 import org.openbase.bco.registry.editor.struct.LeafContainer;
-import org.openbase.bco.registry.editor.struct.Node;
+import org.openbase.bco.registry.editor.struct.NodeInterface;
 import org.openbase.bco.registry.editor.struct.NodeContainer;
 import org.openbase.bco.registry.editor.util.RSTDefaultInstances;
 import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.printer.LogLevel;
-import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,7 @@ import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public abstract class RowCell extends TreeTableCell<Node, Node> {
+public abstract class RowCell extends TreeTableCell<NodeInterface, NodeInterface> {
 
     protected static final org.slf4j.Logger logger = LoggerFactory.getLogger(RowCell.class);
 
@@ -78,7 +77,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
     }
 
     @Override
-    protected void updateItem(Node item, boolean empty) {
+    protected void updateItem(NodeInterface item, boolean empty) {
         super.updateItem(item, empty);
 
         if (getTableColumn().getTreeTableView().isEditable()
@@ -121,7 +120,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             });
         }
 
-        private void addAction(Node add) throws InterruptedException {
+        private void addAction(NodeInterface add) throws InterruptedException {
             try {
                 if (add instanceof GenericNodeContainer) {
                     GeneratedMessage.Builder builder = ((NodeContainer) add).getBuilder();
@@ -178,7 +177,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
             }
         }
 
-        private void removeAction(Node nodeToRemove) {
+        private void removeAction(NodeInterface nodeToRemove) {
             // check if the removed item is an instance of classes that have to be directly
             // removed in the registry [deviceClass, deviceConfig, locationConfig]
             if (nodeToRemove instanceof NodeContainer && ((NodeContainer) nodeToRemove).isSendable()) {
@@ -201,7 +200,7 @@ public abstract class RowCell extends TreeTableCell<Node, Node> {
         }
     }
 
-    private void removeNodeFromRepeatedField(NodeContainer parent, Node nodeToRemove) {
+    private void removeNodeFromRepeatedField(NodeContainer parent, NodeInterface nodeToRemove) {
         removeNodeFromRepeatedField(parent, parent.getChildren().indexOf(nodeToRemove));
     }
 

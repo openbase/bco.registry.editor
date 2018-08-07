@@ -24,8 +24,9 @@ package org.openbase.bco.registry.editor.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
-import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
@@ -38,25 +39,10 @@ import java.util.Set;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class UnitConfigTreeItem extends BuilderTreeItem<UnitConfig.Builder> {
-
-    private final SimpleObjectProperty<Boolean> changedProperty;
+public class UnitConfigTreeItem extends SendableTreeItem<Builder> {
 
     public UnitConfigTreeItem(FieldDescriptor fieldDescriptor, Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);
-
-        this.changedProperty = new SimpleObjectProperty<>(false);
-
-        this.addEventHandler(valueChangedEvent(), event -> {
-            logger.info("Received changed event for unit: [" + getBuilder().getScope() + "]");
-            // this is triggered when the value of this node or one of its children changes
-            changedProperty.set(true);
-        });
-
-        this.addEventHandler(childrenModificationEvent(), event -> {
-            // this is triggered when children are removed or added
-            changedProperty.set(true);
-        });
     }
 
     @Override
@@ -64,15 +50,9 @@ public class UnitConfigTreeItem extends BuilderTreeItem<UnitConfig.Builder> {
         switch (field.getNumber()) {
             case UnitConfig.SERVICE_CONFIG_FIELD_NUMBER:
                 return new BuilderListTreeItem<>(field, getBuilder(), false);
-            case UnitConfig.ID_FIELD_NUMBER:
-                return new LeafTreeItem<>(field, getBuilder().getId(), getBuilder(), false);
             default:
                 return super.createChild(field);
         }
-    }
-
-    public SimpleObjectProperty<Boolean> getChangedProperty() {
-        return changedProperty;
     }
 
     @Override
@@ -138,19 +118,9 @@ public class UnitConfigTreeItem extends BuilderTreeItem<UnitConfig.Builder> {
 
         return filteredFieldSet;
     }
-
-    @Override
-    protected DescriptionGenerator<Builder> getDescriptionGenerator() {
-        return new DescriptionGenerator<Builder>() {
-            @Override
-            public String getValueDescription(Builder value) {
-                return value.getDescription();
-            }
-
-            @Override
-            public String getDescription(Builder value) {
-                return "UnitConfig";
-            }
-        };
-    }
+//
+//    @Override
+//    public Node getValueGraphic() {
+//        return new Label(getInternalValue().getDescription());
+//    }
 }

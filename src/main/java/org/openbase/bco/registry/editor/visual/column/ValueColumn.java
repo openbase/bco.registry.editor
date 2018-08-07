@@ -27,7 +27,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import org.openbase.bco.registry.editor.struct.Leaf;
-import org.openbase.bco.registry.editor.struct.Node;
+import org.openbase.bco.registry.editor.struct.NodeInterface;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
@@ -46,7 +46,7 @@ public class ValueColumn extends Column {
         this.setEditable(true);
         this.setSortable(false);
         this.setOnEditCommit(new EventHandlerImpl());
-        this.setCellFactory((TreeTableColumn<Node, Node> param) -> {
+        this.setCellFactory((TreeTableColumn<NodeInterface, NodeInterface> param) -> {
             try {
                 return new ValueCell();
             } catch (InterruptedException ex) {
@@ -56,10 +56,10 @@ public class ValueColumn extends Column {
         });
     }
 
-    private class EventHandlerImpl implements EventHandler<TreeTableColumn.CellEditEvent<Node, Node>> {
+    private class EventHandlerImpl implements EventHandler<TreeTableColumn.CellEditEvent<NodeInterface, NodeInterface>> {
 
         @Override
-        public void handle(CellEditEvent<Node, Node> event) {
+        public void handle(CellEditEvent<NodeInterface, NodeInterface> event) {
             if (event.getRowValue().getValue() instanceof Leaf) {
                 try {
                     ((Leaf) event.getRowValue().getValue()).setValue(((Leaf) event.getNewValue()).getValue());

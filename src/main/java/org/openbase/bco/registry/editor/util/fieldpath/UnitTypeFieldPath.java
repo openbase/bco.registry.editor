@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.visual.cell;
+package org.openbase.bco.registry.editor.util.fieldpath;
 
 /*-
  * #%L
@@ -22,27 +22,24 @@ package org.openbase.bco.registry.editor.visual.cell;
  * #L%
  */
 
-import javafx.scene.control.Label;
-import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.ValueType;
+import com.google.protobuf.Descriptors.EnumValueDescriptor;
+import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
+import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
+import org.openbase.jul.processing.StringProcessor;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class SecondCell extends TreeTableCell<ValueType, ValueType> {
+public class UnitTypeFieldPath extends FieldPathDescriptionProvider {
 
-    public SecondCell() {
-        super();
+    public UnitTypeFieldPath() {
+        super(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.UNIT_TYPE_FIELD_NUMBER));
     }
 
     @Override
-    protected void updateItem(ValueType item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (!empty && item != null) {
-            setGraphic(item.getDescriptionGraphic());
-        } else {
-            setGraphic(new Label(""));
-        }
+    public String generateDescription(final Object value) {
+        final EnumValueDescriptor unitType = (EnumValueDescriptor) value;
+        return StringProcessor.transformUpperCaseToCamelCase(unitType.getName());
     }
 }

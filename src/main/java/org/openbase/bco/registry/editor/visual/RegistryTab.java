@@ -22,7 +22,6 @@ package org.openbase.bco.registry.editor.visual;
  * #L%
  */
 
-import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import javafx.scene.control.Tab;
@@ -32,21 +31,15 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderTreeItem;
 import org.openbase.bco.registry.editor.struct.BuilderListTreeItem;
 import org.openbase.bco.registry.editor.struct.GroupTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.visual.cell.SecondCell;
 import org.openbase.bco.registry.editor.visual.cell.TestCell;
-import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.exception.NotAvailableException;
-import org.openbase.jul.extension.rst.processing.LabelProcessor;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.location.LocationConfigType.LocationConfig;
-import rst.spatial.PlacementConfigType.PlacementConfig;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -56,6 +49,8 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryTab.class);
 
     private static final double DESCRIPTION_PROPORTION = 0.3;
+    private static final String FIELD_POSTFIX_READ_ONLY = "_registry_read_only";
+    private static final String FIELD_POSTFIX_CONSISTENT = "_registry_consistent";
 
     private final FieldDescriptor fieldDescriptor;
     private AbstractBuilderTreeItem<RD.Builder> root;
@@ -63,9 +58,16 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     private final TreeTableView<ValueType> treeTableView;
     private final TreeTableColumn<ValueType, ValueType> descriptionColumn, valueColumn;
 
+    private boolean readOnly, consistent;
+
+    private FieldPathDescriptionProvider[] fieldPathDescriptionProviders;
     private RD registryData;
 
     public RegistryTab(final FieldDescriptor fieldDescriptor, final RD registryData) {
+        this(fieldDescriptor, registryData, null);
+    }
+
+    public RegistryTab(final FieldDescriptor fieldDescriptor, final RD registryData, final FieldPathDescriptionProvider[] fieldPathDescriptionProviders) {
         super(StringProcessor.transformToCamelCase(fieldDescriptor.getName()).
                 replace("UnitConfig", "").
                 replace("Config", "").
@@ -74,6 +76,9 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
 
         this.registryData = registryData;
         this.fieldDescriptor = fieldDescriptor;
+        this.fieldPathDescriptionProviders = fieldPathDescriptionProviders;
+
+        extractRegistryFlags();
 
         // init columns
         this.descriptionColumn = new TreeTableColumn<>();
@@ -103,50 +108,26 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     }
 
     public void update(RD registryData) throws CouldNotPerformException {
+        this.registryData = registryData;
         if (root == null) {
-            throw new NotAvailableException("");
+            // not yet initialized so just set the new data type
+            return;
         }
 
         root.update(registryData.toBuilder());
+
+        extractRegistryFlags();
+        updateStatus();
     }
 
     public void init() throws InitializationException {
         try {
             this.initialized = true;
+            updateStatus();
 
-            if (fieldDescriptor.getName().equals("dal_unit_config")) {
-                FieldPathDescriptionProvider locationIdProvider = new FieldPathDescriptionProvider(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.PLACEMENT_CONFIG_FIELD_NUMBER, PlacementConfig.LOCATION_ID_FIELD_NUMBER)) {
-                    @Override
-                    public String generateDescription(Object value) {
-                        final String locationId = (String) value;
-                        try {
-                            return LabelProcessor.getBestMatch(Registries.getUnitRegistry().getUnitConfigById(locationId).getLabel());
-                        } catch (CouldNotPerformException ex) {
-                            return locationId;
-                        }
-                    }
-                };
-                FieldPathDescriptionProvider unitTypeProvider = new FieldPathDescriptionProvider(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.UNIT_TYPE_FIELD_NUMBER)) {
-                    @Override
-                    public String generateDescription(Object value) {
-                        final EnumValueDescriptor unitType = (EnumValueDescriptor) value;
-                        return StringProcessor.transformUpperCaseToCamelCase(unitType.getName());
-                    }
-                };
-
-                root = new GroupTreeItem<>(fieldDescriptor, registryData.toBuilder(), true, locationIdProvider, unitTypeProvider);
-            } else if (fieldDescriptor.getName().equals("location_unit_config")) {
-                FieldPathDescriptionProvider locationType = new FieldPathDescriptionProvider(new FieldDescriptorPath(UnitConfig.getDefaultInstance(), UnitConfig.LOCATION_CONFIG_FIELD_NUMBER, LocationConfig.TYPE_FIELD_NUMBER)) {
-                    @Override
-                    public String generateDescription(Object value) {
-                        final EnumValueDescriptor unitType = (EnumValueDescriptor) value;
-                        return StringProcessor.transformUpperCaseToCamelCase(unitType.getName());
-                    }
-                };
-                root = new GroupTreeItem<>(fieldDescriptor, registryData.toBuilder(), true, locationType);
+            if (fieldPathDescriptionProviders != null) {
+                root = new GroupTreeItem<>(fieldDescriptor, registryData.toBuilder(), true, fieldPathDescriptionProviders);
             } else {
-                // init root node
-                //TODO how to realize grouping here
                 root = new BuilderListTreeItem<>(fieldDescriptor, registryData.toBuilder(), true);
             }
             root.setExpanded(true);
@@ -169,5 +150,35 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     @Override
     public String toString() {
         return StringProcessor.transformToCamelCase(fieldDescriptor.getName()) + Tab.class.getSimpleName();
+    }
+
+    private void extractRegistryFlags() {
+        final String readOnlyFieldName = fieldDescriptor.getName() + FIELD_POSTFIX_READ_ONLY;
+        final FieldDescriptor readOnlyFieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(registryData, readOnlyFieldName);
+        readOnly = (Boolean) registryData.getField(readOnlyFieldDescriptor);
+
+        final String consistentFieldName = fieldDescriptor.getName() + FIELD_POSTFIX_CONSISTENT;
+        final FieldDescriptor consistentFieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(registryData, consistentFieldName);
+        consistent = (Boolean) registryData.getField(consistentFieldDescriptor);
+    }
+
+    private void updateStatus() {
+        if (!readOnly && consistent) {
+            clearStatusLabel();
+            return;
+        }
+
+        // TODO: update style and set tree table view to read only
+        String statusDescription = "";
+        if (readOnly) {
+            statusDescription += "Read Only";
+        }
+        if (!consistent) {
+            if (!statusDescription.isEmpty()) {
+                statusDescription += " & ";
+            }
+            statusDescription += "Inconsistent";
+        }
+        setStatusText(statusDescription);
     }
 }

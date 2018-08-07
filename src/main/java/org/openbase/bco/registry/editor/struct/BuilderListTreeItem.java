@@ -25,12 +25,21 @@ package org.openbase.bco.registry.editor.struct;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
+import de.jensd.fx.glyphs.materialicons.MaterialIcon;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
+import org.openbase.jul.processing.StringProcessor;
+import org.openbase.jul.visual.javafx.geometry.svg.SVGGlyphIcon;
 
 import java.util.List;
 
@@ -82,6 +91,30 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
     }
 
     @Override
+    public Node getDescriptionGraphic() {
+        final Label label = new Label(StringProcessor.transformToCamelCase(getFieldDescriptor().getName()) + "List");
+        if (isModifiable()) {
+            final HBox hBox = new HBox();
+            hBox.setSpacing(3);
+            final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.ADD, label.getHeight(), false);
+            svgGlyphIcon.setForegroundIconColor(Color.GREEN);
+            svgGlyphIcon.setOnMouseClicked(event -> {
+                try {
+                    addElement();
+                } catch (CouldNotPerformException e) {
+                    logger.warn("Could not add new element", e);
+                }
+            });
+            label.heightProperty().addListener((observable, oldValue, newValue) -> {
+                svgGlyphIcon.setPrefHeight(newValue.doubleValue());
+            });
+            hBox.getChildren().addAll(label, svgGlyphIcon);
+            return hBox;
+        }
+        return label;
+    }
+
+    @Override
     protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException {
         ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
 
@@ -96,20 +129,20 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
     }
 
     public void addElement() throws CouldNotPerformException {
-//        try {
-            // add the new message builder to the repeated field
-//            final Message.Builder builder = BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, getBuilder());
+        try {
+            //add the new message builder to the repeated field
+            final Message.Builder builder = BuilderProcessor.addDefaultInstanceToRepeatedField(getFieldDescriptor(), getBuilder());
             // if available set value from parent group
-//            if (getParent() instanceof GroupTreeItem) {
-//                ((GroupTreeItem) getParent()).updateElement(builder);
-//            }
-//            // create tree item and add it
-//            getChildren().add(loadTreeItem(fieldDescriptor, builder));
-//            getChildren().get(this.getChildren().size() - 1).setExpanded(true);
-//            // expand new element
-//            setExpanded(true);
-//        } catch (CouldNotPerformException ex) {
-//            throw new CouldNotPerformException("Could not new element for [" + fieldDescriptor.getName() + "] of Message[" + extractMessageClass(getBuilder()) + "]!", ex);
-//        }
+            if (getParent() instanceof GroupTreeItem) {
+                ((GroupTreeItem) getParent()).updateElement(builder);
+            }
+            // create tree item and add it
+            getChildren().add(loadTreeItem(getFieldDescriptor(), builder));
+            getChildren().get(this.getChildren().size() - 1).setExpanded(true);
+            // expand new element
+            setExpanded(true);
+        } catch (CouldNotPerformException ex) {
+            throw new CouldNotPerformException("Could not new element for [" + getFieldDescriptor().getName() + "] of Message[" + extractMessageClass(getBuilder()) + "]!", ex);
+        }
     }
 }

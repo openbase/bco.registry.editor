@@ -25,8 +25,11 @@ package org.openbase.bco.registry.editor.struct;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
-import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
+import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.editing.ScopeEditingGraphic;
 import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
 import org.openbase.jul.exception.CouldNotPerformException;
@@ -50,28 +53,16 @@ public class ScopeTreeItem extends BuilderTreeItem<Scope.Builder> {
     }
 
     @Override
-    protected DescriptionGenerator<Scope.Builder> getDescriptionGenerator() {
-        //TODO: maybe descriptor can just be a helper class so that not that many will be generated?
-        return new DescriptionGenerator<Scope.Builder>() {
-            @Override
-            public String getValueDescription(Scope.Builder value) {
-                try {
-                    return ScopeGenerator.generateStringRep(value.build());
-                } catch (CouldNotPerformException ex) {
-                    logger.error("Could not generate string rep for scope", ex);
-                    return "";
-                }
-            }
-
-            @Override
-            public String getDescription(Scope.Builder value) {
-                return getFieldDescriptor().getName();
-            }
-        };
+    public Node getValueGraphic() {
+        try {
+            return new Label(ScopeGenerator.generateStringRep(getInternalValue().build()));
+        } catch (CouldNotPerformException ex) {
+            return new Label("Not Available");
+        }
     }
 
     @Override
-    protected EditingGraphicFactory getEditingGraphicFactory() throws CouldNotPerformException {
-        return EditingGraphicFactory.getInstance(ScopeEditingGraphic.class);
+    public Control getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
+        return new ScopeEditingGraphic(getValueCasted(), cell).getControl();
     }
 }

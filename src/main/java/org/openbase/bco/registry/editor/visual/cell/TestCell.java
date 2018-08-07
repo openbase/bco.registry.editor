@@ -26,8 +26,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.util.SelectableLabel;
-import org.openbase.jul.exception.CouldNotPerformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +36,14 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestCell.class);
 
-    private final Label label;
-    private final Label selectableLabel;
+    //    private final Label label;
+//    private final Label selectableLabel;
     private Control editingGraphic;
 
     public TestCell() {
         super();
-        this.label = new Label();
-        this.selectableLabel = SelectableLabel.makeSelectable(new Label());
+//        this.label = new Label();
+//        this.selectableLabel = SelectableLabel.makeSelectable(new Label());
     }
 
     @Override
@@ -57,22 +55,13 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
                 if (editingGraphic != null) {
                     setGraphic(editingGraphic);
                 }
-
                 return;
             }
 
-            // set text by updating the selectable label
-            if (item.isEditable()) {
-                label.setText(item.getValueDescription());
-                setGraphic(label);
-            } else {
-                selectableLabel.setText(item.getValueDescription());
-                setGraphic(selectableLabel);
-            }
+            setGraphic(item.getValueGraphic());
         } else {
             // reset text if now empty
-            label.setText("");
-            setGraphic(label);
+            setGraphic(new Label(""));
         }
     }
 
@@ -81,15 +70,10 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
         super.startEdit();
 
         System.out.println("Start editing");
-        try {
-            editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
-            if (editingGraphic != null) {
-                // editing graphic equals null means not editable
-                setGraphic(editingGraphic);
-            }
-        } catch (CouldNotPerformException ex) {
-            LOGGER.error("Could not create editing graphic", ex);
-            cancelEdit();
+        editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
+        if (editingGraphic != null) {
+            // editing graphic equals null means not editable
+            setGraphic(editingGraphic);
         }
     }
 

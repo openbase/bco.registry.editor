@@ -34,7 +34,7 @@ import rst.rsb.ScopeType.Scope;
  */
 public class ScopeEditingGraphic extends AbstractTextEditingGraphic<TextField, Scope.Builder> {
 
-    public ScopeEditingGraphic(ValueType<Scope.Builder> valueType, TreeTableCell<Object, Object> treeTableCell) {
+    public ScopeEditingGraphic(ValueType<Scope.Builder> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new TextField(), valueType, treeTableCell);
     }
 

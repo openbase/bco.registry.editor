@@ -65,11 +65,7 @@ public class ValueListTreeItem<MB extends Message.Builder> extends AbstractBuild
 
         for (int i = 0; i < getBuilder().getRepeatedFieldCount(getFieldDescriptor()); i++) {
             //TODO: something else than genericTreeItem
-            try {
-                childList.add(new GenericTreeItem<>(getFieldDescriptor(), getBuilder().getRepeatedField(getFieldDescriptor(), i)));
-            } catch (InitializationException ex) {
-                logger.error("Could not generate child for [" + getBuilder().getClass().getName() + "]");
-            }
+            childList.add(new GenericTreeItem<>(getFieldDescriptor(), getBuilder().getRepeatedField(getFieldDescriptor(), i)));
         }
 
         return childList;

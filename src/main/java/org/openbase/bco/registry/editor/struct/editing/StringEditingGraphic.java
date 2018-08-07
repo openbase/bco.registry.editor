@@ -31,7 +31,7 @@ import org.openbase.bco.registry.editor.struct.ValueType;
  */
 public class StringEditingGraphic extends AbstractTextEditingGraphic<TextField, String> {
 
-    public StringEditingGraphic(final ValueType<String> valueType, final TreeTableCell<Object, Object> treeTableCell) {
+    public StringEditingGraphic(final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new TextField(), valueType, treeTableCell);
     }
 

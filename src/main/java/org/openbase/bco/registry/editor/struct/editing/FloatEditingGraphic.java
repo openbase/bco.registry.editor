@@ -31,7 +31,7 @@ import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextFi
  */
 public class FloatEditingGraphic extends AbstractTextEditingGraphic<NumberFilteredTextField, Float> {
 
-    public FloatEditingGraphic(ValueType<Float> valueType, TreeTableCell<Object, Object> treeTableCell) {
+    public FloatEditingGraphic(ValueType<Float> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new NumberFilteredTextField(), valueType, treeTableCell);
     }
 

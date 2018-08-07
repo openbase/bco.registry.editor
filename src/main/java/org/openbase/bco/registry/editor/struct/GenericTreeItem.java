@@ -23,12 +23,12 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import javafx.scene.Node;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
-import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
-import org.openbase.bco.registry.editor.struct.value.DefaultDescriptionGenerator;
-import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
-import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.exception.InitializationException;
+import javafx.scene.control.TreeTableCell;
+import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,18 +41,14 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     private final FieldDescriptor fieldDescriptor;
     private boolean editable;
 
-    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value) throws InitializationException {
+    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value) {
         this(fieldDescriptor, value, true);
     }
 
-    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value, final boolean editable) throws InitializationException {
-        try {
-            this.fieldDescriptor = fieldDescriptor;
-            this.setValue(new ValueType<>(value, editable, getEditingGraphicFactory(), getDescriptionGenerator()));
-            this.editable = editable;
-        } catch (CouldNotPerformException ex) {
-            throw new InitializationException(this, ex);
-        }
+    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value, final boolean editable) {
+        this.fieldDescriptor = fieldDescriptor;
+        this.editable = editable;
+        this.setValue(new ValueType<>(value, this));
     }
 
     public FieldDescriptor getFieldDescriptor() {
@@ -64,12 +60,16 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
         return (V) getValue().getValue();
     }
 
-    protected EditingGraphicFactory getEditingGraphicFactory() throws CouldNotPerformException {
+    public Control getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
         return null;
     }
 
-    protected DescriptionGenerator<V> getDescriptionGenerator() {
-        return new DefaultDescriptionGenerator<>(fieldDescriptor);
+    public Node getDescriptionGraphic() {
+        return new Label(StringProcessor.transformToCamelCase(fieldDescriptor.getName()));
+    }
+
+    public Node getValueGraphic() {
+        return null;
     }
 
     protected boolean isEditable() {

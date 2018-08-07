@@ -36,6 +36,8 @@ public class TabWithStatusLabel extends Tab {
     private final Label statusLabel;
     private final VBox vBox;
 
+    private Region internalContent;
+
     public TabWithStatusLabel(final String text) {
         super(text);
 
@@ -43,13 +45,19 @@ public class TabWithStatusLabel extends Tab {
         this.statusLabel.setAlignment(Pos.CENTER);
 
         this.vBox = new VBox();
+        this.vBox.setAlignment(Pos.CENTER);
 
         this.setContent(vBox);
     }
 
     protected void setStatusText(final String text) {
-        //TODO: add status label
         statusLabel.setText(text);
+
+        vBox.getChildren().clear();
+        vBox.getChildren().add(statusLabel);
+        if (internalContent != null) {
+            vBox.getChildren().add(internalContent);
+        }
     }
 
     protected void clearStatusLabel() {
@@ -57,14 +65,18 @@ public class TabWithStatusLabel extends Tab {
         vBox.getChildren().remove(statusLabel);
     }
 
-    protected void setInternalContent(final Region node) {
+    protected void setInternalContent(final Region content) {
+        if (internalContent == content) {
+            return;
+        }
+
+        internalContent = content;
         vBox.getChildren().clear();
         if (!statusLabel.getText().isEmpty()) {
             vBox.getChildren().add(statusLabel);
         }
-        // TODO: manage height correctly depending on status label
-        vBox.heightProperty().addListener((observable, oldValue, newValue) -> node.setPrefHeight(newValue.doubleValue()));
-        node.setPrefHeight(vBox.getHeight());
-        vBox.getChildren().add(node);
+        vBox.heightProperty().addListener((observable, oldValue, newValue) -> content.setPrefHeight(newValue.doubleValue()));
+        content.setPrefHeight(vBox.getHeight());
+        vBox.getChildren().add(content);
     }
 }

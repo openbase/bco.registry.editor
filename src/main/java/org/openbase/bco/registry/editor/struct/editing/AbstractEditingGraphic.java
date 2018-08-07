@@ -38,9 +38,9 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Control, V> {
 
     private final GRAPHIC control;
     private final ValueType<V> valueType;
-    private final TreeTableCell<Object, Object> treeTableCell;
+    private final TreeTableCell<ValueType, ValueType> treeTableCell;
 
-    AbstractEditingGraphic(final GRAPHIC control, final ValueType<V> valueType, final TreeTableCell<Object, Object> treeTableCell) {
+    AbstractEditingGraphic(final GRAPHIC control, final ValueType<V> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         this.control = control;
         this.valueType = valueType;
         this.treeTableCell = treeTableCell;
