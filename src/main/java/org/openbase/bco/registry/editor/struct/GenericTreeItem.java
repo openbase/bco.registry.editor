@@ -60,7 +60,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
         return (V) getValue().getValue();
     }
 
-    public Control getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
+    public Node getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
         return null;
     }
 

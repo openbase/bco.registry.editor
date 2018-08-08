@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.struct.editing;
+package org.openbase.bco.registry.editor.struct.editing.util;
 
 /*-
  * #%L
@@ -22,26 +22,34 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
-import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextField;
+import javafx.scene.control.TextField;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class FloatEditingGraphic extends AbstractTextEditingGraphic<NumberFilteredTextField, Float> {
+public abstract class ValidatedTextField extends TextField {
 
-    public FloatEditingGraphic(ValueType<Float> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(new NumberFilteredTextField(), valueType, treeTableCell);
+
+    @Override
+    public void replaceText(int start, int end, String text) {
+        super.replaceText(start, end, text);
+        validate();
     }
 
     @Override
-    protected Float getCurrentValue() {
-        return Float.parseFloat(getControl().getText());
+    public void replaceSelection(String text) {
+        super.replaceSelection(text);
+        validate();
     }
 
-    @Override
-    protected void init(Float value) {
-        getControl().setText(value.toString());
+    public boolean validate() {
+        if (!internalValidate()) {
+            this.setStyle("-fx-text-inner-color: red;");
+            return false;
+        }
+        this.setStyle("-fx-text-inner-color: black;");
+        return true;
     }
+
+    protected abstract boolean internalValidate();
 }

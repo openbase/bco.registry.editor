@@ -25,6 +25,7 @@ package org.openbase.bco.registry.editor.struct.editing;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.struct.editing.util.ValidatedTextField;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -47,5 +48,16 @@ abstract class AbstractTextEditingGraphic<TF extends TextField, V> extends Abstr
                     commitEdit();
             }
         });
+    }
+
+    @Override
+    protected void commitEdit() {
+        if (getControl() instanceof ValidatedTextField) {
+            if (((ValidatedTextField) getControl()).validate()) {
+                super.commitEdit();
+            }
+        } else {
+            super.commitEdit();
+        }
     }
 }

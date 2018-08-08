@@ -23,12 +23,16 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 import com.google.protobuf.Message;
+import com.google.protobuf.Message.Builder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.extension.protobuf.BuilderProcessor;
+import org.openbase.jul.processing.StringProcessor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -72,6 +76,16 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
         } else {
             switch (field.getType()) {
                 case MESSAGE:
+                    //TODO: also implement for values which are not builders and make nicer
+                    Builder fieldBuilder = getBuilder().getFieldBuilder(field);
+                    if (fieldBuilder.getDescriptorForType().getFields().size() == 1 &&
+                            fieldBuilder.getDescriptorForType().getFields().get(0).isRepeated() &&
+                            fieldBuilder.getDescriptorForType().getFields().get(0).getType() == Type.MESSAGE) {
+                        FieldDescriptor fieldDescriptor = fieldBuilder.getDescriptorForType().getFields().get(0);
+                        BuilderListTreeItem mbBuilderListTreeItem = new BuilderListTreeItem(fieldDescriptor, fieldBuilder, true, BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, fieldBuilder));
+                        mbBuilderListTreeItem.setDescription(StringProcessor.transformToCamelCase(field.getName()));
+                        return mbBuilderListTreeItem;
+                    }
                     return loadTreeItem(field, getBuilder().getFieldBuilder(field));
                 default:
                     return new LeafTreeItem<>(field, getBuilder().getField(field), getBuilder());

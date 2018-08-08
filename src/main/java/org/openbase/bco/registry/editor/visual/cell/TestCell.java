@@ -22,6 +22,7 @@ package org.openbase.bco.registry.editor.visual.cell;
  * #L%
  */
 
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
@@ -38,7 +39,7 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
 
     //    private final Label label;
 //    private final Label selectableLabel;
-    private Control editingGraphic;
+    private Node editingGraphic;
 
     public TestCell() {
         super();

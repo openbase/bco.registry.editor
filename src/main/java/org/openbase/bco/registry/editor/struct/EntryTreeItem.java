@@ -24,35 +24,32 @@ package org.openbase.bco.registry.editor.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.scene.Node;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.editing.ScopeEditingGraphic;
-import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.bco.registry.editor.struct.editing.MetaConfigEntryEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.rsb.ScopeType.Scope;
-import rst.rsb.ScopeType.Scope.Builder;
+import rst.configuration.EntryType.Entry.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class ScopeTreeItem extends BuilderLeafTreeItem<Builder> {
+public class EntryTreeItem extends BuilderLeafTreeItem<Builder> {
 
-    public ScopeTreeItem(FieldDescriptor fieldDescriptor, Scope.Builder builder) throws InitializationException {
-        super(fieldDescriptor, builder);
+    public EntryTreeItem(FieldDescriptor fieldDescriptor, Builder value) throws InitializationException {
+        super(fieldDescriptor, value);
     }
 
     @Override
     public Node getValueGraphic() {
-        try {
-            return new Label(ScopeGenerator.generateStringRep(getInternalValue().build()));
-        } catch (CouldNotPerformException ex) {
-            return new Label("Not Available");
+        if(!getBuilder().hasKey() && !getBuilder().hasValue()) {
+            return new Label("");
         }
+        return new Label(getBuilder().getKey() + " = " + getBuilder().getValue());
     }
 
     @Override
-    public Node getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
-        return new ScopeEditingGraphic(getValueCasted(), cell).getControl();
+    public Control getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
+        return new MetaConfigEntryEditingGraphic(getValue(), cell).getControl();
     }
 }

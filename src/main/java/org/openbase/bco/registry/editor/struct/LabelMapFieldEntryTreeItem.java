@@ -26,33 +26,36 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.editing.ScopeEditingGraphic;
-import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.bco.registry.editor.struct.editing.LabelEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.rsb.ScopeType.Scope;
-import rst.rsb.ScopeType.Scope.Builder;
+import rst.configuration.LabelType.Label.MapFieldEntry.Builder;
+
+import java.util.Locale;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class ScopeTreeItem extends BuilderLeafTreeItem<Builder> {
+public class LabelMapFieldEntryTreeItem extends BuilderLeafTreeItem<Builder> {
 
-    public ScopeTreeItem(FieldDescriptor fieldDescriptor, Scope.Builder builder) throws InitializationException {
+    public LabelMapFieldEntryTreeItem(FieldDescriptor fieldDescriptor, Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);
     }
 
     @Override
     public Node getValueGraphic() {
-        try {
-            return new Label(ScopeGenerator.generateStringRep(getInternalValue().build()));
-        } catch (CouldNotPerformException ex) {
-            return new Label("Not Available");
+        String valueDescription = new Locale(getBuilder().getKey()).getDisplayLanguage() + ": ";
+        for (int i = 0; i < getBuilder().getValueList().size(); i++) {
+            valueDescription += getBuilder().getValue(i);
+            if(i < getBuilder().getValueCount() - 1) {
+                valueDescription += ", ";
+            }
         }
+
+        return new Label(valueDescription);
     }
 
     @Override
     public Node getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
-        return new ScopeEditingGraphic(getValueCasted(), cell).getControl();
+        return new LabelEditingGraphic(getValueCasted(), cell).getControl();
     }
 }

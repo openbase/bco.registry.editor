@@ -23,6 +23,7 @@ package org.openbase.bco.registry.editor.struct.editing;
  */
 
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public abstract class AbstractEditingGraphic<GRAPHIC extends Control, V> {
+public abstract class AbstractEditingGraphic<GRAPHIC extends Node, V> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 

@@ -22,6 +22,7 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
@@ -58,7 +59,7 @@ public class EditingGraphicFactory<V, EG extends AbstractEditingGraphic> {
         }
     }
 
-    public Control getEditingGraphic(final ValueType<V> valueType, final TreeTableCell<ValueType<V>, ValueType<V>> cell) throws CouldNotPerformException {
+    public Node getEditingGraphic(final ValueType<V> valueType, final TreeTableCell<ValueType<V>, ValueType<V>> cell) throws CouldNotPerformException {
         try {
             return constructor.newInstance(valueType, cell).getControl();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {

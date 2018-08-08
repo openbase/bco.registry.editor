@@ -59,7 +59,7 @@ public class ValueType<V extends Object> {
         this.value = value;
     }
 
-    public Control getEditingGraphic(final TreeTableCell<ValueType<V>, ValueType<V>> cell) {
+    public Node getEditingGraphic(final TreeTableCell<ValueType<V>, ValueType<V>> cell) {
         return treeItem.getEditingGraphic(cell);
     }
 

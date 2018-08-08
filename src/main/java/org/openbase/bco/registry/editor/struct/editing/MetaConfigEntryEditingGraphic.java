@@ -22,26 +22,35 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextField;
+import org.openbase.bco.registry.editor.struct.editing.util.MetaConfigEntryTextField;
+import rst.configuration.EntryType.Entry;
+import rst.configuration.EntryType.Entry.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class FloatEditingGraphic extends AbstractTextEditingGraphic<NumberFilteredTextField, Float> {
+public class MetaConfigEntryEditingGraphic extends AbstractTextEditingGraphic<TextField, Entry.Builder> {
 
-    public FloatEditingGraphic(ValueType<Float> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(new NumberFilteredTextField(), valueType, treeTableCell);
+    public MetaConfigEntryEditingGraphic(ValueType<Builder> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
+        super(new MetaConfigEntryTextField(), valueType, treeTableCell);
     }
 
     @Override
-    protected Float getCurrentValue() {
-        return Float.parseFloat(getControl().getText());
+    protected Builder getCurrentValue() {
+        Entry.Builder entry = getValueType().getValue();
+        String[] split = getControl().getText().split("=");
+        entry.setKey(split[0].replaceAll(" ", ""));
+        entry.setValue(split[1].replaceAll(" ", ""));
+        System.out.println("Entry: " + entry.build());
+        return entry;
+
     }
 
     @Override
-    protected void init(Float value) {
-        getControl().setText(value.toString());
+    protected void init(Builder value) {
+        getControl().setText(value.getKey() + " = " + value.getValue());
     }
 }

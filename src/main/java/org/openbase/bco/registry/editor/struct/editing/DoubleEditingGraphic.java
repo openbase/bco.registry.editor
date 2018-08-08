@@ -44,11 +44,4 @@ public class DoubleEditingGraphic extends AbstractTextEditingGraphic<NumberFilte
     protected void init(Double value) {
         getControl().setText(value.toString());
     }
-
-    @Override
-    protected void commitEdit() {
-        if (getControl().validateDecimalField()) {
-            super.commitEdit();
-        }
-    }
 }

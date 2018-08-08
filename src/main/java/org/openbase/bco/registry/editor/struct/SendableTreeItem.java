@@ -41,6 +41,7 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
 import org.openbase.jul.iface.Identifiable;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -62,6 +63,9 @@ public class SendableTreeItem<MB extends Message.Builder> extends BuilderTreeIte
         this.changedProperty = new SimpleObjectProperty<>(false);
 
         this.addEventHandler(valueChangedEvent(), event -> {
+            if (getBuilder() instanceof UnitConfig.Builder) {
+                System.out.println(((UnitConfig.Builder) getBuilder()).getLabel());
+            }
             // this is triggered when the value of this node or one of its children changes
             changedProperty.set(true);
         });

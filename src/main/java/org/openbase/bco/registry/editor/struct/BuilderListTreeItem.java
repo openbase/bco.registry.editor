@@ -26,8 +26,6 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
 import de.jensd.fx.glyphs.materialicons.MaterialIcon;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -52,12 +50,13 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
 
     private final boolean modifiable;
     private final List<Message.Builder> builderList;
+    private String description;
 
     public BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
         super(fieldDescriptor, builder);
-
         try {
             validateDescriptor();
+            setDescription(getFieldDescriptor());
             this.modifiable = modifiable;
             this.builderList = BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, builder);
         } catch (CouldNotPerformException ex) {
@@ -69,6 +68,7 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
         super(fieldDescriptor, builder);
         try {
             validateDescriptor();
+            setDescription(getFieldDescriptor());
             this.modifiable = modifiable;
             this.builderList = builderList;
         } catch (CouldNotPerformException ex) {
@@ -90,9 +90,17 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
         return builderList;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setDescription(FieldDescriptor fieldDescriptor) {
+        setDescription(StringProcessor.transformToCamelCase(fieldDescriptor.getName()) + "List");
+    }
+
     @Override
     public Node getDescriptionGraphic() {
-        final Label label = new Label(StringProcessor.transformToCamelCase(getFieldDescriptor().getName()) + "List");
+        final Label label = new Label(description);
         if (isModifiable()) {
             final HBox hBox = new HBox();
             hBox.setSpacing(3);

@@ -22,12 +22,10 @@ package org.openbase.bco.registry.editor.struct.editing.util;
  * #L%
  */
 
-import javafx.scene.control.TextField;
-
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class NumberFilteredTextField extends TextField {
+public class NumberFilteredTextField extends ValidatedTextField {
 
     private static final String VALID_DECIMAL_REGEX = "\\-{0,1}((\\.[0-9]+|[0-9]+\\.){0,1})([0-9]*){0,1}";
     private static final String INPUT_CHAR_DECIMAL_REGEX = "(\\-{0,1}[0-9]*\\.{0,1}[0-9]*)";
@@ -37,7 +35,6 @@ public class NumberFilteredTextField extends TextField {
         if (text.matches(INPUT_CHAR_DECIMAL_REGEX) || text.isEmpty()) {
             super.replaceText(start, end, text);
         }
-        validateDecimalField();
     }
 
     @Override
@@ -45,15 +42,10 @@ public class NumberFilteredTextField extends TextField {
         if (text.matches(INPUT_CHAR_DECIMAL_REGEX) || text.isEmpty()) {
             super.replaceSelection(text);
         }
-        validateDecimalField();
     }
 
-    public boolean validateDecimalField() {
-        if (!this.getText().matches(VALID_DECIMAL_REGEX)) {
-            this.setStyle("-fx-text-inner-color: red;");
-            return false;
-        }
-        this.setStyle("-fx-text-inner-color: black;");
-        return true;
+    @Override
+    protected boolean internalValidate() {
+        return this.getText().matches(VALID_DECIMAL_REGEX);
     }
 }

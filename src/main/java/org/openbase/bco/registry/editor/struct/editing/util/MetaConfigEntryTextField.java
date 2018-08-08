@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.struct.editing;
+package org.openbase.bco.registry.editor.struct.editing.util;
 
 /*-
  * #%L
@@ -22,26 +22,13 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
-import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextField;
-
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class FloatEditingGraphic extends AbstractTextEditingGraphic<NumberFilteredTextField, Float> {
-
-    public FloatEditingGraphic(ValueType<Float> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(new NumberFilteredTextField(), valueType, treeTableCell);
-    }
+public class MetaConfigEntryTextField extends ValidatedTextField {
 
     @Override
-    protected Float getCurrentValue() {
-        return Float.parseFloat(getControl().getText());
-    }
-
-    @Override
-    protected void init(Float value) {
-        getControl().setText(value.toString());
+    protected boolean internalValidate() {
+        return getText().split("=").length == 2;
     }
 }

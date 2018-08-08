@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.struct.editing;
+package org.openbase.bco.registry.editor.struct;
 
 /*-
  * #%L
@@ -22,26 +22,25 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
-import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextField;
+import com.google.protobuf.Descriptors.FieldDescriptor;
+import com.google.protobuf.Message;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
+import org.openbase.jul.exception.InitializationException;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class FloatEditingGraphic extends AbstractTextEditingGraphic<NumberFilteredTextField, Float> {
+public class BuilderLeafTreeItem<MB extends Message.Builder> extends BuilderTreeItem<MB> {
 
-    public FloatEditingGraphic(ValueType<Float> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(new NumberFilteredTextField(), valueType, treeTableCell);
+    public BuilderLeafTreeItem(FieldDescriptor fieldDescriptor, MB builder) throws InitializationException {
+        super(fieldDescriptor, builder);
     }
 
     @Override
-    protected Float getCurrentValue() {
-        return Float.parseFloat(getControl().getText());
-    }
-
-    @Override
-    protected void init(Float value) {
-        getControl().setText(value.toString());
+    protected ObservableList<TreeItem<ValueType>> createChildren() {
+        // empty list because label will be printed as a single string
+        return FXCollections.observableArrayList();
     }
 }

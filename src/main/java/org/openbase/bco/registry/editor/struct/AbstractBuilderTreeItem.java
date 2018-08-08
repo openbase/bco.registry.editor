@@ -76,7 +76,12 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
     abstract protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException;
 
     protected String extractMessageClass(final Message.Builder builder) {
-        return builder.getClass().getName().split("\\$")[1];
+        String className = "";
+        final String[] split = builder.getClass().getName().split("\\$");
+        for (int i = 1; i < split.length - 1; i++) {
+            className += split[i];
+        }
+        return className;
     }
 
     @SuppressWarnings("unchecked")
