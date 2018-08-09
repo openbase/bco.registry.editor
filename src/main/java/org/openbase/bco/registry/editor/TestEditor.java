@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -26,9 +26,11 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.util.fieldpath.*;
+import org.openbase.bco.registry.editor.visual.LoginPanel;
 import org.openbase.bco.registry.editor.visual.RegistryRemoteTab;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jps.core.JPService;
@@ -101,6 +103,9 @@ public class TestEditor extends Application {
 ////            FieldDescriptor descriptor = ProtoBufFieldProcessor.getFieldDescriptor(unitConfig, UnitConfig.SCOPE_FIELD_NUMBER);
 ////            treeTableView.setRoot(new ScopeTreeItem(descriptor, unitConfig.toBuilder().getScopeBuilder()));
 
+            final LoginPanel loginPanel = new LoginPanel();
+
+
             final List<Integer> unitPriorityList = new ArrayList<>();
             unitPriorityList.add(UnitRegistryData.DAL_UNIT_CONFIG_FIELD_NUMBER);
             unitPriorityList.add(UnitRegistryData.LOCATION_UNIT_CONFIG_FIELD_NUMBER);
@@ -112,7 +117,10 @@ public class TestEditor extends Application {
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getTemplateRegistry()));
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getActivityRegistry()));
 
-            final Scene scene = new Scene(globalTabPane, 1024, 768);
+            final VBox vBox = new VBox();
+            vBox.getChildren().addAll(loginPanel, globalTabPane);
+
+            final Scene scene = new Scene(vBox, 1024, 768);
             scene.heightProperty().addListener((observable, oldValue, newValue) -> globalTabPane.setPrefHeight(newValue.doubleValue()));
             primaryStage.setScene(scene);
 //            primaryStage.setMaximized(true);

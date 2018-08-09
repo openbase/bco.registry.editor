@@ -23,7 +23,6 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
 import javafx.collections.FXCollections;
@@ -31,15 +30,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.processing.StringProcessor;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -48,8 +41,8 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
 
     private final Map<FieldDescriptor, GenericTreeItem> descriptorChildMap;
 
-    public BuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB builder) throws InitializationException {
-        super(fieldDescriptor, builder);
+    public BuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final Boolean editable) throws InitializationException {
+        super(fieldDescriptor, builder, editable);
 
         this.descriptorChildMap = new HashMap<>();
     }
@@ -61,12 +54,13 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
         //TODO:
         // complete conversion?
         final Set<Integer> filteredFields = getFilteredFields();
+        final Set<Integer> uneditableFields = getUneditableFields();
         for (final FieldDescriptor field : getBuilder().getDescriptorForType().getFields()) {
             if (filteredFields.contains(field.getNumber())) {
                 continue;
             }
 
-            final GenericTreeItem child = createChild(field);
+            final GenericTreeItem child = createChild(field, !uneditableFields.contains(field.getNumber()));
             descriptorChildMap.put(field, child);
             childList.add(child);
         }
@@ -74,31 +68,38 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
         return childList;
     }
 
-    protected GenericTreeItem createChild(final FieldDescriptor field) throws CouldNotPerformException {
+    protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         if (field.isRepeated()) {
             switch (field.getType()) {
                 case MESSAGE:
-                    return new BuilderListTreeItem<>(field, getBuilder(), true);
+                    return new BuilderListTreeItem<>(field, getBuilder(), editable);
                 default:
-                    //TODO: leaf type
-                    return new GenericTreeItem<>(field, getBuilder().getField(field));
+                    return new ValueListTreeItem<>(field, getBuilder(), editable);
             }
         } else {
             switch (field.getType()) {
                 case MESSAGE:
-                    //TODO: also implement for values which are not builders and make nicer
-                    Builder fieldBuilder = getBuilder().getFieldBuilder(field);
-                    if (fieldBuilder.getDescriptorForType().getFields().size() == 1 &&
-                            fieldBuilder.getDescriptorForType().getFields().get(0).isRepeated() &&
-                            fieldBuilder.getDescriptorForType().getFields().get(0).getType() == Type.MESSAGE) {
-                        FieldDescriptor fieldDescriptor = fieldBuilder.getDescriptorForType().getFields().get(0);
-                        BuilderListTreeItem mbBuilderListTreeItem = new BuilderListTreeItem<>(fieldDescriptor, fieldBuilder, true, BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, fieldBuilder));
-                        mbBuilderListTreeItem.setDescription(StringProcessor.transformToCamelCase(field.getName()));
-                        return mbBuilderListTreeItem;
+                    // handle if a message only has one repeated field by reducing the tree depth by 1 in these cases
+                    final Builder fieldBuilder = getBuilder().getFieldBuilder(field);
+                    // check if the builder for the field has only one field and if it is repeated
+                    if (fieldBuilder.getDescriptorForType().getFields().size() == 1 && fieldBuilder.getDescriptorForType().getFields().get(0).isRepeated()) {
+                        final FieldDescriptor fieldDescriptor = fieldBuilder.getDescriptorForType().getFields().get(0);
+                        AbstractListTreeItem treeItem;
+                        // differentiate between internal field type
+                        switch (fieldDescriptor.getType()) {
+                            case MESSAGE:
+                                treeItem = new BuilderListTreeItem<>(fieldDescriptor, fieldBuilder, editable);
+                                break;
+                            default:
+                                treeItem = new ValueListTreeItem<>(fieldDescriptor, fieldBuilder, editable);
+                        }
+                        // update description to the original field name
+                        treeItem.setDescription(StringProcessor.transformToCamelCase(field.getName()));
+                        return treeItem;
                     }
-                    return loadTreeItem(field, getBuilder().getFieldBuilder(field));
+                    return loadTreeItem(field, fieldBuilder, editable);
                 default:
-                    return new LeafTreeItem<>(field, getBuilder().getField(field), getBuilder());
+                    return new LeafTreeItem<>(field, getBuilder().getField(field), getBuilder(), editable);
             }
         }
     }
@@ -111,6 +112,17 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
      * @return a set of field numbers to be filtered
      */
     protected Set<Integer> getFilteredFields() {
+        return new HashSet<>();
+    }
+
+    /**
+     * Return a set of field numbers for fields that are not editable.
+     * This is called once when the children are
+     * generated and should be overwritten to set fields uneditable.
+     *
+     * @return a set of field numbers to be set uneditable
+     */
+    protected Set<Integer> getUneditableFields() {
         return new HashSet<>();
     }
 
@@ -132,13 +144,12 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
             if (field.isRepeated()) {
                 descriptorChildMap.get(field).update(value);
             } else {
-                if (!value.hasField(field)) {
-                    continue;
-                }
-
 //                logger.info("Extract class for field: " + value.getField(field).getClass().getName());
                 switch (field.getType()) {
                     case MESSAGE:
+                        if (!value.hasField(field)) {
+                            continue;
+                        }
                         descriptorChildMap.get(field).update(value.getFieldBuilder(field));
                         break;
                     default:
@@ -159,5 +170,9 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
      */
     protected boolean matchesBuilder(final MB builder) {
         return false;
+    }
+
+    protected Map<FieldDescriptor, GenericTreeItem> getDescriptorChildMap() {
+        return Collections.unmodifiableMap(descriptorChildMap);
     }
 }

@@ -43,8 +43,9 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
 import org.openbase.jul.iface.Identifiable;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -56,8 +57,8 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
     private final SimpleObjectProperty<Boolean> changedProperty;
     private final FieldDescriptor idField, labelField;
 
-    public RegistryMessageTreeItem(FieldDescriptor fieldDescriptor, MB builder) throws InitializationException {
-        super(fieldDescriptor, builder);
+    public RegistryMessageTreeItem(FieldDescriptor fieldDescriptor, MB builder, Boolean editable) throws InitializationException {
+        super(fieldDescriptor, builder, editable);
 
         idField = ProtoBufFieldProcessor.getFieldDescriptor(builder, Identifiable.TYPE_FIELD_ID);
         labelField = ProtoBufFieldProcessor.getFieldDescriptor(builder, rst.configuration.LabelType.Label.class.getSimpleName().toLowerCase());
@@ -65,6 +66,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
         this.changedProperty = new SimpleObjectProperty<>(false);
 
         this.addEventHandler(valueChangedEvent(), event -> {
+            logger.info("Event for tree item");
             // this is triggered when the value of this node or one of its children changes
             changedProperty.set(true);
 
@@ -91,11 +93,10 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
     }
 
     @Override
-    protected GenericTreeItem createChild(final FieldDescriptor field) throws CouldNotPerformException {
-        if (field.equals(idField)) {
-            return new LeafTreeItem<>(field, getBuilder().getField(field), getBuilder(), false);
-        }
-        return super.createChild(field);
+    protected Set<Integer> getUneditableFields() {
+        Set<Integer> uneditableFieldSet = new HashSet<>();
+        uneditableFieldSet.add(idField.getNumber());
+        return uneditableFieldSet;
     }
 
     public SimpleObjectProperty<Boolean> getChangedProperty() {
@@ -113,7 +114,9 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
 
     @Override
     protected Node createValueGraphic() {
+        logger.info("Create buttons1");
         if (changedProperty.get()) {
+            logger.info("Create buttons");
             final Button applyButton, cancelButton;
             final HBox buttonLayout;
             applyButton = new Button("Apply");

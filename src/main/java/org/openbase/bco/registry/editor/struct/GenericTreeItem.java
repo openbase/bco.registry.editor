@@ -47,11 +47,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     private Node valueGraphic;
     private boolean editable;
 
-    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value) {
-        this(fieldDescriptor, value, true);
-    }
-
-    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value, final boolean editable) {
+    public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Boolean editable) {
         this.fieldDescriptor = fieldDescriptor;
         this.editable = editable;
         this.setValue(new ValueType<>(value, this));

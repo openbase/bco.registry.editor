@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -40,9 +40,23 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
         this(fieldDescriptor, value, parentBuilder, true);
     }
 
+    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final int index) {
+        this(fieldDescriptor, value, parentBuilder, true, index);
+    }
+
     public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final boolean editable) {
+        this(fieldDescriptor, value, parentBuilder, editable, -1);
+    }
+
+    private LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final boolean editable, final int index) {
         super(fieldDescriptor, value, editable);
-        this.valueProperty().addListener((observable, oldValue, newValue) -> parentBuilder.setField(getFieldDescriptor(), newValue.getValue()));
+        this.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (index == -1) {
+                parentBuilder.setField(getFieldDescriptor(), newValue.getValue());
+            } else {
+                parentBuilder.setRepeatedField(getFieldDescriptor(), index, newValue.getValue());
+            }
+        });
         this.addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
     }
 

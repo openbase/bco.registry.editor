@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -34,41 +34,38 @@ import org.openbase.jul.exception.InitializationException;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class ValueListTreeItem<MB extends Message.Builder> extends AbstractBuilderTreeItem<MB> {
-
-    private final boolean modifiable;
+public class ValueListTreeItem<MB extends Message.Builder> extends AbstractListTreeItem<MB> {
 
     public ValueListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
-        super(fieldDescriptor, builder);
-
-        try {
-            validateDescriptor();
-            this.modifiable = modifiable;
-        } catch (CouldNotPerformException ex) {
-            throw new InitializationException(this, ex);
-        }
+        super(fieldDescriptor, builder, modifiable);
     }
 
-    private void validateDescriptor() throws CouldNotPerformException {
-        if (getFieldDescriptor().getType() == Type.MESSAGE || !getFieldDescriptor().isRepeated()) {
-            throw new CouldNotPerformException("FieldDescriptor[" + getFieldDescriptor() + "] of Message[" + extractSimpleMessageClass(getBuilder()) + "] is not a repeated message");
+    protected void validateDescriptor() throws CouldNotPerformException {
+        super.validateDescriptor();
+        if (getFieldDescriptor().getType() == Type.MESSAGE) {
+            throw new CouldNotPerformException("FieldDescriptor[" + getFieldDescriptor().getName() + "] of Message[" +
+                    extractSimpleMessageClass(getBuilder()) + "] is a message type");
         }
-    }
-
-    public boolean isModifiable() {
-        return modifiable;
     }
 
     @Override
-    protected ObservableList<TreeItem<ValueType>> createChildren() {
+    protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException {
         ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
 
         for (int i = 0; i < getBuilder().getRepeatedFieldCount(getFieldDescriptor()); i++) {
-            //TODO: something else than genericTreeItem
-            childList.add(new GenericTreeItem<>(getFieldDescriptor(), getBuilder().getRepeatedField(getFieldDescriptor(), i)));
+            childList.add(createChild(getBuilder().getRepeatedField(getFieldDescriptor(), i), i));
         }
 
         return childList;
+    }
+
+    private LeafTreeItem createChild(final Object value, final int index) throws CouldNotPerformException {
+        // create leaf tree item
+        final LeafTreeItem leafTreeItem = new LeafTreeItem<>(getFieldDescriptor(), value, getBuilder(), index);
+        // if is modifiable add symbol to remove to child
+        updateChildGraphic(leafTreeItem);
+        // return tree item
+        return leafTreeItem;
     }
 
     private Object getDefaultValue() throws CouldNotPerformException {
@@ -89,15 +86,26 @@ public class ValueListTreeItem<MB extends Message.Builder> extends AbstractBuild
         }
     }
 
-    public void addElement() throws CouldNotPerformException {
+    @Override
+    protected void addElement() throws CouldNotPerformException {
         // generate default value
         final Object defaultValue = getDefaultValue();
         // add to builder
         getBuilder().addRepeatedField(getFieldDescriptor(), defaultValue);
         // add child tree item with this value
-        //TODO: child has to now its index
-        getChildren().add(new GenericTreeItem<>(getFieldDescriptor(), getDefaultValue()));
+        getChildren().add(createChild(defaultValue, getBuilder().getRepeatedFieldCount(getFieldDescriptor()) - 1));
         // expand
         setExpanded(true);
+        // trigger update in parent
+        setValue(getValueCasted().createNew(getBuilder()));
+    }
+
+    @Override
+    public void update(final MB value) throws CouldNotPerformException {
+        // update internal builder
+        setValue(getValueCasted().createNew(value));
+        // just create the list anew
+        getChildren().clear();
+        getChildren().addAll(createChildren());
     }
 }

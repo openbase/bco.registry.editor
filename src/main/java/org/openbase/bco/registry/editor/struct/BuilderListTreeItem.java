@@ -25,19 +25,12 @@ package org.openbase.bco.registry.editor.struct;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
-import de.jensd.fx.glyphs.materialicons.MaterialIcon;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
-import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.protobuf.BuilderProcessor;
-import org.openbase.jul.processing.StringProcessor;
-import org.openbase.jul.visual.javafx.geometry.svg.SVGGlyphIcon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,12 +40,9 @@ import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBuilderTreeItem<MB> {
+public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractListTreeItem<MB> {
 
-    private final boolean modifiable;
     private List<Message.Builder> builderList;
-
-    private String description;
 
     public BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
         this(fieldDescriptor, builder, modifiable, null);
@@ -64,25 +54,22 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
     }
 
     BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final List<Message.Builder> builderList) throws InitializationException {
-        super(fieldDescriptor, builder);
+        super(fieldDescriptor, builder, modifiable);
         try {
             validateDescriptor();
             setDescription(getFieldDescriptor());
-            this.modifiable = modifiable;
             this.builderList = builderList;
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
         }
     }
 
-    private void validateDescriptor() throws CouldNotPerformException {
-        if (getFieldDescriptor().getType() != MESSAGE || !getFieldDescriptor().isRepeated()) {
-            throw new CouldNotPerformException("FieldDescriptor[" + getFieldDescriptor() + "] of Message[" + extractSimpleMessageClass(getBuilder()) + "] is not a repeated message");
+    protected void validateDescriptor() throws CouldNotPerformException {
+        super.validateDescriptor();
+        if (getFieldDescriptor().getType() != MESSAGE) {
+            throw new CouldNotPerformException("FieldDescriptor[" + getFieldDescriptor().getName() + "] of Message[" +
+                    extractSimpleMessageClass(getBuilder()) + "] is not a message type");
         }
-    }
-
-    public boolean isModifiable() {
-        return modifiable;
     }
 
     public List<Builder> getBuilderList() {
@@ -93,62 +80,43 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
         this.builderList = newBuilderList;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setDescription(FieldDescriptor fieldDescriptor) {
-        setDescription(StringProcessor.transformToCamelCase(fieldDescriptor.getName()) + "List");
-    }
-
-    @Override
-    protected Node createDescriptionGraphic() {
-        final Label label = new Label(description);
-        if (isModifiable()) {
-            final HBox hBox = new HBox();
-            hBox.setSpacing(3);
-            final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.ADD, label.getHeight(), false);
-            svgGlyphIcon.setForegroundIconColor(Color.GREEN);
-            svgGlyphIcon.setOnMouseClicked(event -> {
-                try {
-                    addElement();
-                } catch (CouldNotPerformException e) {
-                    logger.warn("Could not add new element", e);
-                }
-            });
-            label.heightProperty().addListener((observable, oldValue, newValue) -> {
-                svgGlyphIcon.setPrefHeight(newValue.doubleValue());
-            });
-            hBox.getChildren().addAll(label, svgGlyphIcon);
-            return hBox;
-        }
-        return label;
-    }
-
     @Override
     protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException {
         ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
 
         for (final Message.Builder builder : builderList) {
-            childList.add(loadTreeItem(getFieldDescriptor(), builder));
+            childList.add(createChild(builder));
         }
 
         return childList;
     }
 
-    private void addElement() throws CouldNotPerformException {
+    private BuilderTreeItem createChild(final Message.Builder builder) throws CouldNotPerformException {
+        // load tree item by type
+        final BuilderTreeItem builderTreeItem = loadTreeItem(getFieldDescriptor(), builder, true);
+        // if is modifiable add symbol to remove to child
+        updateChildGraphic(builderTreeItem);
+        // return tree item
+        return builderTreeItem;
+    }
+
+    @Override
+    protected void addElement() throws CouldNotPerformException {
         try {
             //add the new message builder to the repeated field
             final Message.Builder builder = BuilderProcessor.addDefaultInstanceToRepeatedField(getFieldDescriptor(), getBuilder());
             // if available set value from parent group
             if (getParent() instanceof GroupTreeItem) {
-                ((GroupTreeItem) getParent()).updateElement(builder);
+                ((GroupTreeItem<MB>) getParent()).updateElement(builder, this);
             }
             // create tree item and add it
-            getChildren().add(loadTreeItem(getFieldDescriptor(), builder));
-            getChildren().get(this.getChildren().size() - 1).setExpanded(true);
+            BuilderTreeItem child = createChild(builder);
+            child.setExpanded(true);
+            getChildren().add(child);
             // expand new element
             setExpanded(true);
+            // trigger update in parent
+            setValue(getValueCasted().createNew(getBuilder()));
         } catch (CouldNotPerformException ex) {
             throw new CouldNotPerformException("Could not new element for [" + getFieldDescriptor().getName() + "] of Message[" + extractSimpleMessageClass(getBuilder()) + "]!", ex);
         }
@@ -196,7 +164,7 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
 
             // no child matching the builder found so add new child
             if (!childFound) {
-                getChildren().add(loadTreeItem(getFieldDescriptor(), builder));
+                getChildren().add(loadTreeItem(getFieldDescriptor(), builder, true));
             }
         }
 
@@ -208,10 +176,6 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
 
     @Override
     public void update(final MB value) throws CouldNotPerformException {
-        // if the builder has not changed just return
-        if (getBuilder().equals(value)) {
-            return;
-        }
         update(value, BuilderProcessor.extractRepeatedFieldBuilderList(getFieldDescriptor(), value));
     }
 }

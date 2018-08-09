@@ -1,21 +1,24 @@
-package org.openbase.bco.registry.editor.struct;
+package org.openbase.bco.registry.editor.struct.preset;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
+import org.openbase.bco.registry.editor.struct.BuilderLeafTreeItem;
+import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.EnablingStateEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
 import rst.domotic.state.EnablingStateType.EnablingState;
+import rst.domotic.state.EnablingStateType.EnablingState.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class EnablingStateTreeItem extends BuilderLeafTreeItem<EnablingState.Builder> {
+public class EnablingStateTreeItem extends BuilderLeafTreeItem<Builder> {
 
-    public EnablingStateTreeItem(final FieldDescriptor fieldDescriptor, final EnablingState.Builder builder) throws InitializationException {
-        super(fieldDescriptor, builder);
+    public EnablingStateTreeItem(final FieldDescriptor fieldDescriptor, final EnablingState.Builder builder, Boolean editable) throws InitializationException {
+        super(fieldDescriptor, builder, editable);
     }
 
     @Override

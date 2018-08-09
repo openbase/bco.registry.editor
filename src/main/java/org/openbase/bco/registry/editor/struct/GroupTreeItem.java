@@ -27,14 +27,11 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Message.Builder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.NotAvailableException;
-import org.openbase.jul.extension.protobuf.BuilderProcessor;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -54,6 +51,11 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
         this(fieldDescriptor, builder, modifiable, null, null, groupValueProviders);
     }
 
+    private GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final List<Message.Builder> builderList, final Object value, final FieldPathDescriptionProvider parentGroupValueProvider, FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
+        this(fieldDescriptor, builder, modifiable, value, parentGroupValueProvider, groupValueProviders);
+        super.setBuilderList(builderList);
+    }
+
     private GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final Object value, final FieldPathDescriptionProvider parentGroupValueProvider, final FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
         super(fieldDescriptor, builder, modifiable);
 
@@ -69,13 +71,11 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
             System.arraycopy(groupValueProviders, 1, childGroups, 0, childGroups.length);
         }
         this.valueChildMap = new HashMap<>();
-    }
 
-    private GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final List<Message.Builder> builderList, final Object value, final FieldPathDescriptionProvider parentGroupValueProvider, FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
-        this(fieldDescriptor, builder, modifiable, value, parentGroupValueProvider, groupValueProviders);
-        super.setBuilderList(builderList);
+        if (this.parentGroupValueProvider != null && this.value != null) {
+            setDescription(this.parentGroupValueProvider.generateDescription(this.value));
+        }
     }
-
 
     @SuppressWarnings("unchecked")
     @Override
@@ -92,7 +92,7 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
         BuilderListTreeItem<MB> childTreeItem;
         if (childGroups.length == 0) {
             childTreeItem = new BuilderListTreeItem<>(getFieldDescriptor(), getBuilder(), isModifiable(), builderList);
-            childTreeItem.setDescriptionGraphic(new Label(groupValueProvider.generateDescription(value)));
+            childTreeItem.setDescription(groupValueProvider.generateDescription(value));
         } else {
             childTreeItem = new GroupTreeItem<>(getFieldDescriptor(), getBuilder(), isModifiable(), builderList, value, groupValueProvider, childGroups);
         }
@@ -100,24 +100,34 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
         return childTreeItem;
     }
 
-    public void updateElement(final Message.Builder builder) {
-        // ignore topmost group
-        if (getParent() == null) {
-            return;
+    /**
+     * Update a builder according to a group. Because groups only save the value they group by the child tree
+     * item has to be given to resolve the value it belongs to.
+     *
+     * @param builder       the builder to update
+     * @param childTreeItem the child tree item to which the builder was added
+     * @throws NotAvailableException if for the given child tree item no value could be resolved
+     */
+    void updateElement(final Message.Builder builder, final BuilderListTreeItem<MB> childTreeItem) throws NotAvailableException {
+        Object valueToUpdate = null;
+        for (Entry<Object, BuilderListTreeItem<MB>> entry : valueChildMap.entrySet()) {
+            if (entry.getValue().equals(childTreeItem)) {
+                valueToUpdate = entry.getKey();
+                break;
+            }
+        }
+
+        if (valueToUpdate == null) {
+            throw new NotAvailableException("Value to update");
         }
 
         // update with value
-        parentGroupValueProvider.setValue(builder, value);
+        groupValueProvider.setValue(builder, valueToUpdate);
 
         // update with value from parent
         if (getParent() instanceof GroupTreeItem) {
-            ((GroupTreeItem) getParent()).updateElement(builder);
+            ((GroupTreeItem<MB>) getParent()).updateElement(builder, this);
         }
-    }
-
-    @Override
-    protected Node createDescriptionGraphic() {
-        return new Label(parentGroupValueProvider.generateDescription(value));
     }
 
     @Override

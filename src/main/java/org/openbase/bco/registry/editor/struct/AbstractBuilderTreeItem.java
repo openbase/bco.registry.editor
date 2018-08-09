@@ -26,9 +26,9 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import org.openbase.bco.registry.editor.struct.preset.UnitConfigTreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.FatalImplementationErrorException;
-import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 
 import java.lang.reflect.Constructor;
@@ -41,8 +41,8 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
 
     private boolean childrenInitialized;
 
-    public AbstractBuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB value) throws InitializationException {
-        super(fieldDescriptor, value);
+    public AbstractBuilderTreeItem(final FieldDescriptor fieldDescriptor, final MB value, final Boolean editable) {
+        super(fieldDescriptor, value, editable);
 
         this.childrenInitialized = false;
         this.expandedProperty().addListener((observable, oldValue, newValue) -> {
@@ -89,21 +89,21 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
     }
 
     @SuppressWarnings("unchecked")
-    protected BuilderTreeItem loadTreeItem(final FieldDescriptor fieldDescriptor, final Message.Builder builder) throws CouldNotPerformException {
-        final String className = getClass().getPackage().getName() + "." + extractSimpleMessageClass(builder) + "TreeItem";
+    BuilderTreeItem loadTreeItem(final FieldDescriptor fieldDescriptor, final Message.Builder builder, final Boolean editable) throws CouldNotPerformException {
+        final String className = UnitConfigTreeItem.class.getPackage().getName() + "." + extractSimpleMessageClass(builder) + "TreeItem";
 
         try {
             // load class
             Class<? extends BuilderTreeItem> treeItemClass = (Class<? extends BuilderTreeItem>) getClass().getClassLoader().loadClass(className);
 
             // get constructor
-            Constructor<? extends BuilderTreeItem> constructor = treeItemClass.getConstructor(fieldDescriptor.getClass(), builder.getClass());
+            Constructor<? extends BuilderTreeItem> constructor = treeItemClass.getConstructor(fieldDescriptor.getClass(), builder.getClass(), editable.getClass());
 
             // invoke constructor
-            return constructor.newInstance(fieldDescriptor, builder);
+            return constructor.newInstance(fieldDescriptor, builder, editable);
         } catch (ClassNotFoundException ex) {
             // no class found so use the default tree item
-            return new BuilderTreeItem(fieldDescriptor, builder);
+            return new BuilderTreeItem(fieldDescriptor, builder, editable);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ex) {
             // could not get or invoke constructor which is only the case on an implementation error
             throw ExceptionPrinter.printHistoryAndReturnThrowable(new FatalImplementationErrorException("Could not invoke constructor[" + className + "] for type[" + extractSimpleMessageClass(builder) + "]", this, ex), logger);

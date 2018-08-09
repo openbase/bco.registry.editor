@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.struct;
+package org.openbase.bco.registry.editor.struct.preset;
 
 /*-
  * #%L
@@ -23,10 +23,13 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import org.openbase.bco.registry.editor.struct.BuilderListTreeItem;
+import org.openbase.bco.registry.editor.struct.GenericTreeItem;
+import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import rst.domotic.state.EnablingStateType.EnablingState;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitConfigType.UnitConfig.Builder;
 
@@ -39,18 +42,27 @@ import java.util.Set;
  */
 public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
 
-    public UnitConfigTreeItem(FieldDescriptor fieldDescriptor, Builder builder) throws InitializationException {
-        super(fieldDescriptor, builder);
+    public UnitConfigTreeItem(FieldDescriptor fieldDescriptor, Builder builder, Boolean editable) throws InitializationException {
+        super(fieldDescriptor, builder, editable);
     }
 
     @Override
-    protected GenericTreeItem createChild(final FieldDescriptor field) throws CouldNotPerformException {
+    protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         switch (field.getNumber()) {
             case UnitConfig.SERVICE_CONFIG_FIELD_NUMBER:
                 return new BuilderListTreeItem<>(field, getBuilder(), false);
             default:
-                return super.createChild(field);
+                return super.createChild(field, editable);
         }
+    }
+
+    @Override
+    protected Set<Integer> getUneditableFields() {
+        final Set<Integer> uneditableFields = super.getUneditableFields();
+        uneditableFields.add(UnitConfig.UNIT_HOST_ID_FIELD_NUMBER);
+        uneditableFields.add(UnitConfig.UNIT_TEMPLATE_CONFIG_ID_FIELD_NUMBER);
+        uneditableFields.add(UnitConfig.UNIT_TYPE_FIELD_NUMBER);
+        return uneditableFields;
     }
 
     @Override
@@ -116,9 +128,9 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
 
         return filteredFieldSet;
     }
-//
-//    @Override
-//    public Node getValueGraphic() {
-//        return new Label(getInternalValue().getDescription());
-//    }
+
+    @Override
+    protected Node createValueGraphic() {
+        return new Label(getBuilder().getDescription());
+    }
 }
