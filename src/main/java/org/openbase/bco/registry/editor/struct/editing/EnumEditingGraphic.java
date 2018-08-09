@@ -68,7 +68,7 @@ public class EnumEditingGraphic extends AbstractEditingGraphic<ComboBox<EnumValu
         getControl().setValue(value);
     }
 
-    public static ObservableList<EnumValueDescriptor> createSortedEnumList(EnumDescriptor enumDescriptor) {
+    static ObservableList<EnumValueDescriptor> createSortedEnumList(EnumDescriptor enumDescriptor) {
         List<EnumValueDescriptor> values = new ArrayList<>();
         for (EnumValueDescriptor value : enumDescriptor.getValues()) {
             if (value.getName().equals(ENUM_NAME_UNKNOWN)) {

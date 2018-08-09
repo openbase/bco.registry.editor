@@ -25,20 +25,18 @@ package org.openbase.bco.registry.editor.struct;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.editing.*;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
+import org.openbase.jul.exception.CouldNotPerformException;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class LeafTreeItem<V> extends GenericTreeItem<V> {
 
-    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder) {
-        this(fieldDescriptor, value, parentBuilder, true);
-    }
+    private EditingGraphicFactory<V, ?> editingGraphicFactory;
 
     public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final int index) {
         this(fieldDescriptor, value, parentBuilder, true, index);
@@ -50,6 +48,7 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
 
     private LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final boolean editable, final int index) {
         super(fieldDescriptor, value, editable);
+        this.editingGraphicFactory = null;
         this.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (index == -1) {
                 parentBuilder.setField(getFieldDescriptor(), newValue.getValue());
@@ -62,7 +61,14 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Control getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
+    public Node getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
+        if (editingGraphicFactory != null) {
+            try {
+                return editingGraphicFactory.getEditingGraphic(getValueCasted(), cell);
+            } catch (CouldNotPerformException ex) {
+                logger.warn("Could not create editing graphic", ex);
+            }
+        }
         switch (getFieldDescriptor().getType()) {
             case BOOL:
                 return new BooleanEditingGraphic(getValue(), cell).getControl();
@@ -87,5 +93,9 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
         } else {
             return SelectableLabel.makeSelectable(new Label(getInternalValue().toString()));
         }
+    }
+
+    public void setEditingGraphicFactory(EditingGraphicFactory<V, ?> editingGraphicFactory) {
+        this.editingGraphicFactory = editingGraphicFactory;
     }
 }
