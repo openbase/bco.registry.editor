@@ -25,12 +25,10 @@ package org.openbase.bco.registry.editor.struct;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.RegistryEditor;
 import org.openbase.bco.registry.editor.visual.RequiredFieldAlert;
@@ -54,8 +52,11 @@ import java.util.concurrent.Future;
  */
 public class RegistryMessageTreeItem<MB extends Message.Builder> extends BuilderTreeItem<MB> {
 
-    private final SimpleObjectProperty<Boolean> changedProperty;
     private final FieldDescriptor idField, labelField;
+
+    private boolean inUpdate;
+    private boolean changed;
+    private Future<Message> registryTask;
 
     public RegistryMessageTreeItem(FieldDescriptor fieldDescriptor, MB builder, Boolean editable) throws InitializationException {
         super(fieldDescriptor, builder, editable);
@@ -63,20 +64,17 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
         idField = ProtoBufFieldProcessor.getFieldDescriptor(builder, Identifiable.TYPE_FIELD_ID);
         labelField = ProtoBufFieldProcessor.getFieldDescriptor(builder, rst.configuration.LabelType.Label.class.getSimpleName().toLowerCase());
 
-        this.changedProperty = new SimpleObjectProperty<>(false);
+        changed = false;
+        inUpdate = false;
 
         this.addEventHandler(valueChangedEvent(), event -> {
-            logger.info("Event for tree item");
             // this is triggered when the value of this node or one of its children changes
-            changedProperty.set(true);
+            if (!inUpdate) {
+                changed = true;
+            }
 
             updateValueGraphic();
         });
-
-//        this.addEventHandler(childrenModificationEvent(), event -> {
-//            // this is triggered when children are removed or added
-//            changedProperty.set(true);
-//        });
     }
 
     /**
@@ -99,10 +97,6 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
         return uneditableFieldSet;
     }
 
-    public SimpleObjectProperty<Boolean> getChangedProperty() {
-        return changedProperty;
-    }
-
     @Override
     protected Node createDescriptionGraphic() {
         try {
@@ -114,92 +108,130 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
 
     @Override
     protected Node createValueGraphic() {
-        logger.info("Create buttons1");
-        if (changedProperty.get()) {
+        if (registryTask != null && !registryTask.isDone()) {
+            final Label label = new Label("Waiting for registry update...");
+            final ProgressIndicator progressIndicator = new ProgressIndicator();
+            progressIndicator.setMaxHeight(16);
+
+            final HBox hBox = new HBox();
+            hBox.setSpacing(5);
+            hBox.getChildren().addAll(progressIndicator, label);
+            return hBox;
+        }
+
+        if (changed) {
             logger.info("Create buttons");
             final Button applyButton, cancelButton;
             final HBox buttonLayout;
             applyButton = new Button("Apply");
-            applyButton.setOnAction(event -> GlobalCachedExecutorService.submit(() -> {
-                logger.info("Apply button pressed");
-                if (!getBuilder().isInitialized()) {
-                    if (ProtoBufFieldProcessor.checkIfSomeButNotAllRequiredFieldsAreSet(getBuilder())) {
-                        new RequiredFieldAlert(getBuilder());
-                        if (!getBuilder().isInitialized()) {
-                            return null;
-                        }
-                    } else {
-                        ProtoBufFieldProcessor.clearRequiredFields(getBuilder());
-                    }
-                }
-                Future<Message> task = null;
+            applyButton.setOnAction(event -> handleApplyEvent());
+            cancelButton = new Button("Cancel");
+            cancelButton.setOnAction(event -> handleCancelEvent());
+            buttonLayout = new HBox(applyButton, cancelButton);
+            return buttonLayout;
+        }
+
+        return super.createValueGraphic();
+    }
+
+    @Override
+    public void update(MB value) throws CouldNotPerformException {
+        //TODO handle local changes but global update
+
+        inUpdate = true;
+        try {
+            changed = false;
+            if (registryTask != null) {
+                registryTask = null;
+            }
+
+            super.update(value);
+        } finally {
+            inUpdate = false;
+        }
+    }
+
+    private void handleCancelEvent() {
+        final String id = (String) getBuilder().getField(idField);
+        if (id.isEmpty()) {
+            getParent().getChildren().remove(RegistryMessageTreeItem.this);
+        } else {
+            try {
+                final MB oldBuilder = (MB) Registries.getById(id, getBuilder()).toBuilder();
                 try {
-                    Message message;
+                    update(oldBuilder);
+                } catch (CouldNotPerformException ex) {
+                    logger.error("Could not update tree item with old builder from registry", ex);
+                }
+            } catch (CouldNotPerformException ex) {
+                logger.warn("Could not retrieve message with id[" + id + "] for type[" + getBuilder().getClass().getName() + "] from registry", ex);
+            }
+        }
+    }
+
+    private void handleApplyEvent() {
+        logger.info("Apply button pressed");
+        handleRequiredFields();
+        if (!getBuilder().isInitialized()) {
+            return;
+        }
+
+        try {
+            Message message;
+            try {
+                message = getBuilder().build();
+            } catch (Throwable ex) {
+                logger.info("Build failed", ex);
+                throw ex;
+            }
+            if (Registries.contains(message)) {
+                // save original value from model
+                final Message original = Registries.getById(ProtoBufFieldProcessor.getId(message));
+                registryTask = Registries.update(message);
+                GlobalCachedExecutorService.submit(() -> {
+                    final Message update;
                     try {
-                        message = getBuilder().build();
-                    } catch (Throwable ex) {
-                        logger.info("Build failed", ex);
-                        throw ex;
-                    }
-                    if (Registries.contains(message)) {
-                        // save original value from model
-                        final Message original = Registries.getById(ProtoBufFieldProcessor.getId(message));
-                        task = Registries.update(message);
-//                                    registryTask = Registries.update(msg);
-                        final Message update = task.get();
+                        update = registryTask.get();
 
                         // check if update and original are the same, then the changed values where reset and a registry update is not triggered
                         if (original.equals(update)) {
                             // reset the container to its old value
-                            RegistryMessageTreeItem.this.update((MB) original.toBuilder());
+                            Platform.runLater(() -> {
+                                try {
+                                    RegistryMessageTreeItem.this.update((MB) original.toBuilder());
+                                } catch (CouldNotPerformException e) {
+                                    logger.error("Could not reset tree item", e);
+                                }
+                            });
                         }
+                        //TODO handle correctly
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                });
 
-                    } else {
-                        task = Registries.register(message);
-                        task.get();
+            } else {
+                registryTask = Registries.register(message);
+                GlobalCachedExecutorService.submit(() -> {
+                    try {
+                        registryTask.get();
                         // remove temporally created node structure
-                        RegistryMessageTreeItem.this.getParent().getChildren().remove(RegistryMessageTreeItem.this);
-                    }
-                } catch (CouldNotPerformException | ExecutionException ex) {
-                    RegistryEditor.printException(ex, logger, LogLevel.ERROR);
-                    if (task != null && !task.isDone()) {
-                        task.cancel(true);
+                        Platform.runLater(() -> RegistryMessageTreeItem.this.getParent().getChildren().remove(RegistryMessageTreeItem.this));
+                        //TODO handle correctly
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
                     }
 
-                    RegistryMessageTreeItem.this.changedProperty.set(false);
-                }
-                return true;
-            }));
-            cancelButton = new Button("Cancel");
-            cancelButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    final String id = (String) getBuilder().getField(idField);
-                    if (id.isEmpty()) {
-                        getParent().getChildren().remove(RegistryMessageTreeItem.this);
-                    } else {
-                        GlobalCachedExecutorService.submit(() -> {
-                            try {
-                                final MB oldBuilder = (MB) Registries.getById(id, getBuilder()).toBuilder();
-                                Platform.runLater(() -> {
-                                    try {
-                                        update(oldBuilder);
-                                    } catch (CouldNotPerformException ex) {
-                                        logger.error("Could not update tree item with old builder from registry", ex);
-                                    }
-                                });
-                            } catch (CouldNotPerformException ex) {
-                                logger.warn("Could not retrieve message with id[" + id + "] for type[" + getBuilder().getClass().getName() + "] from registry", ex);
-                            }
-                        });
-                    }
-                }
-            });
-//            cancelButton.setOnAction(new CancelEventHandler());
-            buttonLayout = new HBox(applyButton, cancelButton);
-            return buttonLayout;
+                });
+            }
+            setValue(getValueCasted().createNew(getBuilder()));
+        } catch (CouldNotPerformException ex) {
+            logger.error("Error while applying event");
         }
-        return super.createValueGraphic();
     }
 
     private void handleRequiredFields() {
@@ -209,6 +241,32 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
             } else {
                 ProtoBufFieldProcessor.clearRequiredFields(getBuilder());
             }
+        }
+    }
+
+    void handleRemoveEvent() {
+        final String id = (String) getBuilder().getField(idField);
+        try {
+            logger.debug("Removing message with Id [" + id + "]");
+            if (!"".equals(id) && Registries.containsById(id, getBuilder())) {
+                // always remove by id to ignore not initialized fields of the builder
+                registryTask = Registries.remove(Registries.getById(id, getBuilder()));
+                setValue(getValueCasted().createNew(getBuilder()));
+                GlobalCachedExecutorService.submit(() -> {
+                    try {
+                        registryTask.get();
+                        //TODO handle correctly
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                });
+            } else {
+                Platform.runLater(() -> RegistryMessageTreeItem.this.getParent().getChildren().remove(RegistryMessageTreeItem.this));
+            }
+        } catch (CouldNotPerformException ex) {
+            RegistryEditor.printException(ex, logger, LogLevel.WARN);
         }
     }
 }

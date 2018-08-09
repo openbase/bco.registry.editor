@@ -129,7 +129,7 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
     @SuppressWarnings("unchecked")
     @Override
     public void update(final MB value) throws CouldNotPerformException {
-//        logger.info("Update value [" + value + "]");
+        logger.info("Update value [" + value.getClass().getName() + ", " + getClass().getName() + "]");
         this.setValue(getValueCasted().createNew(value));
 
         // if children are not yet initialized just change the internal builder
@@ -139,12 +139,12 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
 
 //        logger.info("Children are already intitialized");
         for (final FieldDescriptor field : descriptorChildMap.keySet()) {
-//            logger.info("Update for field[" + field.getName() + ", " + field.getType().name() + ", " + field.isRepeated() + "]");
+            logger.info("Update for field[" + field.getName() + ", " + field.getType().name() + ", " + field.isRepeated() + "]");
 
             if (field.isRepeated()) {
                 descriptorChildMap.get(field).update(value);
             } else {
-//                logger.info("Extract class for field: " + value.getField(field).getClass().getName());
+                logger.info("Extract class for field: " + value.getField(field).getClass().getName());
                 switch (field.getType()) {
                     case MESSAGE:
                         if (!value.hasField(field)) {

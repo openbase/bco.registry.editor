@@ -129,8 +129,8 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
         return filteredFieldSet;
     }
 
-    @Override
-    protected Node createValueGraphic() {
-        return new Label(getBuilder().getDescription());
-    }
+//    @Override
+//    protected Node createValueGraphic() {
+//        return new Label(getBuilder().getDescription());
+//    }
 }

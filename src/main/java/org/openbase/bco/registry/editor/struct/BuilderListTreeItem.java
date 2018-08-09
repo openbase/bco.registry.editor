@@ -157,14 +157,18 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
                     // save child found, remove from list of removed children, update child
                     childFound = true;
                     childrenToRemove.remove(child);
-                    childCasted.update(newBuilder);
+                    childCasted.update(builder);
                     break;
                 }
             }
 
             // no child matching the builder found so add new child
             if (!childFound) {
-                getChildren().add(loadTreeItem(getFieldDescriptor(), builder, true));
+                BuilderTreeItem child = createChild(builder);
+                if (isExpanded()) {
+                    child.getChildren();
+                }
+                getChildren().add(child);
             }
         }
 

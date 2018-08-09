@@ -91,6 +91,11 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
             final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.REMOVE, region.getHeight(), false);
             svgGlyphIcon.setForegroundIconColor(Color.RED);
             svgGlyphIcon.setOnMouseClicked(event -> {
+                if (treeItem instanceof RegistryMessageTreeItem) {
+                    ((RegistryMessageTreeItem) treeItem).handleRemoveEvent();
+                    return;
+                }
+
                 List updatedList = new ArrayList((List) getBuilder().getField(getFieldDescriptor()));
                 updatedList.remove(treeItem.getInternalValue());
                 getBuilder().clearField(getFieldDescriptor());
