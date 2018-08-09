@@ -23,9 +23,6 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
@@ -39,7 +36,7 @@ import java.util.Set;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class UnitConfigTreeItem extends SendableTreeItem<Builder> {
+public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
 
     public UnitConfigTreeItem(FieldDescriptor fieldDescriptor, Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);

@@ -40,10 +40,12 @@ public class ScopeTreeItem extends BuilderLeafTreeItem<Builder> {
 
     public ScopeTreeItem(FieldDescriptor fieldDescriptor, Scope.Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);
+
+        this.addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
     }
 
     @Override
-    public Node getValueGraphic() {
+    protected Node createValueGraphic() {
         try {
             return new Label(ScopeGenerator.generateStringRep(getInternalValue().build()));
         } catch (CouldNotPerformException ex) {

@@ -49,12 +49,12 @@ import java.util.concurrent.Future;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class SendableTreeItem<MB extends Message.Builder> extends BuilderTreeItem<MB> {
+public class RegistryMessageTreeItem<MB extends Message.Builder> extends BuilderTreeItem<MB> {
 
     private final SimpleObjectProperty<Boolean> changedProperty;
     private final FieldDescriptor idField, labelField;
 
-    public SendableTreeItem(FieldDescriptor fieldDescriptor, MB builder) throws InitializationException {
+    public RegistryMessageTreeItem(FieldDescriptor fieldDescriptor, MB builder) throws InitializationException {
         super(fieldDescriptor, builder);
 
         idField = ProtoBufFieldProcessor.getFieldDescriptor(builder, Identifiable.TYPE_FIELD_ID);
@@ -68,6 +68,8 @@ public class SendableTreeItem<MB extends Message.Builder> extends BuilderTreeIte
             }
             // this is triggered when the value of this node or one of its children changes
             changedProperty.set(true);
+
+            updateValueGraphic();
         });
 
 //        this.addEventHandler(childrenModificationEvent(), event -> {
@@ -89,16 +91,16 @@ public class SendableTreeItem<MB extends Message.Builder> extends BuilderTreeIte
     }
 
     @Override
-    public Node getDescriptionGraphic() {
+    protected Node createDescriptionGraphic() {
         try {
             return new Label(LabelProcessor.getBestMatch((rst.configuration.LabelType.Label) getBuilder().getField(labelField)));
         } catch (NotAvailableException e) {
-            return super.getDescriptionGraphic();
+            return super.createDescriptionGraphic();
         }
     }
 
     @Override
-    public Node getValueGraphic() {
+    protected Node createValueGraphic() {
         if (changedProperty.get()) {
             final Button applyButton, cancelButton;
             final HBox buttonLayout;
@@ -134,14 +136,14 @@ public class SendableTreeItem<MB extends Message.Builder> extends BuilderTreeIte
                         // check if update and original are the same, then the changed values where reset and a registry update is not triggered
                         if (original.equals(update)) {
                             // reset the container to its old value
-                            SendableTreeItem.this.update((MB) original.toBuilder());
+                            RegistryMessageTreeItem.this.update((MB) original.toBuilder());
                         }
 
                     } else {
                         task = Registries.register(message);
                         task.get();
                         // remove temporally created node structure
-                        SendableTreeItem.this.getParent().getChildren().remove(SendableTreeItem.this);
+                        RegistryMessageTreeItem.this.getParent().getChildren().remove(RegistryMessageTreeItem.this);
                     }
                 } catch (CouldNotPerformException | ExecutionException ex) {
                     RegistryEditor.printException(ex, logger, LogLevel.ERROR);
@@ -149,7 +151,7 @@ public class SendableTreeItem<MB extends Message.Builder> extends BuilderTreeIte
                         task.cancel(true);
                     }
 
-                    SendableTreeItem.this.changedProperty.set(false);
+                    RegistryMessageTreeItem.this.changedProperty.set(false);
                 }
                 return true;
             }));
@@ -158,7 +160,7 @@ public class SendableTreeItem<MB extends Message.Builder> extends BuilderTreeIte
             buttonLayout = new HBox(applyButton, cancelButton);
             return buttonLayout;
         }
-        return super.getValueGraphic();
+        return super.createValueGraphic();
     }
 
     private void handleRequiredFields() {

@@ -39,14 +39,16 @@ public class LabelMapFieldEntryTreeItem extends BuilderLeafTreeItem<Builder> {
 
     public LabelMapFieldEntryTreeItem(FieldDescriptor fieldDescriptor, Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);
+
+        this.addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
     }
 
     @Override
-    public Node getValueGraphic() {
+    protected Node createValueGraphic() {
         String valueDescription = new Locale(getBuilder().getKey()).getDisplayLanguage() + ": ";
         for (int i = 0; i < getBuilder().getValueList().size(); i++) {
             valueDescription += getBuilder().getValue(i);
-            if(i < getBuilder().getValueCount() - 1) {
+            if (i < getBuilder().getValueCount() - 1) {
                 valueDescription += ", ";
             }
         }

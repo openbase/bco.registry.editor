@@ -84,7 +84,7 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
                 childTreeItem = new BuilderListTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue()) {
 
                     @Override
-                    public Node getDescriptionGraphic() {
+                    public Node createDescriptionGraphic() {
                         return new Label(entry.getKey() == null ? "" : childGroupValueProviders[0].generateDescription(entry.getKey()));
                     }
                 };
@@ -92,7 +92,7 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
                 childTreeItem = new GroupTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue(), entry.getKey(), childGroupValueProviders[0], childGroups) {
 
                     @Override
-                    public Node getDescriptionGraphic() {
+                    public Node createDescriptionGraphic() {
                         return new Label(entry.getKey() == null ? "" : childGroupValueProviders[0].generateDescription(entry.getKey()));
                     }
                 };

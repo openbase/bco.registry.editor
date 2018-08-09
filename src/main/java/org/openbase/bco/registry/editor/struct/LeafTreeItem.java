@@ -30,23 +30,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.editing.*;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
-import org.openbase.jul.exception.InitializationException;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class LeafTreeItem<V> extends GenericTreeItem<V> {
 
-    private final Message.Builder parentBuilder;
-
-    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder) throws InitializationException {
+    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder) {
         this(fieldDescriptor, value, parentBuilder, true);
     }
 
-    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final boolean editable) throws InitializationException {
+    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final boolean editable) {
         super(fieldDescriptor, value, editable);
-        this.parentBuilder = parentBuilder;
-        valueProperty().addListener((observable, oldValue, newValue) -> parentBuilder.setField(getFieldDescriptor(), newValue.getValue()));
+        this.valueProperty().addListener((observable, oldValue, newValue) -> parentBuilder.setField(getFieldDescriptor(), newValue.getValue()));
+        this.addEventHandler(valueChangedEvent(), event -> createValueGraphic());
     }
 
     @SuppressWarnings("unchecked")
@@ -70,7 +67,7 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
     }
 
     @Override
-    public Node getValueGraphic() {
+    protected Node createValueGraphic() {
         if (isEditable()) {
             return new Label(getInternalValue().toString());
         } else {

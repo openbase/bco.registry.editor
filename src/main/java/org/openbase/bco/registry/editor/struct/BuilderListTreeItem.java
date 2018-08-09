@@ -44,6 +44,8 @@ import java.util.List;
 import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
 
 /**
+ * TODO: maybe also create children also only if not yet initialized?
+ *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBuilderTreeItem<MB> {
@@ -99,7 +101,7 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
     }
 
     @Override
-    public Node getDescriptionGraphic() {
+    protected Node createDescriptionGraphic() {
         final Label label = new Label(description);
         if (isModifiable()) {
             final HBox hBox = new HBox();
@@ -129,9 +131,6 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractBui
         for (final Message.Builder builder : builderList) {
             childList.add(loadTreeItem(getFieldDescriptor(), builder));
         }
-//            for (int i = 0; i < getBuilder().getRepeatedFieldCount(fieldDescriptor); i++) {
-//                childList.add(new GenericTreeItem<>(fieldDescriptor, getBuilder().getRepeatedField(fieldDescriptor, i)));
-//            }
 
         return childList;
     }

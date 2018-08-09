@@ -23,7 +23,6 @@ package org.openbase.bco.registry.editor.visual.cell;
  */
 
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
@@ -57,6 +56,10 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
                     setGraphic(editingGraphic);
                 }
                 return;
+            }
+
+            if (item.getValue() instanceof rst.configuration.LabelType.Label.MapFieldEntry.Builder) {
+                LOGGER.info("Call get value graphic for label entry [" + ((Label) item.getValueGraphic()).getText() + "]");
             }
 
             setGraphic(item.getValueGraphic());
