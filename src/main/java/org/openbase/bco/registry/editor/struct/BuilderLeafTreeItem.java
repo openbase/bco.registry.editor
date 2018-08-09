@@ -36,11 +36,13 @@ public class BuilderLeafTreeItem<MB extends Message.Builder> extends BuilderTree
 
     public BuilderLeafTreeItem(FieldDescriptor fieldDescriptor, MB builder) throws InitializationException {
         super(fieldDescriptor, builder);
+
+        this.addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
     }
 
     @Override
     protected ObservableList<TreeItem<ValueType>> createChildren() {
-        // empty list because label will be printed as a single string
+        // empty list because leaf nodes do not have children
         return FXCollections.observableArrayList();
     }
 }

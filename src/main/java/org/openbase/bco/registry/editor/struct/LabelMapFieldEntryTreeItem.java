@@ -39,8 +39,6 @@ public class LabelMapFieldEntryTreeItem extends BuilderLeafTreeItem<Builder> {
 
     public LabelMapFieldEntryTreeItem(FieldDescriptor fieldDescriptor, Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);
-
-        this.addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
     }
 
     @Override

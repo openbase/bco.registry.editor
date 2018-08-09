@@ -40,8 +40,6 @@ public class ScopeTreeItem extends BuilderLeafTreeItem<Builder> {
 
     public ScopeTreeItem(FieldDescriptor fieldDescriptor, Scope.Builder builder) throws InitializationException {
         super(fieldDescriptor, builder);
-
-        this.addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
     }
 
     @Override

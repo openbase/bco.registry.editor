@@ -51,7 +51,7 @@ public class ValueListTreeItem<MB extends Message.Builder> extends AbstractBuild
 
     private void validateDescriptor() throws CouldNotPerformException {
         if (getFieldDescriptor().getType() == Type.MESSAGE || !getFieldDescriptor().isRepeated()) {
-            throw new CouldNotPerformException("FieldDescriptor[" + getFieldDescriptor() + "] of Message[" + extractMessageClass(getBuilder()) + "] is not a repeated message");
+            throw new CouldNotPerformException("FieldDescriptor[" + getFieldDescriptor() + "] of Message[" + extractSimpleMessageClass(getBuilder()) + "] is not a repeated message");
         }
     }
 

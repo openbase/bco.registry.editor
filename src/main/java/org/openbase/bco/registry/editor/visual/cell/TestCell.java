@@ -58,10 +58,6 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
                 return;
             }
 
-            if (item.getValue() instanceof rst.configuration.LabelType.Label.MapFieldEntry.Builder) {
-                LOGGER.info("Call get value graphic for label entry [" + ((Label) item.getValueGraphic()).getText() + "]");
-            }
-
             setGraphic(item.getValueGraphic());
         } else {
             // reset text if now empty
@@ -73,7 +69,6 @@ public class TestCell extends TreeTableCell<ValueType, ValueType> {
     public void startEdit() {
         super.startEdit();
 
-        System.out.println("Start editing");
         editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
         if (editingGraphic != null) {
             // editing graphic equals null means not editable

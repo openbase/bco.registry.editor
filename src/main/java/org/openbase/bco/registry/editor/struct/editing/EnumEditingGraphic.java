@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct.editing;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -27,9 +27,9 @@ import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.struct.editing.util.EnumValueDescriptorCell;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,14 +40,14 @@ import java.util.List;
  */
 public class EnumEditingGraphic extends AbstractEditingGraphic<ComboBox<EnumValueDescriptor>, EnumValueDescriptor> {
 
+    private static final String ENUM_NAME_UNKNOWN = "UNKNOWN";
+
     public EnumEditingGraphic(final ValueType<EnumValueDescriptor> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new ComboBox<>(), valueType, treeTableCell);
         getControl().setVisibleRowCount(10);
         getControl().setCellFactory(param -> new EnumValueDescriptorCell());
         getControl().setButtonCell(new EnumValueDescriptorCell());
-        getControl().setOnAction((event) -> {
-            commitEdit();
-        });
+        getControl().setOnAction((event) -> commitEdit());
     }
 
     @Override
@@ -68,20 +68,16 @@ public class EnumEditingGraphic extends AbstractEditingGraphic<ComboBox<EnumValu
         getControl().setValue(value);
     }
 
-    private ObservableList<EnumValueDescriptor> createSortedEnumList(EnumDescriptor enumDescriptor) {
-        List<EnumValueDescriptor> values = new ArrayList<>(enumDescriptor.getValues());
+    public static ObservableList<EnumValueDescriptor> createSortedEnumList(EnumDescriptor enumDescriptor) {
+        List<EnumValueDescriptor> values = new ArrayList<>();
+        for (EnumValueDescriptor value : enumDescriptor.getValues()) {
+            if (value.getName().equals(ENUM_NAME_UNKNOWN)) {
+                continue;
+            }
+
+            values.add(value);
+        }
         values.sort(Comparator.comparing(EnumValueDescriptor::getName));
         return FXCollections.observableArrayList(values);
-    }
-
-    private class EnumValueDescriptorCell extends ListCell<EnumValueDescriptor> {
-
-        @Override
-        public void updateItem(EnumValueDescriptor item, boolean empty) {
-            super.updateItem(item, empty);
-            if (item != null) {
-                setText(item.getName());
-            }
-        }
     }
 }

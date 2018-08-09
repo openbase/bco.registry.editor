@@ -23,7 +23,6 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -39,8 +38,6 @@ public class EntryTreeItem extends BuilderLeafTreeItem<Builder> {
 
     public EntryTreeItem(FieldDescriptor fieldDescriptor, Builder value) throws InitializationException {
         super(fieldDescriptor, value);
-
-        this.addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
     }
 
     @Override

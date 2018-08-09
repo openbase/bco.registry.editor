@@ -43,7 +43,7 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
     public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final boolean editable) {
         super(fieldDescriptor, value, editable);
         this.valueProperty().addListener((observable, oldValue, newValue) -> parentBuilder.setField(getFieldDescriptor(), newValue.getValue()));
-        this.addEventHandler(valueChangedEvent(), event -> createValueGraphic());
+        this.addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
     }
 
     @SuppressWarnings("unchecked")

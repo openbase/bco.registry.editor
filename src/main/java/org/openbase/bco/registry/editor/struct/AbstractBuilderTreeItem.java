@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -75,7 +75,11 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
 
     abstract protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException;
 
-    protected String extractMessageClass(final Message.Builder builder) {
+    protected boolean childrenInitialized() {
+        return childrenInitialized;
+    }
+
+    protected String extractSimpleMessageClass(final Message.Builder builder) {
         String className = "";
         final String[] split = builder.getClass().getName().split("\\$");
         for (int i = 1; i < split.length - 1; i++) {
@@ -86,7 +90,7 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
 
     @SuppressWarnings("unchecked")
     protected BuilderTreeItem loadTreeItem(final FieldDescriptor fieldDescriptor, final Message.Builder builder) throws CouldNotPerformException {
-        final String className = getClass().getPackage().getName() + "." + extractMessageClass(builder) + "TreeItem";
+        final String className = getClass().getPackage().getName() + "." + extractSimpleMessageClass(builder) + "TreeItem";
 
         try {
             // load class
@@ -102,11 +106,7 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
             return new BuilderTreeItem(fieldDescriptor, builder);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ex) {
             // could not get or invoke constructor which is only the case on an implementation error
-            throw ExceptionPrinter.printHistoryAndReturnThrowable(new FatalImplementationErrorException("Could not invoke constructor[" + className + "] for type[" + extractMessageClass(builder) + "]", this, ex), logger);
+            throw ExceptionPrinter.printHistoryAndReturnThrowable(new FatalImplementationErrorException("Could not invoke constructor[" + className + "] for type[" + extractSimpleMessageClass(builder) + "]", this, ex), logger);
         }
-    }
-
-    public void update(MB builder) {
-        //TODO
     }
 }

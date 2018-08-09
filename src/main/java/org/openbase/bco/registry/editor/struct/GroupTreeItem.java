@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -30,14 +30,13 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
-import org.openbase.bco.registry.editor.struct.value.DescriptionGenerator;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.exception.NotAvailableException;
+import org.openbase.jul.extension.protobuf.BuilderProcessor;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -46,26 +45,35 @@ import java.util.Map.Entry;
 public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeItem<MB> {
 
     private final Object value;
+    private final FieldPathDescriptionProvider parentGroupValueProvider;
     private final FieldPathDescriptionProvider groupValueProvider;
-    private final FieldPathDescriptionProvider[] childGroupValueProviders;
-    private final Map<Object, BuilderListTreeItem> valueChildMap;
+    private final Map<Object, BuilderListTreeItem<MB>> valueChildMap;
+    private final FieldPathDescriptionProvider[] childGroups;
 
     public GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
+        this(fieldDescriptor, builder, modifiable, null, null, groupValueProviders);
+    }
+
+    private GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final Object value, final FieldPathDescriptionProvider parentGroupValueProvider, final FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
         super(fieldDescriptor, builder, modifiable);
 
-        this.value = null;
-        this.groupValueProvider = null;
-        this.childGroupValueProviders = groupValueProviders;
+        if (groupValueProviders.length < 1) {
+            throw new InitializationException(this, new NotAvailableException("field path descriptors"));
+        }
+
+        this.value = value;
+        this.parentGroupValueProvider = parentGroupValueProvider;
+        this.groupValueProvider = groupValueProviders[0];
+        this.childGroups = new FieldPathDescriptionProvider[groupValueProviders.length - 1];
+        if (groupValueProviders.length > 1) {
+            System.arraycopy(groupValueProviders, 1, childGroups, 0, childGroups.length);
+        }
         this.valueChildMap = new HashMap<>();
     }
 
-    private GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final List<Message.Builder> builderList, final Object value, final FieldPathDescriptionProvider groupValueProvider, FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
-        super(fieldDescriptor, builder, modifiable, builderList);
-
-        this.value = value;
-        this.groupValueProvider = groupValueProvider;
-        this.childGroupValueProviders = groupValueProviders;
-        this.valueChildMap = new HashMap<>();
+    private GroupTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final List<Message.Builder> builderList, final Object value, final FieldPathDescriptionProvider parentGroupValueProvider, FieldPathDescriptionProvider... groupValueProviders) throws InitializationException {
+        this(fieldDescriptor, builder, modifiable, value, parentGroupValueProvider, groupValueProviders);
+        super.setBuilderList(builderList);
     }
 
 
@@ -73,44 +81,33 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
     @Override
     protected ObservableList<TreeItem<ValueType>> createChildren() throws CouldNotPerformException {
         final ObservableList<TreeItem<ValueType>> childList = FXCollections.observableArrayList();
-        final FieldPathDescriptionProvider[] childGroups = new FieldPathDescriptionProvider[childGroupValueProviders.length - 1];
-        if (childGroupValueProviders.length > 1) {
-            System.arraycopy(childGroupValueProviders, 1, childGroups, 0, childGroups.length);
-        }
 
-        for (final Entry<Object, List<Builder>> entry : childGroupValueProviders[0].getValueBuilderMap(getBuilderList()).entrySet()) {
-            BuilderListTreeItem childTreeItem;
-            if (childGroups.length == 0) {
-                childTreeItem = new BuilderListTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue()) {
-
-                    @Override
-                    public Node createDescriptionGraphic() {
-                        return new Label(entry.getKey() == null ? "" : childGroupValueProviders[0].generateDescription(entry.getKey()));
-                    }
-                };
-            } else {
-                childTreeItem = new GroupTreeItem(getFieldDescriptor(), getBuilder(), isModifiable(), entry.getValue(), entry.getKey(), childGroupValueProviders[0], childGroups) {
-
-                    @Override
-                    public Node createDescriptionGraphic() {
-                        return new Label(entry.getKey() == null ? "" : childGroupValueProviders[0].generateDescription(entry.getKey()));
-                    }
-                };
-            }
-            childList.add(childTreeItem);
-            valueChildMap.put(entry.getKey(), childTreeItem);
+        for (final Entry<Object, List<Builder>> entry : groupValueProvider.getValueBuilderMap(getBuilderList()).entrySet()) {
+            childList.add(createChild(entry.getKey(), entry.getValue()));
         }
         return childList;
     }
 
+    private BuilderListTreeItem<MB> createChild(final Object value, final List<Message.Builder> builderList) throws CouldNotPerformException {
+        BuilderListTreeItem<MB> childTreeItem;
+        if (childGroups.length == 0) {
+            childTreeItem = new BuilderListTreeItem<>(getFieldDescriptor(), getBuilder(), isModifiable(), builderList);
+            childTreeItem.setDescriptionGraphic(new Label(groupValueProvider.generateDescription(value)));
+        } else {
+            childTreeItem = new GroupTreeItem<>(getFieldDescriptor(), getBuilder(), isModifiable(), builderList, value, groupValueProvider, childGroups);
+        }
+        valueChildMap.put(value, childTreeItem);
+        return childTreeItem;
+    }
+
     public void updateElement(final Message.Builder builder) {
         // ignore topmost group
-        if (groupValueProvider == null) {
+        if (getParent() == null) {
             return;
         }
 
         // update with value
-        groupValueProvider.setValue(builder, value);
+        parentGroupValueProvider.setValue(builder, value);
 
         // update with value from parent
         if (getParent() instanceof GroupTreeItem) {
@@ -118,22 +115,43 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
         }
     }
 
-    public class GroupDescriptionGenerator implements DescriptionGenerator<MB> {
+    @Override
+    protected Node createDescriptionGraphic() {
+        return new Label(parentGroupValueProvider.generateDescription(value));
+    }
 
-        final String description;
+    @Override
+    protected void update(final MB newBuilder, final List<Builder> newBuilderList) throws CouldNotPerformException {
+        // update the internal builder
+        this.setValue(getValueCasted().createNew(newBuilder));
+        setBuilderList(newBuilderList);
 
-        public GroupDescriptionGenerator(final FieldPathDescriptionProvider groupValueProvider, final Object value) {
-            this.description = value == null ? "" : groupValueProvider.generateDescription(value);
+        // if children are not yet initialized just change the internal builder and save the new builder list
+        if (!childrenInitialized()) {
+            return;
         }
 
-        @Override
-        public String getValueDescription(MB value) {
-            return "";
+        // save current values to check if some are not existent anymore
+        final Set<Object> removedValueSet = new HashSet<>(valueChildMap.keySet());
+        // create value map for new builder list and iterate over it
+        for (final Entry<Object, List<Builder>> entry : groupValueProvider.getValueBuilderMap(newBuilderList).entrySet()) {
+            if (!valueChildMap.containsKey(entry.getKey())) {
+                // new value so add new child
+                getChildren().add(createChild(entry.getKey(), entry.getValue()));
+            } else {
+                // value existent so trigger update in according child
+                valueChildMap.get(entry.getKey()).update(newBuilder, entry.getValue());
+                // remove from set of removed valued
+                removedValueSet.remove(entry.getKey());
+            }
         }
 
-        @Override
-        public String getDescription(MB value) {
-            return description;
+        // iterate over removed values
+        for (final Object groupValue : removedValueSet) {
+            // remove from child map
+            final BuilderListTreeItem removedTreeItem = valueChildMap.remove(groupValue);
+            // remove tree item from children
+            getChildren().remove(removedTreeItem);
         }
     }
 }
