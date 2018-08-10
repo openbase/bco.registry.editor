@@ -34,7 +34,6 @@ import rst.configuration.LabelType.Label;
 import rst.configuration.LabelType.Label.MapFieldEntry.Builder;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -66,9 +65,8 @@ public class LabelEditingGraphic extends AbstractEditingGraphic<HBox, Label.MapF
         builder.setKey(languageComboBox.getValue());
         builder.clearValue();
         for (final String label : labelTextField.getText().split(",")) {
-            builder.addValue(label.replaceFirst(" ", ""));
+            builder.addValue(label.trim());
         }
-        System.out.println("Created label: " + builder.build());
         return builder;
     }
 

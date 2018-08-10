@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -147,7 +147,9 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
         for (final Entry<Object, List<Builder>> entry : groupValueProvider.getValueBuilderMap(newBuilderList).entrySet()) {
             if (!valueChildMap.containsKey(entry.getKey())) {
                 // new value so add new child
-                getChildren().add(createChild(entry.getKey(), entry.getValue()));
+                BuilderListTreeItem<MB> child = createChild(entry.getKey(), entry.getValue());
+                child.getChildren();
+                getChildren().add(child);
             } else {
                 // value existent so trigger update in according child
                 valueChildMap.get(entry.getKey()).update(newBuilder, entry.getValue());
