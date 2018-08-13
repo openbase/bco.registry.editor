@@ -66,4 +66,8 @@ public class ValueType<V extends Object> {
     public boolean isEditable() {
         return treeItem.isEditable();
     }
+
+    public GenericTreeItem getTreeItem() {
+        return treeItem;
+    }
 }

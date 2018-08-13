@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct.editing;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -30,7 +30,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import rst.configuration.LabelType.Label;
 import rst.configuration.LabelType.Label.MapFieldEntry.Builder;
 
 import java.util.Arrays;
@@ -40,7 +39,7 @@ import java.util.Locale;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class LabelEditingGraphic extends AbstractEditingGraphic<HBox, Label.MapFieldEntry.Builder> {
+public class LabelEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Builder> {
 
     private ComboBox<String> languageComboBox;
     private TextField labelTextField;
@@ -60,14 +59,12 @@ public class LabelEditingGraphic extends AbstractEditingGraphic<HBox, Label.MapF
     }
 
     @Override
-    protected Builder getCurrentValue() {
-        final Label.MapFieldEntry.Builder builder = getValueType().getValue();
+    protected void updateBuilder(Builder builder) {
         builder.setKey(languageComboBox.getValue());
         builder.clearValue();
         for (final String label : labelTextField.getText().split(",")) {
             builder.addValue(label.trim());
         }
-        return builder;
     }
 
     @Override

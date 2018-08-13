@@ -25,15 +25,17 @@ package org.openbase.bco.registry.editor.struct.editing;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TreeTableCell;
+import org.openbase.bco.registry.editor.struct.AbstractBuilderTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.EnumValueDescriptorCell;
 import rst.domotic.state.EnablingStateType.EnablingState;
+import rst.domotic.state.EnablingStateType.EnablingState.Builder;
 import rst.domotic.state.EnablingStateType.EnablingState.State;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class EnablingStateEditingGraphic extends AbstractEditingGraphic<ComboBox<EnumValueDescriptor>, EnablingState.Builder> {
+public class EnablingStateEditingGraphic extends AbstractBuilderEditingGraphic<ComboBox<EnumValueDescriptor>, Builder> {
 
     public EnablingStateEditingGraphic(final ValueType<EnablingState.Builder> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new ComboBox<>(), valueType, treeTableCell);
@@ -49,11 +51,9 @@ public class EnablingStateEditingGraphic extends AbstractEditingGraphic<ComboBox
             super.commitEdit();
         }
     }
-
     @Override
-    protected EnablingState.Builder getCurrentValue() {
-        State state = State.valueOf(getControl().getSelectionModel().getSelectedItem().getNumber());
-        return getValueType().getValue().setValue(state);
+    protected void updateBuilder(Builder builder) {
+        builder.setValue(State.valueOf(getControl().getSelectionModel().getSelectedItem().getNumber()));
     }
 
     @Override

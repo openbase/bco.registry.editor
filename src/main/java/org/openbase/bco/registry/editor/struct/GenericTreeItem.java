@@ -121,7 +121,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
      * If a tree item needs a representation it should overwrite this method.
      * If the description graphic changes for a tree item if its internal value changes it should register an event
      * handler on the {@link #valueChangedEvent()} by calling {@link #addEventHandler(EventType, EventHandler)}.
-     * This event handler should call {@link #updateValueGraphic()} to generate and save new value graphic.
+     * This event handler should call {@link #updateValueGraphic()} to generate and save a new value graphic.
      *
      * @return a graphic displayed in the value column
      */

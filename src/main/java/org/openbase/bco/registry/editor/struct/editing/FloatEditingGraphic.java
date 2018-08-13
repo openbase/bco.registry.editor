@@ -37,7 +37,7 @@ public class FloatEditingGraphic extends AbstractTextEditingGraphic<NumberFilter
 
     @Override
     protected Float getCurrentValue() {
-        return Float.parseFloat(getControl().getText());
+        return getControl().getAsFloat();
     }
 
     @Override

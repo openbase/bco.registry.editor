@@ -28,6 +28,8 @@ import com.google.protobuf.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
+import org.openbase.bco.registry.editor.util.DescriptionGenerator;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 
@@ -35,6 +37,9 @@ import org.openbase.jul.exception.InitializationException;
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class ValueListTreeItem<MB extends Message.Builder> extends AbstractListTreeItem<MB> {
+
+    private DescriptionGenerator descriptionGenerator;
+    private EditingGraphicFactory editingGraphicFactory;
 
     public ValueListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
         super(fieldDescriptor, builder, modifiable);
@@ -62,6 +67,15 @@ public class ValueListTreeItem<MB extends Message.Builder> extends AbstractListT
     private LeafTreeItem createChild(final Object value, final int index) throws CouldNotPerformException {
         // create leaf tree item
         final LeafTreeItem leafTreeItem = new LeafTreeItem<>(getFieldDescriptor(), value, getBuilder(), isModifiable(), index);
+
+        if (editingGraphicFactory != null) {
+            leafTreeItem.setEditingGraphicFactory(editingGraphicFactory);
+        }
+
+        if (descriptionGenerator != null) {
+            leafTreeItem.setDescriptionGenerator(descriptionGenerator);
+        }
+
         // if is modifiable add symbol to remove to child
         updateChildGraphic(leafTreeItem);
         // return tree item
@@ -107,5 +121,13 @@ public class ValueListTreeItem<MB extends Message.Builder> extends AbstractListT
         // just create the list anew
         getChildren().clear();
         getChildren().addAll(createChildren());
+    }
+
+    public void setDescriptionGenerator(DescriptionGenerator descriptionGenerator) {
+        this.descriptionGenerator = descriptionGenerator;
+    }
+
+    public void setEditingGraphicFactory(EditingGraphicFactory editingGraphicFactory) {
+        this.editingGraphicFactory = editingGraphicFactory;
     }
 }

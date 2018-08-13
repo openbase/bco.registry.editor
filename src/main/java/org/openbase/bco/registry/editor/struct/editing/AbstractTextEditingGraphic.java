@@ -39,15 +39,15 @@ abstract class AbstractTextEditingGraphic<TF extends TextField, V> extends Abstr
                 getControl().selectAll();
             }
         });
-        getControl().setOnKeyReleased(event -> {
-            switch (event.getCode()) {
-                case ESCAPE:
-                    treeTableCell.cancelEdit();
-                    break;
-                case ENTER:
-                    commitEdit();
-            }
-        });
+//        getControl().setOnKeyReleased(event -> {
+//            switch (event.getCode()) {
+//                case ESCAPE:
+//                    treeTableCell.cancelEdit();
+//                    break;
+//                case ENTER:
+//                    commitEdit();
+//            }
+//        });
     }
 
     @Override
