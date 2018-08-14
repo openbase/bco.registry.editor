@@ -30,6 +30,7 @@ import org.openbase.bco.registry.editor.struct.preset.UnitConfigTreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.FatalImplementationErrorException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -79,7 +80,7 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
         return childrenInitialized;
     }
 
-    protected String extractSimpleMessageClass(final Message.Builder builder) {
+    public static String extractSimpleMessageClass(final Message.Builder builder) {
         String className = "";
         final String[] split = builder.getClass().getName().split("\\$");
         for (int i = 1; i < split.length - 1; i++) {
@@ -89,12 +90,12 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
     }
 
     @SuppressWarnings("unchecked")
-    BuilderTreeItem loadTreeItem(final FieldDescriptor fieldDescriptor, final Message.Builder builder, final Boolean editable) throws CouldNotPerformException {
+    public static BuilderTreeItem loadTreeItem(final FieldDescriptor fieldDescriptor, final Message.Builder builder, final Boolean editable) throws CouldNotPerformException {
         final String className = UnitConfigTreeItem.class.getPackage().getName() + "." + extractSimpleMessageClass(builder) + "TreeItem";
 
         try {
             // load class
-            Class<? extends BuilderTreeItem> treeItemClass = (Class<? extends BuilderTreeItem>) getClass().getClassLoader().loadClass(className);
+            Class<? extends BuilderTreeItem> treeItemClass = (Class<? extends BuilderTreeItem>) AbstractBuilderTreeItem.class.getClassLoader().loadClass(className);
 
             // get constructor
             Constructor<? extends BuilderTreeItem> constructor = treeItemClass.getConstructor(fieldDescriptor.getClass(), builder.getClass(), editable.getClass());
@@ -106,7 +107,7 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
             return new BuilderTreeItem(fieldDescriptor, builder, editable);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ex) {
             // could not get or invoke constructor which is only the case on an implementation error
-            throw ExceptionPrinter.printHistoryAndReturnThrowable(new FatalImplementationErrorException("Could not invoke constructor[" + className + "] for type[" + extractSimpleMessageClass(builder) + "]", this, ex), logger);
+            throw ExceptionPrinter.printHistoryAndReturnThrowable(new FatalImplementationErrorException("Could not invoke constructor[" + className + "] for type[" + extractSimpleMessageClass(builder) + "]", AbstractBuilderTreeItem.class, ex), LoggerFactory.getLogger(AbstractBuilderTreeItem.class));
         }
     }
 }

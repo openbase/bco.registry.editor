@@ -55,7 +55,13 @@ public class UnitTemplateConfigTreeItem extends BuilderTreeItem<UnitTemplateConf
 
         addEventHandler(valueChangedEvent(), event -> {
             updateDescriptionGraphic();
+
+            if (!event.getSource().getParent().equals(this)) {
+                return;
+            }
+
             final GenericTreeItem source = (GenericTreeItem) event.getSource();
+            logger.info(source.getClass().getSimpleName() + ", " + source.getFieldDescriptor().getNumber() + ", " + source.getFieldDescriptor().getName() + ", " + UnitTemplateConfig.TYPE_FIELD_NUMBER);
             if (source.getFieldDescriptor().getNumber() == UnitTemplateConfig.TYPE_FIELD_NUMBER) {
                 // try to find position of service template tree item
                 int index = -1;

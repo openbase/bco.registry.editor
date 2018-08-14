@@ -24,13 +24,8 @@ package org.openbase.bco.registry.editor.visual;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
-import org.openbase.bco.registry.editor.struct.AbstractBuilderTreeItem;
-import org.openbase.bco.registry.editor.struct.BuilderListTreeItem;
-import org.openbase.bco.registry.editor.struct.GroupTreeItem;
-import org.openbase.bco.registry.editor.struct.ValueType;
+import javafx.scene.control.*;
+import org.openbase.bco.registry.editor.struct.*;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.visual.cell.SecondCell;
 import org.openbase.bco.registry.editor.visual.cell.TestCell;
@@ -40,6 +35,9 @@ import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitConfigType.UnitConfig.Builder;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -106,6 +104,24 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
                 }
             }
         });
+
+        if (fieldDescriptor.getName().startsWith("app_unit")) {
+            final ContextMenu contextMenu = new ContextMenu();
+            final MenuItem addMenuItem = new MenuItem("Add");
+            addMenuItem.setOnAction(event -> {
+                Builder builder = UnitConfig.newBuilder().setUnitType(UnitType.APP);
+                try {
+                    BuilderTreeItem builderTreeItem = AbstractBuilderTreeItem.loadTreeItem(fieldDescriptor, builder, true);
+                    builderTreeItem.setExpanded(true);
+                    builderTreeItem.getChildren();
+                    root.getChildren().add(builderTreeItem);
+                } catch (CouldNotPerformException e) {
+                    e.printStackTrace();
+                }
+            });
+            contextMenu.getItems().add(addMenuItem);
+            treeTableView.setContextMenu(contextMenu);
+        }
     }
 
     public void update(RD registryData) throws CouldNotPerformException {
