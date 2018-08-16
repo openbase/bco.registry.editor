@@ -10,18 +10,20 @@ package org.openbase.bco.registry.editor.struct.editing;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
+import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
@@ -32,43 +34,36 @@ import rst.geometry.RotationType.Rotation.Builder;
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
 import java.text.DecimalFormat;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class RotationEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Builder> {
 
-
     private NumberFilteredTextField rollTextField, pitchTextField, yawTextField;
-    private DecimalFormat decimalFormat;
 
     public RotationEditingGraphic(ValueType<Builder> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new HBox(), valueType, treeTableCell);
-
-        getControl().setOnKeyReleased(event -> {
-            switch (event.getCode()) {
-                case ENTER:
-                    commitEdit();
-                    break;
-                case ESCAPE:
-                    treeTableCell.cancelEdit();
-                    break;
-            }
-        });
     }
 
     @Override
-    protected void updateBuilder(Builder builder) {
+    protected boolean updateBuilder(Builder builder) {
         double roll = Math.toRadians(rollTextField.getAsDouble());
         double pitch = Math.toRadians(pitchTextField.getAsDouble());
         double yaw = Math.toRadians(yawTextField.getAsDouble());
         final Vector3d euler = new Vector3d(roll, pitch, yaw);
 
         Quat4d quaternion = QuaternionEulerTransform.transform(euler);
+        if (quaternion.w == builder.getQw() && quaternion.x == builder.getQx() && quaternion.y == builder.getQy() && quaternion.z == builder.getQz()) {
+            return false;
+        }
+
         builder.setQw(quaternion.w);
         builder.setQx(quaternion.x);
         builder.setQy(quaternion.y);
         builder.setQz(quaternion.z);
+        return true;
     }
 
     @Override
@@ -99,9 +94,11 @@ public class RotationEditingGraphic extends AbstractBuilderEditingGraphic<HBox, 
             euler.z = Math.toDegrees(euler.z);
         }
 
-        decimalFormat = new DecimalFormat("##.##");
+        DecimalFormat decimalFormat = new DecimalFormat("##.##");
         rollTextField.setText("" + decimalFormat.format(euler.x));
         pitchTextField.setText("" + decimalFormat.format(euler.y));
         yawTextField.setText("" + decimalFormat.format(euler.z));
+
+        Platform.runLater(() -> rollTextField.requestFocus());
     }
 }

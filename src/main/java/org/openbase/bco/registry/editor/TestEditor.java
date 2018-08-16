@@ -23,10 +23,12 @@ package org.openbase.bco.registry.editor;
  */
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeItem;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.util.fieldpath.*;
@@ -117,10 +119,17 @@ public class TestEditor extends Application {
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getTemplateRegistry()));
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getActivityRegistry()));
 
-            final VBox vBox = new VBox();
-            vBox.getChildren().addAll(loginPanel, globalTabPane);
-
-            final Scene scene = new Scene(vBox, 1024, 768);
+            final StackPane stackPane = new StackPane();
+            // make login panel appear in the top right with small margins at the top and right
+            loginPanel.setAlignment(Pos.TOP_RIGHT);
+            loginPanel.setPadding(new Insets(5, 5, 0, 0));
+            // make events path through to layers below if they do not hit the login panel
+            loginPanel.setPickOnBounds(false);
+            stackPane.getChildren().addAll(globalTabPane, loginPanel);
+            final Scene scene = new Scene(stackPane, 1024, 768);
+//            final VBox vBox = new VBox();
+//            vBox.getChildren().addAll(loginPanel, globalTabPane);
+//            final Scene scene = new Scene(vBox, 1024, 768);
             scene.heightProperty().addListener((observable, oldValue, newValue) -> globalTabPane.setPrefHeight(newValue.doubleValue()));
             primaryStage.setScene(scene);
 //            primaryStage.setMaximized(true);

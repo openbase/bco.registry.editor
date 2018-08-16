@@ -22,6 +22,7 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
+import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
@@ -34,20 +35,6 @@ abstract class AbstractTextEditingGraphic<TF extends TextField, V> extends Abstr
 
     AbstractTextEditingGraphic(final TF textfield, final ValueType<V> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(textfield, valueType, treeTableCell);
-        getControl().focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                getControl().selectAll();
-            }
-        });
-//        getControl().setOnKeyReleased(event -> {
-//            switch (event.getCode()) {
-//                case ESCAPE:
-//                    treeTableCell.cancelEdit();
-//                    break;
-//                case ENTER:
-//                    commitEdit();
-//            }
-//        });
     }
 
     @Override

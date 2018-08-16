@@ -25,6 +25,7 @@ package org.openbase.bco.registry.editor.struct.editing;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.struct.editing.util.FocusedTextField;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -32,7 +33,7 @@ import org.openbase.bco.registry.editor.struct.ValueType;
 public class StringEditingGraphic extends AbstractTextEditingGraphic<TextField, String> {
 
     public StringEditingGraphic(final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(new TextField(), valueType, treeTableCell);
+        super(new FocusedTextField(), valueType, treeTableCell);
     }
 
     @Override

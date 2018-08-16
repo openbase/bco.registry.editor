@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct.editing;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -27,6 +27,7 @@ import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.jul.extension.rst.processing.TimestampJavaTimeTransform;
 import rst.timing.TimestampType.Timestamp;
+import rst.timing.TimestampType.Timestamp.Builder;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -34,7 +35,7 @@ import java.util.Date;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class TimestampEditingGraphic extends AbstractEditingGraphic<DatePicker, Timestamp.Builder> {
+public class TimestampEditingGraphic extends AbstractBuilderEditingGraphic<DatePicker, Builder> {
 
     public TimestampEditingGraphic(final ValueType<Timestamp.Builder> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new DatePicker(), valueType, treeTableCell);
@@ -42,10 +43,15 @@ public class TimestampEditingGraphic extends AbstractEditingGraphic<DatePicker, 
     }
 
     @Override
-    protected Timestamp.Builder getCurrentValue() {
-        final Timestamp.Builder timestamp = getValueType().getValue();
-        final long timeInMicros = getControl().getValue().toEpochDay() * 24 * 60 * 60 * 1000 * 1000;
-        return timestamp.setTime(timeInMicros);
+    protected boolean updateBuilder(Builder builder) {
+        final long newTime = getControl().getValue().toEpochDay() * 24 * 60 * 60 * 1000 * 1000;
+
+        if (newTime == builder.getTime()) {
+            return false;
+        }
+
+        builder.setTime(newTime);
+        return true;
     }
 
     @Override
