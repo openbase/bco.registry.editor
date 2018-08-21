@@ -98,6 +98,18 @@ public class LabelEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Bui
         this.languageComboBox.setItems(createSortedLanguageCodeList());
 
         this.labelTextField = new TextField();
+        //TODO: textfield should occupy all space not needed by the combo box in the cell
+//        getControl().widthProperty().addListener((observable, oldValue, newValue) -> {
+//            labelTextField.setPrefWidth(newValue.doubleValue() - languageComboBox.getWidth());
+//            System.out.println(languageComboBox.getWidth() + ", " + languageComboBox.getPrefWidth());
+//        });
+//        languageComboBox.widthProperty().addListener(new ChangeListener<Number>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                labelTextField.setPrefWidth(getControl().getWidth() - newValue.doubleValue());
+//                System.out.println("ComboBox: " + newValue.doubleValue() + ", " + getControl().getPrefWidth());
+//            }
+//        });
         getControl().getChildren().addAll(this.languageComboBox, this.labelTextField);
 
 

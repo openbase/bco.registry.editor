@@ -126,7 +126,7 @@ public class TestEditor extends Application {
             // make events path through to layers below if they do not hit the login panel
             loginPanel.setPickOnBounds(false);
             stackPane.getChildren().addAll(globalTabPane, loginPanel);
-            final Scene scene = new Scene(stackPane, 1024, 768);
+            final Scene scene = new Scene(stackPane, 1600, 900);
 //            final VBox vBox = new VBox();
 //            vBox.getChildren().addAll(loginPanel, globalTabPane);
 //            final Scene scene = new Scene(vBox, 1024, 768);

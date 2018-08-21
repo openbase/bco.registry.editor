@@ -221,8 +221,6 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                 GlobalCachedExecutorService.submit(() -> {
                     try {
                         registryTask.get();
-                        // remove temporally created node structure
-                        Platform.runLater(() -> RegistryMessageTreeItem.this.getParent().getChildren().remove(RegistryMessageTreeItem.this));
                         //TODO handle correctly
                     } catch (InterruptedException e) {
                         e.printStackTrace();

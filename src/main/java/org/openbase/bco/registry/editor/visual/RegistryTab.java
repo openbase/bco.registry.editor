@@ -31,12 +31,13 @@ import org.openbase.bco.registry.editor.visual.cell.SecondCell;
 import org.openbase.bco.registry.editor.visual.cell.TestCell;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
+import org.openbase.jul.extension.protobuf.BuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.UnitConfigType.UnitConfig.Builder;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 /**
@@ -51,13 +52,11 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     private static final String FIELD_POSTFIX_CONSISTENT = "_registry_consistent";
 
     private final FieldDescriptor fieldDescriptor;
-    private AbstractBuilderTreeItem<RD.Builder> root;
-    private boolean initialized = false;
     private final TreeTableView<ValueType> treeTableView;
     private final TreeTableColumn<ValueType, ValueType> descriptionColumn, valueColumn;
 
-    private boolean readOnly, consistent;
-
+    private boolean readOnly, consistent, initialized;
+    private AbstractBuilderTreeItem<RD.Builder> root;
     private FieldPathDescriptionProvider[] fieldPathDescriptionProviders;
     private RD registryData;
 
@@ -75,6 +74,7 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
         this.registryData = registryData;
         this.fieldDescriptor = fieldDescriptor;
         this.fieldPathDescriptionProviders = fieldPathDescriptionProviders;
+        this.initialized = false;
 
         extractRegistryFlags();
 
@@ -92,36 +92,45 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
         treeTableView.getColumns().addAll(descriptionColumn, valueColumn);
         treeTableView.showRootProperty().setValue(false);
         treeTableView.setEditable(true);
-//        treeTableView.getStylesheets().add("default.css");
+        treeTableView.getStylesheets().add("default.css");
 
         setOnSelectionChanged(event -> {
             if (!initialized) {
                 try {
                     init();
-                } catch (InitializationException e) {
-                    //TODO print exception correctly
-                    e.printStackTrace();
+                } catch (InitializationException ex) {
+                    ExceptionPrinter.printHistory(ex, LOGGER);
                 }
             }
         });
 
-        if (fieldDescriptor.getName().startsWith("app_unit")) {
-            final ContextMenu contextMenu = new ContextMenu();
-            final MenuItem addMenuItem = new MenuItem("Add");
-            addMenuItem.setOnAction(event -> {
-                Builder builder = UnitConfig.newBuilder().setUnitType(UnitType.APP);
-                try {
-                    BuilderTreeItem builderTreeItem = AbstractBuilderTreeItem.loadTreeItem(fieldDescriptor, builder, true);
-                    builderTreeItem.setExpanded(true);
-                    builderTreeItem.getChildren();
-                    root.getChildren().add(builderTreeItem);
-                } catch (CouldNotPerformException e) {
-                    e.printStackTrace();
+        final ContextMenu contextMenu = new ContextMenu();
+        final MenuItem addMenuItem = new MenuItem("Add");
+        addMenuItem.setOnAction(event -> {
+            try {
+                final Message.Builder builder = BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, registryData.toBuilder());
+                if (builder instanceof UnitConfig.Builder) {
+                    String unitTypeName = fieldDescriptor.getName().split("_")[0].toUpperCase();
+                    LOGGER.info(unitTypeName);
+                    try {
+                        UnitType unitType = UnitType.valueOf(unitTypeName);
+                        LOGGER.info(unitType.name());
+                        ((UnitConfig.Builder) builder).setUnitType(unitType);
+                    } catch (IllegalArgumentException ex) {
+                        // unit type not available from field descriptor, e.g. for dal units
+                        // just continue without setting the unit type
+                    }
                 }
-            });
-            contextMenu.getItems().add(addMenuItem);
-            treeTableView.setContextMenu(contextMenu);
-        }
+                BuilderTreeItem builderTreeItem = AbstractBuilderTreeItem.loadTreeItem(fieldDescriptor, builder, true);
+                builderTreeItem.setExpanded(true);
+                builderTreeItem.getChildren();
+                root.getChildren().add(builderTreeItem);
+            } catch (CouldNotPerformException e) {
+                e.printStackTrace();
+            }
+        });
+        contextMenu.getItems().add(addMenuItem);
+        treeTableView.setContextMenu(contextMenu);
     }
 
     public void update(RD registryData) throws CouldNotPerformException {
