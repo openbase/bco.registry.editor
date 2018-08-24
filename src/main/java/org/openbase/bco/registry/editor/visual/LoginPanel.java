@@ -10,20 +10,19 @@ package org.openbase.bco.registry.editor.visual;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -63,11 +62,23 @@ public class LoginPanel extends HBox {
         this.logoutButton.setOnAction(event -> logout());
 
         this.setSpacing(5);
-        this.getChildren().addAll(errorLabel, userNameTextField, passwordField, loginButton);
+        this.getChildren().addAll(userNameTextField, passwordField, loginButton);
         this.setOnKeyReleased(event -> {
             switch (event.getCode()) {
                 case ENTER:
                     login();
+            }
+        });
+
+        // logout when session manager logged out, e.g. because server restarted and the session does not match anymore
+        SessionManager.getInstance().addLoginObserver((source, data) -> {
+            if (!SessionManager.getInstance().isLoggedIn()) {
+                Platform.runLater(() -> {
+                    userNameLabel.setText("");
+
+                    getChildren().clear();
+                    getChildren().addAll(errorLabel, userNameTextField, passwordField, loginButton);
+                });
             }
         });
     }

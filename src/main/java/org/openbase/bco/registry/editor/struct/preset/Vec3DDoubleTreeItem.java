@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct.preset;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -24,27 +24,25 @@ package org.openbase.bco.registry.editor.struct.preset;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.BuilderLeafTreeItem;
+import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.Vec3DDoubleEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.math.Vec3DDoubleType.Vec3DDouble;
 import rst.math.Vec3DDoubleType.Vec3DDouble.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class Vec3DDoubleTreeItem extends BuilderLeafTreeItem<Vec3DDouble.Builder> {
+public class Vec3DDoubleTreeItem extends AbstractBuilderLeafTreeItem<Builder> {
 
     public Vec3DDoubleTreeItem(FieldDescriptor fieldDescriptor, Builder builder, Boolean editable) throws InitializationException {
         super(fieldDescriptor, builder, editable);
     }
 
     @Override
-    protected Node createValueGraphic() {
-        return new Label("x = " + getBuilder().getX() + ", y = " + getBuilder().getY() + ", z = " + getBuilder().getZ());
+    protected String createValueRepresentation() {
+        return "x = " + getBuilder().getX() + ", y = " + getBuilder().getY() + ", z = " + getBuilder().getZ();
     }
 
     @Override

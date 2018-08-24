@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct.preset;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -24,9 +24,8 @@ package org.openbase.bco.registry.editor.struct.preset;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
-import org.openbase.bco.registry.editor.struct.BuilderLeafTreeItem;
+import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.RotationEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
@@ -40,7 +39,7 @@ import java.text.DecimalFormat;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class RotationTreeItem extends BuilderLeafTreeItem<Builder> {
+public class RotationTreeItem extends AbstractBuilderLeafTreeItem<Builder> {
 
     private final DecimalFormat decimalFormat;
 
@@ -51,7 +50,7 @@ public class RotationTreeItem extends BuilderLeafTreeItem<Builder> {
     }
 
     @Override
-    protected Node createValueGraphic() {
+    protected String createValueRepresentation() {
         final Vector3d euler;
         /* Even though the rotation type has defined default values they do not seem to be used.
          * Thus assume the default rotation as none.
@@ -67,7 +66,7 @@ public class RotationTreeItem extends BuilderLeafTreeItem<Builder> {
             euler.z = Math.toDegrees(euler.z);
         }
 
-        return new Label("Roll = " + decimalFormat.format(euler.x) + ", Pitch = " + decimalFormat.format(euler.y) + ", Yaw = " + decimalFormat.format(euler.z));
+        return "Roll = " + decimalFormat.format(euler.x) + ", Pitch = " + decimalFormat.format(euler.y) + ", Yaw = " + decimalFormat.format(euler.z);
     }
 
     @Override

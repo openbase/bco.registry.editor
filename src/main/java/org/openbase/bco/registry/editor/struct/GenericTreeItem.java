@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -33,6 +33,8 @@ import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -167,5 +169,19 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
 
     public void update(final V value) throws CouldNotPerformException {
         this.setValue(getValueCasted().createNew(value));
+    }
+
+    /**
+     * Recursively search the tree for a text contained in its values. This method will only pass the search
+     * done to its children.
+     * Children that contain the text in their value should add themselves to the list.
+     *
+     * @param text         the text for which is searched.
+     * @param treeItemList a list which will be filled with every leaf containing the text in their value.
+     */
+    public void search(final String text, final List<GenericTreeItem> treeItemList) {
+        for (final TreeItem<ValueType> child : getChildren()) {
+            ((GenericTreeItem) child).search(text, treeItemList);
+        }
     }
 }

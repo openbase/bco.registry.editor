@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -29,6 +29,7 @@ import javafx.scene.control.TreeItem;
 import org.openbase.bco.registry.editor.struct.preset.UnitConfigTreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.FatalImplementationErrorException;
+import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.slf4j.LoggerFactory;
 
@@ -90,19 +91,32 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
     }
 
     @SuppressWarnings("unchecked")
+    public static Class<? extends BuilderTreeItem> getPresetClass(final String className) throws NotAvailableException {
+        try {
+            return (Class<? extends BuilderTreeItem>) AbstractBuilderTreeItem.class.getClassLoader().loadClass(className);
+        } catch (ClassNotFoundException e) {
+            throw new NotAvailableException(className);
+        }
+    }
+
+    public static String getPresetClassName(final Message.Builder builder) {
+        return UnitConfigTreeItem.class.getPackage().getName() + "." + extractSimpleMessageClass(builder) + "TreeItem";
+    }
+
+    @SuppressWarnings("unchecked")
     public static BuilderTreeItem loadTreeItem(final FieldDescriptor fieldDescriptor, final Message.Builder builder, final Boolean editable) throws CouldNotPerformException {
-        final String className = UnitConfigTreeItem.class.getPackage().getName() + "." + extractSimpleMessageClass(builder) + "TreeItem";
+        final String className = getPresetClassName(builder);
 
         try {
             // load class
-            Class<? extends BuilderTreeItem> treeItemClass = (Class<? extends BuilderTreeItem>) AbstractBuilderTreeItem.class.getClassLoader().loadClass(className);
+            Class<? extends BuilderTreeItem> treeItemClass = getPresetClass(className);
 
             // get constructor
             Constructor<? extends BuilderTreeItem> constructor = treeItemClass.getConstructor(fieldDescriptor.getClass(), builder.getClass(), editable.getClass());
 
             // invoke constructor
             return constructor.newInstance(fieldDescriptor, builder, editable);
-        } catch (ClassNotFoundException ex) {
+        } catch (NotAvailableException ex) {
             // no class found so use the default tree item
             return new BuilderTreeItem(fieldDescriptor, builder, editable);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ex) {

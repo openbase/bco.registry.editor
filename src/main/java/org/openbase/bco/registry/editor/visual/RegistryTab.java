@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.visual;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -24,7 +24,13 @@ package org.openbase.bco.registry.editor.visual;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.StackPane;
 import org.openbase.bco.registry.editor.struct.*;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.visual.cell.SecondCell;
@@ -51,6 +57,8 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     private static final String FIELD_POSTFIX_READ_ONLY = "_registry_read_only";
     private static final String FIELD_POSTFIX_CONSISTENT = "_registry_consistent";
 
+    private final StackPane stackPane;
+    private final SearchBar searchBar;
     private final FieldDescriptor fieldDescriptor;
     private final TreeTableView<ValueType> treeTableView;
     private final TreeTableColumn<ValueType, ValueType> descriptionColumn, valueColumn;
@@ -82,8 +90,20 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
         this.descriptionColumn = new TreeTableColumn<>();
         this.valueColumn = new TreeTableColumn<>();
 
-        descriptionColumn.setCellValueFactory(param -> param.getValue().valueProperty());
-        valueColumn.setCellValueFactory(param -> param.getValue().valueProperty());
+        descriptionColumn.setCellValueFactory(param -> {
+            //TODO: why is this check needed when searching will collapse a tree item before searching?
+            if (param == null || param.getValue() == null) {
+                return null;
+            }
+            return param.getValue().valueProperty();
+        });
+        valueColumn.setCellValueFactory(param -> {
+            //TODO: why is this check needed when searching will collapse a tree item before searching?
+            if (param == null || param.getValue() == null) {
+                return null;
+            }
+            return param.getValue().valueProperty();
+        });
         descriptionColumn.setCellFactory(param -> new SecondCell());
         valueColumn.setCellFactory(param -> new TestCell());
 
@@ -111,10 +131,8 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
                 final Message.Builder builder = BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, registryData.toBuilder());
                 if (builder instanceof UnitConfig.Builder) {
                     String unitTypeName = fieldDescriptor.getName().split("_")[0].toUpperCase();
-                    LOGGER.info(unitTypeName);
                     try {
                         UnitType unitType = UnitType.valueOf(unitTypeName);
-                        LOGGER.info(unitType.name());
                         ((UnitConfig.Builder) builder).setUnitType(unitType);
                     } catch (IllegalArgumentException ex) {
                         // unit type not available from field descriptor, e.g. for dal units
@@ -131,7 +149,32 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
         });
         contextMenu.getItems().add(addMenuItem);
         treeTableView.setContextMenu(contextMenu);
+
+        // create a search bar for the tree table view
+        searchBar = new SearchBar(treeTableView);
+        searchBar.setAlignment(Pos.TOP_RIGHT);
+        searchBar.setPickOnBounds(false);
+        treeTableView.setOnKeyReleased(event -> {
+            // make ctrl + f focus the search text field
+            if (event.getCode() == KeyCode.F && event.isControlDown()) {
+                Platform.runLater(() -> searchBar.getSearchTextField().requestFocus());
+            }
+        });
+
+        // create stack pane with search bar in front as the content of this tab
+        stackPane = new StackPane();
+        stackPane.getChildren().addAll(treeTableView, searchBar);
+
+        stackPane.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    System.out.println("StackPane focused");
+                }
+            }
+        });
     }
+
 
     public void update(RD registryData) throws CouldNotPerformException {
         this.registryData = registryData;
@@ -160,7 +203,7 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
 
             treeTableView.setRoot(root);
 
-            this.setInternalContent(treeTableView);
+            this.setInternalContent(stackPane);
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
         }
