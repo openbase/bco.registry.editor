@@ -26,7 +26,7 @@ import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.editing.util.EnumValueDescriptorCell;
+import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
 import rst.domotic.state.EnablingStateType.EnablingState;
 import rst.domotic.state.EnablingStateType.EnablingState.Builder;
 import rst.domotic.state.EnablingStateType.EnablingState.State;
@@ -37,10 +37,7 @@ import rst.domotic.state.EnablingStateType.EnablingState.State;
 public class EnablingStateEditingGraphic extends AbstractBuilderEditingGraphic<ComboBox<EnumValueDescriptor>, Builder> {
 
     public EnablingStateEditingGraphic(final ValueType<EnablingState.Builder> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(new ComboBox<>(), valueType, treeTableCell);
-        getControl().setVisibleRowCount(10);
-        getControl().setCellFactory(param -> new EnumValueDescriptorCell());
-        getControl().setButtonCell(new EnumValueDescriptorCell());
+        super(new ScrollingComboBox<>(EnumValueDescriptor::getName), valueType, treeTableCell);
         getControl().setOnAction((event) -> commitEdit());
     }
 

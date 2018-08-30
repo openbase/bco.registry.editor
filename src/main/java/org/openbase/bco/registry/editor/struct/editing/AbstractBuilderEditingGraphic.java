@@ -55,7 +55,6 @@ public abstract class AbstractBuilderEditingGraphic<GRAPHIC extends Node, V exte
     @Override
     protected V getCurrentValue() {
         valueHasChanged = updateBuilder(getValueType().getValue());
-        logger.info("Updated builder [" + valueHasChanged + "]");
         return getValueType().getValue();
     }
 

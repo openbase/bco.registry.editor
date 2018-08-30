@@ -40,9 +40,9 @@ import java.util.List;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class LocationChildIdEditingGraphic extends AbstractMessageEditingGraphic<UnitConfig> {
+public class LocationChildIdEditingGraphic extends AbstractUnitConfigEditingGraphic {
 
-    public LocationChildIdEditingGraphic(ValueType<String> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
+    public LocationChildIdEditingGraphic(final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(valueType, treeTableCell);
     }
 
@@ -84,26 +84,5 @@ public class LocationChildIdEditingGraphic extends AbstractMessageEditingGraphic
         }
 
         return unitConfigs;
-    }
-
-    @Override
-    protected String getCurrentValue(final UnitConfig message) {
-        return message.getId();
-    }
-
-    @Override
-    protected UnitConfig getMessage(final String value) throws CouldNotPerformException {
-        return Registries.getUnitRegistry().getUnitConfigById(value);
-    }
-
-    @Override
-    protected DescriptionGenerator<UnitConfig> getDescriptionGenerator() {
-        return value -> {
-            try {
-                return ScopeGenerator.generateStringRep(value.getScope());
-            } catch (CouldNotPerformException ex) {
-                return value.getId();
-            }
-        };
     }
 }

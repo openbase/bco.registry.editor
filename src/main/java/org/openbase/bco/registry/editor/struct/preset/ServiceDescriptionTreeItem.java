@@ -22,17 +22,17 @@ package org.openbase.bco.registry.editor.struct.preset;
  * #L%
  */
 
-import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
 import org.openbase.bco.registry.editor.struct.GenericTreeItem;
-import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.processing.StringProcessor;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription.Builder;
-import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServiceType;
 
 import java.util.Set;
 
@@ -45,11 +45,12 @@ public class ServiceDescriptionTreeItem extends BuilderTreeItem<ServiceDescripti
         super(fieldDescriptor, builder, editable);
 
         addEventHandler(valueChangedEvent(), event -> {
+            updateDescriptionGraphic();
+
             final GenericTreeItem source = (GenericTreeItem) event.getSource();
             try {
                 if (source.getFieldDescriptor().getNumber() == ServiceDescription.SERVICE_TYPE_FIELD_NUMBER) {
-                    final ServiceType serviceType = ServiceType.valueOf(((ValueType<EnumValueDescriptor>) event.getNewValue()).getValue().getNumber());
-                    final String id = Registries.getTemplateRegistry().getServiceTemplateByType(serviceType).getId();
+                    final String id = Registries.getTemplateRegistry().getServiceTemplateByType(getBuilder().getServiceType()).getId();
                     for (FieldDescriptor descriptor : getDescriptorChildMap().keySet()) {
                         if (descriptor.getNumber() != ServiceDescription.SERVICE_TEMPLATE_ID_FIELD_NUMBER) {
                             continue;
@@ -70,5 +71,11 @@ public class ServiceDescriptionTreeItem extends BuilderTreeItem<ServiceDescripti
         final Set<Integer> uneditableFields = super.getUneditableFields();
         uneditableFields.add(ServiceDescription.SERVICE_TEMPLATE_ID_FIELD_NUMBER);
         return uneditableFields;
+    }
+
+    @Override
+    protected String createDescriptionText() {
+        return StringProcessor.transformUpperCaseToCamelCase(getBuilder().getServiceType().name().replace(
+                "SERVICE", getBuilder().getPattern().name() + "_" + "SERVICE"));
     }
 }

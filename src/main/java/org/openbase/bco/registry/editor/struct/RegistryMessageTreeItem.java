@@ -30,10 +30,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
-import org.openbase.bco.registry.editor.RegistryEditor;
+import org.openbase.bco.registry.editor.RegistryEditorOld;
 import org.openbase.bco.registry.editor.visual.RequiredFieldAlert;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.ExceptionProcessor;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.LogLevel;
@@ -69,15 +70,19 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
 
         this.addEventHandler(valueChangedEvent(), event -> {
             // this is triggered when the value of this node or one of its children changes
-            //TODO has to be handled if the parent is a list -> icon disappears
-//            updateDescriptionGraphic();
+            updateDescriptionGraphic();
 
-            if (!inUpdate) {
+            if (!inUpdate && !(event.getSource().equals(RegistryMessageTreeItem.this))) {
+                logger.info("Set changed");
                 changed = true;
             }
 
             updateValueGraphic();
         });
+    }
+
+    public String getId() {
+        return (String) getBuilder().getField(idField);
     }
 
     /**
@@ -101,16 +106,17 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
     }
 
     @Override
-    protected Node createDescriptionGraphic() {
+    protected String createDescriptionText() {
         try {
-            return new Label(LabelProcessor.getBestMatch((rst.configuration.LabelType.Label) getBuilder().getField(labelField)));
+            return LabelProcessor.getBestMatch((rst.configuration.LabelType.Label) getBuilder().getField(labelField));
         } catch (NotAvailableException e) {
-            return super.createDescriptionGraphic();
+            return super.createDescriptionText();
         }
     }
 
     @Override
     protected Node createValueGraphic() {
+        // task is not done yet so display loading graphic
         if (registryTask != null && !registryTask.isDone()) {
             final Label label = new Label("Waiting for registry update...");
             final ProgressIndicator progressIndicator = new ProgressIndicator();
@@ -122,6 +128,24 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
             return hBox;
         }
 
+        final Label errorLabel = new Label();
+        // task is done but not reset meaning it failed, so generate an error label
+        if (registryTask != null) {
+            errorLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");
+            // done but failed
+            try {
+                registryTask.get();
+            } catch (InterruptedException ex) {
+                // this should not because the task should already be done
+            } catch (ExecutionException ex) {
+                try {
+                    errorLabel.setText(ExceptionProcessor.getInitialCause(ex).getMessage());
+                } catch (NotAvailableException exx) {
+                    errorLabel.setText(exx.getMessage());
+                }
+            }
+        }
+
         if (changed) {
             logger.info("Create buttons");
             final Button applyButton, cancelButton;
@@ -131,7 +155,15 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
             cancelButton = new Button("Cancel");
             cancelButton.setOnAction(event -> handleCancelEvent());
             buttonLayout = new HBox(applyButton, cancelButton);
+            if (registryTask != null) {
+                // if task failed add error to button layout
+                buttonLayout.getChildren().add(errorLabel);
+            }
             return buttonLayout;
+        }
+
+        if (registryTask != null) {
+            return errorLabel;
         }
 
         return super.createValueGraphic();
@@ -143,8 +175,10 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
 
         inUpdate = true;
         try {
+            logger.info("Reset changed");
             changed = false;
             if (registryTask != null) {
+                logger.info("Received update after registry task...");
                 registryTask = null;
             }
 
@@ -207,11 +241,11 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                                 }
                             });
                         }
-                        //TODO handle correctly
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        // just let the thread finish
                     } catch (ExecutionException e) {
-                        e.printStackTrace();
+                        // update the current value which will trigger an update of the displayed graphics,
+                        // this will display the exception to the user
                         setValue(getValueCasted().createNew(getBuilder()));
                     }
                 });
@@ -221,11 +255,11 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                 GlobalCachedExecutorService.submit(() -> {
                     try {
                         registryTask.get();
-                        //TODO handle correctly
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        // just let the thread finish
                     } catch (ExecutionException e) {
-                        e.printStackTrace();
+                        // update the current value which will trigger an update of the displayed graphics,
+                        // this will display the exception to the user
                         setValue(getValueCasted().createNew(getBuilder()));
                     }
 
@@ -258,18 +292,19 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                 GlobalCachedExecutorService.submit(() -> {
                     try {
                         registryTask.get();
-                        //TODO handle correctly
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        // just let the thread finish
                     } catch (ExecutionException e) {
-                        e.printStackTrace();
+                        // update the current value which will trigger an update of the displayed graphics,
+                        // this will display the exception to the user
+                        setValue(getValueCasted().createNew(getBuilder()));
                     }
                 });
             } else {
                 Platform.runLater(() -> RegistryMessageTreeItem.this.getParent().getChildren().remove(RegistryMessageTreeItem.this));
             }
         } catch (CouldNotPerformException ex) {
-            RegistryEditor.printException(ex, logger, LogLevel.WARN);
+            RegistryEditorOld.printException(ex, logger, LogLevel.WARN);
         }
     }
 }

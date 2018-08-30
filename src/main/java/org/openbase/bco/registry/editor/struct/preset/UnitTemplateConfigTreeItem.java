@@ -22,14 +22,9 @@ package org.openbase.bco.registry.editor.struct.preset;
  * #L%
  */
 
-import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import org.openbase.bco.registry.editor.struct.BuilderListTreeItem;
 import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
 import org.openbase.bco.registry.editor.struct.GenericTreeItem;
-import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
@@ -40,7 +35,6 @@ import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServiceType;
 import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig;
 import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig.Builder;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,28 +50,18 @@ public class UnitTemplateConfigTreeItem extends BuilderTreeItem<UnitTemplateConf
         addEventHandler(valueChangedEvent(), event -> {
             updateDescriptionGraphic();
 
+            // do nothing if not a direct child has been modified
             if (!event.getSource().getParent().equals(this)) {
                 return;
             }
 
             final GenericTreeItem source = (GenericTreeItem) event.getSource();
-            logger.info(source.getClass().getSimpleName() + ", " + source.getFieldDescriptor().getNumber() + ", " + source.getFieldDescriptor().getName() + ", " + UnitTemplateConfig.TYPE_FIELD_NUMBER);
             if (source.getFieldDescriptor().getNumber() == UnitTemplateConfig.TYPE_FIELD_NUMBER) {
-                // try to find position of service template tree item
-                int index = -1;
-                for (int i = 0; i < getChildren().size(); i++) {
-                    if (((GenericTreeItem) getChildren().get(i)).getFieldDescriptor().getNumber() == UnitTemplateConfig.SERVICE_TEMPLATE_CONFIG_FIELD_NUMBER) {
-                        index = i;
-                        break;
-                    }
-                }
-
                 try {
-                    final UnitType newValue = UnitType.valueOf(((ValueType<EnumValueDescriptor>) event.getNewValue()).getValue().getNumber());
-
                     // filter so that every serviceType is only added once
                     final Set<ServiceType> serviceTypeSet = new HashSet<>();
-                    for (final ServiceDescription serviceDescription : Registries.getTemplateRegistry().getUnitTemplateByType(newValue).getServiceDescriptionList()) {
+                    for (final ServiceDescription serviceDescription :
+                            Registries.getTemplateRegistry().getUnitTemplateByType(getBuilder().getType()).getServiceDescriptionList()) {
                         serviceTypeSet.add(serviceDescription.getServiceType());
                     }
 
@@ -92,16 +76,8 @@ public class UnitTemplateConfigTreeItem extends BuilderTreeItem<UnitTemplateConf
                         getBuilder().addServiceTemplateConfigBuilder().setServiceType(serviceType);
                     }
 
-                    // create tree item, init its children
-                    final BuilderListTreeItem<Builder> treeItem = new BuilderListTreeItem<>(field, getBuilder(), false);
-                    treeItem.getChildren();
-                    treeItem.setExpanded(true);
-                    // if builder position was found previously exchange tree item, else add
-                    if (index != -1) {
-                        getChildren().set(index, treeItem);
-                    } else {
-                        getChildren().add(treeItem);
-                    }
+                    // update according child
+                    getDescriptorChildMap().get(field).update(getBuilder());
                 } catch (CouldNotPerformException ex) {
                     logger.warn("Could not update service template configs", ex);
                 }
@@ -118,11 +94,11 @@ public class UnitTemplateConfigTreeItem extends BuilderTreeItem<UnitTemplateConf
     }
 
     @Override
-    protected Node createDescriptionGraphic() {
+    protected String createDescriptionText() {
         try {
-            return new Label(LabelProcessor.getBestMatch(getBuilder().getLabel()));
+            return LabelProcessor.getBestMatch(getBuilder().getLabel());
         } catch (NotAvailableException ex) {
-            return super.createDescriptionGraphic();
+            return super.createDescriptionText();
         }
     }
 }

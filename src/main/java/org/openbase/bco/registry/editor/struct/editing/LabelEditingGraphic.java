@@ -24,12 +24,11 @@ package org.openbase.bco.registry.editor.struct.editing;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
 import rst.configuration.LabelType.Label.MapFieldEntry.Builder;
 
 import java.util.ArrayList;
@@ -42,7 +41,7 @@ import java.util.Locale;
  */
 public class LabelEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Builder> {
 
-    private ComboBox<String> languageComboBox;
+    private ScrollingComboBox<String> languageComboBox;
     private TextField labelTextField;
 
     public LabelEditingGraphic(ValueType<Builder> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
@@ -91,10 +90,7 @@ public class LabelEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Bui
 
     @Override
     protected void init(final Builder value) {
-        this.languageComboBox = new ComboBox<>();
-        this.languageComboBox.setVisibleRowCount(10);
-        this.languageComboBox.setCellFactory(param -> new LanguageCell());
-        this.languageComboBox.setButtonCell(new LanguageCell());
+        this.languageComboBox = new ScrollingComboBox<>(item -> new Locale(item).getDisplayLanguage());
         this.languageComboBox.setItems(createSortedLanguageCodeList());
 
         this.labelTextField = new TextField();
@@ -135,16 +131,4 @@ public class LabelEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Bui
         });
         return FXCollections.observableArrayList(languageCodeList);
     }
-
-    private class LanguageCell extends ListCell<String> {
-
-        @Override
-        protected void updateItem(String item, boolean empty) {
-            super.updateItem(item, empty);
-            if (item != null) {
-                setText(new Locale(item).getDisplayLanguage());
-            }
-        }
-    }
-
 }

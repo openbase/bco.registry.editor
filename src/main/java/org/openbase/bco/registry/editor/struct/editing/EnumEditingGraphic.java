@@ -29,7 +29,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.editing.util.EnumValueDescriptorCell;
+import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,13 +40,10 @@ import java.util.List;
  */
 public class EnumEditingGraphic extends AbstractEditingGraphic<ComboBox<EnumValueDescriptor>, EnumValueDescriptor> {
 
-    private static final String ENUM_NAME_UNKNOWN = "UNKNOWN";
+    private static final String TYPE_NAME_UNKNOWN = "UNKNOWN";
 
     public EnumEditingGraphic(final ValueType<EnumValueDescriptor> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(new ComboBox<>(), valueType, treeTableCell);
-        getControl().setVisibleRowCount(10);
-        getControl().setCellFactory(param -> new EnumValueDescriptorCell());
-        getControl().setButtonCell(new EnumValueDescriptorCell());
+        super(new ScrollingComboBox<>(EnumValueDescriptor::getName), valueType, treeTableCell);
         getControl().setOnAction((event) -> commitEdit());
     }
 
@@ -71,7 +68,7 @@ public class EnumEditingGraphic extends AbstractEditingGraphic<ComboBox<EnumValu
     static ObservableList<EnumValueDescriptor> createSortedEnumList(EnumDescriptor enumDescriptor) {
         List<EnumValueDescriptor> values = new ArrayList<>();
         for (EnumValueDescriptor value : enumDescriptor.getValues()) {
-            if (value.getName().equals(ENUM_NAME_UNKNOWN)) {
+            if (value.getName().equals(TYPE_NAME_UNKNOWN)) {
                 continue;
             }
 

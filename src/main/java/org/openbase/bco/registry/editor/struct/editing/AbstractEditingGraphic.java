@@ -24,8 +24,10 @@ package org.openbase.bco.registry.editor.struct.editing;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeTableCell;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.slf4j.Logger;
@@ -48,6 +50,8 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Node, V> {
     private final TreeTableCell<ValueType, ValueType> treeTableCell;
     private final Set<Node> internalElements;
 
+    private ChangeListener<Boolean> focusChangeListener;
+
     /**
      * Create a new editing graphic.
      *
@@ -67,6 +71,8 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Node, V> {
         this.addInternalElements(internalElements, control);
         // init listeners for focus handling
         this.initFocusLossHandling();
+        // if the control component already had a key handler integrate it, e.g. needed for ScrollingComboBox
+        final EventHandler<? super KeyEvent> oldKeyHandler = this.control.getOnKeyReleased();
         // add key released handling
         this.control.setOnKeyReleased(event -> {
             switch (event.getCode()) {
@@ -75,9 +81,19 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Node, V> {
                     commitEdit();
                     break;
                 case ESCAPE:
+                    //TODO: this does not work anymore for all nodes, e.g. PermissionEditingGraphic, search why
                     // cancel on escape released
+                    // remove focus handler, this is needed because commit causes focus loss which would result in doubled commits
+                    // if the initial commit is not started because of the focus loss
+                    for (final Node internalElement : internalElements) {
+                        internalElement.focusedProperty().removeListener(focusChangeListener);
+                    }
                     treeTableCell.cancelEdit();
                     break;
+                default:
+                    if (oldKeyHandler != null) {
+                        oldKeyHandler.handle(event);
+                    }
             }
         });
 
@@ -121,7 +137,7 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Node, V> {
      */
     private void initFocusLossHandling() {
         // create change listener
-        final ChangeListener<Boolean> focusChangeListener = (observable, oldValue, newValue) -> {
+        focusChangeListener = (observable, oldValue, newValue) -> {
             if (lostFocus()) {
                 commitEdit();
             }
@@ -138,6 +154,11 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Node, V> {
      * unnecessarily.
      */
     protected void commitEdit() {
+        // remove focus handler, this is needed because commit causes focus loss which would result in doubled commits
+        // if the initial commit is not started because of the focus loss
+        for (final Node internalElement : internalElements) {
+            internalElement.focusedProperty().removeListener(focusChangeListener);
+        }
         // compute the currently setup value
         V currentValue = getCurrentValue();
         // test if the value has changed

@@ -1,6 +1,6 @@
 package org.openbase.bco.registry.editor.visual.cell;
 
-/*
+/*-
  * #%L
  * BCO Registry Editor
  * %%
@@ -22,511 +22,74 @@ package org.openbase.bco.registry.editor.visual.cell;
  * #L%
  */
 
-import com.google.protobuf.Descriptors.EnumValueDescriptor;
-import com.google.protobuf.GeneratedMessage;
-import com.google.protobuf.Message;
-import com.google.protobuf.Message.Builder;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.event.Event;
+import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import org.openbase.bco.registry.editor.RegistryEditor;
-import org.openbase.bco.registry.editor.struct.*;
-import org.openbase.bco.registry.editor.struct.consistency.Configuration;
-import org.openbase.bco.registry.editor.util.SelectableLabel;
-import org.openbase.bco.registry.editor.visual.GlobalTextArea;
-import org.openbase.bco.registry.editor.visual.RegistryTreeTableView;
-import org.openbase.bco.registry.editor.visual.cell.editing.DecimalTextField;
-import org.openbase.bco.registry.editor.visual.cell.editing.LongDatePicker;
-import org.openbase.bco.registry.editor.visual.cell.editing.StringTextField;
-import org.openbase.bco.registry.editor.visual.cell.editing.ValueCheckBox;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.EnumComboBox;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.MessageComboBox;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.DeviceClassComboBoxConverter;
-import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.LabelComboBoxConverter;
-import org.openbase.bco.registry.editor.visual.provider.DeviceClassItemDescriptorProvider;
-import org.openbase.bco.registry.remote.Registries;
-import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.exception.InstantiationException;
-import org.openbase.jul.exception.printer.LogLevel;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import org.openbase.jul.schedule.GlobalCachedExecutorService;
-import rst.configuration.EntryType;
-import rst.domotic.state.InventoryStateType.InventoryState;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
-import rst.domotic.unit.authorizationgroup.AuthorizationGroupConfigType.AuthorizationGroupConfig;
-import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
-import rst.math.Vec3DDoubleType.Vec3DDouble;
-import rst.timing.TimestampType.Timestamp;
-
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import org.openbase.bco.registry.editor.struct.ValueType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class ValueCell extends RowCell {
+public class ValueCell extends TreeTableCell<ValueType, ValueType> {
 
-    protected final Button applyButton, cancelButton;
-    protected final HBox buttonLayout;
-    protected LeafContainer leaf;
-    private javafx.scene.control.Control graphic;
+    private final Logger logger = LoggerFactory.getLogger(ValueCell.class);
 
-    protected SimpleObjectProperty<Boolean> changed = null;
-    protected final ChangeListener<Boolean> changeListener;
-    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
+    private Node editingGraphic;
 
-    private Future registryTask = null;
-    private static final Map<NodeInterface, Future> TASK_MAP = new HashMap<>();
+    @Override
+    protected void updateItem(ValueType item, boolean empty) {
+        super.updateItem(item, empty);
 
-    public ValueCell() throws InterruptedException {
-        super();
-        applyButton = new Button("Apply");
-//        ((RegistryTreeTableView) this.getTableColumn().getTreeTableView()).addDisconnectedObserver(new Observer<Boolean>() {
-//
-//            @Override
-//            public void update(Observable<Boolean> source, Boolean data) throws Exception {
-//                applyButton.setDisable(data);
-//            }
-//        });
-        applyButton.setOnAction(new ApplyEventHandler());
-        cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(new CancelEventHandler());
-        buttonLayout = new HBox(applyButton, cancelButton);
-        this.changeListener = new ChangedListener();
+        if (!empty && item != null) {
+            if (isEditing()) {
+                if (editingGraphic != null) {
+                    setGraphic(editingGraphic);
+                }
+                return;
+            }
+
+            setGraphic(item.getValueGraphic());
+        } else {
+            // reset text if now empty
+            setGraphic(new Label(""));
+        }
     }
 
     @Override
     public void startEdit() {
         super.startEdit();
 
-        if (getItem() instanceof Leaf) {
-            leaf = ((LeafContainer) getItem());
-            if (((LeafContainer) getItem()).getEditable()) {
-                setGraphic(getEditingGraphic());
-            } else {
-                if ("unit_id".equals(leaf.getDescriptor())) {
-                    Platform.runLater(() -> {
-                        try {
-                            ((RegistryTreeTableView) getTreeTableView()).getRegistryEditor().selectMessageById((String) leaf.getValue());
-                        } catch (CouldNotPerformException ex) {
-                            RegistryEditor.printException(new CouldNotPerformException("Could not select message by id!", ex), logger, LogLevel.ERROR);
-                        }
-                    });
-                }
-            }
+        editingGraphic = getTreeTableRow().getTreeItem().getValue().getEditingGraphic(this);
+        if (editingGraphic != null) {
+            // editing graphic equals null means not editable
+            setGraphic(editingGraphic);
         }
-    }
-
-    private javafx.scene.control.Control getEditingGraphic() {
-        graphic = null;
-        Message type = MessageComboBox.getMessageEnumBoxType(leaf.getDescriptor(), leaf.getParent().getBuilder());
-        if (type != null) {
-            try {
-                graphic = new MessageComboBox(this, leaf.getParent().getBuilder(), leaf.getDescriptor());
-            } catch (InstantiationException ex) {
-                RegistryEditor.printException(ex, logger, LogLevel.ERROR);
-            }
-        } else if (leaf.getValue() instanceof String) {
-            graphic = new StringTextField(this, (String) leaf.getValue());
-        } else if (leaf.getValue() instanceof EnumValueDescriptor) {
-            graphic = new EnumComboBox(this, (EnumValueDescriptor) leaf.getValue());
-        } else if (leaf.getValue() instanceof Float || leaf.getValue() instanceof Double) {
-            graphic = new DecimalTextField(this, leaf.getValue().toString());
-        } else if (leaf.getValue() instanceof Long) {
-            if (leaf.getParent().getBuilder() instanceof Timestamp.Builder) {
-                graphic = new LongDatePicker(this, (Long) leaf.getValue());
-            } else {
-                graphic = new DecimalTextField(this, leaf.getValue().toString());
-            }
-        } else if (leaf.getValue() instanceof Boolean) {
-            graphic = new ValueCheckBox(this, true, false);
-        }
-        if (graphic != null) {
-            graphic.setPrefWidth(this.getWidth() * 5 / 8);
-        }
-        return graphic;
     }
 
     @Override
     public void cancelEdit() {
         super.cancelEdit();
+        updateItem(getItem(), getItem() == null);
     }
 
     @Override
-    public void updateItem(NodeInterface item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (empty) {
-            setGraphic(null);
-            setText("");
-            setContextMenu(null);
-        } else if (item instanceof Leaf) {
-            String text = "";
-            if (((Leaf) item).getValue() instanceof Long) {
-                if (((LeafContainer) item).getParent().getBuilder() instanceof Timestamp.Builder) {
-                    text = LongDatePicker.DATE_CONVERTER.format(new Date((Long) ((Leaf) item).getValue()));
-                } else {
-                    text = ((Leaf) item).getValue().toString();
-                }
-            } else if (((Leaf) item).getValue() instanceof Double) {
-                text = decimalFormat.format(((Double) ((Leaf) item).getValue()));
-            } else if (((Leaf) item).getValue() instanceof EnumValueDescriptor) {
-                text = (((EnumValueDescriptor) ((Leaf) item).getValue()).getName());
-            } else if ((((Leaf) item).getValue() != null)) {
-                if ("location_id".equals(item.getDescriptor()) || "parent_id".equals(item.getDescriptor()) || "child_id".equals(item.getDescriptor()) || "tile_id".equals(item.getDescriptor())) {
-                    try {
-                        text = ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.LOCATION).getScope());
-                    } catch (CouldNotPerformException ex) {
-                        text = ((Leaf) item).getValue().toString();
-                    }
-                } else if ("member_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof AuthorizationGroupConfig.Builder) {
-                    try {
-                        text = new LabelComboBoxConverter<>().getText(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.USER));
-                    } catch (CouldNotPerformException ex) {
-                        text = ((Leaf) item).getValue().toString();
-                    }
-                } else if ("owner_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof InventoryState.Builder) {
-                    try {
-                        text = new LabelComboBoxConverter().getText(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.USER));
-                    } catch (CouldNotPerformException ex) {
-                        text = ((Leaf) item).getValue().toString();
-                    }
-                } else if ("device_class_id".equals(item.getDescriptor()) && ((LeafContainer) item).getParent().getBuilder() instanceof DeviceConfig.Builder) {
-                    try {
-                        text = new DeviceClassComboBoxConverter().getText(Registries.getClassRegistry().getDeviceClassById((String) ((Leaf) item).getValue()));
-                    } catch (CouldNotPerformException ex) {
-                        text = ((Leaf) item).getValue().toString();
-                    }
-                } else if ("unit_host_id".equals(item.getDescriptor())) {
-                    try {
-                        text = ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
-                    } catch (CouldNotPerformException ex) {
-                        text = ((Leaf) item).getValue().toString();
-                    }
-                } else if ("connection_id".equals(item.getDescriptor())) {
-                    try {
-                        text = ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue(), UnitType.CONNECTION).getScope());
-                    } catch (CouldNotPerformException ex) {
-                        text = ((Leaf) item).getValue().toString();
-                    }
-                } else {
-                    text = ((Leaf) item).getValue().toString();
-                }
-            }
-
-            if (((LeafContainer) item).getEditable()) {
-                setGraphic(new Label(text));
-            } else {
-                Label selectableLabel = SelectableLabel.makeSelectable(new Label(text));
-                if (item.getDescriptor().endsWith("unit_id")) {
-                    try {
-                        text = ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById((String) ((Leaf) item).getValue()).getScope());
-                    } catch (CouldNotPerformException ex) {
-                        logger.warn("Could not retrieve unitConfig with id [" + ((Leaf) item).getValue() + "]", ex);
-                    }
-                    selectableLabel = new Label(text);
-                    selectableLabel.setDisable(true);
-                    selectableLabel.setStyle(
-                            "-fx-background-color: transparent; -fx-background-insets: 0; -fx-background-radius: 0; -fx-padding: 0; -fx-text-inner-color: blue;"
-                    );
-                }
-                setGraphic(selectableLabel);
+    public void commitEdit(ValueType newValue) {
+        // This block is necessary to support commit on losing focus, because the baked-in mechanism
+        // sets our editing state to false before we can intercept the loss of focus.
+        // The default commitEdit(...) method simply bails if we are not editing...
+        if (!isEditing() && !newValue.equals(getItem())) {
+            final TreeTableView<ValueType> table = getTreeTableView();
+            if (table != null) {
+                final TreeTableColumn<ValueType, ValueType> tableColumn = getTableColumn();
+                final TreeTableColumn.CellEditEvent<ValueType, ValueType> event = new TreeTableColumn.CellEditEvent<>(table,
+                        new TreeTablePosition<>(table, getIndex(), tableColumn), TreeTableColumn.editCommitEvent(), newValue);
+                logger.debug("Fire event because loss of focus commit");
+                Event.fireEvent(tableColumn, event);
             }
         }
 
-        if (item instanceof GenericNodeContainer) {
-            GenericNodeContainer container = (GenericNodeContainer) item;
-            String text = getBuilderDescription(container.getBuilder());
-            if (text != null) {
-                setGraphic(SelectableLabel.makeSelectable(new Label(text)));
-            } else {
-                if (container.getDescriptor().equals("floor")) {
-                    Vec3DDouble.Builder vector = (Vec3DDouble.Builder) container.getBuilder();
-                    setGraphic(SelectableLabel.makeSelectable(new Label("[" + vector.getX() + "x, " + vector.getY() + "y, " + vector.getZ() + "z]")));
-                } else {
-                    setText("");
-                    setGraphic(null);
-                }
-            }
-            if (container.isSendable()) {
-                updateButtonListener(container.getChanged());
-                if (container.hasChanged()) {
-                    setGraphic(buttonLayout);
-                }
-
-                try {
-                    // do not show buttons during running registryTask
-                    if (!isUpdateTaskRunning() && ProtoBufFieldProcessor.getId(container.getBuilder()).isEmpty()) {
-                        container.setChanged(true);
-                    }
-                } catch (CouldNotPerformException ex) {
-                    RegistryEditor.printException(ex, logger, LogLevel.WARN);
-                }
-            } else {
-                updateButtonListener(null);
-            }
-
-            if (isUpdateTaskRunning()) {
-                ProgressIndicator progressIndicator = new ProgressIndicator();
-                progressIndicator.setPrefHeight(ValueCell.this.getHeight());
-                Label label = new Label("Waiting for registry update...");
-                label.setMaxHeight(ValueCell.this.applyButton.getHeight());
-                ValueCell.this.setGraphic(new HBox(progressIndicator, label));
-            }
-        } else {
-            updateButtonListener(null);
-        }
-
-        // ==================== TODO:tamino redesign
-        if (item instanceof GenericGroupContainer) {
-            if (((GenericGroupContainer) item).getParent().getValue() instanceof GenericGroupContainer) {
-                GenericGroupContainer parent = (GenericGroupContainer) ((GenericGroupContainer) item).getParent().getValue();
-                if (parent.getFieldGroup() instanceof DeviceClassItemDescriptorProvider) {
-                    try {
-                        String text = Registries.getClassRegistry().getDeviceClassById((String) parent.getValueMap().get(getItem())).getDescription();
-                        setGraphic(SelectableLabel.makeSelectable(new Label(text)));
-                    } catch (CouldNotPerformException ex) {
-                        RegistryEditor.printException(ex, logger, LogLevel.DEBUG);
-                    }
-                }
-            }
-        }
-        // ============================================
-    }
-
-    public String getBuilderDescription(Message.Builder builder) {
-        if (builder instanceof EntryType.Entry.Builder) {
-            EntryType.Entry.Builder entry = (EntryType.Entry.Builder) builder;
-            return entry.getKey() + " = " + entry.getValue();
-        } else if (Configuration.isSendable(builder)) {
-            try {
-                return ProtoBufFieldProcessor.getDescription(builder);
-            } catch (CouldNotPerformException ex) {
-            }
-        }
-        return null;
-    }
-
-    public LeafContainer getLeaf() {
-        return leaf;
-    }
-
-    private void updateButtonListener(SimpleObjectProperty<Boolean> property) {
-        if (changed != null) {
-            changed.removeListener(changeListener);
-        }
-        changed = property;
-        if (changed != null) {
-            changed.addListener(changeListener);
-        }
-    }
-
-    private class ApplyEventHandler implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-            logger.info("new apply event");
-            GlobalTextArea.getInstance().clearText();
-            GenericNodeContainer container = (GenericNodeContainer) getItem();
-            Builder builder = container.getBuilder();
-
-            if (!builder.isInitialized()) {
-                if (ProtoBufFieldProcessor.checkIfSomeButNotAllRequiredFieldsAreSet(builder)) {
-                    List<String> missingFieldList = builder.findInitializationErrors();
-                    String missingFields = "";
-                    missingFields = missingFieldList.stream().map((error) -> error + "\n").reduce(missingFields, String::concat);
-
-                    Alert alert = new Alert(AlertType.CONFIRMATION);
-                    alert.setResizable(true);
-                    alert.setTitle("Message initialization error!");
-                    alert.setHeaderText("Missing some required fields!");
-                    alert.setContentText("Initialize them with default values or clear them?");
-
-                    ButtonType initButton = new ButtonType("Init");
-                    ButtonType clearButton = new ButtonType("Clear");
-                    ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-                    alert.getButtonTypes().setAll(initButton, clearButton, cancelButton);
-
-                    TextArea textArea = new TextArea(missingFields);
-                    textArea.setEditable(false);
-                    textArea.setWrapText(true);
-                    Label label = new Label("Missing fields:");
-
-                    textArea.setMaxWidth(Double.MAX_VALUE);
-                    textArea.setMaxHeight(Double.MAX_VALUE);
-                    GridPane.setVgrow(textArea, Priority.ALWAYS);
-                    GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-                    GridPane expContent = new GridPane();
-                    expContent.setMaxWidth(Double.MAX_VALUE);
-                    expContent.add(label, 0, 0);
-                    expContent.add(textArea, 0, 1);
-
-                    alert.getDialogPane().setExpandableContent(expContent);
-
-                    Optional<ButtonType> result = alert.showAndWait();
-                    if (result.get() == clearButton) {
-                        ProtoBufFieldProcessor.clearRequiredFields(builder);
-                    } else if (result.get() == initButton) {
-                        ProtoBufFieldProcessor.initRequiredFieldsWithDefault(builder);
-                    } else {
-                        return;
-                    }
-                } else {
-                    while (!builder.findInitializationErrors().isEmpty()) {
-                        ProtoBufFieldProcessor.clearRequiredFields(builder);
-                    }
-                }
-            }
-
-            GlobalCachedExecutorService.submit(new Callable<Boolean>() {
-
-                @Override
-                public Boolean call() throws Exception {
-                    GenericNodeContainer container = (GenericNodeContainer) getItem();
-                    Message msg;
-
-                    try {
-                        msg = container.getBuilder().build();
-                        container.setChanged(false);
-                        Platform.runLater(() -> {
-                            ProgressIndicator progressIndicator = new ProgressIndicator();
-                            progressIndicator.setMaxHeight(ValueCell.this.applyButton.getHeight());
-                            Label label = new Label("Waiting for registry update...");
-                            label.setMaxHeight(ValueCell.this.applyButton.getHeight());
-                            ValueCell.this.setGraphic(new HBox(progressIndicator, label));
-                        });
-                        if (Registries.contains(msg)) {
-                            // save original value from model
-                            final Message original = Registries.getById(ProtoBufFieldProcessor.getId(msg));
-
-                            registryTask = Registries.update(msg);
-                            addToTaskMap(container, registryTask);
-                            // save update
-                            final Message update = (Message) registryTask.get();
-                            removeFromTaskMap(container);
-
-                            // check if update and original are the same, then the changed values where reset and a registry update is not triggered
-                            if (original.equals(update)) {
-                                // reset the container to its old value
-                                resetContainer();
-                            }
-
-                        } else {
-                            registryTask = Registries.register(msg);
-                            addToTaskMap(container, registryTask);
-                            registryTask.get();
-                            removeFromTaskMap(container);
-                            // remove temporally created node structure
-                            container.getParent().getChildren().remove(container);
-                        }
-                    } catch (CouldNotPerformException | ExecutionException ex) {
-                        RegistryEditor.printException(ex, logger, LogLevel.ERROR);
-                        registryTask = null;
-                        container.setChanged(true);
-                    }
-                    return true;
-                }
-            });
-        }
-    }
-
-    public void resetContainer() throws CouldNotPerformException {
-        final GenericNodeContainer container = (GenericNodeContainer) getItem();
-
-        final int index = container.getParent().getChildren().indexOf(container);
-        final GenericNodeContainer resetNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(),
-                (GeneratedMessage.Builder) Registries.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
-        RegistryTreeTableView.expandEqually(container, resetNode);
-        Platform.runLater(() -> {
-            container.getParent().getChildren().set(index, resetNode);
-        });
-    }
-
-    private class CancelEventHandler implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-            GlobalTextArea.getInstance().clearText();
-            GlobalCachedExecutorService.submit(new Callable<Boolean>() {
-
-                @Override
-                public Boolean call() throws Exception {
-                    GenericNodeContainer container = (GenericNodeContainer) getItem();
-                    try {
-                        if ("".equals(ProtoBufFieldProcessor.getId(container.getBuilder()))) {
-                            Platform.runLater(() -> {
-                                container.getParent().getChildren().remove(container);
-                            });
-                        } else {
-                            resetContainer();
-//                            int index = container.getParent().getChildren().indexOf(container);
-//                            GenericNodeContainer oldNode = new GenericNodeContainer(container.getBuilder().getDescriptorForType().getName(), (GeneratedMessage.Builder) remotePool.getById(ProtoBufFieldProcessor.getId(container.getBuilder()), container.getBuilder()).toBuilder());
-//                            RegistryTreeTableView.expandEqually(container, oldNode);
-//                            Platform.runLater(() -> {
-//                                container.getParent().getChildren().set(index, oldNode);
-//                            });
-                        }
-                    } catch (Exception ex) {
-                        RegistryEditor.printException(ex, logger, LogLevel.ERROR);
-                        logger.warn("Could not cancel update of [" + container.getBuilder() + "]", ex);
-                    }
-                    return true;
-                }
-            });
-        }
-    }
-
-    private class ChangedListener implements ChangeListener<Boolean> {
-
-        @Override
-        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-            Platform.runLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (isUpdateTaskRunning()) {
-                        return;
-                    }
-
-                    if (newValue && (changed != null)) {
-                        setGraphic(buttonLayout);
-                    } else {
-                        setGraphic(null);
-                    }
-                }
-            });
-        }
-    }
-
-    private boolean isUpdateTaskRunning() {
-        synchronized (TASK_MAP) {
-            return TASK_MAP.containsKey(this.getItem()) && !TASK_MAP.get(this.getItem()).isDone();
-        }
-    }
-
-    private void addToTaskMap(NodeInterface node, Future future) {
-        synchronized (TASK_MAP) {
-            TASK_MAP.put(node, future);
-        }
-    }
-
-    private void removeFromTaskMap(NodeInterface node) {
-        synchronized (TASK_MAP) {
-            TASK_MAP.remove(node);
-        }
+        super.commitEdit(newValue);
     }
 }

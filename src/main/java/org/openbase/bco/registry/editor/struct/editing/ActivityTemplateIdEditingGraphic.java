@@ -39,7 +39,13 @@ import java.util.List;
 public class ActivityTemplateIdEditingGraphic extends AbstractMessageEditingGraphic<ActivityTemplate> {
 
     public ActivityTemplateIdEditingGraphic(ValueType<String> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(valueType, treeTableCell);
+        super(value -> {
+            try {
+                return LabelProcessor.getBestMatch(value.getLabel());
+            } catch (NotAvailableException e) {
+                return value.getId();
+            }
+        }, valueType, treeTableCell);
     }
 
     @Override
@@ -55,16 +61,5 @@ public class ActivityTemplateIdEditingGraphic extends AbstractMessageEditingGrap
     @Override
     protected ActivityTemplate getMessage(final String value) throws CouldNotPerformException {
         return Registries.getTemplateRegistry().getActivityTemplateById(value);
-    }
-
-    @Override
-    protected DescriptionGenerator<ActivityTemplate> getDescriptionGenerator() {
-        return value -> {
-            try {
-                return LabelProcessor.getBestMatch(value.getLabel());
-            } catch (NotAvailableException e) {
-                return value.getId();
-            }
-        };
     }
 }

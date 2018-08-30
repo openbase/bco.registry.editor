@@ -24,29 +24,38 @@ package org.openbase.bco.registry.editor.struct.preset;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
+import javafx.scene.control.TreeTableCell;
+import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
+import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.struct.editing.TimestampEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass.Builder;
+import org.openbase.jul.extension.rst.processing.TimestampJavaTimeTransform;
+import rst.timing.TimestampType.Timestamp.Builder;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class DeviceClassTreeItem extends RegistryMessageTreeItem<DeviceClass.Builder> {
+public class TimestampTreeItem extends AbstractBuilderLeafTreeItem<Builder> {
 
-    public DeviceClassTreeItem(FieldDescriptor fieldDescriptor, Builder builder, Boolean editable) throws InitializationException {
+    private DateFormat dateFormat;
+
+    public TimestampTreeItem(FieldDescriptor fieldDescriptor, Builder builder, Boolean editable) throws InitializationException {
         super(fieldDescriptor, builder, editable);
 
-        addEventHandler(valueChangedEvent(), event -> updateValueGraphic());
+        this.dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     }
 
     @Override
-    protected Node createValueGraphic() {
-        final Node valueGraphic = super.createValueGraphic();
-        if (valueGraphic == null) {
-            return new Label(getBuilder().getDescription());
-        }
-        return valueGraphic;
+    protected String createValueRepresentation() {
+        return dateFormat.format(new Date(TimestampJavaTimeTransform.transform(getBuilder())));
+    }
+
+    @Override
+    public Node getEditingGraphic(TreeTableCell<ValueType, ValueType> cell) {
+        return new TimestampEditingGraphic(getValueCasted(), cell).getControl();
     }
 }

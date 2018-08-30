@@ -39,7 +39,13 @@ import java.util.List;
 public class AppClassIdEditingGraphic extends AbstractMessageEditingGraphic<AppClass> {
 
     public AppClassIdEditingGraphic(ValueType<String> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(valueType, treeTableCell);
+        super(value -> {
+            try {
+                return LabelProcessor.getBestMatch(value.getLabel());
+            } catch (NotAvailableException e) {
+                return value.getId();
+            }
+        }, valueType, treeTableCell);
     }
 
     @Override
@@ -55,16 +61,5 @@ public class AppClassIdEditingGraphic extends AbstractMessageEditingGraphic<AppC
     @Override
     protected AppClass getMessage(final String value) throws CouldNotPerformException {
         return Registries.getClassRegistry().getAppClassById(value);
-    }
-
-    @Override
-    protected DescriptionGenerator<AppClass> getDescriptionGenerator() {
-        return value -> {
-            try {
-                return LabelProcessor.getBestMatch(value.getLabel());
-            } catch (NotAvailableException e) {
-                return value.getId();
-            }
-        };
     }
 }

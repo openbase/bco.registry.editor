@@ -23,7 +23,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter;
  */
 
 import com.google.protobuf.Message;
-import org.openbase.bco.registry.editor.RegistryEditor;
+import org.openbase.bco.registry.editor.RegistryEditorOld;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.FatalImplementationErrorException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
@@ -42,7 +42,7 @@ public abstract class AbstractComboBoxConverter<MSG extends Message> implements 
         try {
             return ProtoBufFieldProcessor.getId(message);
         } catch (CouldNotPerformException ex) {
-            RegistryEditor.printException(new FatalImplementationErrorException("Id for message[" + message.getClass().getName() + "] not available", this, ex));
+            RegistryEditorOld.printException(new FatalImplementationErrorException("Id for message[" + message.getClass().getName() + "] not available", this, ex));
             return "";
         }
     }

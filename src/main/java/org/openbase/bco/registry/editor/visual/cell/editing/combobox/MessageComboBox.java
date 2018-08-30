@@ -33,9 +33,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
-import org.openbase.bco.registry.editor.struct.NodeContainer;
 import org.openbase.bco.registry.editor.util.SendableType;
-import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.DeviceClassComboBoxConverter;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.LabelComboBoxConverter;
 import org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter.MessageComboBoxConverter;
@@ -70,11 +68,9 @@ public class MessageComboBox extends ComboBox<Message> {
 
     private static final int DEFAULT_VISIBLE_ROW_COUNT = 5;
     private final MessageComboBoxConverter converter;
-    private final ValueCell cell;
 
-    public MessageComboBox(ValueCell cell, Message.Builder parentBuilder, String fieldName) throws InstantiationException {
+    public MessageComboBox(Message.Builder parentBuilder, String fieldName) throws InstantiationException {
         super();
-        this.cell = cell;
         this.setVisibleRowCount(DEFAULT_VISIBLE_ROW_COUNT);
         this.converter = getConverterByMessageType(fieldName, parentBuilder);
         this.setCellFactory(new Callback<ListView<Message>, ListCell<Message>>() {
@@ -85,23 +81,6 @@ public class MessageComboBox extends ComboBox<Message> {
             }
         });
         this.setButtonCell(new MessageComboBoxCell());
-        this.setItems(sortedList(parentBuilder, fieldName, cell.getLeaf().getValue()));
-        this.setStartingValue(cell.getLeaf().getValue());
-        this.setOnAction(new EventHandler() {
-
-            @Override
-            public void handle(Event event) {
-                try {
-                    if (getSelectionModel().getSelectedItem() != null && !cell.getLeaf().getValue().equals(getSelectionModel().getSelectedItem())) {
-                        cell.getLeaf().setValue(converter.getValue(getSelectionModel().getSelectedItem()));
-                        cell.setGraphic(new Label(converter.getText(getSelectionModel().getSelectedItem())));
-                        cell.commitEdit(cell.getLeaf());
-                    }
-                } catch (InterruptedException ex) {
-                    ExceptionPrinter.printHistory(new CouldNotPerformException("Event handing skipped!", ex), logger, LogLevel.WARN);
-                }
-            }
-        });
     }
 
     private void setStartingValue(Object value) {
@@ -165,17 +144,17 @@ public class MessageComboBox extends ComboBox<Message> {
                     list.addAll(Registries.getUnitRegistry().getUnitConfigsByLocation(tileId));
                 }
             }
-            if (parentBuilder instanceof PermissionConfig.MapFieldEntry.Builder) {
-                PermissionConfig.Builder permissionConfig = (PermissionConfig.Builder) ((NodeContainer) this.cell.getLeaf().getParent().getParent().getValue()).getBuilder();
-                for (PermissionConfig.MapFieldEntry entry : permissionConfig.getGroupPermissionList()) {
-                    if (leafValue.equals(entry.getGroupId())) {
-                        continue;
-                    }
-                    if (entry.hasGroupId() && !entry.getGroupId().isEmpty()) {
-                        list.remove(Registries.getUnitRegistry().getUnitConfigById(entry.getGroupId(), UnitType.AUTHORIZATION_GROUP));
-                    }
-                }
-            }
+//            if (parentBuilder instanceof PermissionConfig.MapFieldEntry.Builder) {
+//                PermissionConfig.Builder permissionConfig = (PermissionConfig.Builder) ((NodeContainer) this.cell.getLeaf().getParent().getParent().getValue()).getBuilder();
+//                for (PermissionConfig.MapFieldEntry entry : permissionConfig.getGroupPermissionList()) {
+//                    if (leafValue.equals(entry.getGroupId())) {
+//                        continue;
+//                    }
+//                    if (entry.hasGroupId() && !entry.getGroupId().isEmpty()) {
+//                        list.remove(Registries.getUnitRegistry().getUnitConfigById(entry.getGroupId(), UnitType.AUTHORIZATION_GROUP));
+//                    }
+//                }
+//            }
             list.sort((o1, o2) -> {
                 if (o1 == null && o2 == null) {
                     return 0;

@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.struct.converter.filter;
+package org.openbase.bco.registry.editor.struct.editing;
 
 /*-
  * #%L
@@ -22,17 +22,26 @@ package org.openbase.bco.registry.editor.struct.converter.filter;
  * #L%
  */
 
+import javafx.scene.control.TreeTableCell;
+import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.remote.Registries;
+import org.openbase.jul.exception.CouldNotPerformException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
+
+import java.util.List;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class SceneUnitConfigFilter extends NotDalUnitConfigFilter {
+public class UserIdEditingGraphic extends AbstractUnitConfigEditingGraphic {
+
+    public UserIdEditingGraphic(final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
+        super(value -> value.getUserConfig().getUserName(), valueType, treeTableCell);
+    }
 
     @Override
-    protected void registerFilteredFields() {
-        super.registerFilteredFields();
-        removeFilteredField(UnitConfig.SCENE_CONFIG_FIELD_NUMBER);
+    protected List<UnitConfig> getMessages() throws CouldNotPerformException {
+        return Registries.getUnitRegistry().getUnitConfigs(UnitType.USER);
     }
 }

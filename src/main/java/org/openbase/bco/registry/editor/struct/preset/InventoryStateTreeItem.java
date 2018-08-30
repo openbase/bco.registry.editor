@@ -24,8 +24,20 @@ package org.openbase.bco.registry.editor.struct.preset;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
+import org.openbase.bco.registry.editor.struct.GenericTreeItem;
+import org.openbase.bco.registry.editor.struct.LeafTreeItem;
+import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
+import org.openbase.bco.registry.editor.struct.editing.LocationIdEditingGraphic;
+import org.openbase.bco.registry.editor.struct.editing.UserIdEditingGraphic;
+import org.openbase.bco.registry.remote.Registries;
+import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.rst.processing.TimestampProcessor;
+import rst.domotic.state.InventoryStateType.InventoryState;
 import rst.domotic.state.InventoryStateType.InventoryState.Builder;
+
+import java.util.Set;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -36,8 +48,53 @@ public class InventoryStateTreeItem extends BuilderTreeItem<Builder> {
         super(fieldDescriptor, builder, editable);
 
         this.addEventHandler(valueChangedEvent(), event -> {
-            // TODO: if value die not come from timestamp, update the timestamp to now
+            GenericTreeItem source = (GenericTreeItem) event.getSource();
 
+            if (!(source instanceof TimestampTreeItem)) {
+                try {
+                    TimestampProcessor.updateTimestampWithCurrentTime(getBuilder().getTimestampBuilder());
+                    source.update(getBuilder().getTimestampBuilder());
+                } catch (CouldNotPerformException ex) {
+                    logger.warn("Could not update timestamp", ex);
+                }
+            }
         });
+    }
+
+    @Override
+    protected Set<Integer> getFilteredFields() {
+        final Set<Integer> filteredFields = super.getFilteredFields();
+        filteredFields.add(InventoryState.LAST_VALUE_OCCURRENCE_FIELD_NUMBER);
+        return filteredFields;
+    }
+
+    @Override
+    protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
+        switch (field.getNumber()) {
+            case InventoryState.LOCATION_ID_FIELD_NUMBER:
+                final LeafTreeItem<String> leaf = new LeafTreeItem<>(field, getBuilder().getLocationId(), getBuilder(), editable);
+                leaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(LocationIdEditingGraphic.class));
+                leaf.setDescriptionGenerator(value -> {
+                    try {
+                        return ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(value).getScope());
+                    } catch (CouldNotPerformException e) {
+                        return value;
+                    }
+                });
+                return leaf;
+            case InventoryState.BORROWER_ID_FIELD_NUMBER:
+                final LeafTreeItem<String> borrowerLeaf = new LeafTreeItem<>(field, getBuilder().getBorrowerId(), getBuilder(), editable);
+                borrowerLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(UserIdEditingGraphic.class));
+                borrowerLeaf.setDescriptionGenerator(value -> {
+                    try {
+                        return Registries.getUnitRegistry().getUnitConfigById(value).getUserConfig().getUserName();
+                    } catch (CouldNotPerformException e) {
+                        return value;
+                    }
+                });
+
+            default:
+                return super.createChild(field, editable);
+        }
     }
 }

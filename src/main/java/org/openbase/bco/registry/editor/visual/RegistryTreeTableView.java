@@ -26,32 +26,24 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TreeSortMode;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.VBox;
-import org.openbase.bco.registry.editor.RegistryEditor;
-import org.openbase.bco.registry.editor.struct.*;
+import org.openbase.bco.registry.editor.RegistryEditorOld;
 import org.openbase.bco.registry.editor.util.SendableType;
-import org.openbase.bco.registry.editor.visual.column.Column;
-import org.openbase.bco.registry.editor.visual.column.DescriptorColumn;
-import org.openbase.bco.registry.editor.visual.column.ValueColumn;
-
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.ProtobufListDiff;
-import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import org.openbase.jul.pattern.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate;
 import rst.rsb.ScopeType.Scope;
 
 import java.util.ArrayList;
@@ -64,34 +56,34 @@ import static org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProces
  * @param <MB> The message builder type to use.
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Builder<MB>> extends TreeTableView<NodeInterface> {
+public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Builder<MB>> extends TreeTableView<Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryTreeTableView.class);
 
-    private final DescriptorColumn descriptorColumn;
+//    private final DescriptorColumn descriptorColumn;
     private final SendableType type;
     private final ProtobufListDiff<?, M, ?> listDiff;
     private final VBox vBox;
     private final Label statusInfoLabel;
     private final List<Observer<Boolean>> disconnectionObserver;
-    private final RegistryEditor registryEditor;
+    private final RegistryEditorOld registryEditor;
 
-    public RegistryTreeTableView(SendableType type, RegistryEditor registryEditor) throws InstantiationException, InterruptedException {
+    public RegistryTreeTableView(SendableType type, RegistryEditorOld registryEditor) throws InstantiationException, InterruptedException {
         this.type = type;
         this.setEditable(true);
         this.setShowRoot(false);
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.getSelectionModel().setCellSelectionEnabled(false);
         this.disconnectionObserver = new ArrayList<>();
-        this.descriptorColumn = new DescriptorColumn();
-        ValueColumn valueColumn = new ValueColumn();
-        this.getColumns().addAll(descriptorColumn, valueColumn);
+//        this.descriptorColumn = new DescriptorColumn();
+//        ValueColumn valueColumn = new ValueColumn();
+//        this.getColumns().addAll(descriptorColumn, valueColumn);
         if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.ACTIVITY_TEMPLATE) {
             System.out.println("Set Context Menu for type [" + type.name() + "]");
-            this.setContextMenu(new TreeTableViewContextMenu(this, type));
+//            this.setContextMenu(new TreeTableViewContextMenu(this, type));
         }
         setSortMode(TreeSortMode.ALL_DESCENDANTS);
-        getSortOrder().addAll(descriptorColumn, valueColumn);
+//        getSortOrder().addAll(descriptorColumn, valueColumn);
         this.listDiff = new ProtobufListDiff<>();
 
         this.statusInfoLabel = new Label("Status Info Label");
@@ -105,9 +97,9 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
     }
 
     public void addWidthProperty(ReadOnlyDoubleProperty widthProperty) {
-        getColumns().forEach((column) -> {
-            ((Column) column).addWidthProperty(widthProperty);
-        });
+//        getColumns().forEach((column) -> {
+//            ((Column) column).addWidthProperty(widthProperty);
+//        });
     }
 
     public void addHeightProperty(ReadOnlyDoubleProperty heightProperty) {
@@ -116,9 +108,9 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         });
     }
 
-    public DescriptorColumn getDescriptorColumn() {
-        return descriptorColumn;
-    }
+//    public DescriptorColumn getDescriptorColumn() {
+//        return descriptorColumn;
+//    }
 
     public SendableType getSendableType() {
         return type;
@@ -127,102 +119,102 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
     public void update(List<M> messageList) throws CouldNotPerformException, InterruptedException {
         // TODO tamino: fix update issue and remove workaround.
         // Workaround: Hack for registry restart bug, should be removed after fixing update because empty registries can not be displayed anymore.
-        while (true) {
-            Registries.getUnitRegistry().waitForData();
-            Registries.getRegistries(true);
-            if (Registries.getUnitRegistry().getData().getDeviceUnitConfigCount() != 0) {
-                break;
-            }
-            Thread.sleep(100);
-        }
-        // =======================================
-
-        // get all changes
-        listDiff.diff(messageList);
-        // Remove all removed messages
-        for (M msg : listDiff.getRemovedMessageMap().getMessages()) {
-            NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
-            if (nodeToRemove.hasChanged()) {
-                GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
-                GlobalTextArea.getInstance().putText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been removed from the global database!");
-                continue;
-            }
-            TreeItem<NodeInterface> parent = nodeToRemove.getParent();
-            parent.getChildren().remove(nodeToRemove);
-            if (SendableType.getTypeToMessage(msg) != null) {
-                TreeItem<NodeInterface> removed;
-                while (parent.getChildren().isEmpty() && parent.getParent() != null) {
-                    removed = parent;
-                    parent = (NodeContainer) parent.getParent();
-                    parent.getChildren().remove(removed);
-                }
-            }
-        }
-        for (M msg : listDiff.getUpdatedMessageMap().getMessages()) {
-            NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
-            if (nodeToRemove.hasChanged()) {
-                Platform.runLater(() -> {
-                    GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
-                    String difference = diffString(nodeToRemove.getBuilder(), msg);
-                    try {
-                        GlobalTextArea.getInstance().putText("WARNING: Message [" + ScopeGenerator.generateStringRep(getScope(nodeToRemove.getBuilder())) + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'\nDifferences between local and gloabl:\n" + difference);
-                    } catch (CouldNotPerformException ex) {
-                        GlobalTextArea.getInstance().putText("WARNING: Message with descriptor [" + nodeToRemove.getDescriptor() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'\nDifferences between local and gloabl:\n" + difference);
-                    }
-                });
-                continue;
-            }
-            GenericListContainer parent = (GenericListContainer) nodeToRemove.getParent();
-            GenericListContainer accordingParent = getAccordingParent(new ArrayList<>(this.getRoot().getChildren()), msg);
-            if (accordingParent != null) {
-                if (accordingParent.equals(parent)) {
-                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
-                    expandEqually(nodeToRemove, updatedNode);
-                    parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
-                } else {
-                    parent.getChildren().remove(nodeToRemove);
-                    accordingParent.registerElement(msg.toBuilder());
-                }
-            } else {
-                // according parent either is null if no group exists where aunit can be placed or there are no groups for this tableview
-                if (this.getRoot() instanceof GenericGroupContainer) {
-                    parent.getChildren().remove(nodeToRemove);
-                    GenericGroupContainer rootNode = (GenericGroupContainer) this.getRoot();
-                    rootNode.addItemWithNewGroup(msg);
-                } else {
-                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
-                    expandEqually(nodeToRemove, updatedNode);
-                    parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
-                }
-            }
-        }
-        for (M msg : listDiff.getNewMessageMap().getMessages()) {
-            if (msg instanceof UnitConfig) {
-                UnitConfig a = (UnitConfig) msg;
-                LOGGER.info("New Message [" + a.getUnitType().name() + ", " + a.getLabel() + "]");
-            }
-            //logger.info("New message [" + message + "]");
-            if (this.getRoot() instanceof GenericGroupContainer) {
-                GenericListContainer parent = getAccordingParent(new ArrayList<>(this.getRoot().getChildren()), msg);
-                //parent is null if the new entry belongs to a group that did not exists before
-                if (parent == null) {
-                    GenericGroupContainer rootNode = (GenericGroupContainer) this.getRoot();
-                    rootNode.addItemWithNewGroup(msg);
-                } else {
-                    parent.registerElement(msg.toBuilder());
-                }
-            } else {
-                if (getSendableType() == SendableType.UNIT_TEMPLATE) {
-                    ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((UnitTemplate) msg).getType().name());
-                } else if (getSendableType() == SendableType.SERVICE_TEMPLATE) {
-                    ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((ServiceTemplate) msg).getType().name());
-                } else {
-                    ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder());
-                }
-            }
-        }
-
-        setReadOnlyMode(Registries.isReadOnly(type.getDefaultInstanceForType()));
+//        while (true) {
+//            Registries.getUnitRegistry().waitForData();
+//            Registries.getRegistries(true);
+//            if (Registries.getUnitRegistry().getData().getDeviceUnitConfigCount() != 0) {
+//                break;
+//            }
+//            Thread.sleep(100);
+//        }
+//        // =======================================
+//
+//        // get all changes
+//        listDiff.diff(messageList);
+//        // Remove all removed messages
+//        for (M msg : listDiff.getRemovedMessageMap().getMessages()) {
+//            NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
+//            if (nodeToRemove.hasChanged()) {
+//                GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
+//                GlobalTextArea.getInstance().putText("WARNING: Message [" + nodeToRemove.getBuilder().build() + "] has been removed from the global database!");
+//                continue;
+//            }
+//            TreeItem<NodeInterface> parent = nodeToRemove.getParent();
+//            parent.getChildren().remove(nodeToRemove);
+//            if (SendableType.getTypeToMessage(msg) != null) {
+//                TreeItem<NodeInterface> removed;
+//                while (parent.getChildren().isEmpty() && parent.getParent() != null) {
+//                    removed = parent;
+//                    parent = (NodeContainer) parent.getParent();
+//                    parent.getChildren().remove(removed);
+//                }
+//            }
+//        }
+//        for (M msg : listDiff.getUpdatedMessageMap().getMessages()) {
+//            NodeContainer nodeToRemove = getNodeByMessage(new ArrayList(this.getRoot().getChildren()), msg);
+//            if (nodeToRemove.hasChanged()) {
+//                Platform.runLater(() -> {
+//                    GlobalTextArea.getInstance().setStyle("-fx-text-background-color: red");
+//                    String difference = diffString(nodeToRemove.getBuilder(), msg);
+//                    try {
+//                        GlobalTextArea.getInstance().putText("WARNING: Message [" + ScopeGenerator.generateStringRep(getScope(nodeToRemove.getBuilder())) + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'\nDifferences between local and gloabl:\n" + difference);
+//                    } catch (CouldNotPerformException ex) {
+//                        GlobalTextArea.getInstance().putText("WARNING: Message with descriptor [" + nodeToRemove.getDescriptor() + "] has been changed in the global database!\nTo discard your changes and receive the new ones press 'Cancel'\nTo overwrite the global changes with yours press 'Apply'\nDifferences between local and gloabl:\n" + difference);
+//                    }
+//                });
+//                continue;
+//            }
+//            GenericListContainer parent = (GenericListContainer) nodeToRemove.getParent();
+//            GenericListContainer accordingParent = getAccordingParent(new ArrayList<>(this.getRoot().getChildren()), msg);
+//            if (accordingParent != null) {
+//                if (accordingParent.equals(parent)) {
+//                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
+//                    expandEqually(nodeToRemove, updatedNode);
+//                    parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
+//                } else {
+//                    parent.getChildren().remove(nodeToRemove);
+//                    accordingParent.registerElement(msg.toBuilder());
+//                }
+//            } else {
+//                // according parent either is null if no group exists where aunit can be placed or there are no groups for this tableview
+//                if (this.getRoot() instanceof GenericGroupContainer) {
+//                    parent.getChildren().remove(nodeToRemove);
+//                    GenericGroupContainer rootNode = (GenericGroupContainer) this.getRoot();
+//                    rootNode.addItemWithNewGroup(msg);
+//                } else {
+//                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
+//                    expandEqually(nodeToRemove, updatedNode);
+//                    parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
+//                }
+//            }
+//        }
+//        for (M msg : listDiff.getNewMessageMap().getMessages()) {
+//            if (msg instanceof UnitConfig) {
+//                UnitConfig a = (UnitConfig) msg;
+//                LOGGER.info("New Message [" + a.getUnitType().name() + ", " + a.getLabel() + "]");
+//            }
+//            //logger.info("New message [" + message + "]");
+//            if (this.getRoot() instanceof GenericGroupContainer) {
+//                GenericListContainer parent = getAccordingParent(new ArrayList<>(this.getRoot().getChildren()), msg);
+//                //parent is null if the new entry belongs to a group that did not exists before
+//                if (parent == null) {
+//                    GenericGroupContainer rootNode = (GenericGroupContainer) this.getRoot();
+//                    rootNode.addItemWithNewGroup(msg);
+//                } else {
+//                    parent.registerElement(msg.toBuilder());
+//                }
+//            } else {
+//                if (getSendableType() == SendableType.UNIT_TEMPLATE) {
+//                    ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((UnitTemplate) msg).getType().name());
+//                } else if (getSendableType() == SendableType.SERVICE_TEMPLATE) {
+//                    ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder(), ((ServiceTemplate) msg).getType().name());
+//                } else {
+//                    ((GenericListContainer) this.getRoot()).registerElement(msg.toBuilder());
+//                }
+//            }
+//        }
+//
+//        setReadOnlyMode(Registries.isReadOnly(type.getDefaultInstanceForType()));
     }
 
     public String diffString(MessageOrBuilder origin, MessageOrBuilder updated) {
@@ -284,86 +276,86 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         }
     }
 
-    public void selectMessage(GeneratedMessage msg) throws CouldNotPerformException {
-        TreeItem container = getNodeByMessage(new ArrayList<>(getRoot().getChildren()), msg);
-        container.setExpanded(true);
-        while (container.getParent() != null) {
-            container = container.getParent();
-            container.setExpanded(true);
-        }
-    }
+//    public void selectMessage(GeneratedMessage msg) throws CouldNotPerformException {
+//        TreeItem container = getNodeByMessage(new ArrayList<>(getRoot().getChildren()), msg);
+//        container.setExpanded(true);
+//        while (container.getParent() != null) {
+//            container = container.getParent();
+//            container.setExpanded(true);
+//        }
+//    }
 
-    private NodeContainer getNodeByMessage(List<TreeItem<NodeInterface>> nodes, GeneratedMessage msg) {
-        if (nodes.isEmpty()) {
-            return null;
-        }
+//    private NodeContainer getNodeByMessage(List<TreeItem<NodeInterface>> nodes, GeneratedMessage msg) {
+//        if (nodes.isEmpty()) {
+//            return null;
+//        }
+//
+//        try {
+//            // if the search has progressed too far leaf containers can be under the searched nodes
+//            // they are ignored and the remaining nodes are tested
+//            if (!(nodes.get(0) instanceof NodeContainer)) {
+//                nodes.remove(0);
+//                return getNodeByMessage(nodes, msg);
+//            }
+//
+//            if (ProtoBufFieldProcessor.getId(msg).equals(ProtoBufFieldProcessor.getId(((NodeContainer) nodes.get(0)).getBuilder()))) {
+//                return (NodeContainer) nodes.get(0);
+//            } else {
+//                nodes.addAll(nodes.get(0).getChildren());
+//                nodes.remove(0);
+//                return getNodeByMessage(nodes, msg);
+//            }
+//        } catch (CouldNotPerformException ex) {
+//            // all searched messages must have an id field... else this method will run over all treeitems and then return null
+//            nodes.addAll(nodes.get(0).getChildren());
+//            nodes.remove(0);
+//            return getNodeByMessage(nodes, msg);
+//        }
+//    }
 
-        try {
-            // if the search has progressed too far leaf containers can be under the searched nodes
-            // they are ignored and the remaining nodes are tested
-            if (!(nodes.get(0) instanceof NodeContainer)) {
-                nodes.remove(0);
-                return getNodeByMessage(nodes, msg);
-            }
-            
-            if (ProtoBufFieldProcessor.getId(msg).equals(ProtoBufFieldProcessor.getId(((NodeContainer) nodes.get(0)).getBuilder()))) {
-                return (NodeContainer) nodes.get(0);
-            } else {
-                nodes.addAll(nodes.get(0).getChildren());
-                nodes.remove(0);
-                return getNodeByMessage(nodes, msg);
-            }
-        } catch (CouldNotPerformException ex) {
-            // all searched messages must have an id field... else this method will run over all treeitems and then return null
-            nodes.addAll(nodes.get(0).getChildren());
-            nodes.remove(0);
-            return getNodeByMessage(nodes, msg);
-        }
-    }
+//    private GenericListContainer getAccordingParent(List<TreeItem<NodeInterface>> nodes, GeneratedMessage msg) throws CouldNotPerformException, InterruptedException {
+//        if (nodes.isEmpty()) {
+//            return null;
+//        }
+//
+//        if (nodes.get(0) instanceof GenericGroupContainer) {
+//            GenericGroupContainer group = (GenericGroupContainer) nodes.get(0);
+//            GenericGroupContainer parent = (GenericGroupContainer) group.getParent();
+//            if (group.getDescriptor().equals(parent.getFieldGroup().getDescriptor(msg))) {
+//                return getAccordingParent(new ArrayList<>(group.getChildren()), msg);
+//            } else {
+//                nodes.remove(0);
+//                return getAccordingParent(nodes, msg);
+//            }
+//        } else if (nodes.get(0) instanceof GenericListContainer) {
+//            GenericListContainer list = (GenericListContainer) nodes.get(0);
+//            GenericGroupContainer parent = (GenericGroupContainer) list.getParent();
+//            if (list.getDescriptor().equals(parent.getFieldGroup().getDescriptor(msg))) {
+//                return list;
+//            } else {
+//                nodes.remove(0);
+//                return getAccordingParent(nodes, msg);
+//            }
+//        }
+//        return null;
+//    }
 
-    private GenericListContainer getAccordingParent(List<TreeItem<NodeInterface>> nodes, GeneratedMessage msg) throws CouldNotPerformException, InterruptedException {
-        if (nodes.isEmpty()) {
-            return null;
-        }
-
-        if (nodes.get(0) instanceof GenericGroupContainer) {
-            GenericGroupContainer group = (GenericGroupContainer) nodes.get(0);
-            GenericGroupContainer parent = (GenericGroupContainer) group.getParent();
-            if (group.getDescriptor().equals(parent.getFieldGroup().getDescriptor(msg))) {
-                return getAccordingParent(new ArrayList<>(group.getChildren()), msg);
-            } else {
-                nodes.remove(0);
-                return getAccordingParent(nodes, msg);
-            }
-        } else if (nodes.get(0) instanceof GenericListContainer) {
-            GenericListContainer list = (GenericListContainer) nodes.get(0);
-            GenericGroupContainer parent = (GenericGroupContainer) list.getParent();
-            if (list.getDescriptor().equals(parent.getFieldGroup().getDescriptor(msg))) {
-                return list;
-            } else {
-                nodes.remove(0);
-                return getAccordingParent(nodes, msg);
-            }
-        }
-        return null;
-    }
-
-    public static void expandEqually(TreeItem<NodeInterface> origin, TreeItem<NodeInterface> update) {
-        if (origin.isExpanded()) {
-            update.setExpanded(true);
-        }
-
-        for (TreeItem<NodeInterface> originChild : origin.getChildren()) {
-            for (TreeItem<NodeInterface> updatedChild : update.getChildren()) {
-                if (originChild.getValue().getDescriptor().equals(updatedChild.getValue().getDescriptor())) {
-                    expandEqually(originChild, updatedChild);
-                }
-            }
-        }
-    }
+//    public static void expandEqually(TreeItem<NodeInterface> origin, TreeItem<NodeInterface> update) {
+//        if (origin.isExpanded()) {
+//            update.setExpanded(true);
+//        }
+//
+//        for (TreeItem<NodeInterface> originChild : origin.getChildren()) {
+//            for (TreeItem<NodeInterface> updatedChild : update.getChildren()) {
+//                if (originChild.getValue().getDescriptor().equals(updatedChild.getValue().getDescriptor())) {
+//                    expandEqually(originChild, updatedChild);
+//                }
+//            }
+//        }
+//    }
 
     public void setReadOnlyMode(boolean readOnly) {
-        RegistryEditor.runOnFxThread(() -> {
+        RegistryEditorOld.runOnFxThread(() -> {
             try {
                 if (!Registries.isConsistent(type.getDefaultInstanceForType())) {
                     statusInfoLabel.setText("Registry inconsistent!");
@@ -382,9 +374,9 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
             } else {
                 getStylesheets().clear();
                 getStylesheets().add("default.css");
-                if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.ACTIVITY_TEMPLATE) {
-                    setContextMenu(new TreeTableViewContextMenu(RegistryTreeTableView.this, type));
-                }
+//                if (type != null && type != SendableType.UNIT_TEMPLATE && type != SendableType.ACTIVITY_TEMPLATE) {
+//                    setContextMenu(new TreeTableViewContextMenu(RegistryTreeTableView.this, type));
+//                }
             }
             setEditableWithReadOnlyLabel(!readOnly);
             return null;
@@ -392,7 +384,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
     }
 
     public void setEditableWithReadOnlyLabel(final boolean editable) {
-        RegistryEditor.runOnFxThread(() -> {
+        RegistryEditorOld.runOnFxThread(() -> {
             if (!editable) {
                 vBox.getChildren().clear();
                 vBox.getChildren().addAll(statusInfoLabel, this);
@@ -405,7 +397,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
     }
 
     public void setDisconnected(boolean disconnected) {
-        RegistryEditor.runOnFxThread(() -> {
+        RegistryEditorOld.runOnFxThread(() -> {
             if (disconnected) {
                 statusInfoLabel.setText("Registry disconnected!");
                 statusInfoLabel.setStyle("-fx-text-background-color: rgb(120,120,120); -fx-font-weight: bold;");
@@ -439,7 +431,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         }
     }
 
-    public RegistryEditor getRegistryEditor() {
+    public RegistryEditorOld getRegistryEditor() {
         return registryEditor;
     }
 

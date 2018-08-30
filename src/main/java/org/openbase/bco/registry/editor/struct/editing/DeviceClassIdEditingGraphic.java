@@ -39,7 +39,13 @@ import java.util.List;
 public class DeviceClassIdEditingGraphic extends AbstractMessageEditingGraphic<DeviceClass> {
 
     public DeviceClassIdEditingGraphic(ValueType<String> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(valueType, treeTableCell);
+        super(value -> {
+            try {
+                return LabelProcessor.getBestMatch(value.getLabel());
+            } catch (NotAvailableException e) {
+                return value.getId();
+            }
+        }, valueType, treeTableCell);
     }
 
     @Override
@@ -55,16 +61,5 @@ public class DeviceClassIdEditingGraphic extends AbstractMessageEditingGraphic<D
     @Override
     protected DeviceClass getMessage(String value) throws CouldNotPerformException {
         return Registries.getClassRegistry().getDeviceClassById(value);
-    }
-
-    @Override
-    protected DescriptionGenerator<DeviceClass> getDescriptionGenerator() {
-        return value -> {
-            try {
-                return LabelProcessor.getBestMatch(value.getLabel());
-            } catch (NotAvailableException e) {
-                return value.getId();
-            }
-        };
     }
 }

@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -30,6 +30,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.pattern.ObservableImpl;
+import org.openbase.jul.pattern.Observer;
 import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,9 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final FieldDescriptor fieldDescriptor;
+    private final ObservableImpl<Node> descriptionGraphicObservable;
 
+    private String descriptionText;
     private Node descriptionGraphic;
     private Node valueGraphic;
     private boolean editable;
@@ -52,6 +56,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     public GenericTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Boolean editable) {
         this.fieldDescriptor = fieldDescriptor;
         this.editable = editable;
+        this.descriptionGraphicObservable = new ObservableImpl<>();
         this.setValue(new ValueType<>(value, this));
     }
 
@@ -114,8 +119,18 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
      *
      * @return a graphic displayed in the description column
      */
-    protected Node createDescriptionGraphic() {
-        return new Label(StringProcessor.transformToCamelCase(fieldDescriptor.getName()));
+    private Node createDescriptionGraphic() {
+        descriptionText = createDescriptionText();
+        return new Label(descriptionText);
+    }
+
+    protected void setDescriptionText(final String descriptionText) {
+        this.descriptionText = descriptionText;
+        descriptionGraphic = new Label(descriptionText);
+    }
+
+    protected String createDescriptionText() {
+        return StringProcessor.transformToCamelCase(fieldDescriptor.getName());
     }
 
     /**
@@ -135,7 +150,12 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
      * Update the current description graphic by setting it to the result of {@link #createDescriptionGraphic()}.
      */
     protected final void updateDescriptionGraphic() {
-        this.descriptionGraphic = createDescriptionGraphic();
+        descriptionGraphic = createDescriptionGraphic();
+        try {
+            descriptionGraphicObservable.notifyObservers(descriptionGraphic);
+        } catch (CouldNotPerformException ex) {
+            logger.error("Could not notify description graphic change", ex);
+        }
     }
 
     /**
@@ -183,5 +203,20 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
         for (final TreeItem<ValueType> child : getChildren()) {
             ((GenericTreeItem) child).search(text, treeItemList);
         }
+    }
+
+    public void addDescriptionGraphicObserver(final Observer<Node> observer) {
+        descriptionGraphicObservable.addObserver(observer);
+    }
+
+    public void removeDescriptionGraphicObserver(final Observer<Node> observer) {
+        descriptionGraphicObservable.removeObserver(observer);
+    }
+
+    public String getDescriptionText() {
+        if (descriptionText == null) {
+            descriptionText = createDescriptionText();
+        }
+        return descriptionText;
     }
 }

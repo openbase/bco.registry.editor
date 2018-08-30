@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.struct.value;
+package org.openbase.bco.registry.editor.struct.preset;
 
 /*-
  * #%L
@@ -23,26 +23,26 @@ package org.openbase.bco.registry.editor.struct.value;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import org.openbase.jul.processing.StringProcessor;
+import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
+import org.openbase.jul.exception.InitializationException;
+import rst.domotic.unit.location.TileConfigType.TileConfig;
+import rst.domotic.unit.location.TileConfigType.TileConfig.Builder;
+
+import java.util.Set;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class DefaultDescriptionGenerator<V> implements DescriptionGenerator<V> {
+public class TileConfigTreeItem extends BuilderTreeItem<TileConfig.Builder> {
 
-    private final String description;
-
-    public DefaultDescriptionGenerator(FieldDescriptor fieldDescriptor) {
-        this.description = StringProcessor.transformUpperCaseToCamelCase(fieldDescriptor.getName().toUpperCase());
+    public TileConfigTreeItem(final FieldDescriptor fieldDescriptor, final Builder builder, final Boolean editable) throws InitializationException {
+        super(fieldDescriptor, builder, editable);
     }
 
     @Override
-    public String getValueDescription(V value) {
-        return "";
-    }
-
-    @Override
-    public String getDescription(V value) {
-        return description;
+    protected Set<Integer> getUneditableFields() {
+        Set<Integer> uneditableFields = super.getUneditableFields();
+        uneditableFields.add(TileConfig.CONNECTION_ID_FIELD_NUMBER);
+        return uneditableFields;
     }
 }

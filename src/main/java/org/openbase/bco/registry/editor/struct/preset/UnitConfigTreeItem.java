@@ -28,10 +28,12 @@ import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.struct.BuilderListTreeItem;
 import org.openbase.bco.registry.editor.struct.GenericTreeItem;
 import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
+import org.openbase.bco.registry.editor.util.SelectableLabel;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitConfigType.UnitConfig.Builder;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,6 +46,15 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
 
     public UnitConfigTreeItem(FieldDescriptor fieldDescriptor, Builder builder, Boolean editable) throws InitializationException {
         super(fieldDescriptor, builder, editable);
+    }
+
+    @Override
+    protected Node createValueGraphic() {
+        final Node valueGraphic = super.createValueGraphic();
+        if (valueGraphic == null) {
+            return SelectableLabel.makeSelectable(new Label(getBuilder().getDescription()));
+        }
+        return valueGraphic;
     }
 
     @Override
@@ -61,7 +72,11 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
         final Set<Integer> uneditableFields = super.getUneditableFields();
         uneditableFields.add(UnitConfig.UNIT_HOST_ID_FIELD_NUMBER);
         uneditableFields.add(UnitConfig.UNIT_TEMPLATE_CONFIG_ID_FIELD_NUMBER);
-        uneditableFields.add(UnitConfig.UNIT_TYPE_FIELD_NUMBER);
+        if (getBuilder().getUnitType() != UnitType.UNKNOWN) {
+            uneditableFields.add(UnitConfig.UNIT_TYPE_FIELD_NUMBER);
+        }
+        uneditableFields.add(UnitConfig.SERVICE_CONFIG_FIELD_NUMBER);
+        uneditableFields.add(UnitConfig.SCOPE_FIELD_NUMBER);
         return uneditableFields;
     }
 
@@ -128,9 +143,4 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
 
         return filteredFieldSet;
     }
-
-//    @Override
-//    protected Node createValueGraphic() {
-//        return new Label(getBuilder().getDescription());
-//    }
 }

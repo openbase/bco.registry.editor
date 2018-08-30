@@ -31,6 +31,8 @@ import org.openbase.jul.processing.StringProcessor;
 import rst.domotic.service.ServiceTemplateConfigType.ServiceTemplateConfig;
 import rst.domotic.service.ServiceTemplateConfigType.ServiceTemplateConfig.Builder;
 
+import java.util.Set;
+
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
@@ -41,7 +43,14 @@ public class ServiceTemplateConfigTreeItem extends BuilderTreeItem<ServiceTempla
     }
 
     @Override
-    protected Node createDescriptionGraphic() {
-        return new Label(StringProcessor.transformToCamelCase(getBuilder().getServiceType().name()));
+    protected Set<Integer> getUneditableFields() {
+        final Set<Integer> uneditableFields = super.getUneditableFields();
+        uneditableFields.add(ServiceTemplateConfig.SERVICE_TYPE_FIELD_NUMBER);
+        return uneditableFields;
+    }
+
+    @Override
+    protected String createDescriptionText() {
+        return StringProcessor.transformToCamelCase(getBuilder().getServiceType().name());
     }
 }

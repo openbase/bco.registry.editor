@@ -23,31 +23,53 @@ package org.openbase.bco.registry.editor.struct.preset;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import javafx.scene.control.Control;
+import javafx.scene.Node;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.editing.EnablingStateEditingGraphic;
+import org.openbase.bco.registry.editor.struct.editing.PermissionEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.state.EnablingStateType.EnablingState;
-import rst.domotic.state.EnablingStateType.EnablingState.Builder;
+import rst.domotic.authentication.PermissionType.Permission;
+import rst.domotic.authentication.PermissionType.Permission.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class EnablingStateTreeItem extends AbstractBuilderLeafTreeItem<Builder> {
+public class PermissionTreeItem extends AbstractBuilderLeafTreeItem<Permission.Builder> {
 
-    public EnablingStateTreeItem(final FieldDescriptor fieldDescriptor, final EnablingState.Builder builder, Boolean editable) throws InitializationException {
+    public PermissionTreeItem(FieldDescriptor fieldDescriptor, Builder builder, Boolean editable) throws InitializationException {
         super(fieldDescriptor, builder, editable);
     }
 
     @Override
     protected String createValueRepresentation() {
-        return getBuilder().getValue().name();
+        String representation = "";
+        if (getBuilder().getAccess()) {
+            representation += "Access";
+        }
+
+        if (getBuilder().getRead()) {
+            if (!representation.isEmpty()) {
+                representation += ", ";
+            }
+            representation += "Read";
+        }
+
+        if (getBuilder().getWrite()) {
+            if (!representation.isEmpty()) {
+                representation += ", ";
+            }
+            representation += "Write";
+        }
+
+        if (representation.isEmpty()) {
+            representation = "None";
+        }
+        return representation;
     }
 
     @Override
-    public Control getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
-        return new EnablingStateEditingGraphic(getValue(), cell).getControl();
+    public Node getEditingGraphic(TreeTableCell<ValueType, ValueType> cell) {
+        return new PermissionEditingGraphic(getValueCasted(), cell).getControl();
     }
 }

@@ -45,6 +45,10 @@ public class ValueListTreeItem<MB extends Message.Builder> extends AbstractListT
         super(fieldDescriptor, builder, modifiable);
     }
 
+    public ValueListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final String description) throws InitializationException {
+        super(fieldDescriptor, builder, modifiable, description);
+    }
+
     protected void validateDescriptor() throws CouldNotPerformException {
         super.validateDescriptor();
         if (getFieldDescriptor().getType() == Type.MESSAGE) {

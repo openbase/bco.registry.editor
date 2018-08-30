@@ -1,6 +1,6 @@
 package org.openbase.bco.registry.editor.visual.cell;
 
-/*
+/*-
  * #%L
  * BCO Registry Editor
  * %%
@@ -21,28 +21,28 @@ package org.openbase.bco.registry.editor.visual.cell;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import org.openbase.bco.registry.editor.struct.NodeInterface;
+
+import javafx.scene.control.Label;
+import javafx.scene.control.TreeTableCell;
+import org.openbase.bco.registry.editor.struct.ValueType;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class DescriptionCell extends RowCell {
+public class DescriptionCell extends TreeTableCell<ValueType, ValueType> {
 
-    public DescriptionCell() throws InterruptedException {
+    public DescriptionCell() {
         super();
     }
 
     @Override
-    public void updateItem(NodeInterface item, boolean empty) {
+    protected void updateItem(ValueType item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (empty) {
-            graphicProperty().setValue(null);
-            textProperty().setValue("");
-            setContextMenu(null);
+        if (!empty && item != null) {
+            setGraphic(item.getDescriptionGraphic());
         } else {
-            setText(item.getDisplayedDescriptor());
+            setGraphic(new Label(""));
         }
     }
 }

@@ -8,8 +8,8 @@
 
     <name>BCO Registry Editor</name>
     <inceptionYear>2014</inceptionYear>
-    <description>This editor allows the modification and introspection of all registries holded by the bco.registry
-        project.
+    <description>
+        This editor allows the modification and introspection of all registries provided by the bco.registry project.
     </description>
 
     <url>https://github.com/openbase/bco.registry.editor/wiki</url>

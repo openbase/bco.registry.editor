@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Comparator;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -66,7 +67,9 @@ public abstract class AbstractBuilderTreeItem<MB extends Message.Builder> extend
             childrenInitialized = true;
 
             try {
-                super.getChildren().addAll(createChildren());
+                final ObservableList<TreeItem<ValueType>> children = createChildren();
+                children.sort(Comparator.comparing(o -> o.getValue().getTreeItem().getDescriptionText()));
+                super.getChildren().addAll(children);
             } catch (CouldNotPerformException ex) {
                 ExceptionPrinter.printHistory(new CouldNotPerformException(
                         "Could not generate child items for[" + getClass().getSimpleName() + "] with value type[" + getInternalValue().getClass().getSimpleName() + "]", ex), logger);

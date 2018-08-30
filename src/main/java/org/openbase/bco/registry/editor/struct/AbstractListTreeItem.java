@@ -32,6 +32,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.pattern.Observable;
+import org.openbase.jul.pattern.Observer;
 import org.openbase.jul.processing.StringProcessor;
 import org.openbase.jul.visual.javafx.geometry.svg.SVGGlyphIcon;
 
@@ -45,9 +47,11 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
 
     private final boolean modifiable;
 
-    private String description;
-
     public AbstractListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
+        this(fieldDescriptor, builder, modifiable, StringProcessor.transformToCamelCase(fieldDescriptor.getName()) + "List");
+    }
+
+    public AbstractListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final String description) throws InitializationException {
         super(fieldDescriptor, builder, false);
         this.modifiable = modifiable;
         try {
@@ -55,7 +59,32 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
         }
-        setDescription(fieldDescriptor);
+        setDescriptionText(description);
+
+        addDescriptionGraphicObserver(new Observer<Node>() {
+            @Override
+            public void update(Observable<Node> source, Node data) throws Exception {
+                final Label label = (Label) data;
+                if (isModifiable()) {
+                    final HBox hBox = new HBox();
+                    hBox.setSpacing(3);
+                    final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.ADD, label.getHeight(), false);
+                    svgGlyphIcon.setForegroundIconColor(Color.GREEN);
+                    svgGlyphIcon.setOnMouseClicked(event -> {
+                        try {
+                            addElement();
+                        } catch (CouldNotPerformException e) {
+                            logger.warn("Could not add new element", e);
+                        }
+                    });
+                    label.heightProperty().addListener((observable, oldValue, newValue) -> {
+                        svgGlyphIcon.setPrefHeight(newValue.doubleValue());
+                    });
+                    hBox.getChildren().addAll(label, svgGlyphIcon);
+                    setDescriptionGraphic(hBox);
+                }
+            }
+        });
     }
 
     protected void validateDescriptor() throws CouldNotPerformException {
@@ -69,75 +98,51 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
         return modifiable;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public void setDescription(final FieldDescriptor fieldDescriptor) {
-        setDescription(StringProcessor.transformToCamelCase(fieldDescriptor.getName()) + "List");
-    }
-
-    @Override
-    protected Node createDescriptionGraphic() {
-        final Label label = new Label(description);
-        if (isModifiable()) {
-            final HBox hBox = new HBox();
-            hBox.setSpacing(3);
-            final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.ADD, label.getHeight(), false);
-            svgGlyphIcon.setForegroundIconColor(Color.GREEN);
-            svgGlyphIcon.setOnMouseClicked(event -> {
-                try {
-                    addElement();
-                } catch (CouldNotPerformException e) {
-                    logger.warn("Could not add new element", e);
-                }
-            });
-            label.heightProperty().addListener((observable, oldValue, newValue) -> {
-                svgGlyphIcon.setPrefHeight(newValue.doubleValue());
-            });
-            hBox.getChildren().addAll(label, svgGlyphIcon);
-            return hBox;
-        }
-        return label;
-    }
-
-    protected void updateChildGraphic(final GenericTreeItem treeItem) throws CouldNotPerformException {
-        // if is modifiable add symbol to remove to child
-        if (isModifiable()) {
-            // retrieve current description graphic
-            final Region region = (Region) treeItem.getDescriptionGraphic();
-            // create horizontal box
-            final HBox hBox = new HBox();
-            hBox.setSpacing(3);
-            // create icon and add remove on mouse click
-            final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.REMOVE, region.getHeight(), false);
-            svgGlyphIcon.setForegroundIconColor(Color.RED);
-            svgGlyphIcon.setOnMouseClicked(event -> {
-                if (treeItem instanceof RegistryMessageTreeItem) {
-                    ((RegistryMessageTreeItem) treeItem).handleRemoveEvent();
+    protected void updateChildGraphic(final GenericTreeItem treeItem) {
+        treeItem.addDescriptionGraphicObserver(new Observer<Node>() {
+            @Override
+            public void update(Observable<Node> source, Node data) throws Exception {
+                if (!isModifiable()) {
                     return;
                 }
 
-                ArrayList updatedList = new ArrayList((List) getBuilder().getField(getFieldDescriptor()));
-                // it the internal value is a builder it has to be build first because the list
-                // consists of build messages
-                Object toRemove;
-                if (treeItem.getInternalValue() instanceof Message.Builder) {
-                    toRemove = ((Message.Builder) treeItem.getInternalValue()).build();
-                } else {
-                    toRemove = treeItem.getInternalValue();
-                }
-                updatedList.remove(toRemove);
-                getBuilder().clearField(getFieldDescriptor());
-                getBuilder().setField(getFieldDescriptor(), updatedList);
-                getChildren().remove(treeItem);
-                this.setValue(getValueCasted().createNew(getBuilder()));
-            });
-            // add description graphic and icon to box
-            hBox.getChildren().addAll(region, svgGlyphIcon);
-            // set graphic for child
-            treeItem.setDescriptionGraphic(hBox);
-        }
+                // create horizontal box
+                final HBox hBox = new HBox();
+                hBox.setSpacing(3);
+                // create icon and add remove on mouse click
+                final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.REMOVE, ((Region) data).getHeight(), false);
+                svgGlyphIcon.setForegroundIconColor(Color.RED);
+                svgGlyphIcon.setOnMouseClicked(event -> {
+                    if (treeItem instanceof RegistryMessageTreeItem) {
+                        ((RegistryMessageTreeItem) treeItem).handleRemoveEvent();
+                        return;
+                    }
+
+                    ArrayList updatedList = new ArrayList((List) getBuilder().getField(getFieldDescriptor()));
+                    // if the internal value is a builder it has to be build first because the list
+                    // consists of build messages
+                    Object toRemove;
+                    if (treeItem.getInternalValue() instanceof Message.Builder) {
+                        toRemove = ((Message.Builder) treeItem.getInternalValue()).build();
+                    } else {
+                        toRemove = treeItem.getInternalValue();
+                    }
+                    updatedList.remove(toRemove);
+                    getBuilder().clearField(getFieldDescriptor());
+                    getBuilder().setField(getFieldDescriptor(), updatedList);
+                    getChildren().remove(treeItem);
+                    try {
+                        AbstractListTreeItem.this.update(getBuilder());
+                    } catch (CouldNotPerformException ex) {
+                        logger.error("Could not update list tree item", ex);
+                    }
+                });
+                // add description graphic and icon to box
+                hBox.getChildren().addAll(data, svgGlyphIcon);
+                // set graphic for child
+                treeItem.setDescriptionGraphic(hBox);
+            }
+        });
     }
 
     protected abstract void addElement() throws CouldNotPerformException;

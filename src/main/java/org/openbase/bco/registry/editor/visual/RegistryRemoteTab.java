@@ -159,6 +159,10 @@ public class RegistryRemoteTab<RD extends Message> extends TabWithStatusLabel {
         });
     }
 
+    public RegistryRemote<RD> getRegistryRemote() {
+        return registryRemote;
+    }
+
     @Override
     public String toString() {
         return registryRemote.getClass().getSimpleName() + TabPane.class.getSimpleName();

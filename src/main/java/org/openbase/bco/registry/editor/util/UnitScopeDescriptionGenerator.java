@@ -1,4 +1,4 @@
-package org.openbase.bco.registry.editor.struct.converter.filter;
+package org.openbase.bco.registry.editor.util;
 
 /*-
  * #%L
@@ -22,17 +22,21 @@ package org.openbase.bco.registry.editor.struct.converter.filter;
  * #L%
  */
 
-import rst.domotic.unit.UnitConfigType.UnitConfig;
+import org.openbase.bco.registry.remote.Registries;
+import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 
 /**
- *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class DeviceUnitConfigFilter extends NotDalUnitConfigFilter {
+public class UnitScopeDescriptionGenerator implements DescriptionGenerator<String> {
 
     @Override
-    protected void registerFilteredFields() {
-        super.registerFilteredFields();
-        removeFilteredField(UnitConfig.DEVICE_CONFIG_FIELD_NUMBER, UnitConfig.BOUND_TO_UNIT_HOST_FIELD_NUMBER);
+    public String getDescription(final String unitId) {
+        try {
+            return ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(unitId).getScope());
+        } catch (CouldNotPerformException ex) {
+            return unitId;
+        }
     }
 }

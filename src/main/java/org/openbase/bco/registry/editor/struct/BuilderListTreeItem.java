@@ -45,11 +45,26 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
     private List<Message.Builder> builderList;
 
     public BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
-        this(fieldDescriptor, builder, modifiable, null);
+        this(fieldDescriptor, builder, modifiable, (List<Message.Builder> ) null);
         try {
             setBuilderList(BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, builder));
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
+        }
+        if(getDescriptionText() == null) {
+            logger.error("Error in constructor 1");
+        }
+    }
+
+    public BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final String description) throws InitializationException {
+        this(fieldDescriptor, builder, modifiable, null, description);
+        try {
+            setBuilderList(BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, builder));
+        } catch (CouldNotPerformException ex) {
+            throw new InitializationException(this, ex);
+        }
+        if(getDescriptionText() == null) {
+            logger.error("Error in constructor 2");
         }
     }
 
@@ -57,10 +72,25 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
         super(fieldDescriptor, builder, modifiable);
         try {
             validateDescriptor();
-            setDescription(getFieldDescriptor());
             this.builderList = builderList;
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
+        }
+        if(getDescriptionText() == null) {
+            logger.error("Error in constructor 3");
+        }
+    }
+
+    BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final List<Message.Builder> builderList, final String description) throws InitializationException {
+        super(fieldDescriptor, builder, modifiable, description);
+        try {
+            validateDescriptor();
+            this.builderList = builderList;
+        } catch (CouldNotPerformException ex) {
+            throw new InitializationException(this, ex);
+        }
+        if(getDescriptionText() == null) {
+            logger.error("Error in constructor 4");
         }
     }
 

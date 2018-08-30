@@ -24,41 +24,39 @@ package org.openbase.bco.registry.editor.struct.editing;
 
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.util.DescriptionGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.exception.NotAvailableException;
-import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
-
-import java.util.List;
+import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import rst.domotic.unit.UnitConfigType.UnitConfig;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class AgentClassIdEditingGraphic extends AbstractMessageEditingGraphic<AgentClass> {
+public abstract class AbstractUnitConfigEditingGraphic extends AbstractMessageEditingGraphic<UnitConfig> {
 
-    public AgentClassIdEditingGraphic(ValueType<String> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(value -> {
+    public AbstractUnitConfigEditingGraphic(final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
+        this(unitConfig -> {
             try {
-                return LabelProcessor.getBestMatch(value.getLabel());
-            } catch (NotAvailableException e) {
-                return value.getId();
+                return ScopeGenerator.generateStringRep(unitConfig.getScope());
+            } catch (CouldNotPerformException ex) {
+                return unitConfig.getId();
             }
         }, valueType, treeTableCell);
     }
 
-    @Override
-    protected List<AgentClass> getMessages() throws CouldNotPerformException {
-        return Registries.getClassRegistry().getAgentClasses();
+    public AbstractUnitConfigEditingGraphic(final DescriptionGenerator<UnitConfig> descriptionGenerator,
+                                            final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
+        super(descriptionGenerator, valueType, treeTableCell);
     }
 
     @Override
-    protected String getCurrentValue(final AgentClass message) {
-        return message.getId();
+    protected String getCurrentValue(final UnitConfig unitConfig) {
+        return unitConfig.getId();
     }
 
     @Override
-    protected AgentClass getMessage(final String value) throws CouldNotPerformException {
-        return Registries.getClassRegistry().getAgentClassById(value);
+    protected UnitConfig getMessage(final String unitId) throws CouldNotPerformException {
+        return Registries.getUnitRegistry().getUnitConfigById(unitId);
     }
 }
