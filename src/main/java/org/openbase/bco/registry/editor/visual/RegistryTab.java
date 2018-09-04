@@ -194,7 +194,8 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
             this.initialized = true;
             updateStatus();
 
-            System.out.println("Create root for [" + fieldDescriptor.getName() + "]");
+            //TODO: maybe put root creation in a separate thread - high cpu usage clicking on uninitialized tab
+            // takes quite long because this is done on the GUI thread
             if (fieldPathDescriptionProviders != null) {
                 root = new GroupTreeItem<>(fieldDescriptor, registryData.toBuilder(), true, fieldPathDescriptionProviders);
             } else {

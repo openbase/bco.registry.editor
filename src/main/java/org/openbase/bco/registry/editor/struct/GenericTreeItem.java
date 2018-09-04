@@ -127,6 +127,11 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     protected void setDescriptionText(final String descriptionText) {
         this.descriptionText = descriptionText;
         descriptionGraphic = new Label(descriptionText);
+        try {
+            descriptionGraphicObservable.notifyObservers(descriptionGraphic);
+        } catch (CouldNotPerformException ex) {
+            logger.error("Could not notify description graphic change", ex);
+        }
     }
 
     protected String createDescriptionText() {

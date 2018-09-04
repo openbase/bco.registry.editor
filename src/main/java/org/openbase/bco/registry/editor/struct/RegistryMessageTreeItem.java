@@ -175,10 +175,8 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
 
         inUpdate = true;
         try {
-            logger.info("Reset changed");
             changed = false;
             if (registryTask != null) {
-                logger.info("Received update after registry task...");
                 registryTask = null;
             }
 
@@ -306,5 +304,9 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
         } catch (CouldNotPerformException ex) {
             RegistryEditorOld.printException(ex, logger, LogLevel.WARN);
         }
+    }
+
+    public boolean isChanged() {
+        return changed;
     }
 }

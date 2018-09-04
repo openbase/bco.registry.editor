@@ -91,7 +91,8 @@ public class GroupTreeItem<MB extends Message.Builder> extends BuilderListTreeIt
     private BuilderListTreeItem<MB> createChild(final Object value, final List<Message.Builder> builderList) throws CouldNotPerformException {
         BuilderListTreeItem<MB> childTreeItem;
         if (childGroups.length == 0) {
-            childTreeItem = new BuilderListTreeItem<>(getFieldDescriptor(), getBuilder(), isModifiable(), builderList, groupValueProvider.generateDescription(value));
+            childTreeItem = new BuilderListTreeItem<>(getFieldDescriptor(), getBuilder(), isModifiable(), builderList);
+            childTreeItem.setDescriptionText(groupValueProvider.generateDescription(value));
         } else {
             childTreeItem = new GroupTreeItem<>(getFieldDescriptor(), getBuilder(), isModifiable(), builderList, value, groupValueProvider, childGroups);
         }

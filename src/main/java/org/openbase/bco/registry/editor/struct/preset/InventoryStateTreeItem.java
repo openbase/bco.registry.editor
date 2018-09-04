@@ -32,6 +32,7 @@ import org.openbase.bco.registry.editor.struct.editing.UserIdEditingGraphic;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import org.openbase.jul.extension.rst.processing.TimestampProcessor;
 import rst.domotic.state.InventoryStateType.InventoryState;
@@ -48,16 +49,22 @@ public class InventoryStateTreeItem extends BuilderTreeItem<Builder> {
         super(fieldDescriptor, builder, editable);
 
         this.addEventHandler(valueChangedEvent(), event -> {
-            GenericTreeItem source = (GenericTreeItem) event.getSource();
+            final GenericTreeItem source = (GenericTreeItem) event.getSource();
 
-            if (!(source instanceof TimestampTreeItem)) {
-                try {
-                    TimestampProcessor.updateTimestampWithCurrentTime(getBuilder().getTimestampBuilder());
-                    source.update(getBuilder().getTimestampBuilder());
-                } catch (CouldNotPerformException ex) {
-                    logger.warn("Could not update timestamp", ex);
-                }
-            }
+            //TODO: if borrower id is set switch to borrowed automatically and clear borrower id if switched to not borrowed
+            //TODO: activate but filter when updating through external changes
+//            if (!(source instanceof TimestampTreeItem)) {
+//                // if something else than the timestamp changed update it
+//                try {
+//                    // update current timestamp
+//                    TimestampProcessor.updateTimestampWithCurrentTime(getBuilder());
+//                    // update leaf presenting the timestamp
+//                    final FieldDescriptor timestampField = ProtoBufFieldProcessor.getFieldDescriptor(getBuilder(), InventoryState.TIMESTAMP_FIELD_NUMBER);
+//                    getDescriptorChildMap().get(timestampField).update(getBuilder().getTimestampBuilder());
+//                } catch (CouldNotPerformException ex) {
+//                    logger.warn("Could not update timestamp", ex);
+//                }
+//            }
         });
     }
 
@@ -92,7 +99,7 @@ public class InventoryStateTreeItem extends BuilderTreeItem<Builder> {
                         return value;
                     }
                 });
-
+                return borrowerLeaf;
             default:
                 return super.createChild(field, editable);
         }

@@ -95,11 +95,12 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
                             // differentiate between internal field type
                             switch (fieldDescriptor.getType()) {
                                 case MESSAGE:
-                                    treeItem = new BuilderListTreeItem<>(fieldDescriptor, fieldBuilder, editable, StringProcessor.transformToCamelCase(field.getName()));
+                                    treeItem = new BuilderListTreeItem<>(fieldDescriptor, fieldBuilder, editable);
                                     break;
                                 default:
-                                    treeItem = new ValueListTreeItem<>(fieldDescriptor, fieldBuilder, editable, StringProcessor.transformToCamelCase(field.getName()));
+                                    treeItem = new ValueListTreeItem<>(fieldDescriptor, fieldBuilder, editable);
                             }
+                            treeItem.setDescriptionText(StringProcessor.transformToCamelCase(field.getName()));
                             // update description to the original field name
                             return treeItem;
                         }

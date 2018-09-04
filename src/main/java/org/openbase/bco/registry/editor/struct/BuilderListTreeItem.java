@@ -45,26 +45,11 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
     private List<Message.Builder> builderList;
 
     public BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
-        this(fieldDescriptor, builder, modifiable, (List<Message.Builder> ) null);
+        this(fieldDescriptor, builder, modifiable, null);
         try {
             setBuilderList(BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, builder));
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
-        }
-        if(getDescriptionText() == null) {
-            logger.error("Error in constructor 1");
-        }
-    }
-
-    public BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final String description) throws InitializationException {
-        this(fieldDescriptor, builder, modifiable, null, description);
-        try {
-            setBuilderList(BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, builder));
-        } catch (CouldNotPerformException ex) {
-            throw new InitializationException(this, ex);
-        }
-        if(getDescriptionText() == null) {
-            logger.error("Error in constructor 2");
         }
     }
 
@@ -75,22 +60,6 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
             this.builderList = builderList;
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
-        }
-        if(getDescriptionText() == null) {
-            logger.error("Error in constructor 3");
-        }
-    }
-
-    BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final List<Message.Builder> builderList, final String description) throws InitializationException {
-        super(fieldDescriptor, builder, modifiable, description);
-        try {
-            validateDescriptor();
-            this.builderList = builderList;
-        } catch (CouldNotPerformException ex) {
-            throw new InitializationException(this, ex);
-        }
-        if(getDescriptionText() == null) {
-            logger.error("Error in constructor 4");
         }
     }
 
@@ -204,6 +173,19 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
 
         // remove all children that do not have a matching builder anymore
         for (final TreeItem<ValueType> child : childrenToRemove) {
+            if (child instanceof RegistryMessageTreeItem) {
+                RegistryMessageTreeItem registryMessageTreeItem = (RegistryMessageTreeItem) child;
+                if (registryMessageTreeItem.getId().isEmpty()) {
+                    continue;
+                }
+
+                if (registryMessageTreeItem.isChanged()) {
+                    //TODO: make this message visible in the GUI
+                    logger.warn("Config[" + registryMessageTreeItem.getId() + "] is changed locally and remotely. Press apply to overwrite with your " +
+                            "local changes and cancel to receive the remote changes");
+                    continue;
+                }
+            }
             getChildren().remove(child);
         }
     }
