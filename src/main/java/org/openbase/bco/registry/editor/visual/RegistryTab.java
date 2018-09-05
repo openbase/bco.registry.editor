@@ -138,7 +138,7 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
                 try {
                     final Message.Builder builder = BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, registryData.toBuilder());
                     if (builder instanceof UnitConfig.Builder) {
-                        String unitTypeName = fieldDescriptor.getName().split("_")[0].toUpperCase();
+                        final String unitTypeName = fieldDescriptor.getName().replace("_unit_config", "").toUpperCase();
                         try {
                             UnitType unitType = UnitType.valueOf(unitTypeName);
                             ((UnitConfig.Builder) builder).setUnitType(unitType);

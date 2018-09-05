@@ -207,9 +207,6 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
     private void handleApplyEvent() {
         logger.info("Apply button pressed");
         handleRequiredFields();
-        if (!getBuilder().isInitialized()) {
-            return;
-        }
 
         try {
             Message message;
@@ -222,6 +219,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
             if (Registries.contains(message)) {
                 // save original value from model
                 final Message original = Registries.getById(ProtoBufFieldProcessor.getId(message));
+                changed = false;
                 registryTask = Registries.update(message);
                 GlobalCachedExecutorService.submit(() -> {
                     final Message update;
@@ -242,6 +240,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                     } catch (InterruptedException e) {
                         // just let the thread finish
                     } catch (ExecutionException e) {
+                        changed = true;
                         // update the current value which will trigger an update of the displayed graphics,
                         // this will display the exception to the user
                         setValue(getValueCasted().createNew(getBuilder()));
@@ -253,6 +252,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                 GlobalCachedExecutorService.submit(() -> {
                     try {
                         registryTask.get();
+                        Platform.runLater(() -> getParent().getChildren().remove(this));
                     } catch (InterruptedException e) {
                         // just let the thread finish
                     } catch (ExecutionException e) {
@@ -260,7 +260,6 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                         // this will display the exception to the user
                         setValue(getValueCasted().createNew(getBuilder()));
                     }
-
                 });
             }
             setValue(getValueCasted().createNew(getBuilder()));

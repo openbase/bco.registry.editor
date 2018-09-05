@@ -156,6 +156,12 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
                     // save child found, remove from list of removed children, update child
                     childFound = true;
                     childrenToRemove.remove(child);
+                    if (childCasted instanceof RegistryMessageTreeItem && ((RegistryMessageTreeItem) childCasted).isChanged()) {
+                        //TODO: make this message visible in the GUI
+                        logger.warn("Config[" + ((RegistryMessageTreeItem) childCasted).getId() + "] is changed locally and remotely. Press apply to overwrite with your " +
+                                "local changes and cancel to receive the remote changes");
+                        continue;
+                    }
                     childCasted.update(builder);
                     break;
                 }
@@ -173,16 +179,10 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
 
         // remove all children that do not have a matching builder anymore
         for (final TreeItem<ValueType> child : childrenToRemove) {
+            // do not remove items newly added
             if (child instanceof RegistryMessageTreeItem) {
                 RegistryMessageTreeItem registryMessageTreeItem = (RegistryMessageTreeItem) child;
                 if (registryMessageTreeItem.getId().isEmpty()) {
-                    continue;
-                }
-
-                if (registryMessageTreeItem.isChanged()) {
-                    //TODO: make this message visible in the GUI
-                    logger.warn("Config[" + registryMessageTreeItem.getId() + "] is changed locally and remotely. Press apply to overwrite with your " +
-                            "local changes and cancel to receive the remote changes");
                     continue;
                 }
             }

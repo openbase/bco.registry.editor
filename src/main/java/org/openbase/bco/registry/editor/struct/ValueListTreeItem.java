@@ -43,6 +43,11 @@ public class ValueListTreeItem<MB extends Message.Builder> extends AbstractListT
 
     public ValueListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
         super(fieldDescriptor, builder, modifiable);
+        try {
+            validateDescriptor();
+        } catch (CouldNotPerformException ex) {
+            throw new InitializationException(this, ex);
+        }
     }
 
     protected void validateDescriptor() throws CouldNotPerformException {

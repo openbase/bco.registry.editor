@@ -59,7 +59,6 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
         }
-        setDescriptionText(description);
 
         addDescriptionGraphicObserver(new Observer<Node>() {
             @Override
@@ -85,6 +84,8 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
                 }
             }
         });
+
+        setDescriptionText(description);
     }
 
     protected void validateDescriptor() throws CouldNotPerformException {
