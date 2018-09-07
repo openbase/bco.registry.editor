@@ -28,7 +28,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.control.TreeItem;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
@@ -36,6 +35,7 @@ import org.openbase.bco.registry.editor.util.fieldpath.*;
 import org.openbase.bco.registry.editor.visual.LoginPanel;
 import org.openbase.bco.registry.editor.visual.RegistryRemoteTab;
 import org.openbase.bco.registry.remote.Registries;
+import org.openbase.bco.registry.remote.login.BCOLogin;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPVerbose;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
@@ -52,6 +52,12 @@ import java.util.Map;
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class RegistryEditor extends Application {
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        BCOLogin.autoLogin(false);
+    }
 
     @Override
     public void start(Stage primaryStage) {
