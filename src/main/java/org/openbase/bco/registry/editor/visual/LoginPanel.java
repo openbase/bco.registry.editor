@@ -31,12 +31,14 @@ import javafx.scene.layout.HBox;
 import org.openbase.bco.authentication.lib.SessionManager;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.NotAvailableException;
+import org.openbase.jul.visual.javafx.iface.DynamicPane;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class LoginPanel extends HBox {
+public class LoginPanel extends HBox implements DynamicPane {
 
     private final Label errorLabel, userNameLabel;
     private final TextField userNameTextField;
@@ -59,7 +61,7 @@ public class LoginPanel extends HBox {
         this.loginButton.setOnAction(event -> login());
 
         this.logoutButton = new Button("Logout");
-        this.logoutButton.setOnAction(event -> logout());
+        this.logoutButton.setOnAction(event -> SessionManager.getInstance().logout());
 
         this.setSpacing(5);
         this.getChildren().addAll(userNameTextField, passwordField, loginButton);
@@ -70,31 +72,57 @@ public class LoginPanel extends HBox {
             }
         });
 
-        // logout when session manager logged out, e.g. because server restarted and the session does not match anymore
-        SessionManager.getInstance().addLoginObserver((source, data) -> {
-            if (!SessionManager.getInstance().isLoggedIn()) {
-                Platform.runLater(() -> {
-                    userNameLabel.setText("");
+        initContent();
+    }
 
-                    getChildren().clear();
-                    getChildren().addAll(errorLabel, userNameTextField, passwordField, loginButton);
-                });
+    @Override
+    public void initContent() {
+        SessionManager.getInstance().addLoginObserver((observable, userAtClientId) -> updateDynamicContent());
+        updateDynamicContent();
+    }
+
+    @Override
+    public void updateDynamicContent() {
+        onLoggedInChanged();
+    }
+
+    private void onLoggedInChanged() {
+        if (SessionManager.getInstance().isLoggedIn()) {
+            // load user name from registry if possible.
+            String displayedUserName;
+            try {
+                displayedUserName = Registries.getUnitRegistry().getUnitConfigById(SessionManager.getInstance().getUserId()).getUserConfig().getUserName();
+            } catch (CouldNotPerformException ex) {
+                displayedUserName = userNameTextField.getText();
             }
-        });
+
+            final String userName = displayedUserName;
+
+            Platform.runLater(() -> {
+                // clear user name after successful login
+                userNameTextField.clear();
+                errorLabel.setText("");
+
+                // retrieve user name with correct lower and upper case letter
+                userNameLabel.setText(userName);
+                this.getChildren().clear();
+                this.getChildren().addAll(userNameLabel, logoutButton);
+
+            });
+        } else {
+            // logout when session manager logged out, e.g. because server restarted and the session does not match anymore
+            Platform.runLater(() -> {
+                userNameLabel.setText("");
+                this.getChildren().clear();
+                this.getChildren().addAll(errorLabel, userNameTextField, passwordField, loginButton);
+            });
+        }
     }
 
     private void login() {
         try {
             final String userId = Registries.getUnitRegistry().getUserUnitIdByUserName(userNameTextField.getText());
             SessionManager.getInstance().login(userId, passwordField.getText());
-            // clear user name after successful login
-            userNameTextField.clear();
-            errorLabel.setText("");
-
-            // retrieve user name with correct lower and upper case letter
-            userNameLabel.setText(Registries.getUnitRegistry().getUnitConfigById(userId).getUserConfig().getUserName());
-            this.getChildren().clear();
-            this.getChildren().addAll(userNameLabel, logoutButton);
         } catch (NotAvailableException ex) {
             errorLabel.setText("Invalid username");
         } catch (CouldNotPerformException ex) {
@@ -103,13 +131,5 @@ public class LoginPanel extends HBox {
             // always clear password field
             passwordField.clear();
         }
-    }
-
-    private void logout() {
-        SessionManager.getInstance().logout();
-        userNameLabel.setText("");
-
-        this.getChildren().clear();
-        this.getChildren().addAll(errorLabel, userNameTextField, passwordField, loginButton);
     }
 }
