@@ -363,7 +363,7 @@ public class RegistryEditor extends Application {
                     registrationFutureMap.put(registryRemote, GlobalCachedExecutorService.submit(() -> {
                         try {
                             LOGGER.info("Register observer for [" + registryRemote + "]");
-                            registryRemote.addDataObserver((org.openbase.jul.pattern.Observable source, Object data) -> {
+                            registryRemote.addDataObserver((source, data) -> {
                                 assert registryRemote.isDataAvailable();
                                 LOGGER.info("Received update for [" + registryRemote + "]");
                                 if (data == null) {

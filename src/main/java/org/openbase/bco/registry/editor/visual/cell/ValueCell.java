@@ -94,7 +94,7 @@ public class ValueCell extends RowCell {
     public ValueCell() throws InterruptedException {
         super();
         applyButton = new Button("Apply");
-//        ((RegistryTreeTableView) this.getTableColumn().getTreeTableView()).addDisconnectedObserver(new Observer<Boolean>() {
+//        ((RegistryTreeTableView) this.getTableColumn().getTreeTableView()).addDisconnectedObserver(new Observer<Object, Boolean>() {
 //
 //            @Override
 //            public void update(Observable<Boolean> source, Boolean data) throws Exception {
