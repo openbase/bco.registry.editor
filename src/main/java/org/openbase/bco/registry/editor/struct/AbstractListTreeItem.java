@@ -60,28 +60,25 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
             throw new InitializationException(this, ex);
         }
 
-        addDescriptionGraphicObserver(new Observer<Node>() {
-            @Override
-            public void update(Observable<Node> source, Node data) throws Exception {
-                final Label label = (Label) data;
-                if (isModifiable()) {
-                    final HBox hBox = new HBox();
-                    hBox.setSpacing(3);
-                    final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.ADD, label.getHeight(), false);
-                    svgGlyphIcon.setForegroundIconColor(Color.GREEN);
-                    svgGlyphIcon.setOnMouseClicked(event -> {
-                        try {
-                            addElement();
-                        } catch (CouldNotPerformException e) {
-                            logger.warn("Could not add new element", e);
-                        }
-                    });
-                    label.heightProperty().addListener((observable, oldValue, newValue) -> {
-                        svgGlyphIcon.setPrefHeight(newValue.doubleValue());
-                    });
-                    hBox.getChildren().addAll(label, svgGlyphIcon);
-                    setDescriptionGraphic(hBox);
-                }
+        addDescriptionGraphicObserver((source, data) -> {
+            final Label label = (Label) data;
+            if (isModifiable()) {
+                final HBox hBox = new HBox();
+                hBox.setSpacing(3);
+                final SVGGlyphIcon svgGlyphIcon = new SVGGlyphIcon(MaterialIcon.ADD, label.getHeight(), false);
+                svgGlyphIcon.setForegroundIconColor(Color.GREEN);
+                svgGlyphIcon.setOnMouseClicked(event -> {
+                    try {
+                        addElement();
+                    } catch (CouldNotPerformException e) {
+                        logger.warn("Could not add new element", e);
+                    }
+                });
+                label.heightProperty().addListener((observable, oldValue, newValue) -> {
+                    svgGlyphIcon.setPrefHeight(newValue.doubleValue());
+                });
+                hBox.getChildren().addAll(label, svgGlyphIcon);
+                setDescriptionGraphic(hBox);
             }
         });
 
@@ -100,9 +97,9 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
     }
 
     protected void updateChildGraphic(final GenericTreeItem treeItem) {
-        treeItem.addDescriptionGraphicObserver(new Observer<Node>() {
+        treeItem.addDescriptionGraphicObserver(new Observer<Object, Node>() {
             @Override
-            public void update(Observable<Node> source, Node data) throws Exception {
+            public void update(Object source, Node data) throws Exception {
                 if (!isModifiable()) {
                     return;
                 }
