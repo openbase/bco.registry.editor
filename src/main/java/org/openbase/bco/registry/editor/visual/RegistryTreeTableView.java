@@ -65,7 +65,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
     private final ProtobufListDiff<?, M, ?> listDiff;
     private final VBox vBox;
     private final Label statusInfoLabel;
-    private final List<Observer<Boolean>> disconnectionObserver;
+    private final List<Observer<Object, Boolean>> disconnectionObserver;
     private final RegistryEditorOld registryEditor;
 
     public RegistryTreeTableView(SendableType type, RegistryEditorOld registryEditor) throws InstantiationException, InterruptedException {
@@ -413,16 +413,16 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         });
     }
 
-    public void addDisconnectedObserver(Observer<Boolean> observer) {
+    public void addDisconnectedObserver(Observer<Object, Boolean> observer) {
         disconnectionObserver.add(observer);
     }
 
-    public void removeDisconnectedObserver(Observer<Boolean> observer) {
+    public void removeDisconnectedObserver(Observer<Object, Boolean> observer) {
         disconnectionObserver.remove(observer);
     }
 
     private void notifiyDisconnection(Boolean connected) {
-        for (Observer<Boolean> observer : disconnectionObserver) {
+        for (Observer<Object, Boolean> observer : disconnectionObserver) {
             try {
                 observer.update(null, connected);
             } catch (Exception ex) {

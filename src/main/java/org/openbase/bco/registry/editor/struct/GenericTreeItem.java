@@ -46,7 +46,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final FieldDescriptor fieldDescriptor;
-    private final ObservableImpl<Node> descriptionGraphicObservable;
+    private final ObservableImpl<Object, Node> descriptionGraphicObservable;
 
     private String descriptionText;
     private Node descriptionGraphic;
@@ -214,11 +214,11 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
         }
     }
 
-    public void addDescriptionGraphicObserver(final Observer<Node> observer) {
+    public void addDescriptionGraphicObserver(final Observer<Object, Node> observer) {
         descriptionGraphicObservable.addObserver(observer);
     }
 
-    public void removeDescriptionGraphicObserver(final Observer<Node> observer) {
+    public void removeDescriptionGraphicObserver(final Observer<Object, Node> observer) {
         descriptionGraphicObservable.removeObserver(observer);
     }
 
