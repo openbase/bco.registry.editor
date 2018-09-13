@@ -153,7 +153,7 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Node, V> {
      * the editing will just be cancelled. This is done so that the apply and cancel buttons are not displayed
      * unnecessarily.
      */
-    protected void commitEdit() {
+    public void commitEdit() {
         // remove focus handler, this is needed because commit causes focus loss which would result in doubled commits
         // if the initial commit is not started because of the focus loss
         for (final Node internalElement : internalElements) {
@@ -201,4 +201,8 @@ public abstract class AbstractEditingGraphic<GRAPHIC extends Node, V> {
      * @param value the currently displayed value
      */
     protected abstract void init(V value);
+
+    protected TreeTableCell<ValueType, ValueType> getTreeTableCell() {
+        return treeTableCell;
+    }
 }

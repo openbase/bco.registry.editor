@@ -22,21 +22,25 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
+import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
-import rst.domotic.state.EnablingStateType.EnablingState;
-import rst.domotic.state.EnablingStateType.EnablingState.Builder;
-import rst.domotic.state.EnablingStateType.EnablingState.State;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class EnablingStateEditingGraphic extends AbstractBuilderEditingGraphic<ComboBox<EnumValueDescriptor>, Builder> {
+public class EnumEditingGraphicAll extends AbstractEditingGraphic<ComboBox<EnumValueDescriptor>, EnumValueDescriptor> {
 
-    public EnablingStateEditingGraphic(final ValueType<EnablingState.Builder> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
+    public EnumEditingGraphicAll(final ValueType<EnumValueDescriptor> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new ScrollingComboBox<>(EnumValueDescriptor::getName), valueType, treeTableCell);
         getControl().setOnAction((event) -> commitEdit());
     }
@@ -49,19 +53,19 @@ public class EnablingStateEditingGraphic extends AbstractBuilderEditingGraphic<C
     }
 
     @Override
-    protected boolean updateBuilder(Builder builder) {
-        final State newState = State.valueOf(getControl().getSelectionModel().getSelectedItem().getNumber());
-        if (builder.getValue().equals(newState)) {
-            return false;
-        }
-
-        builder.setValue(newState);
-        return true;
+    protected EnumValueDescriptor getCurrentValue() {
+        return getControl().getSelectionModel().getSelectedItem();
     }
 
     @Override
-    protected void init(final EnablingState.Builder value) {
-        getControl().setItems(EnumEditingGraphic.createSortedEnumListWithougUnkown(value.getValue().getDescriptorForType()));
-        getControl().setValue(value.getValue().getValueDescriptor());
+    protected void init(final EnumValueDescriptor value) {
+        getControl().setItems(createSortedEnumList(value.getType()));
+        getControl().setValue(value);
+    }
+
+    protected ObservableList<EnumValueDescriptor> createSortedEnumList(EnumDescriptor enumDescriptor) {
+        List<EnumValueDescriptor> values = new ArrayList<>(enumDescriptor.getValues());
+        values.sort(Comparator.comparing(EnumValueDescriptor::getName));
+        return FXCollections.observableArrayList(values);
     }
 }

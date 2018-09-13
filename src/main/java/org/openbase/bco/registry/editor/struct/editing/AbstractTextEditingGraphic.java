@@ -38,7 +38,7 @@ abstract class AbstractTextEditingGraphic<TF extends TextField, V> extends Abstr
     }
 
     @Override
-    protected void commitEdit() {
+    public void commitEdit() {
         if (getControl() instanceof ValidatedTextField) {
             if (((ValidatedTextField) getControl()).validate()) {
                 super.commitEdit();

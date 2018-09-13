@@ -46,7 +46,7 @@ public abstract class AbstractBuilderEditingGraphic<GRAPHIC extends Node, V exte
     }
 
     @Override
-    protected void commitEdit() {
+    public void commitEdit() {
         if (validate()) {
             super.commitEdit();
         }

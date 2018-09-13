@@ -105,6 +105,10 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
         return editable;
     }
 
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
     @SuppressWarnings("unchecked")
     protected ValueType<V> getValueCasted() {
         return (ValueType<V>) getValue();

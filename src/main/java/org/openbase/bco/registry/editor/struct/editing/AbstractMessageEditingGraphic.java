@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct.editing;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -30,7 +30,6 @@ import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
 import org.openbase.bco.registry.editor.util.DescriptionGenerator;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 
 import java.util.Comparator;
 import java.util.List;
@@ -46,7 +45,7 @@ public abstract class AbstractMessageEditingGraphic<M extends Message> extends A
     }
 
     @Override
-    protected void commitEdit() {
+    public void commitEdit() {
         if (getControl().getSelectionModel().getSelectedItem() != null) {
             super.commitEdit();
         }
@@ -76,9 +75,33 @@ public abstract class AbstractMessageEditingGraphic<M extends Message> extends A
         }
     }
 
+    /**
+     * Get a list of all messages displayed by this message editing graphic.
+     *
+     * @return a list of all messages displayed.
+     *
+     * @throws CouldNotPerformException if the list cannot be created.
+     */
     protected abstract List<M> getMessages() throws CouldNotPerformException;
 
+    /**
+     * Get the current string value representing the currently selected message. This is usually the id of the message.
+     *
+     * @param message the currently selected message.
+     *
+     * @return a string representation for the message which is usually the id.
+     */
     protected abstract String getCurrentValue(final M message);
 
+    /**
+     * Get the message represented by the provided value. This is needed to initialize the combo box to select
+     * the returned message.
+     *
+     * @param value a string representing the message which is usually the id.
+     *
+     * @return the message represented by the given value.
+     *
+     * @throws CouldNotPerformException if the message could not be retrieved.
+     */
     protected abstract M getMessage(final String value) throws CouldNotPerformException;
 }

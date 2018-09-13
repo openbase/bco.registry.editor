@@ -26,10 +26,8 @@ import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,42 +36,24 @@ import java.util.List;
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class EnumEditingGraphic extends AbstractEditingGraphic<ComboBox<EnumValueDescriptor>, EnumValueDescriptor> {
+public class EnumEditingGraphic extends EnumEditingGraphicAll {
 
     private static final String TYPE_NAME_UNKNOWN = "UNKNOWN";
 
     public EnumEditingGraphic(final ValueType<EnumValueDescriptor> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
-        super(new ScrollingComboBox<>(EnumValueDescriptor::getName), valueType, treeTableCell);
-        getControl().setOnAction((event) -> commitEdit());
+        super(valueType, treeTableCell);
     }
 
     @Override
-    protected void commitEdit() {
-        if (getControl().getSelectionModel().getSelectedItem() != null) {
-            super.commitEdit();
-        }
+    protected ObservableList<EnumValueDescriptor> createSortedEnumList(EnumDescriptor enumDescriptor) {
+        ObservableList<EnumValueDescriptor> sortedEnumList = super.createSortedEnumList(enumDescriptor);
+        sortedEnumList.remove(enumDescriptor.findValueByName(TYPE_NAME_UNKNOWN));
+        return sortedEnumList;
     }
 
-    @Override
-    protected EnumValueDescriptor getCurrentValue() {
-        return getControl().getSelectionModel().getSelectedItem();
-    }
-
-    @Override
-    protected void init(final EnumValueDescriptor value) {
-        getControl().setItems(createSortedEnumList(value.getType()));
-        getControl().setValue(value);
-    }
-
-    static ObservableList<EnumValueDescriptor> createSortedEnumList(EnumDescriptor enumDescriptor) {
-        List<EnumValueDescriptor> values = new ArrayList<>();
-        for (EnumValueDescriptor value : enumDescriptor.getValues()) {
-            if (value.getName().equals(TYPE_NAME_UNKNOWN)) {
-                continue;
-            }
-
-            values.add(value);
-        }
+    static ObservableList<EnumValueDescriptor> createSortedEnumListWithougUnkown(EnumDescriptor enumDescriptor) {
+        List<EnumValueDescriptor> values = new ArrayList<>(enumDescriptor.getValues());
+        values.remove(enumDescriptor.findValueByName(TYPE_NAME_UNKNOWN));
         values.sort(Comparator.comparing(EnumValueDescriptor::getName));
         return FXCollections.observableArrayList(values);
     }
