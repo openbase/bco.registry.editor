@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.struct.preset;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -39,11 +39,9 @@ import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufJSonProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import org.openbase.jul.processing.StringProcessor;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceStateDescriptionType.ServiceStateDescription;
 import rst.domotic.service.ServiceStateDescriptionType.ServiceStateDescription.Builder;
-import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServicePattern;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServiceType;
 import rst.domotic.state.ActivationStateType.ActivationState;
@@ -117,7 +115,7 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
         if (getBuilder().getServiceType() != ServiceType.UNKNOWN) {
             // if service type is set and not unknown the attribute becomes editable and the attribute type is updated
             // note: the order here is important, if the attribute type is not updated before the attribute parsing the empty json value will fail
-            attributeTypeLeaf.update(retrieveServiceAttributeType(getBuilder().getServiceType()));
+            attributeTypeLeaf.update(Registries.getTemplateRegistry().getServiceAttributeType(getBuilder().getServiceType()));
             attributeLeaf.setEditable(true);
             // update value with empty json object
             attributeLeaf.update("{}");
@@ -127,22 +125,6 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
             attributeLeaf.update("");
             attributeTypeLeaf.update("");
         }
-    }
-
-    /**
-     * Construct the service attribute type for a service type. The service attribute type is the class name of
-     * the service state.
-     *
-     * @param serviceType the service type for which the service attribute type is retrieved
-     *
-     * @return the service attribute type for the service
-     *
-     * @throws CouldNotPerformException if accessing the template registry fails
-     */
-    private String retrieveServiceAttributeType(final ServiceType serviceType) throws CouldNotPerformException {
-        final ServiceTemplate serviceTemplate = Registries.getTemplateRegistry().getServiceTemplateByType(serviceType);
-        final String communicationTypeName = StringProcessor.transformUpperCaseToCamelCase(serviceTemplate.getCommunicationType().name());
-        return PowerState.class.getName().replaceAll(PowerState.class.getSimpleName(), communicationTypeName);
     }
 
     /**
