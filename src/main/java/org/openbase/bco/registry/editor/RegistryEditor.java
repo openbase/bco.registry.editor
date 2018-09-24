@@ -118,7 +118,6 @@ public class RegistryEditor extends Application {
 
     private Map<Integer, FieldPathDescriptionProvider[]> getClassRegistryGrouping() {
         final DeviceClassCompanyFieldPath deviceClassCompanyFieldPath = new DeviceClassCompanyFieldPath();
-
         final Map<Integer, FieldPathDescriptionProvider[]> classRegistryGroupingMap = new HashMap<>();
 
         final FieldPathDescriptionProvider[] deviceClassGrouping = {deviceClassCompanyFieldPath};
