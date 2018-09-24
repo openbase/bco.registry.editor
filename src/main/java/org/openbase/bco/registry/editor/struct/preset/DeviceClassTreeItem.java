@@ -27,6 +27,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.exception.NotAvailableException;
+import org.openbase.jul.extension.rst.processing.DescriptionProcessor;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass;
 import rst.domotic.unit.device.DeviceClassType.DeviceClass.Builder;
 
@@ -45,7 +47,11 @@ public class DeviceClassTreeItem extends RegistryMessageTreeItem<DeviceClass.Bui
     protected Node createValueGraphic() {
         final Node valueGraphic = super.createValueGraphic();
         if (valueGraphic == null) {
-            return new Label(getBuilder().getDescription());
+            try {
+                return new Label(DescriptionProcessor.getBestMatch(getBuilder().getDescription()));
+            } catch (NotAvailableException e) {
+                return new Label();
+            }
         }
         return valueGraphic;
     }

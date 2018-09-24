@@ -29,7 +29,7 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
-import rst.configuration.LabelType.Label.MapFieldEntry.Builder;
+import rst.language.LabelType.Label.MapFieldEntry.Builder;
 
 import java.util.ArrayList;
 import java.util.Arrays;

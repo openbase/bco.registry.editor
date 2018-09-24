@@ -31,6 +31,8 @@ import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.exception.NotAvailableException;
+import org.openbase.jul.extension.rst.processing.DescriptionProcessor;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
 import rst.domotic.unit.UnitConfigType.UnitConfig.Builder;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
@@ -52,7 +54,11 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
     protected Node createValueGraphic() {
         final Node valueGraphic = super.createValueGraphic();
         if (valueGraphic == null) {
-            return SelectableLabel.makeSelectable(new Label(getBuilder().getDescription()));
+            try {
+                return SelectableLabel.makeSelectable(new Label(DescriptionProcessor.getBestMatch(getBuilder().getDescription())));
+            } catch (NotAvailableException e) {
+                return SelectableLabel.makeSelectable(new Label());
+            }
         }
         return valueGraphic;
     }
