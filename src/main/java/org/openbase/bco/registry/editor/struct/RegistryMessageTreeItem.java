@@ -26,9 +26,8 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import javafx.application.Platform;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.RegistryEditorOld;
 import org.openbase.bco.registry.editor.visual.RequiredFieldAlert;
@@ -44,6 +43,7 @@ import org.openbase.jul.iface.Identifiable;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -89,6 +89,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
      * Match a builder by comparing their ids.
      *
      * @param builder {@inheritDoc}
+     *
      * @return {@inheritDoc}
      */
     @Override
@@ -283,6 +284,17 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
         try {
             logger.debug("Removing message with Id [" + id + "]");
             if (!"".equals(id) && Registries.containsById(id, getBuilder())) {
+
+                final Alert alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Remove Action");
+                alert.setHeaderText("Attention! Irreversible Action!");
+                alert.setContentText("Do you really want to remove " + getDescriptionText() + "?");
+
+                final Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() != ButtonType.OK) {
+                    return;
+                }
+
                 // always remove by id to ignore not initialized fields of the builder
                 registryTask = Registries.remove(Registries.getById(id, getBuilder()));
                 setValue(getValueCasted().createNew(getBuilder()));
