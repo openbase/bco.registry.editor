@@ -22,92 +22,68 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
-import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
-import rst.language.LabelType.Label.MapFieldEntry.Builder;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import rst.language.DescriptionType.Description;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class LabelEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Builder> {
+public class MultiLanguageTextEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Description.MapFieldEntry.Builder> {
 
     private LanguageComboBox languageComboBox;
-    private TextField labelTextField;
+    private TextField textField;
 
-    public LabelEditingGraphic(ValueType<Builder> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
+    public MultiLanguageTextEditingGraphic(ValueType<Description.MapFieldEntry.Builder> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new HBox(), valueType, treeTableCell);
+
+//        getControl().setOnKeyReleased(event -> {
+//            switch (event.getCode()) {
+//                case ESCAPE:
+//                    treeTableCell.cancelEdit();
+//                    break;
+//                case ENTER:
+//                    commitEdit();
+//            }
+//        });
     }
 
     @Override
-    protected boolean updateBuilder(Builder builder) {
-        final String newKey = languageComboBox.getValue();
-        final List<String> newLabelList = new ArrayList<>();
-        for (final String label : labelTextField.getText().split(",")) {
-            newLabelList.add(label.trim());
-        }
-
-        if (builder.getKey().equals(newKey) && equalLabelList(newLabelList, builder.getValueList())) {
+    protected boolean updateBuilder(Description.MapFieldEntry.Builder builder) {
+        if (builder.getKey().equals(languageComboBox.getValue())
+                && builder.getValue().equals(textField.getText())) {
             return false;
         }
 
-        builder.setKey(newKey).clearValue().addAllValue(newLabelList);
-        return true;
-    }
-
-    private boolean equalLabelList(final List<String> list1, final List<String> list2) {
-        for (final String label : list1) {
-            if (!list2.contains(label)) {
-                return false;
-            }
-        }
-        for (final String label : list2) {
-            if (!list1.contains(label)) {
-                return false;
-            }
-        }
+        builder.setKey(languageComboBox.getValue()).clearValue().setValue(textField.getText());
         return true;
     }
 
     @Override
-    protected void init(final Builder value) {
+    protected void init(final Description.MapFieldEntry.Builder value) {
         this.languageComboBox = new LanguageComboBox();
-        this.labelTextField = new TextField();
+        this.textField = new TextField();
         //TODO: textfield should occupy all space not needed by the combo box in the cell
 //        getControl().widthProperty().addListener((observable, oldValue, newValue) -> {
-//            labelTextField.setPrefWidth(newValue.doubleValue() - languageComboBox.getWidth());
+//            textField.setPrefWidth(newValue.doubleValue() - languageComboBox.getWidth());
 //            System.out.println(languageComboBox.getWidth() + ", " + languageComboBox.getPrefWidth());
 //        });
 //        languageComboBox.widthProperty().addListener(new ChangeListener<Number>() {
 //            @Override
 //            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                labelTextField.setPrefWidth(getControl().getWidth() - newValue.doubleValue());
+//                textField.setPrefWidth(getControl().getWidth() - newValue.doubleValue());
 //                System.out.println("ComboBox: " + newValue.doubleValue() + ", " + getControl().getPrefWidth());
 //            }
 //        });
-        getControl().getChildren().addAll(this.languageComboBox, this.labelTextField);
+        getControl().getChildren().addAll(this.languageComboBox, this.textField);
 
 
         if (value.hasKey()) {
             languageComboBox.getSelectionModel().select(value.getKey());
         }
-        String labelText = "";
-        for (int i = 0; i < value.getValueCount(); i++) {
-            labelText += value.getValue(i);
-            if (i < value.getValueCount() - 1) {
-                labelText += ", ";
-            }
-        }
-        labelTextField.setText(labelText);
+        textField.setText(value.getValue());
     }
 }

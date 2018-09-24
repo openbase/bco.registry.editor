@@ -171,6 +171,7 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
      * An example of a good implementation is for example to check if the ids match for unit configs.
      *
      * @param builder the builder which is checked against the current builder of this tree item
+     *
      * @return if the builder matches the one of this tree item
      */
     protected boolean matchesBuilder(final MB builder) {
