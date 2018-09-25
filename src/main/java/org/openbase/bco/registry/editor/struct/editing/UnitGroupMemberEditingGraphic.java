@@ -68,9 +68,11 @@ public class UnitGroupMemberEditingGraphic extends AbstractUnitConfigEditingGrap
 
         // remove all units not at the same location as the group
         final UnitConfigTreeItem unitConfigTreeItem = (UnitConfigTreeItem) unitGroupConfigTreeItem.getParent();
-        for (final UnitConfig unitConfig : new ArrayList<>(unitConfigs)) {
-            if (!isInLocation(unitConfig, unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId())) {
-                unitConfigs.remove(unitConfig);
+        if(!unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId().isEmpty()) {
+            for (final UnitConfig unitConfig : new ArrayList<>(unitConfigs)) {
+                if (!isInLocation(unitConfig, unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId())) {
+                    unitConfigs.remove(unitConfig);
+                }
             }
         }
 
