@@ -29,7 +29,7 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.MultiLanguageTextEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.language.DescriptionType.Description.MapFieldEntry.Builder;
+import rst.language.MultiLanguageTextType.MultiLanguageText.MapFieldEntry.Builder;
 
 import java.util.Locale;
 

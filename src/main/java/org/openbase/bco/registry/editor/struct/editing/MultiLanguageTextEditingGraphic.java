@@ -27,17 +27,17 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
-import rst.language.DescriptionType.Description;
+import rst.language.MultiLanguageTextType.MultiLanguageText;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class MultiLanguageTextEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Description.MapFieldEntry.Builder> {
+public class MultiLanguageTextEditingGraphic extends AbstractBuilderEditingGraphic<HBox, MultiLanguageText.MapFieldEntry.Builder> {
 
     private LanguageComboBox languageComboBox;
     private TextField textField;
 
-    public MultiLanguageTextEditingGraphic(ValueType<Description.MapFieldEntry.Builder> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
+    public MultiLanguageTextEditingGraphic(ValueType<MultiLanguageText.MapFieldEntry.Builder> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(new HBox(), valueType, treeTableCell);
 
 //        getControl().setOnKeyReleased(event -> {
@@ -52,7 +52,7 @@ public class MultiLanguageTextEditingGraphic extends AbstractBuilderEditingGraph
     }
 
     @Override
-    protected boolean updateBuilder(Description.MapFieldEntry.Builder builder) {
+    protected boolean updateBuilder(MultiLanguageText.MapFieldEntry.Builder builder) {
         if (builder.getKey().equals(languageComboBox.getValue())
                 && builder.getValue().equals(textField.getText())) {
             return false;
@@ -63,7 +63,7 @@ public class MultiLanguageTextEditingGraphic extends AbstractBuilderEditingGraph
     }
 
     @Override
-    protected void init(final Description.MapFieldEntry.Builder value) {
+    protected void init(final MultiLanguageText.MapFieldEntry.Builder value) {
         this.languageComboBox = new LanguageComboBox();
         this.textField = new TextField();
         //TODO: textfield should occupy all space not needed by the combo box in the cell
