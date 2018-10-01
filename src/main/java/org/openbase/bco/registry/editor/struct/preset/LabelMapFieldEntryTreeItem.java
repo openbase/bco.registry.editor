@@ -28,6 +28,7 @@ import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.LabelEditingGraphic;
+import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
 import org.openbase.jul.exception.InitializationException;
 import rst.language.LabelType.Label.MapFieldEntry.Builder;
 
@@ -44,7 +45,7 @@ public class LabelMapFieldEntryTreeItem extends AbstractBuilderLeafTreeItem<Buil
 
     @Override
     protected String createValueRepresentation() {
-        String valueRepresentation = new Locale(getBuilder().getKey()).getDisplayLanguage() + ": ";
+        String valueRepresentation = LanguageComboBox.getDisplayedTest(getBuilder().getKey()) + ": ";
         for (int i = 0; i < getBuilder().getValueList().size(); i++) {
             valueRepresentation += getBuilder().getValue(i);
             if (i < getBuilder().getValueCount() - 1) {

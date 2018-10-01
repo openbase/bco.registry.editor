@@ -25,6 +25,7 @@ package org.openbase.bco.registry.editor.struct.editing.util;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -34,19 +35,31 @@ import java.util.Locale;
  */
 public class LanguageComboBox extends ScrollingComboBox<String> {
 
+    private static final String LANGUAGE_TECHNICAL = "Technical";
+    private static final String LANGUAGE_CODE_TECHNICAL = "technical";
+
     public LanguageComboBox() {
-        super(item -> new Locale(item).getDisplayLanguage());
+        super(LanguageComboBox::getDisplayedTest);
 
         this.setItems(createSortedLanguageCodeList());
     }
 
     private ObservableList<String> createSortedLanguageCodeList() {
-        final List<String> languageCodeList = Arrays.asList(Locale.getISOLanguages());
+        final List<String> languageCodeList = new ArrayList<>(Arrays.asList(Locale.getISOLanguages()));
+        languageCodeList.add(LANGUAGE_CODE_TECHNICAL);
         languageCodeList.sort((languageCode1, languageCode2) -> {
-            final String displayed1 = new Locale(languageCode1).getDisplayLanguage();
-            final String displayed2 = new Locale(languageCode2).getDisplayLanguage();
+            final String displayed1 = getDisplayedTest(languageCode1);
+            final String displayed2 = getDisplayedTest(languageCode2);
             return displayed1.compareTo(displayed2);
         });
         return FXCollections.observableArrayList(languageCodeList);
+    }
+
+    public static String getDisplayedTest(final String languageCode) {
+        if (languageCode.equals(LANGUAGE_CODE_TECHNICAL)) {
+            return LANGUAGE_TECHNICAL;
+        } else {
+            return new Locale(languageCode).getDisplayLanguage();
+        }
     }
 }
