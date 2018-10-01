@@ -43,7 +43,7 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
     private DescriptionGenerator<V> descriptionGenerator;
     private EditingGraphicFactory<V, ?> editingGraphicFactory;
 
-    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value,final int index) {
+    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final int index) {
         this(fieldDescriptor, value, true, index);
     }
 
@@ -70,6 +70,9 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
     @SuppressWarnings("unchecked")
     @Override
     public Node getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
+        if (!isEditable()) {
+            return null;
+        }
         if (editingGraphicFactory != null) {
             try {
                 return editingGraphicFactory.getEditingGraphic(getValueCasted(), cell);
