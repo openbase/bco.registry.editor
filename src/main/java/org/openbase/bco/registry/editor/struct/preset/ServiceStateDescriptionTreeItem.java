@@ -264,7 +264,7 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
             case ServiceStateDescription.UNIT_ID_FIELD_NUMBER:
                 // unit id is only editable if the unit type is set, gets a description generator displaying the scope
                 // and gets a description graphic filtering units matching the setting of this service state description
-                final LeafTreeItem<String> unitIdLeaf = new LeafTreeItem<>(field, getBuilder().getUnitId(), getBuilder(), getBuilder().getUnitType() != UnitType.UNKNOWN);
+                final LeafTreeItem<String> unitIdLeaf = new LeafTreeItem<>(field, getBuilder().getUnitId(), getBuilder().getUnitType() != UnitType.UNKNOWN);
                 unitIdLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateUnitIdEditingGraphic.class));
                 unitIdLeaf.setDescriptionGenerator(unitId -> {
                     try {
@@ -280,7 +280,7 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
             case ServiceStateDescription.SERVICE_ATTRIBUTE_FIELD_NUMBER:
                 // service attribute is only editable if the service type is set, its value graphic is created and
                 // it received a special editing graphic
-                LeafTreeItem<String> serviceAttributeLeaf = new LeafTreeItem<>(field, getBuilder().getServiceAttribute(), getBuilder(), getBuilder().getServiceType() != ServiceType.UNKNOWN);
+                LeafTreeItem<String> serviceAttributeLeaf = new LeafTreeItem<>(field, getBuilder().getServiceAttribute(), getBuilder().getServiceType() != ServiceType.UNKNOWN);
                 serviceAttributeLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateAttributeEditingGraphic.class));
                 serviceAttributeLeaf.setValueGraphic(getServiceAttributeValueGraphic());
                 return serviceAttributeLeaf;

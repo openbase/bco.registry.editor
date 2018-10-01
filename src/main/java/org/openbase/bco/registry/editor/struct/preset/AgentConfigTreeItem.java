@@ -52,7 +52,7 @@ public class AgentConfigTreeItem extends BuilderTreeItem<AgentConfig.Builder> {
     protected GenericTreeItem createChild(FieldDescriptor field, Boolean editable) throws CouldNotPerformException {
         GenericTreeItem child;
         if (field.getNumber() == AgentConfig.AGENT_CLASS_ID_FIELD_NUMBER) {
-            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getAgentClassId(), getBuilder(), editable);
+            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getAgentClassId(), editable);
             leaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(AgentClassIdEditingGraphic.class));
             leaf.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
                 try {

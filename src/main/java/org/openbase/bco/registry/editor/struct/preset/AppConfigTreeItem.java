@@ -52,7 +52,7 @@ public class AppConfigTreeItem extends BuilderTreeItem<AppConfig.Builder> {
     protected GenericTreeItem createChild(FieldDescriptor field, Boolean editable) throws CouldNotPerformException {
         GenericTreeItem child;
         if (field.getNumber() == AppConfig.APP_CLASS_ID_FIELD_NUMBER) {
-            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getAppClassId(), getBuilder(), editable);
+            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getAppClassId(), editable);
             leaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(AppClassIdEditingGraphic.class));
             leaf.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
                 try {

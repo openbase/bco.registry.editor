@@ -79,7 +79,7 @@ public class InventoryStateTreeItem extends BuilderTreeItem<Builder> {
     protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         switch (field.getNumber()) {
             case InventoryState.LOCATION_ID_FIELD_NUMBER:
-                final LeafTreeItem<String> leaf = new LeafTreeItem<>(field, getBuilder().getLocationId(), getBuilder(), editable);
+                final LeafTreeItem<String> leaf = new LeafTreeItem<>(field, getBuilder().getLocationId(), editable);
                 leaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(LocationIdEditingGraphic.class));
                 leaf.setDescriptionGenerator(value -> {
                     try {
@@ -90,7 +90,7 @@ public class InventoryStateTreeItem extends BuilderTreeItem<Builder> {
                 });
                 return leaf;
             case InventoryState.BORROWER_ID_FIELD_NUMBER:
-                final LeafTreeItem<String> borrowerLeaf = new LeafTreeItem<>(field, getBuilder().getBorrowerId(), getBuilder(), editable);
+                final LeafTreeItem<String> borrowerLeaf = new LeafTreeItem<>(field, getBuilder().getBorrowerId(), editable);
                 borrowerLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(UserIdEditingGraphic.class));
                 borrowerLeaf.setDescriptionGenerator(value -> {
                     try {

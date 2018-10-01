@@ -43,20 +43,21 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
     private DescriptionGenerator<V> descriptionGenerator;
     private EditingGraphicFactory<V, ?> editingGraphicFactory;
 
-    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final int index) {
-        this(fieldDescriptor, value, parentBuilder, true, index);
+    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value,final int index) {
+        this(fieldDescriptor, value, true, index);
     }
 
-    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final boolean editable) {
-        this(fieldDescriptor, value, parentBuilder, editable, -1);
+    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final boolean editable) {
+        this(fieldDescriptor, value, editable, -1);
     }
 
-    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final Message.Builder parentBuilder, final boolean editable, final int index) {
+    public LeafTreeItem(final FieldDescriptor fieldDescriptor, final V value, final boolean editable, final int index) {
         super(fieldDescriptor, value, editable);
         this.editingGraphicFactory = null;
         this.descriptionGenerator = new DefaultDescriptionGenerator<>();
         this.addEventHandler(valueChangedEvent(), event -> {
-            V newValue = ((ValueType<V>) event.getNewValue()).getValue();
+            final V newValue = ((ValueType<V>) event.getNewValue()).getValue();
+            final Message.Builder parentBuilder = ((BuilderTreeItem) getParent()).getBuilder();
             if (index == -1) {
                 parentBuilder.setField(getFieldDescriptor(), newValue);
             } else {

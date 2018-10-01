@@ -49,7 +49,7 @@ public class PermissionConfigMapFieldEntryTreeItem extends BuilderTreeItem<Permi
     protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         switch (field.getNumber()) {
             case MapFieldEntry.GROUP_ID_FIELD_NUMBER:
-                final LeafTreeItem<String> groupIdLeaf = new LeafTreeItem<>(field, getBuilder().getGroupId(), getBuilder(), editable);
+                final LeafTreeItem<String> groupIdLeaf = new LeafTreeItem<>(field, getBuilder().getGroupId(), editable);
                 groupIdLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(PermissionGroupIdEditingGraphic.class));
                 groupIdLeaf.setDescriptionGenerator(value -> {
                     try {

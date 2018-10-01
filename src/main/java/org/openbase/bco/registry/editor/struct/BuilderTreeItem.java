@@ -107,7 +107,7 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
                         return loadTreeItem(field, fieldBuilder, editable);
                     }
                 default:
-                    return new LeafTreeItem<>(field, getBuilder().getField(field), getBuilder(), editable);
+                    return new LeafTreeItem<>(field, getBuilder().getField(field), editable);
             }
         }
     }

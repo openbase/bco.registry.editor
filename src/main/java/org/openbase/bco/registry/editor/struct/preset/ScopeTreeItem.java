@@ -54,6 +54,7 @@ public class ScopeTreeItem extends AbstractBuilderLeafTreeItem<Builder> {
 
     @Override
     public Node getEditingGraphic(final TreeTableCell<ValueType, ValueType> cell) {
-        return new ScopeEditingGraphic(getValueCasted(), cell).getControl();
+        return null;
+//        return new ScopeEditingGraphic(getValueCasted(), cell).getControl();
     }
 }

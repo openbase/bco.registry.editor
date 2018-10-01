@@ -71,7 +71,7 @@ public class ValueListTreeItem<MB extends Message.Builder> extends AbstractListT
 
     private LeafTreeItem createChild(final Object value, final int index) throws CouldNotPerformException {
         // create leaf tree item
-        final LeafTreeItem leafTreeItem = new LeafTreeItem<>(getFieldDescriptor(), value, getBuilder(), isModifiable(), index);
+        final LeafTreeItem leafTreeItem = new LeafTreeItem<>(getFieldDescriptor(), value, isModifiable(), index);
 
         if (editingGraphicFactory != null) {
             leafTreeItem.setEditingGraphicFactory(editingGraphicFactory);

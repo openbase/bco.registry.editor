@@ -52,7 +52,7 @@ public class ActivityConfigTreeItem extends RegistryMessageTreeItem<ActivityConf
     protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         GenericTreeItem child;
         if (field.getNumber() == ActivityConfig.ACTIVITY_TEMPLATE_ID_FIELD_NUMBER) {
-            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getActivityTemplateId(), getBuilder(), editable);
+            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getActivityTemplateId(), editable);
             leaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ActivityTemplateIdEditingGraphic.class));
             leaf.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
                 try {

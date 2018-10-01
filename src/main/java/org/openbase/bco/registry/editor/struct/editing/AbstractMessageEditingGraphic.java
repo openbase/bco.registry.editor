@@ -60,6 +60,7 @@ public abstract class AbstractMessageEditingGraphic<M extends Message> extends A
 
     @Override
     protected String getCurrentValue() {
+        logger.info("New value {}", getCurrentValue(getControl().getSelectionModel().getSelectedItem()));
         return getCurrentValue(getControl().getSelectionModel().getSelectedItem());
     }
 
@@ -68,6 +69,7 @@ public abstract class AbstractMessageEditingGraphic<M extends Message> extends A
         try {
             getControl().setItems(createSortedList());
             if (!value.isEmpty()) {
+                logger.info("Current value {}", value);
                 getControl().setValue(getMessage(value));
             }
         } catch (CouldNotPerformException ex) {

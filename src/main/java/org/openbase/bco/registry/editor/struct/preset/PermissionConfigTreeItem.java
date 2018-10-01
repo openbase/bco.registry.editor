@@ -47,7 +47,7 @@ public class PermissionConfigTreeItem extends BuilderTreeItem<PermissionConfig.B
     protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         switch (field.getNumber()) {
             case PermissionConfig.OWNER_ID_FIELD_NUMBER:
-                final LeafTreeItem<String> ownerIdLeaf = new LeafTreeItem<>(field, getBuilder().getOwnerId(), getBuilder(), editable);
+                final LeafTreeItem<String> ownerIdLeaf = new LeafTreeItem<>(field, getBuilder().getOwnerId(), editable);
                 ownerIdLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(UserIdEditingGraphic.class));
                 ownerIdLeaf.setDescriptionGenerator(value -> {
                     try {

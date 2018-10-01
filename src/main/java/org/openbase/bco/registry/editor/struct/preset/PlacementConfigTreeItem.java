@@ -57,7 +57,7 @@ public class PlacementConfigTreeItem extends BuilderTreeItem<PlacementConfig.Bui
     protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         switch (field.getNumber()) {
             case PlacementConfig.LOCATION_ID_FIELD_NUMBER:
-                final LeafTreeItem<String> leafTreeItem = new LeafTreeItem<>(field, getBuilder().getLocationId(), getBuilder(), editable);
+                final LeafTreeItem<String> leafTreeItem = new LeafTreeItem<>(field, getBuilder().getLocationId(), editable);
                 leafTreeItem.setDescriptionGenerator(value -> {
                     try {
                         return ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(value).getScope());

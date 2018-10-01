@@ -52,7 +52,7 @@ public class DeviceConfigTreeItem extends BuilderTreeItem<DeviceConfig.Builder> 
     protected GenericTreeItem createChild(FieldDescriptor field, Boolean editable) throws CouldNotPerformException {
         GenericTreeItem child;
         if (field.getNumber() == DeviceConfig.DEVICE_CLASS_ID_FIELD_NUMBER) {
-            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getDeviceClassId(), getBuilder(), editable);
+            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getDeviceClassId(), editable);
             leaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(DeviceClassIdEditingGraphic.class));
             leaf.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
                 try {
