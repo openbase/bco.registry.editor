@@ -24,6 +24,7 @@ package org.openbase.bco.registry.editor.struct;
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
+import com.google.protobuf.Message.Builder;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeTableCell;
@@ -57,7 +58,7 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
         this.descriptionGenerator = new DefaultDescriptionGenerator<>();
         this.addEventHandler(valueChangedEvent(), event -> {
             final V newValue = ((ValueType<V>) event.getNewValue()).getValue();
-            final Message.Builder parentBuilder = ((BuilderTreeItem) getParent()).getBuilder();
+            final Message.Builder parentBuilder = ((AbstractBuilderTreeItem<Builder>) getParent()).getBuilder();
             if (index == -1) {
                 parentBuilder.setField(getFieldDescriptor(), newValue);
             } else {

@@ -26,6 +26,7 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.struct.BuilderListTreeItem;
+import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
 import org.openbase.bco.registry.editor.struct.GenericTreeItem;
 import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
@@ -68,6 +69,8 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
         switch (field.getNumber()) {
             case UnitConfig.SERVICE_CONFIG_FIELD_NUMBER:
                 return new BuilderListTreeItem<>(field, getBuilder(), false);
+            case UnitConfig.AUTHORIZATION_GROUP_CONFIG_FIELD_NUMBER:
+                return new BuilderTreeItem<>(field, getBuilder().getFieldBuilder(field), true);
             default:
                 return super.createChild(field, editable);
         }
