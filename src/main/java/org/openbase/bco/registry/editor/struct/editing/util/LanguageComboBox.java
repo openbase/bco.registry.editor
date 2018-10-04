@@ -38,24 +38,33 @@ public class LanguageComboBox extends ScrollingComboBox<String> {
     private static final String LANGUAGE_TECHNICAL = "Technical";
     private static final String LANGUAGE_CODE_TECHNICAL = "technical";
 
-    public LanguageComboBox() {
-        super(LanguageComboBox::getDisplayedTest);
+    private final boolean includeTechnical;
 
+    public LanguageComboBox() {
+        this(true);
+    }
+
+    public LanguageComboBox(final boolean includeTechnical) {
+        super(LanguageComboBox::getDisplayedText);
+
+        this.includeTechnical = includeTechnical;
         this.setItems(createSortedLanguageCodeList());
     }
 
     private ObservableList<String> createSortedLanguageCodeList() {
         final List<String> languageCodeList = new ArrayList<>(Arrays.asList(Locale.getISOLanguages()));
-        languageCodeList.add(LANGUAGE_CODE_TECHNICAL);
+        if (includeTechnical) {
+            languageCodeList.add(LANGUAGE_CODE_TECHNICAL);
+        }
         languageCodeList.sort((languageCode1, languageCode2) -> {
-            final String displayed1 = getDisplayedTest(languageCode1);
-            final String displayed2 = getDisplayedTest(languageCode2);
+            final String displayed1 = getDisplayedText(languageCode1);
+            final String displayed2 = getDisplayedText(languageCode2);
             return displayed1.compareTo(displayed2);
         });
         return FXCollections.observableArrayList(languageCodeList);
     }
 
-    public static String getDisplayedTest(final String languageCode) {
+    public static String getDisplayedText(final String languageCode) {
         if (languageCode.equals(LANGUAGE_CODE_TECHNICAL)) {
             return LANGUAGE_TECHNICAL;
         } else {

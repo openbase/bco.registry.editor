@@ -32,8 +32,6 @@ import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
 import org.openbase.jul.exception.InitializationException;
 import rst.language.LabelType.Label.MapFieldEntry.Builder;
 
-import java.util.Locale;
-
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
@@ -45,7 +43,7 @@ public class LabelMapFieldEntryTreeItem extends AbstractBuilderLeafTreeItem<Buil
 
     @Override
     protected String createValueRepresentation() {
-        String valueRepresentation = LanguageComboBox.getDisplayedTest(getBuilder().getKey()) + ": ";
+        String valueRepresentation = LanguageComboBox.getDisplayedText(getBuilder().getKey()) + ": ";
         for (int i = 0; i < getBuilder().getValueList().size(); i++) {
             valueRepresentation += getBuilder().getValue(i);
             if (i < getBuilder().getValueCount() - 1) {
