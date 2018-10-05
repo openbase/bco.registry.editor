@@ -68,9 +68,11 @@ public class ServiceStateUnitIdEditingGraphic extends AbstractMessageEditingGrap
     @Override
     protected List<UnitConfig> getMessages() throws CouldNotPerformException {
         final ServiceStateDescriptionTreeItem serviceStateDescriptionTreeItem = (ServiceStateDescriptionTreeItem) getValueType().getTreeItem().getParent();
-        final UnitConfigTreeItem unitConfigTreeItem = (UnitConfigTreeItem) serviceStateDescriptionTreeItem.getParent().getParent().getParent();
-        if (!unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId().isEmpty()) {
-            return Registries.getUnitRegistry().getUnitConfigsByLocation(serviceStateDescriptionTreeItem.getBuilder().getUnitType(), unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId());
+        if (serviceStateDescriptionTreeItem.getParent().getParent().getParent() instanceof UnitConfigTreeItem) {
+            final UnitConfigTreeItem unitConfigTreeItem = (UnitConfigTreeItem) serviceStateDescriptionTreeItem.getParent().getParent().getParent();
+            if (!unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId().isEmpty()) {
+                return Registries.getUnitRegistry().getUnitConfigsByLocation(serviceStateDescriptionTreeItem.getBuilder().getUnitType(), unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId());
+            }
         }
         return Registries.getUnitRegistry().getUnitConfigs(serviceStateDescriptionTreeItem.getBuilder().getUnitType());
     }
