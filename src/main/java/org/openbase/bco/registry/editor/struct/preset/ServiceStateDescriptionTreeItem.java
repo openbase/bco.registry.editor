@@ -207,6 +207,9 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
      * @return a value graphic for the service attribute
      */
     private Node getServiceAttributeValueGraphic() {
+        if (!getBuilder().hasServiceAttribute() || getBuilder().getServiceAttribute().isEmpty()) {
+            return new Label();
+        }
         try {
             // deserialize service attribute
             final Message serviceAttribute = new ProtoBufJSonProcessor().deserialize(getBuilder().getServiceAttribute(), getBuilder().getServiceAttributeType());

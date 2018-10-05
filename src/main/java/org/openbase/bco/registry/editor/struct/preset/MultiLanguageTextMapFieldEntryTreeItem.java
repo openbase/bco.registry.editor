@@ -32,8 +32,6 @@ import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
 import org.openbase.jul.exception.InitializationException;
 import rst.language.MultiLanguageTextType.MultiLanguageText.MapFieldEntry.Builder;
 
-import java.util.Locale;
-
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
@@ -45,7 +43,7 @@ public class MultiLanguageTextMapFieldEntryTreeItem extends AbstractBuilderLeafT
 
     @Override
     protected String createValueRepresentation() {
-        return LanguageComboBox.getDisplayedTest(getBuilder().getKey()) + ": " + getBuilder().getValue();
+        return LanguageComboBox.getDisplayedText(getBuilder().getKey()) + ": " + getBuilder().getValue();
     }
 
     @Override

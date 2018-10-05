@@ -128,7 +128,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
         return new Label(descriptionText);
     }
 
-    protected void setDescriptionText(final String descriptionText) {
+    public void setDescriptionText(final String descriptionText) {
         this.descriptionText = descriptionText;
         descriptionGraphic = new Label(descriptionText);
         try {
