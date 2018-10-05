@@ -30,7 +30,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.extension.protobuf.BuilderProcessor;
+import org.openbase.jul.extension.protobuf.ProtoBufBuilderProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
     public BuilderListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
         this(fieldDescriptor, builder, modifiable, null);
         try {
-            setBuilderList(BuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, builder));
+            setBuilderList(ProtoBufBuilderProcessor.extractRepeatedFieldBuilderList(fieldDescriptor, builder));
         } catch (CouldNotPerformException ex) {
             throw new InitializationException(this, ex);
         }
@@ -103,7 +103,7 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
     protected void addElement() throws CouldNotPerformException {
         try {
             //add the new message builder to the repeated field
-            final Message.Builder builder = BuilderProcessor.addDefaultInstanceToRepeatedField(getFieldDescriptor(), getBuilder());
+            final Message.Builder builder = ProtoBufBuilderProcessor.addDefaultInstanceToRepeatedField(getFieldDescriptor(), getBuilder());
             // if available set value from parent group
             if (getParent() instanceof GroupTreeItem) {
                 ((GroupTreeItem<MB>) getParent()).updateElement(builder, this);
@@ -192,6 +192,6 @@ public class BuilderListTreeItem<MB extends Message.Builder> extends AbstractLis
 
     @Override
     public void update(final MB value) throws CouldNotPerformException {
-        update(value, BuilderProcessor.extractRepeatedFieldBuilderList(getFieldDescriptor(), value));
+        update(value, ProtoBufBuilderProcessor.extractRepeatedFieldBuilderList(getFieldDescriptor(), value));
     }
 }

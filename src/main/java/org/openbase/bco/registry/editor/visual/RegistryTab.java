@@ -36,7 +36,7 @@ import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
-import org.openbase.jul.extension.protobuf.BuilderProcessor;
+import org.openbase.jul.extension.protobuf.ProtoBufBuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.processing.StringProcessor;
 import org.slf4j.Logger;
@@ -136,7 +136,7 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
             final MenuItem addMenuItem = new MenuItem("Add");
             addMenuItem.setOnAction(event -> {
                 try {
-                    final Message.Builder builder = BuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, registryData.toBuilder());
+                    final Message.Builder builder = ProtoBufBuilderProcessor.addDefaultInstanceToRepeatedField(fieldDescriptor, registryData.toBuilder());
                     if (builder instanceof UnitConfig.Builder) {
                         final String unitTypeName = fieldDescriptor.getName().replace("_unit_config", "").toUpperCase();
                         try {
