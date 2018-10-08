@@ -25,6 +25,8 @@ package org.openbase.bco.registry.editor.struct.editing.service;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.paint.Color;
 import org.openbase.bco.registry.editor.struct.editing.ServiceStateAttributeEditingGraphic;
+import org.openbase.jul.exception.CouldNotTransformException;
+import org.openbase.jul.visual.javafx.transform.JFXColorToHSBColorTransformer;
 import rst.domotic.state.ColorStateType.ColorState;
 import rst.vision.ColorType;
 import rst.vision.ColorType.Color.Type;
@@ -46,7 +48,11 @@ public class ColorStateEditingGraphic extends AbstractServiceStateEditingGraphic
         switch (colorState.getColor().getType()) {
             case HSB:
                 final HSBColor hsbColor = colorState.getColor().getHsbColor();
-                color = Color.hsb(hsbColor.getHue(), hsbColor.getSaturation(), hsbColor.getBrightness());
+                try {
+                    color = JFXColorToHSBColorTransformer.transform(hsbColor);
+                } catch (CouldNotTransformException e) {
+                    // do nothing, just use white
+                }
                 break;
             case RGB:
                 final RGBColor rgbColor = colorState.getColor().getRgbColor();
@@ -60,13 +66,13 @@ public class ColorStateEditingGraphic extends AbstractServiceStateEditingGraphic
     @Override
     public ColorState getServiceState() {
         final Color color = getGraphic().getValue();
+        logger.info("Color {}, {}, {}", color.getHue(), color.getSaturation(), color.getBrightness());
 
         final ColorState.Builder colorState = ColorState.newBuilder();
         final ColorType.Color.Builder colorBuilder = colorState.getColorBuilder();
         colorBuilder.setType(Type.HSB);
-
-        final HSBColor.Builder hsbColorBuilder = colorBuilder.getHsbColorBuilder();
-        hsbColorBuilder.setHue(color.getHue()).setSaturation(color.getSaturation()).setBrightness(color.getBrightness());
+        colorBuilder.setHsbColor(JFXColorToHSBColorTransformer.transform(color));
+        
         return colorState.build();
     }
 

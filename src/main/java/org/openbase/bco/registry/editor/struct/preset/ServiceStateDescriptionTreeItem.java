@@ -39,6 +39,7 @@ import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufJSonProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.visual.javafx.transform.JFXColorToHSBColorTransformer;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceStateDescriptionType.ServiceStateDescription;
 import rst.domotic.service.ServiceStateDescriptionType.ServiceStateDescription.Builder;
@@ -217,7 +218,7 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
                 case COLOR_STATE_SERVICE:
                     // build a java fx color from the color state
                     final HSBColor hsbColor = ((ColorState) serviceAttribute).getColor().getHsbColor();
-                    final Color hsb = Color.hsb(hsbColor.getHue(), hsbColor.getSaturation(), hsbColor.getBrightness());
+                    final Color hsb = JFXColorToHSBColorTransformer.transform(hsbColor);
                     // create a rectangle of that color and set it as the value graphic
                     final Rectangle rectangle = new Rectangle(15, 15);
                     rectangle.setFill(hsb);
