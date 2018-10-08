@@ -78,7 +78,7 @@ public class LoginPanel extends HBox implements DynamicPane {
     @Override
     public void initContent() {
         SessionManager.getInstance().addLoginObserver((observable, userAtClientId) -> updateDynamicContent());
-        updateDynamicContent();
+        update();
     }
 
     @Override
