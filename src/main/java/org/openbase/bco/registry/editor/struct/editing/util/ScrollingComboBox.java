@@ -22,12 +22,12 @@ package org.openbase.bco.registry.editor.struct.editing.util;
  * #L%
  */
 
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyEvent;
 import org.openbase.bco.registry.editor.util.DescriptionGenerator;
 
@@ -41,7 +41,7 @@ public class ScrollingComboBox<V> extends ComboBox<V> {
 
     /**
      * Value in milli seconds of how long a delay between two key released events is waited
-     * before a new search string will be initialized.
+     * before a new search string will be initialized.`
      */
     private static final long DEFAULT_ALLOWED_DELAY_BETWEEN_KEY_EVENTS = 500;
 
