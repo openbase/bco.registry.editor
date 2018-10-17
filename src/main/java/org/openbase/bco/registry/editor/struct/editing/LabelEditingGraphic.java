@@ -61,7 +61,11 @@ public class LabelEditingGraphic extends AbstractBuilderEditingGraphic<HBox, Bui
             return false;
         }
 
-        builder.setKey(newKey).clearValue().addAllValue(newLabelList);
+        if(newKey != null) {
+            builder.setKey(newKey);
+        }
+        
+        builder.clearValue().addAllValue(newLabelList);
         return true;
     }
 

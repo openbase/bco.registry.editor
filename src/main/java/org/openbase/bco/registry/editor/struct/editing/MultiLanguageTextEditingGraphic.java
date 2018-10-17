@@ -58,7 +58,11 @@ public class MultiLanguageTextEditingGraphic extends AbstractBuilderEditingGraph
             return false;
         }
 
-        builder.setKey(languageComboBox.getValue()).clearValue().setValue(textField.getText());
+        if (languageComboBox.getValue() != null) {
+            builder.setKey(languageComboBox.getValue());
+        }
+
+        builder.clearValue().setValue(textField.getText());
         return true;
     }
 

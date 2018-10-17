@@ -49,6 +49,7 @@ public class LanguageComboBox extends ScrollingComboBox<String> {
 
         this.includeTechnical = includeTechnical;
         this.setItems(createSortedLanguageCodeList());
+        this.getSelectionModel().select(Locale.getDefault().getLanguage());
     }
 
     private ObservableList<String> createSortedLanguageCodeList() {
