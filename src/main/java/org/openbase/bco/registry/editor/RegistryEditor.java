@@ -23,6 +23,7 @@ package org.openbase.bco.registry.editor;
  */
 
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -39,6 +40,9 @@ import org.openbase.bco.registry.remote.login.BCOLogin;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPVerbose;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
+import org.openbase.jul.exception.printer.LogLevel;
+import org.openbase.jul.visual.swing.image.ImageLoader;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rst.domotic.registry.ClassRegistryDataType.ClassRegistryData;
 import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
@@ -53,6 +57,8 @@ import java.util.Map;
  */
 public class RegistryEditor extends Application {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryEditorOld.class);
+
     @Override
     public void init() throws Exception {
         super.init();
@@ -62,6 +68,16 @@ public class RegistryEditor extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
+
+            primaryStage.setTitle("BCO Registry Editor");
+            try {
+                LOGGER.debug("Try to load icon...");
+                primaryStage.getIcons().add(SwingFXUtils.toFXImage(ImageLoader.getInstance().loadImage("registry-editor.png"), null));
+                LOGGER.debug("App icon loaded...");
+            } catch (Exception ex) {
+                ExceptionPrinter.printHistory(ex, LOGGER, LogLevel.WARN);
+            }
+
             JPService.registerProperty(JPVerbose.class, true);
 
             final LoginPanel loginPanel = new LoginPanel();
