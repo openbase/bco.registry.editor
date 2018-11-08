@@ -33,6 +33,8 @@ import org.openbase.bco.registry.editor.util.DefaultDescriptionGenerator;
 import org.openbase.bco.registry.editor.util.DescriptionGenerator;
 import org.openbase.bco.registry.editor.util.SelectableLabel;
 import org.openbase.jul.exception.CouldNotPerformException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
+import org.openbase.jul.exception.printer.LogLevel;
 
 import java.util.List;
 
@@ -78,7 +80,7 @@ public class LeafTreeItem<V> extends GenericTreeItem<V> {
             try {
                 return editingGraphicFactory.getEditingGraphic(getValueCasted(), cell);
             } catch (CouldNotPerformException ex) {
-                logger.warn("Could not create editing graphic", ex);
+                ExceptionPrinter.printHistory("Could not create editing graphic", ex, logger, LogLevel.WARN);
             }
         }
         switch (getFieldDescriptor().getType()) {

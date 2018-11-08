@@ -32,6 +32,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
+import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.pattern.Observable;
 import org.openbase.jul.pattern.Observer;
 import org.openbase.jul.processing.StringProcessor;
@@ -70,8 +72,8 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
                 svgGlyphIcon.setOnMouseClicked(event -> {
                     try {
                         addElement();
-                    } catch (CouldNotPerformException e) {
-                        logger.warn("Could not add new element", e);
+                    } catch (CouldNotPerformException ex) {
+                        ExceptionPrinter.printHistory("Could not add new element", ex, logger, LogLevel.WARN);
                     }
                 });
                 label.heightProperty().addListener((observable, oldValue, newValue) -> {

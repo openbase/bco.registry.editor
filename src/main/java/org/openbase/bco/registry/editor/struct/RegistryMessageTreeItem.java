@@ -36,6 +36,7 @@ import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.ExceptionProcessor;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.NotAvailableException;
+import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
@@ -200,7 +201,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                     logger.error("Could not update tree item with old builder from registry", ex);
                 }
             } catch (CouldNotPerformException ex) {
-                logger.warn("Could not retrieve message with id[" + id + "] for type[" + getBuilder().getClass().getName() + "] from registry", ex);
+                ExceptionPrinter.printHistory("Could not retrieve message with id[" + id + "] for type[" + getBuilder().getClass().getName() + "] from registry", ex, logger, LogLevel.WARN);
             }
         }
     }
