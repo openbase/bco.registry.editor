@@ -145,7 +145,10 @@ public class RegistryEditor extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
-
         System.exit(0);
+    }
+
+    public static void main(String[] args) {
+        RegistryEditor.launch(args);
     }
 }
