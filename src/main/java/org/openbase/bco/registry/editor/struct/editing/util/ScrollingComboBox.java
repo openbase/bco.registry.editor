@@ -26,10 +26,11 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
-//import javafx.scene.control.ListView;
-//import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyEvent;
 import org.openbase.bco.registry.editor.util.DescriptionGenerator;
+
+//import javafx.scene.control.ListView;
+//import javafx.scene.control.skin.ComboBoxListViewSkin;
 
 /**
  * Enhancement of a combo box which will scroll through the presented list view

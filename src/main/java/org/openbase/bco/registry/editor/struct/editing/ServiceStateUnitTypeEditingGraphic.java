@@ -33,6 +33,7 @@ import org.openbase.jul.exception.CouldNotPerformException;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServicePattern;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -64,9 +65,10 @@ public class ServiceStateUnitTypeEditingGraphic extends EnumEditingGraphic {
      */
     @Override
     protected ObservableList<EnumValueDescriptor> createSortedEnumList(final EnumDescriptor enumDescriptor) {
-        // filter all unit types that do not provide at least one operation service
+        // filter all unit types that do not provide at least one operation service and add unknown
         try {
             final List<EnumValueDescriptor> valueList = new ArrayList<>();
+            valueList.add(UnitType.UNKNOWN.getValueDescriptor());
             outer:
             for (UnitTemplate unitTemplate : Registries.getTemplateRegistry().getUnitTemplates()) {
                 for (ServiceDescription serviceDescription : unitTemplate.getServiceDescriptionList()) {
