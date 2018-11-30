@@ -62,24 +62,27 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
 
     public RegistryMessageTreeItem(FieldDescriptor fieldDescriptor, MB builder, Boolean editable) throws InitializationException {
         super(fieldDescriptor, builder, editable);
+        try {
+            idField = ProtoBufFieldProcessor.getFieldDescriptor(builder, Identifiable.TYPE_FIELD_ID);
+            labelField = ProtoBufFieldProcessor.getFieldDescriptor(builder, rst.language.LabelType.Label.class.getSimpleName().toLowerCase());
 
-        idField = ProtoBufFieldProcessor.getFieldDescriptor(builder, Identifiable.TYPE_FIELD_ID);
-        labelField = ProtoBufFieldProcessor.getFieldDescriptor(builder, rst.language.LabelType.Label.class.getSimpleName().toLowerCase());
+            changed = false;
+            inUpdate = false;
 
-        changed = false;
-        inUpdate = false;
+            this.addEventHandler(valueChangedEvent(), event -> {
+                // this is triggered when the value of this node or one of its children changes
+                updateDescriptionGraphic();
 
-        this.addEventHandler(valueChangedEvent(), event -> {
-            // this is triggered when the value of this node or one of its children changes
-            updateDescriptionGraphic();
+                if (!inUpdate && !(event.getSource().equals(RegistryMessageTreeItem.this))) {
+                    logger.debug("Set changed");
+                    changed = true;
+                }
 
-            if (!inUpdate && !(event.getSource().equals(RegistryMessageTreeItem.this))) {
-                logger.debug("Set changed");
-                changed = true;
-            }
-
-            updateValueGraphic();
-        });
+                updateValueGraphic();
+            });
+        } catch (CouldNotPerformException ex) {
+            throw new InitializationException(this, ex);
+        }
     }
 
     public String getId() {

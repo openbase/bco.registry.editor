@@ -10,12 +10,12 @@ package org.openbase.bco.registry.editor.visual;
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
@@ -35,6 +35,7 @@ import org.openbase.bco.registry.editor.visual.cell.DescriptionCell;
 import org.openbase.bco.registry.editor.visual.cell.ValueCell;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.ProtoBufBuilderProcessor;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
@@ -224,13 +225,25 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     }
 
     private void extractRegistryFlags() {
-        final String readOnlyFieldName = fieldDescriptor.getName() + FIELD_POSTFIX_READ_ONLY;
-        final FieldDescriptor readOnlyFieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(registryData, readOnlyFieldName);
-        readOnly = (Boolean) registryData.getField(readOnlyFieldDescriptor);
+        try {
+            final String readOnlyFieldName = fieldDescriptor.getName() + FIELD_POSTFIX_READ_ONLY;
+            final FieldDescriptor readOnlyFieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(registryData, readOnlyFieldName);
+            readOnly = (Boolean) registryData.getField(readOnlyFieldDescriptor);
+        } catch (NotAvailableException ex) {
+            LOGGER.warn("Could no read Datatype["+registryData.getClass().getSimpleName()+"] because it does not provide a read only flag.");
+            // datatype invalid so apply worse case.
+            readOnly = true;
+        }
 
-        final String consistentFieldName = fieldDescriptor.getName() + FIELD_POSTFIX_CONSISTENT;
-        final FieldDescriptor consistentFieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(registryData, consistentFieldName);
-        consistent = (Boolean) registryData.getField(consistentFieldDescriptor);
+        try {
+            final String consistentFieldName = fieldDescriptor.getName() + FIELD_POSTFIX_CONSISTENT;
+            final FieldDescriptor consistentFieldDescriptor = ProtoBufFieldProcessor.getFieldDescriptor(registryData, consistentFieldName);
+            consistent = (Boolean) registryData.getField(consistentFieldDescriptor);
+        } catch (NotAvailableException ex) {
+            LOGGER.warn("Could no read Datatype["+registryData.getClass().getSimpleName()+"] because it does not provide a consistency flag.");
+            // datatype invalid so apply worse case.
+            consistent = false;
+        }
     }
 
     private void updateStatus() {
