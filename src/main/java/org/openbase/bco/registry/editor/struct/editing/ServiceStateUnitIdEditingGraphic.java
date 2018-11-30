@@ -30,6 +30,7 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
 import rst.domotic.unit.UnitConfigType.UnitConfig;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 import java.util.List;
 
@@ -68,13 +69,19 @@ public class ServiceStateUnitIdEditingGraphic extends AbstractMessageEditingGrap
     @Override
     protected List<UnitConfig> getMessages() throws CouldNotPerformException {
         final ServiceStateDescriptionTreeItem serviceStateDescriptionTreeItem = (ServiceStateDescriptionTreeItem) getValueType().getTreeItem().getParent();
+        final UnitType unitType = serviceStateDescriptionTreeItem.getBuilder().getUnitType();
         if (serviceStateDescriptionTreeItem.getParent().getParent().getParent() instanceof UnitConfigTreeItem) {
             final UnitConfigTreeItem unitConfigTreeItem = (UnitConfigTreeItem) serviceStateDescriptionTreeItem.getParent().getParent().getParent();
-            if (!unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId().isEmpty()) {
-                return Registries.getUnitRegistry().getUnitConfigsByLocation(serviceStateDescriptionTreeItem.getBuilder().getUnitType(), unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId());
+            final String locationId = unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId();
+            if (!locationId.isEmpty()) {
+                // resolve all unit inside of same location as unit
+                final List<UnitConfig> unitConfigsByLocation = Registries.getUnitRegistry().getUnitConfigsByLocation(unitType, locationId);
+                // also add the same location of the unit
+                unitConfigsByLocation.add(Registries.getUnitRegistry().getUnitConfigById(locationId));
+                return unitConfigsByLocation;
             }
         }
-        return Registries.getUnitRegistry().getUnitConfigs(serviceStateDescriptionTreeItem.getBuilder().getUnitType());
+        return Registries.getUnitRegistry().getUnitConfigs(unitType);
     }
 
     /**

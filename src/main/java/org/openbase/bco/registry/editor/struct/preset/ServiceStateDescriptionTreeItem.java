@@ -135,6 +135,11 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
      */
     @SuppressWarnings("unchecked")
     private void handleUnitTypeUpdate() throws CouldNotPerformException {
+        // if the unit type is unknown, no changes need to be applied because all old values are still valid
+        if (getBuilder().getUnitType() == UnitType.UNKNOWN) {
+            return;
+        }
+
         // retrieve descriptors
         final FieldDescriptor serviceTypeField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.SERVICE_TYPE_FIELD_NUMBER);
         final FieldDescriptor unitIdField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.UNIT_ID_FIELD_NUMBER);
@@ -143,23 +148,13 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
         LeafTreeItem<String> unitIdLeaf = (LeafTreeItem<String>) getDescriptorChildMap().get(unitIdField);
         LeafTreeItem<EnumValueDescriptor> serviceTypeLeaf = (LeafTreeItem<EnumValueDescriptor>) getDescriptorChildMap().get(serviceTypeField);
 
-        // unit id always becomes editable because the unit type is now set
-        unitIdLeaf.setEditable(true);
-        if (!getBuilder().getUnitId().isEmpty()) {
-            // if the unit id was set verify that the unit still belongs to the new unit type or is a sub unit type
-            final UnitType unitType = Registries.getUnitRegistry().getUnitConfigById(getBuilder().getUnitId()).getUnitType();
-            final List<UnitType> subUnitTypes = Registries.getTemplateRegistry().getSubUnitTypes(getBuilder().getUnitType());
-            if (getBuilder().getUnitType() != unitType && !subUnitTypes.contains(unitType)) {
-                unitIdLeaf.update("");
-            }
-        } else {
-            // if no unit was previously defined it can happen that the unit type was previously unknown
-            // therefore the leaf was not editable before and has to be updated so that the GUI reflects this change
+        // if the unit id was set verify that the unit still belongs to the new unit type or is a sub unit type
+        final UnitType unitType = Registries.getUnitRegistry().getUnitConfigById(getBuilder().getUnitId()).getUnitType();
+        final List<UnitType> subUnitTypes = Registries.getTemplateRegistry().getSubUnitTypes(getBuilder().getUnitType());
+        if (getBuilder().getUnitType() != unitType && !subUnitTypes.contains(unitType)) {
             unitIdLeaf.update("");
         }
 
-        // service type always becomes editable because the unit type is now set
-        serviceTypeLeaf.setEditable(true);
         // test if the current service type is still valid for the new unit type
         boolean contains = false;
         // iterate over all services of the new unit type
@@ -266,9 +261,9 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
     protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         switch (field.getNumber()) {
             case ServiceStateDescription.UNIT_ID_FIELD_NUMBER:
-                // unit id is only editable if the unit type is set, gets a description generator displaying the scope
+                // unit id is always editable, gets a description generator displaying the scope
                 // and gets a description graphic filtering units matching the setting of this service state description
-                final LeafTreeItem<String> unitIdLeaf = new LeafTreeItem<>(field, getBuilder().getUnitId(), getBuilder().getUnitType() != UnitType.UNKNOWN);
+                final LeafTreeItem<String> unitIdLeaf = new LeafTreeItem<>(field, getBuilder().getUnitId(), editable);
                 unitIdLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateUnitIdEditingGraphic.class));
                 unitIdLeaf.setDescriptionGenerator(unitId -> {
                     try {
@@ -289,9 +284,9 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
                 serviceAttributeLeaf.setValueGraphic(getServiceAttributeValueGraphic());
                 return serviceAttributeLeaf;
             case ServiceStateDescription.SERVICE_TYPE_FIELD_NUMBER:
-                // service type is only editable if the unit type is set and gets a special editing graphic only
+                // service type is always editable and gets a special editing graphic only
                 // displaying operation services according to the unit type
-                final LeafTreeItem serviceTypeLeaf = (LeafTreeItem) super.createChild(field, getBuilder().getUnitType() != UnitType.UNKNOWN);
+                final LeafTreeItem serviceTypeLeaf = (LeafTreeItem) super.createChild(field, editable);
                 serviceTypeLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateServiceTypeEditingGraphic.class));
                 return serviceTypeLeaf;
             case ServiceStateDescription.UNIT_TYPE_FIELD_NUMBER:

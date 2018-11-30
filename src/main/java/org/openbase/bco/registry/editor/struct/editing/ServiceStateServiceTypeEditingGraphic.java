@@ -34,6 +34,7 @@ import org.openbase.jul.exception.CouldNotPerformException;
 import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
 import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServicePattern;
 import rst.domotic.unit.UnitTemplateType.UnitTemplate;
+import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -69,12 +70,24 @@ public class ServiceStateServiceTypeEditingGraphic extends EnumEditingGraphicAll
         // return a set of operation services of the selected unit type
         try {
             final ServiceStateDescriptionTreeItem parent = (ServiceStateDescriptionTreeItem) getValueType().getTreeItem().getParent();
-            final UnitTemplate unitTemplate = Registries.getTemplateRegistry().getUnitTemplateByType(parent.getBuilder().getUnitType());
-
             final List<EnumValueDescriptor> valueList = new ArrayList<>();
-            for (final ServiceDescription serviceDescription : unitTemplate.getServiceDescriptionList()) {
-                if (serviceDescription.getPattern() == ServicePattern.OPERATION) {
-                    valueList.add(serviceDescription.getServiceType().getValueDescriptor());
+
+            if (parent.getBuilder().getUnitType() != UnitType.UNKNOWN) {
+                final UnitTemplate unitTemplate = Registries.getTemplateRegistry().getUnitTemplateByType(parent.getBuilder().getUnitType());
+
+                for (final ServiceDescription serviceDescription : unitTemplate.getServiceDescriptionList()) {
+                    if (serviceDescription.getPattern() == ServicePattern.OPERATION) {
+                        valueList.add(serviceDescription.getServiceType().getValueDescriptor());
+                    }
+                }
+            } else {
+                // if unit type is unknown retrieve all available service types
+                for (UnitTemplate unitTemplate : Registries.getTemplateRegistry().getUnitTemplates()) {
+                    for (ServiceDescription serviceDescription : unitTemplate.getServiceDescriptionList()) {
+                        if (serviceDescription.getPattern() == ServicePattern.OPERATION && !valueList.contains(serviceDescription.getServiceType().getValueDescriptor())) {
+                            valueList.add(serviceDescription.getServiceType().getValueDescriptor());
+                        }
+                    }
                 }
             }
             valueList.sort(Comparator.comparing(EnumValueDescriptor::getName));
