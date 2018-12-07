@@ -89,7 +89,7 @@
                 <configuration>
                     <programs>
                         <program>
-                            <mainClass>org.openbase.bco.registry.editor.RegistryEditor</mainClass>
+                            <mainClass>org.openbase.bco.registry.editor.RegistryEditorLauncher</mainClass>
                             <id>bco-registry-editor</id>
                             <platforms>
                                 <platform>unix</platform>
@@ -105,7 +105,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.openbase.bco.registry.editor.RegistryEditor</mainClass>
+                            <mainClass>org.openbase.bco.registry.editor.RegistryEditorLauncher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
