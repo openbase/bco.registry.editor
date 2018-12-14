@@ -21,7 +21,7 @@ package org.openbase.bco.registry.editor.util;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import com.google.protobuf.GeneratedMessage.Builder;
+import com.google.protobuf.Message.Builder;
 import org.openbase.jul.extension.rst.processing.TimestampProcessor;
 import rst.domotic.state.ActivationStateType.ActivationState;
 import rst.domotic.state.EnablingStateType.EnablingState;

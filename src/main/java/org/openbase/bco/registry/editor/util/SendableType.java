@@ -21,7 +21,7 @@ package org.openbase.bco.registry.editor.util;
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 import com.google.protobuf.Message;
 import rst.domotic.activity.ActivityConfigType.ActivityConfig;
 import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
@@ -57,13 +57,13 @@ public enum SendableType {
     ACTIVITY_TEMPLATE(ActivityTemplate.getDefaultInstance()),
     ACTIVITY_CONFIG(ActivityConfig.getDefaultInstance());
 
-    private final GeneratedMessage defaultInstanceForType;
+    private final Message defaultInstanceForType;
 
-    SendableType(GeneratedMessage message) {
+    SendableType(Message message) {
         defaultInstanceForType = message;
     }
 
-    public GeneratedMessage getDefaultInstanceForType() {
+    public Message getDefaultInstanceForType() {
         return defaultInstanceForType;
     }
 

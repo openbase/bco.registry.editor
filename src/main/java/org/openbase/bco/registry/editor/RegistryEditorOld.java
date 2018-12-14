@@ -22,7 +22,7 @@ package org.openbase.bco.registry.editor;
  * #L%
  */
 
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -417,7 +417,7 @@ public class RegistryEditorOld extends Application {
                     return;
                 }
                 try {
-                    GeneratedMessage data = (GeneratedMessage) registryRemote.getData();
+                    Message data = (Message) registryRemote.getData();
                     if (!initialized.get(data.getClass().getSimpleName())) {
                         LOGGER.debug(data.getClass().getSimpleName() + " is not yet initialized");
                         final Node node = fillTreeTableView(data);
@@ -435,7 +435,7 @@ public class RegistryEditorOld extends Application {
         });
     }
 
-    private javafx.scene.Node fillTreeTableView(GeneratedMessage registryData) throws CouldNotPerformException, InterruptedException {
+    private javafx.scene.Node fillTreeTableView(Message registryData) throws CouldNotPerformException, InterruptedException {
         LOGGER.debug("FillTreeTableView for [" + registryData.getClass().getSimpleName() + "]");
 //        if (registryData instanceof ClassRegistryData) {
 //            ClassRegistryData data = (ClassRegistryData) registryData;
@@ -539,7 +539,7 @@ public class RegistryEditorOld extends Application {
         return null;
     }
 
-    private javafx.scene.Node updateTreeTableView(GeneratedMessage msg) throws CouldNotPerformException, InterruptedException {
+    private javafx.scene.Node updateTreeTableView(Message msg) throws CouldNotPerformException, InterruptedException {
         LOGGER.debug("UpdateTreeTableView for [" + msg.getClass().getSimpleName() + "]");
         if (msg instanceof ClassRegistryData) {
             ClassRegistryData data = (ClassRegistryData) msg;
@@ -702,7 +702,7 @@ public class RegistryEditorOld extends Application {
     }
 
     public void selectMessageById(String id) throws CouldNotPerformException {
-//        GeneratedMessage msg = (GeneratedMessage) Registries.getById(id);
+//        Message msg = (Message) Registries.getById(id);
 //        SendableType sendableType = SendableType.getTypeToMessage(msg);
 //        selectTabBySendableType(sendableType);
 //        getTreeTableViewBySendableType(sendableType).selectMessage(msg);

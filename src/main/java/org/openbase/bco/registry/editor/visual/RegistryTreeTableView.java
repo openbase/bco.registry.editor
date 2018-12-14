@@ -22,10 +22,8 @@ package org.openbase.bco.registry.editor.visual;
  * #L%
  */
 
-import com.google.protobuf.Descriptors;
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.*;
 import com.google.protobuf.Message;
-import com.google.protobuf.MessageOrBuilder;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -56,7 +54,7 @@ import static org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProces
  * @param <MB> The message builder type to use.
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
-public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Builder<MB>> extends TreeTableView<Object> {
+public class RegistryTreeTableView<M extends AbstractMessage, MB extends M.Builder<MB>> extends TreeTableView<Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryTreeTableView.class);
 
@@ -168,7 +166,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
 //            GenericListContainer accordingParent = getAccordingParent(new ArrayList<>(this.getRoot().getChildren()), msg);
 //            if (accordingParent != null) {
 //                if (accordingParent.equals(parent)) {
-//                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
+//                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (Message.Builder) msg.toBuilder());
 //                    expandEqually(nodeToRemove, updatedNode);
 //                    parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
 //                } else {
@@ -182,7 +180,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
 //                    GenericGroupContainer rootNode = (GenericGroupContainer) this.getRoot();
 //                    rootNode.addItemWithNewGroup(msg);
 //                } else {
-//                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (GeneratedMessage.Builder) msg.toBuilder());
+//                    GenericNodeContainer updatedNode = new GenericNodeContainer(parent.getFieldDescriptor(), (Message.Builder) msg.toBuilder());
 //                    expandEqually(nodeToRemove, updatedNode);
 //                    parent.getChildren().set(parent.getChildren().indexOf(nodeToRemove), updatedNode);
 //                }
@@ -276,7 +274,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
         }
     }
 
-//    public void selectMessage(GeneratedMessage msg) throws CouldNotPerformException {
+//    public void selectMessage(Message msg) throws CouldNotPerformException {
 //        TreeItem container = getNodeByMessage(new ArrayList<>(getRoot().getChildren()), msg);
 //        container.setExpanded(true);
 //        while (container.getParent() != null) {
@@ -285,7 +283,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
 //        }
 //    }
 
-//    private NodeContainer getNodeByMessage(List<TreeItem<NodeInterface>> nodes, GeneratedMessage msg) {
+//    private NodeContainer getNodeByMessage(List<TreeItem<NodeInterface>> nodes, Message msg) {
 //        if (nodes.isEmpty()) {
 //            return null;
 //        }
@@ -313,7 +311,7 @@ public class RegistryTreeTableView<M extends GeneratedMessage, MB extends M.Buil
 //        }
 //    }
 
-//    private GenericListContainer getAccordingParent(List<TreeItem<NodeInterface>> nodes, GeneratedMessage msg) throws CouldNotPerformException, InterruptedException {
+//    private GenericListContainer getAccordingParent(List<TreeItem<NodeInterface>> nodes, Message msg) throws CouldNotPerformException, InterruptedException {
 //        if (nodes.isEmpty()) {
 //            return null;
 //        }

@@ -22,7 +22,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox;
  * #L%
  */
 
-import com.google.protobuf.GeneratedMessage;
+import com.google.protobuf.Message;
 import com.google.protobuf.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -172,7 +172,7 @@ public class MessageComboBox extends ComboBox<Message> {
         }
     }
 
-    public static GeneratedMessage getMessageEnumBoxType(String fieldName, Message.Builder parentBuilder) {
+    public static Message getMessageEnumBoxType(String fieldName, Message.Builder parentBuilder) {
         if (null != fieldName) {
             switch (fieldName) {
                 case "location_id":
@@ -208,7 +208,7 @@ public class MessageComboBox extends ComboBox<Message> {
     }
 
     private MessageComboBoxConverter getConverterByMessageType(final String fieldName, final Message.Builder parentBuilder) {
-        GeneratedMessage msg = getMessageEnumBoxType(fieldName, parentBuilder);
+        Message msg = getMessageEnumBoxType(fieldName, parentBuilder);
         if (msg instanceof UnitConfig) {
             switch (((UnitConfig) msg).getUnitType()) {
                 case LOCATION:
