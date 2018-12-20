@@ -64,7 +64,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
         super(fieldDescriptor, builder, editable);
         try {
             idField = ProtoBufFieldProcessor.getFieldDescriptor(builder, Identifiable.TYPE_FIELD_ID);
-            labelField = ProtoBufFieldProcessor.getFieldDescriptor(builder, rst.language.LabelType.Label.class.getSimpleName().toLowerCase());
+            labelField = ProtoBufFieldProcessor.getFieldDescriptor(builder, org.openbase.type.language.LabelType.Label.class.getSimpleName().toLowerCase());
 
             changed = false;
             inUpdate = false;
@@ -113,7 +113,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
     @Override
     protected String createDescriptionText() {
         try {
-            return LabelProcessor.getBestMatch((rst.language.LabelType.Label) getBuilder().getField(labelField));
+            return LabelProcessor.getBestMatch((org.openbase.type.language.LabelType.Label) getBuilder().getField(labelField));
         } catch (NotAvailableException e) {
             return super.createDescriptionText();
         }
