@@ -39,7 +39,7 @@ import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import org.openbase.jul.extension.rst.processing.LabelProcessor;
+import org.openbase.jul.extension.type.processing.LabelProcessor;
 import org.openbase.jul.iface.Identifiable;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
 

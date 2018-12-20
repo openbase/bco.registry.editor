@@ -26,7 +26,7 @@ import com.google.protobuf.Message;
 import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rst.processing.LabelProcessor;
+import org.openbase.jul.extension.type.processing.LabelProcessor;
 import org.openbase.type.domotic.activity.ActivityConfigType.ActivityConfig;
 import org.openbase.type.domotic.activity.ActivityTemplateType.ActivityTemplate;
 

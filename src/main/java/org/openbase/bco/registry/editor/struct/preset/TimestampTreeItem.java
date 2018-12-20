@@ -29,7 +29,7 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.TimestampEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.extension.rst.processing.TimestampJavaTimeTransform;
+import org.openbase.jul.extension.type.processing.TimestampJavaTimeTransform;
 import org.openbase.type.timing.TimestampType.Timestamp.Builder;
 
 import java.text.DateFormat;

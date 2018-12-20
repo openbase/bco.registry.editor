@@ -25,7 +25,7 @@ package org.openbase.bco.registry.editor.struct.editing;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import org.openbase.jul.extension.rst.processing.TimestampJavaTimeTransform;
+import org.openbase.jul.extension.type.processing.TimestampJavaTimeTransform;
 import org.openbase.type.timing.TimestampType.Timestamp;
 import org.openbase.type.timing.TimestampType.Timestamp.Builder;
 

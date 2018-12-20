@@ -22,7 +22,7 @@ package org.openbase.bco.registry.editor.util;
  * #L%
  */
 import com.google.protobuf.Message.Builder;
-import org.openbase.jul.extension.rst.processing.TimestampProcessor;
+import org.openbase.jul.extension.type.processing.TimestampProcessor;
 import org.openbase.type.domotic.state.ActivationStateType.ActivationState;
 import org.openbase.type.domotic.state.EnablingStateType.EnablingState;
 import org.openbase.type.domotic.state.InventoryStateType.InventoryState;

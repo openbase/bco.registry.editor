@@ -35,7 +35,7 @@ import org.openbase.bco.registry.editor.util.SelectableLabel;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.NotAvailableException;
-import org.openbase.jul.extension.rst.processing.MultiLanguageTextProcessor;
+import org.openbase.jul.extension.type.processing.MultiLanguageTextProcessor;
 import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
 import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig.Builder;
 import org.openbase.type.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;

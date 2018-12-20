@@ -25,7 +25,7 @@ import com.google.protobuf.Message;
 import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rst.processing.LabelProcessor;
+import org.openbase.jul.extension.type.processing.LabelProcessor;
 import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
 import org.openbase.type.domotic.unit.device.DeviceClassType.DeviceClass;
 import org.openbase.type.domotic.unit.device.DeviceConfigType.DeviceConfig;

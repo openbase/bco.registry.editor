@@ -28,7 +28,7 @@ import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.NotAvailableException;
-import org.openbase.jul.extension.rst.processing.MultiLanguageTextProcessor;
+import org.openbase.jul.extension.type.processing.MultiLanguageTextProcessor;
 import org.openbase.type.domotic.unit.device.DeviceClassType.DeviceClass;
 import org.openbase.type.domotic.unit.device.DeviceClassType.DeviceClass.Builder;
 
