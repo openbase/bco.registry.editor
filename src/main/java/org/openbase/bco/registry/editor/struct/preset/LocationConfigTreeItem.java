@@ -36,9 +36,9 @@ import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.domotic.unit.location.LocationConfigType.LocationConfig;
-import rst.domotic.unit.location.LocationConfigType.LocationConfig.Builder;
-import rst.domotic.unit.location.LocationConfigType.LocationConfig.LocationType;
+import org.openbase.type.domotic.unit.location.LocationConfigType.LocationConfig;
+import org.openbase.type.domotic.unit.location.LocationConfigType.LocationConfig.Builder;
+import org.openbase.type.domotic.unit.location.LocationConfigType.LocationConfig.LocationType;
 
 import java.util.Set;
 

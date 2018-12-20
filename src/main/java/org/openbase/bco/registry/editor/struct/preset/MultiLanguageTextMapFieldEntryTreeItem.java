@@ -30,7 +30,7 @@ import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.MultiLanguageTextEditingGraphic;
 import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
 import org.openbase.jul.exception.InitializationException;
-import rst.language.MultiLanguageTextType.MultiLanguageText.MapFieldEntry.Builder;
+import org.openbase.type.language.MultiLanguageTextType.MultiLanguageText.MapFieldEntry.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

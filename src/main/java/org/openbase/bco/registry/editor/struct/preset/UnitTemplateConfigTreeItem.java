@@ -31,10 +31,10 @@ import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
-import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServiceType;
-import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig;
-import rst.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig.Builder;
+import org.openbase.type.domotic.service.ServiceDescriptionType.ServiceDescription;
+import org.openbase.type.domotic.service.ServiceTemplateType.ServiceTemplate.ServiceType;
+import org.openbase.type.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig;
+import org.openbase.type.domotic.unit.UnitTemplateConfigType.UnitTemplateConfig.Builder;
 
 import java.util.HashSet;
 import java.util.Set;

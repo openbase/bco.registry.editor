@@ -24,7 +24,7 @@ package org.openbase.bco.registry.editor.util.fieldpath;
 
 import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import org.openbase.type.domotic.unit.device.DeviceClassType.DeviceClass;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

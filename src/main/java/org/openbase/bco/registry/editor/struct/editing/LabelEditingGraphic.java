@@ -30,7 +30,7 @@ import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
 import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
-import rst.language.LabelType.Label.MapFieldEntry.Builder;
+import org.openbase.type.language.LabelType.Label.MapFieldEntry.Builder;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -33,8 +33,8 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.unit.device.DeviceConfigType.DeviceConfig;
-import rst.domotic.unit.device.DeviceConfigType.DeviceConfig.Builder;
+import org.openbase.type.domotic.unit.device.DeviceConfigType.DeviceConfig;
+import org.openbase.type.domotic.unit.device.DeviceConfigType.DeviceConfig.Builder;
 
 import java.util.Set;
 

@@ -25,7 +25,7 @@ package org.openbase.bco.registry.editor.struct.editing.service;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
-import rst.domotic.state.BrightnessStateType.BrightnessState;
+import org.openbase.type.domotic.state.BrightnessStateType.BrightnessState;
 
 import java.text.DecimalFormat;
 

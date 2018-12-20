@@ -29,7 +29,7 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.unit.app.AppClassType.AppClass;
+import org.openbase.type.domotic.unit.app.AppClassType.AppClass;
 
 import java.util.List;
 

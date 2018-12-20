@@ -22,9 +22,9 @@ package org.openbase.bco.registry.editor.struct.editing.service;
  * #L%
  */
 
-import rst.domotic.state.PowerStateType.PowerState;
-import rst.domotic.state.PowerStateType.PowerState.Builder;
-import rst.domotic.state.PowerStateType.PowerState.State;
+import org.openbase.type.domotic.state.PowerStateType.PowerState;
+import org.openbase.type.domotic.state.PowerStateType.PowerState.Builder;
+import org.openbase.type.domotic.state.PowerStateType.PowerState.State;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

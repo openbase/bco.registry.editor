@@ -24,7 +24,7 @@ package org.openbase.bco.registry.editor.visual.cell.editing.combobox.converter;
 
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import org.openbase.type.domotic.unit.device.DeviceClassType.DeviceClass;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

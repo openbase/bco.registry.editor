@@ -25,8 +25,8 @@ package org.openbase.bco.registry.editor.struct.preset;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
-import rst.domotic.activity.ActivityTemplateType.ActivityTemplate.Builder;
+import org.openbase.type.domotic.activity.ActivityTemplateType.ActivityTemplate;
+import org.openbase.type.domotic.activity.ActivityTemplateType.ActivityTemplate.Builder;
 
 import java.util.Set;
 

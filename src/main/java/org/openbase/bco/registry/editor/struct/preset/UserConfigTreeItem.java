@@ -31,8 +31,8 @@ import org.openbase.bco.registry.editor.struct.editing.LanguageEditingGraphic;
 import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.unit.user.UserConfigType.UserConfig;
-import rst.domotic.unit.user.UserConfigType.UserConfig.Builder;
+import org.openbase.type.domotic.unit.user.UserConfigType.UserConfig;
+import org.openbase.type.domotic.unit.user.UserConfigType.UserConfig.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

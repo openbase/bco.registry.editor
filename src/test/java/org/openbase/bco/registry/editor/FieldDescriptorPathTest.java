@@ -30,8 +30,8 @@ import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.exception.JPServiceException;
 import org.openbase.jul.exception.InstantiationException;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.spatial.PlacementConfigType.PlacementConfig;
+import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
+import org.openbase.type.spatial.PlacementConfigType.PlacementConfig;
 
 import static org.junit.Assert.assertEquals;
 

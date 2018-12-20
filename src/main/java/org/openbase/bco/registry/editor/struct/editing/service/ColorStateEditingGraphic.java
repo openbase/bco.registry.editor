@@ -27,11 +27,11 @@ import javafx.scene.paint.Color;
 import org.openbase.bco.registry.editor.struct.editing.ServiceStateAttributeEditingGraphic;
 import org.openbase.jul.exception.CouldNotTransformException;
 import org.openbase.jul.visual.javafx.transform.JFXColorToHSBColorTransformer;
-import rst.domotic.state.ColorStateType.ColorState;
-import rst.vision.ColorType;
-import rst.vision.ColorType.Color.Type;
-import rst.vision.HSBColorType.HSBColor;
-import rst.vision.RGBColorType.RGBColor;
+import org.openbase.type.domotic.state.ColorStateType.ColorState;
+import org.openbase.type.vision.ColorType;
+import org.openbase.type.vision.ColorType.Color.Type;
+import org.openbase.type.vision.HSBColorType.HSBColor;
+import org.openbase.type.vision.RGBColorType.RGBColor;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

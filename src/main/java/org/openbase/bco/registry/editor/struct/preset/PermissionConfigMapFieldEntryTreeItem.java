@@ -32,9 +32,9 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.authentication.PermissionConfigType.PermissionConfig;
-import rst.domotic.authentication.PermissionConfigType.PermissionConfig.MapFieldEntry;
-import rst.domotic.authentication.PermissionConfigType.PermissionConfig.MapFieldEntry.Builder;
+import org.openbase.type.domotic.authentication.PermissionConfigType.PermissionConfig;
+import org.openbase.type.domotic.authentication.PermissionConfigType.PermissionConfig.MapFieldEntry;
+import org.openbase.type.domotic.authentication.PermissionConfigType.PermissionConfig.MapFieldEntry.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

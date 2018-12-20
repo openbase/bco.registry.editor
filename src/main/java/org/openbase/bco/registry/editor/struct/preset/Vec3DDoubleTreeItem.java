@@ -29,7 +29,7 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.Vec3DDoubleEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.math.Vec3DDoubleType.Vec3DDouble.Builder;
+import org.openbase.type.math.Vec3DDoubleType.Vec3DDouble.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

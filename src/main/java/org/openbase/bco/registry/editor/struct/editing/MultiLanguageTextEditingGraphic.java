@@ -27,7 +27,7 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
-import rst.language.MultiLanguageTextType.MultiLanguageText;
+import org.openbase.type.language.MultiLanguageTextType.MultiLanguageText;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

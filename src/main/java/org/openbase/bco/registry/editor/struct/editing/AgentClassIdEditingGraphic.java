@@ -28,7 +28,7 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
+import org.openbase.type.domotic.unit.agent.AgentClassType.AgentClass;
 
 import java.util.List;
 

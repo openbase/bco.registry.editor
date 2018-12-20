@@ -28,8 +28,8 @@ import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.processing.StringProcessor;
-import rst.domotic.service.ServiceConfigType.ServiceConfig;
-import rst.domotic.service.ServiceConfigType.ServiceConfig.Builder;
+import org.openbase.type.domotic.service.ServiceConfigType.ServiceConfig;
+import org.openbase.type.domotic.service.ServiceConfigType.ServiceConfig.Builder;
 
 import java.util.Set;
 

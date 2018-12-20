@@ -32,8 +32,8 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.spatial.PlacementConfigType.PlacementConfig;
-import rst.spatial.PlacementConfigType.PlacementConfig.Builder;
+import org.openbase.type.spatial.PlacementConfigType.PlacementConfig;
+import org.openbase.type.spatial.PlacementConfigType.PlacementConfig.Builder;
 
 import java.util.Set;
 

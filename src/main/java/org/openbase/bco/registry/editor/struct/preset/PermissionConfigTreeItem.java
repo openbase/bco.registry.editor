@@ -31,8 +31,8 @@ import org.openbase.bco.registry.editor.struct.editing.UserIdEditingGraphic;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.authentication.PermissionConfigType.PermissionConfig;
-import rst.domotic.authentication.PermissionConfigType.PermissionConfig.Builder;
+import org.openbase.type.domotic.authentication.PermissionConfigType.PermissionConfig;
+import org.openbase.type.domotic.authentication.PermissionConfigType.PermissionConfig.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

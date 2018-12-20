@@ -30,7 +30,7 @@ import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.LabelEditingGraphic;
 import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
 import org.openbase.jul.exception.InitializationException;
-import rst.language.LabelType.Label.MapFieldEntry.Builder;
+import org.openbase.type.language.LabelType.Label.MapFieldEntry.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

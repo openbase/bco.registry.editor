@@ -26,8 +26,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.jul.extension.rst.processing.TimestampJavaTimeTransform;
-import rst.timing.TimestampType.Timestamp;
-import rst.timing.TimestampType.Timestamp.Builder;
+import org.openbase.type.timing.TimestampType.Timestamp;
+import org.openbase.type.timing.TimestampType.Timestamp.Builder;
 
 import java.time.ZoneId;
 import java.util.Date;

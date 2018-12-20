@@ -31,8 +31,8 @@ import org.openbase.bco.registry.editor.struct.editing.ScopeEditingGraphic;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.rsb.ScopeType.Scope;
-import rst.rsb.ScopeType.Scope.Builder;
+import org.openbase.type.com.ScopeType.Scope;
+import org.openbase.type.com.ScopeType.Scope.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

@@ -26,8 +26,8 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextField;
-import rst.domotic.state.GlobalPositionStateType.GlobalPositionState;
-import rst.domotic.state.GlobalPositionStateType.GlobalPositionState.Builder;
+import org.openbase.type.domotic.state.GlobalPositionStateType.GlobalPositionState;
+import org.openbase.type.domotic.state.GlobalPositionStateType.GlobalPositionState.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

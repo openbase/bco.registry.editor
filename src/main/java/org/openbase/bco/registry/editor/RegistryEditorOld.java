@@ -70,10 +70,10 @@ import org.openbase.jul.storage.registry.RegistryRemote;
 import org.openbase.jul.visual.swing.image.ImageLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.domotic.registry.ActivityRegistryDataType.ActivityRegistryData;
-import rst.domotic.registry.ClassRegistryDataType.ClassRegistryData;
-import rst.domotic.registry.TemplateRegistryDataType.TemplateRegistryData;
-import rst.domotic.registry.UnitRegistryDataType.UnitRegistryData;
+import org.openbase.type.domotic.registry.ActivityRegistryDataType.ActivityRegistryData;
+import org.openbase.type.domotic.registry.ClassRegistryDataType.ClassRegistryData;
+import org.openbase.type.domotic.registry.TemplateRegistryDataType.TemplateRegistryData;
+import org.openbase.type.domotic.registry.UnitRegistryDataType.UnitRegistryData;
 
 import java.util.*;
 import java.util.concurrent.Callable;

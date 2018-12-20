@@ -27,9 +27,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
-import rst.domotic.state.EnablingStateType.EnablingState;
-import rst.domotic.state.EnablingStateType.EnablingState.Builder;
-import rst.domotic.state.EnablingStateType.EnablingState.State;
+import org.openbase.type.domotic.state.EnablingStateType.EnablingState;
+import org.openbase.type.domotic.state.EnablingStateType.EnablingState.Builder;
+import org.openbase.type.domotic.state.EnablingStateType.EnablingState.State;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

@@ -26,7 +26,7 @@ import com.google.protobuf.Descriptors.EnumValueDescriptor;
 import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.jul.processing.StringProcessor;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
+import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

@@ -27,9 +27,9 @@ import org.openbase.bco.registry.editor.struct.ValueListTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
-import rst.domotic.unit.location.LocationConfigType.LocationConfig.LocationType;
+import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
+import org.openbase.type.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
+import org.openbase.type.domotic.unit.location.LocationConfigType.LocationConfig.LocationType;
 
 import java.util.List;
 

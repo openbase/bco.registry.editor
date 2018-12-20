@@ -33,8 +33,8 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.unit.app.AppConfigType.AppConfig;
-import rst.domotic.unit.app.AppConfigType.AppConfig.Builder;
+import org.openbase.type.domotic.unit.app.AppConfigType.AppConfig;
+import org.openbase.type.domotic.unit.app.AppConfigType.AppConfig.Builder;
 
 import java.util.Set;
 

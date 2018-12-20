@@ -29,8 +29,8 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.PermissionEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.authentication.PermissionType.Permission;
-import rst.domotic.authentication.PermissionType.Permission.Builder;
+import org.openbase.type.domotic.authentication.PermissionType.Permission;
+import org.openbase.type.domotic.authentication.PermissionType.Permission.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

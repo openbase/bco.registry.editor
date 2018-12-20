@@ -26,7 +26,7 @@ import com.google.protobuf.Message;
 import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.processing.StringProcessor;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
+import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
 
 /**
  *

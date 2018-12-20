@@ -29,8 +29,8 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.GlobalPositionStateEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.state.GlobalPositionStateType.GlobalPositionState;
-import rst.domotic.state.GlobalPositionStateType.GlobalPositionState.Builder;
+import org.openbase.type.domotic.state.GlobalPositionStateType.GlobalPositionState;
+import org.openbase.type.domotic.state.GlobalPositionStateType.GlobalPositionState.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

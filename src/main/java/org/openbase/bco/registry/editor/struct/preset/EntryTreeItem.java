@@ -29,7 +29,7 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.MetaConfigEntryEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.configuration.EntryType.Entry.Builder;
+import org.openbase.type.configuration.EntryType.Entry.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

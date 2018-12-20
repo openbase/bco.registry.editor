@@ -27,8 +27,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
-import rst.domotic.authentication.PermissionType.Permission;
-import rst.domotic.authentication.PermissionType.Permission.Builder;
+import org.openbase.type.domotic.authentication.PermissionType.Permission;
+import org.openbase.type.domotic.authentication.PermissionType.Permission.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

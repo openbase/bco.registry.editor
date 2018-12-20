@@ -27,8 +27,8 @@ import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.rst.processing.LabelProcessor;
-import rst.domotic.activity.ActivityConfigType.ActivityConfig;
-import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
+import org.openbase.type.domotic.activity.ActivityConfigType.ActivityConfig;
+import org.openbase.type.domotic.activity.ActivityTemplateType.ActivityTemplate;
 
 /**
  * @author <a href="mailto:pLeminoq@openbase.org">Tamino Huxohl</a>

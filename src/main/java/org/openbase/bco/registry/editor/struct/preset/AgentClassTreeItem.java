@@ -25,8 +25,8 @@ package org.openbase.bco.registry.editor.struct.preset;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
-import rst.domotic.unit.agent.AgentClassType.AgentClass.Builder;
+import org.openbase.type.domotic.unit.agent.AgentClassType.AgentClass;
+import org.openbase.type.domotic.unit.agent.AgentClassType.AgentClass.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

@@ -22,9 +22,9 @@ package org.openbase.bco.registry.editor.struct.editing.service;
  * #L%
  */
 
-import rst.domotic.state.StandbyStateType.StandbyState;
-import rst.domotic.state.StandbyStateType.StandbyState.Builder;
-import rst.domotic.state.StandbyStateType.StandbyState.State;
+import org.openbase.type.domotic.state.StandbyStateType.StandbyState;
+import org.openbase.type.domotic.state.StandbyStateType.StandbyState.Builder;
+import org.openbase.type.domotic.state.StandbyStateType.StandbyState.State;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

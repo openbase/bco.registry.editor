@@ -25,8 +25,8 @@ package org.openbase.bco.registry.editor.struct.preset;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.unit.app.AppClassType.AppClass;
-import rst.domotic.unit.app.AppClassType.AppClass.Builder;
+import org.openbase.type.domotic.unit.app.AppClassType.AppClass;
+import org.openbase.type.domotic.unit.app.AppClassType.AppClass.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

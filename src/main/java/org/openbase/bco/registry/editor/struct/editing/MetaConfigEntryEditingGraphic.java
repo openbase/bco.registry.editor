@@ -26,7 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.MetaConfigEntryTextField;
-import rst.configuration.EntryType.Entry.Builder;
+import org.openbase.type.configuration.EntryType.Entry.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

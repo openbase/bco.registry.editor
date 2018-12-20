@@ -25,8 +25,8 @@ package org.openbase.bco.registry.editor.struct.preset;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.unit.location.TileConfigType.TileConfig;
-import rst.domotic.unit.location.TileConfigType.TileConfig.Builder;
+import org.openbase.type.domotic.unit.location.TileConfigType.TileConfig;
+import org.openbase.type.domotic.unit.location.TileConfigType.TileConfig.Builder;
 
 import java.util.Set;
 

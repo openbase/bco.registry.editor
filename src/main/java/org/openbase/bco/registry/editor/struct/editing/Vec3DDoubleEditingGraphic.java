@@ -26,8 +26,8 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextField;
-import rst.math.Vec3DDoubleType.Vec3DDouble;
-import rst.math.Vec3DDoubleType.Vec3DDouble.Builder;
+import org.openbase.type.math.Vec3DDoubleType.Vec3DDouble;
+import org.openbase.type.math.Vec3DDoubleType.Vec3DDouble.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

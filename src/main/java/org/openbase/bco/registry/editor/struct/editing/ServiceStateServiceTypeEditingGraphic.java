@@ -31,10 +31,10 @@ import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.preset.ServiceStateDescriptionTreeItem;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
-import rst.domotic.service.ServiceTemplateType.ServiceTemplate.ServicePattern;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
+import org.openbase.type.domotic.service.ServiceDescriptionType.ServiceDescription;
+import org.openbase.type.domotic.service.ServiceTemplateType.ServiceTemplate.ServicePattern;
+import org.openbase.type.domotic.unit.UnitTemplateType.UnitTemplate;
+import org.openbase.type.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
 import java.util.ArrayList;
 import java.util.Comparator;

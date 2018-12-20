@@ -42,7 +42,7 @@ import org.openbase.jul.extension.protobuf.ProtobufListDiff;
 import org.openbase.jul.pattern.Observer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rst.rsb.ScopeType.Scope;
+import org.openbase.type.com.ScopeType.Scope;
 
 import java.util.ArrayList;
 import java.util.List;

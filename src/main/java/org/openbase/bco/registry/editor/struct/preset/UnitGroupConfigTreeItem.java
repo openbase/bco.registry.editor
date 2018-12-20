@@ -34,12 +34,12 @@ import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import rst.domotic.service.ServiceConfigType.ServiceConfig;
-import rst.domotic.service.ServiceDescriptionType.ServiceDescription;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
-import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
-import rst.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig.Builder;
+import org.openbase.type.domotic.service.ServiceConfigType.ServiceConfig;
+import org.openbase.type.domotic.service.ServiceDescriptionType.ServiceDescription;
+import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
+import org.openbase.type.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
+import org.openbase.type.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig;
+import org.openbase.type.domotic.unit.unitgroup.UnitGroupConfigType.UnitGroupConfig.Builder;
 
 import java.util.ArrayList;
 import java.util.List;

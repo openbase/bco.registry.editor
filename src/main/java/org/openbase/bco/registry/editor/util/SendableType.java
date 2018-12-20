@@ -23,15 +23,15 @@ package org.openbase.bco.registry.editor.util;
  */
 import com.google.protobuf.Message;
 import com.google.protobuf.Message;
-import rst.domotic.activity.ActivityConfigType.ActivityConfig;
-import rst.domotic.activity.ActivityTemplateType.ActivityTemplate;
-import rst.domotic.service.ServiceTemplateType.ServiceTemplate;
-import rst.domotic.unit.UnitConfigType.UnitConfig;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate;
-import rst.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
-import rst.domotic.unit.agent.AgentClassType.AgentClass;
-import rst.domotic.unit.app.AppClassType.AppClass;
-import rst.domotic.unit.device.DeviceClassType.DeviceClass;
+import org.openbase.type.domotic.activity.ActivityConfigType.ActivityConfig;
+import org.openbase.type.domotic.activity.ActivityTemplateType.ActivityTemplate;
+import org.openbase.type.domotic.service.ServiceTemplateType.ServiceTemplate;
+import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
+import org.openbase.type.domotic.unit.UnitTemplateType.UnitTemplate;
+import org.openbase.type.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
+import org.openbase.type.domotic.unit.agent.AgentClassType.AgentClass;
+import org.openbase.type.domotic.unit.app.AppClassType.AppClass;
+import org.openbase.type.domotic.unit.device.DeviceClassType.DeviceClass;
 
 /**
  *

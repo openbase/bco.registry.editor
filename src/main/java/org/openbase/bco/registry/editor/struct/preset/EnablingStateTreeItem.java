@@ -29,8 +29,8 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.EnablingStateEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.state.EnablingStateType.EnablingState;
-import rst.domotic.state.EnablingStateType.EnablingState.Builder;
+import org.openbase.type.domotic.state.EnablingStateType.EnablingState;
+import org.openbase.type.domotic.state.EnablingStateType.EnablingState.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

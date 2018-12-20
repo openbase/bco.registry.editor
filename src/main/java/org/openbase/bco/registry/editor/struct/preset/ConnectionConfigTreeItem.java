@@ -32,8 +32,8 @@ import org.openbase.bco.registry.editor.struct.editing.TileIdEditingGraphic;
 import org.openbase.bco.registry.editor.util.UnitScopeDescriptionGenerator;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
-import rst.domotic.unit.connection.ConnectionConfigType.ConnectionConfig.Builder;
+import org.openbase.type.domotic.unit.connection.ConnectionConfigType.ConnectionConfig;
+import org.openbase.type.domotic.unit.connection.ConnectionConfigType.ConnectionConfig.Builder;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

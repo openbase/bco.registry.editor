@@ -29,7 +29,7 @@ import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.NumberFilteredTextField;
 import org.openbase.jul.processing.QuaternionEulerTransform;
-import rst.geometry.RotationType.Rotation.Builder;
+import org.openbase.type.geometry.RotationType.Rotation.Builder;
 
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;

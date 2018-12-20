@@ -30,7 +30,7 @@ import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.RotationEditingGraphic;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.processing.QuaternionEulerTransform;
-import rst.geometry.RotationType.Rotation.Builder;
+import org.openbase.type.geometry.RotationType.Rotation.Builder;
 
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
