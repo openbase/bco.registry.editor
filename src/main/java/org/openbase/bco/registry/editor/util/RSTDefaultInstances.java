@@ -50,7 +50,11 @@ import org.openbase.type.timing.TimestampType.Timestamp;
 /**
  *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
+ *
+ * @deprecated class will be removed in a future release because default types
+ * should be declared within the protobuf declaration since required fields are removed.
  */
+@Deprecated
 public class RSTDefaultInstances {
 
     public static Timestamp getDefaultTimestamp() {
