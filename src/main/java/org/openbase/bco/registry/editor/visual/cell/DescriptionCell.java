@@ -40,9 +40,9 @@ public class DescriptionCell extends TreeTableCell<ValueType, ValueType> {
         super.updateItem(item, empty);
 
         if (!empty && item != null) {
-            setGraphic(item.getDescriptionGraphic());
+            setText(item.getDescriptionText());
         } else {
-            setGraphic(new Label(""));
+            setText("");
         }
     }
 }

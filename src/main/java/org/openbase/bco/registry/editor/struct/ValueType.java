@@ -47,6 +47,10 @@ public class ValueType<V extends Object> {
         return treeItem.getDescriptionGraphic();
     }
 
+    public String getDescriptionText() {
+        return treeItem.getDescriptionText();
+    }
+
     public Node getValueGraphic() {
         return treeItem.getValueGraphic();
     }
