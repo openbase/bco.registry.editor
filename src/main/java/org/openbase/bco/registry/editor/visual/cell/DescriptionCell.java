@@ -22,7 +22,7 @@ package org.openbase.bco.registry.editor.visual.cell;
  * #L%
  */
 
-import javafx.scene.control.Label;
+import javafx.scene.Node;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
 
@@ -33,6 +33,7 @@ public class DescriptionCell extends TreeTableCell<ValueType, ValueType> {
 
     public DescriptionCell() {
         super();
+        setText(null);
     }
 
     @Override
@@ -40,9 +41,10 @@ public class DescriptionCell extends TreeTableCell<ValueType, ValueType> {
         super.updateItem(item, empty);
 
         if (!empty && item != null) {
-            setText(item.getDescriptionText());
+            final Node descriptionGraphic = item.getDescriptionGraphic();
+            setGraphic(descriptionGraphic);
         } else {
-            setText("");
+            setGraphic(null);
         }
     }
 }
