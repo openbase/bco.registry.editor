@@ -143,11 +143,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
             } catch (InterruptedException ex) {
                 // this should not because the task should already be done
             } catch (ExecutionException ex) {
-                try {
-                    errorLabel.setText(ExceptionProcessor.getInitialCause(ex).getMessage());
-                } catch (NotAvailableException exx) {
-                    errorLabel.setText(exx.getMessage());
-                }
+                errorLabel.setText(ExceptionProcessor.getInitialCause(ex).getMessage());
             }
         }
 
