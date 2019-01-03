@@ -23,7 +23,6 @@ package org.openbase.bco.registry.editor.struct;
  */
 
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.TreeTableCell;
 
 /**

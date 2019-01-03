@@ -23,7 +23,6 @@ package org.openbase.bco.registry.editor.visual;
  */
 
 import com.google.protobuf.*;
-import com.google.protobuf.Message;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;

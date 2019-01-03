@@ -30,7 +30,6 @@ import org.openbase.bco.registry.editor.struct.ValueListTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
 import org.openbase.bco.registry.editor.struct.editing.LocationChildIdEditingGraphic;
-import org.openbase.bco.registry.editor.util.DescriptionGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;

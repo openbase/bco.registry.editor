@@ -23,8 +23,6 @@ package org.openbase.bco.registry.editor.struct.preset;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.processing.StringProcessor;

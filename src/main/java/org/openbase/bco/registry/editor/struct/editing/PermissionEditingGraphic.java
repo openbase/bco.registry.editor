@@ -22,7 +22,6 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
-import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;

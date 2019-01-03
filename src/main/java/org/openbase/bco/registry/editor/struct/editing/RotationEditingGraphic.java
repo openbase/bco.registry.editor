@@ -23,7 +23,6 @@ package org.openbase.bco.registry.editor.struct.editing;
  */
 
 import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
@@ -34,7 +33,6 @@ import org.openbase.type.geometry.RotationType.Rotation.Builder;
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
 import java.text.DecimalFormat;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>

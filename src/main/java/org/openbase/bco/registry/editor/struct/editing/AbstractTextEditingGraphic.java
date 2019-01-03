@@ -22,7 +22,6 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
-import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;

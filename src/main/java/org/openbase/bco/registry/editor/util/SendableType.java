@@ -22,7 +22,6 @@ package org.openbase.bco.registry.editor.util;
  * #L%
  */
 import com.google.protobuf.Message;
-import com.google.protobuf.Message;
 import org.openbase.type.domotic.activity.ActivityConfigType.ActivityConfig;
 import org.openbase.type.domotic.activity.ActivityTemplateType.ActivityTemplate;
 import org.openbase.type.domotic.service.ServiceTemplateType.ServiceTemplate;

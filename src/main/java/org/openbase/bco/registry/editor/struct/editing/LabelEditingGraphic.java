@@ -22,20 +22,15 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.LanguageComboBox;
-import org.openbase.bco.registry.editor.struct.editing.util.ScrollingComboBox;
 import org.openbase.type.language.LabelType.Label.MapFieldEntry.Builder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
