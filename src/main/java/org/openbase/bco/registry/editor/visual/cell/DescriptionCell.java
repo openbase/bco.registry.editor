@@ -22,8 +22,11 @@ package org.openbase.bco.registry.editor.visual.cell;
  * #L%
  */
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
+import javafx.scene.layout.HBox;
 import org.openbase.bco.registry.editor.struct.ValueType;
 
 /**
@@ -42,7 +45,19 @@ public class DescriptionCell extends TreeTableCell<ValueType, ValueType> {
 
         if (!empty && item != null) {
             final Node descriptionGraphic = item.getDescriptionGraphic();
-            setGraphic(descriptionGraphic);
+
+            // TODO: this is a work around because OpenJFX currently does not display graphics correctly, remove if this bug is fixed
+            // count the number of parents and add according spacing on the right
+            int parentNumber = 0;
+            TreeItem treeItem = item.getTreeItem().getParent();
+            while (treeItem != null) {
+                treeItem = treeItem.getParent();
+                parentNumber++;
+            }
+            HBox hBox = new HBox(descriptionGraphic);
+            hBox.setPadding(new Insets(0, 0, 0, 15 * parentNumber));
+
+            setGraphic(hBox);
         } else {
             setGraphic(null);
         }
