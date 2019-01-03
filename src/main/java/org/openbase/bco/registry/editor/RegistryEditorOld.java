@@ -64,7 +64,7 @@ import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBHost;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBPort;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBTransport;
-import org.openbase.jul.pattern.Remote.ConnectionState;
+import org.openbase.type.domotic.state.ConnectionStateType.ConnectionState;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import org.openbase.jul.storage.registry.RegistryRemote;
 import org.openbase.jul.visual.swing.image.ImageLoader;
@@ -380,7 +380,7 @@ public class RegistryEditorOld extends Application {
                         LOGGER.debug("Remote connection state has changed to: " + connectionState);
                         Platform.runLater(() -> {
                             boolean disconnected = false;
-                            if (connectionState != ConnectionState.CONNECTED) {
+                            if (connectionState != ConnectionState.State.CONNECTED) {
                                 disconnected = true;
                             }
 

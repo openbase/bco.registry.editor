@@ -33,7 +33,7 @@ import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
-import org.openbase.jul.pattern.Remote.ConnectionState;
+import org.openbase.type.domotic.state.ConnectionStateType.ConnectionState;
 import org.openbase.jul.processing.StringProcessor;
 import org.openbase.jul.storage.registry.RegistryRemote;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ public class RegistryRemoteTab<RD extends Message> extends TabWithStatusLabel {
             }
         });
         this.registryRemote.addConnectionStateObserver((source, data) -> {
-            if (data != ConnectionState.CONNECTED) {
+            if (data != ConnectionState.State.CONNECTED) {
                 Platform.runLater(() -> setStatusText(StringProcessor.transformUpperCaseToCamelCase(data.name()) + "!"));
                 // TODO: make tabs uneditable or at least changes cannot be applied, also update status label style
             } else {
