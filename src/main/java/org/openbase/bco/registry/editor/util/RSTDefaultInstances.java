@@ -126,7 +126,7 @@ public class RSTDefaultInstances {
     }
 
     public static PlacementConfig.Builder getDefaultPlacementConfig() {
-        return PlacementConfig.newBuilder().setPosition(getDefaultPose()).setShape(getDefaultShape());
+        return PlacementConfig.newBuilder().setPose(getDefaultPose()).setShape(getDefaultShape());
     }
 
     public static Vec3DDouble.Builder getDefaultVec3DDouble() {
