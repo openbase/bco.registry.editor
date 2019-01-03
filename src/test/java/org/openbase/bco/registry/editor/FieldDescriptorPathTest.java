@@ -128,12 +128,12 @@ public class FieldDescriptorPathTest {
         TreeItem<String> child = new TreeItem<>("CHILD");
         root.getChildren().add(child);
 
-        root.addEventHandler(root.valueChangedEvent(), (EventHandler<TreeModificationEvent<String>>) event -> {
+        root.addEventHandler(TreeItem.valueChangedEvent(), (EventHandler<TreeModificationEvent<String>>) event -> {
             System.out.println(event.getNewValue());
             System.out.println(event.getSource());
         });
 
-        root.addEventHandler(root.childrenModificationEvent(), event -> {
+        root.addEventHandler(TreeItem.childrenModificationEvent(), event -> {
             System.out.println(event.getNewValue());
             System.out.println(event.getAddedChildren().size());
         });

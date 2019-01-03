@@ -188,7 +188,7 @@ public class RSTDefaultInstances {
                     return UnitConfig.getDefaultInstance().toBuilder();
             }
         } else {
-            return (Builder) builderType.build().getDefaultInstanceForType().toBuilder();
+            return builderType.build().getDefaultInstanceForType().toBuilder();
         }
     }
 }

@@ -32,19 +32,19 @@ import org.openbase.jul.exception.CouldNotPerformException;
  */
 public interface TreeItemDescriptorProvider {
 
-    public String getDescriptor(Message msg) throws CouldNotPerformException, InterruptedException;
+    String getDescriptor(Message msg) throws CouldNotPerformException, InterruptedException;
 
-    public String getDescriptor(Message.Builder msg) throws CouldNotPerformException, InterruptedException;
+    String getDescriptor(Message.Builder msg) throws CouldNotPerformException, InterruptedException;
 
-    public Object getValue(Message msg) throws CouldNotPerformException;
+    Object getValue(Message msg) throws CouldNotPerformException;
 
-    public Object getValue(Message.Builder msg) throws CouldNotPerformException;
+    Object getValue(Message.Builder msg) throws CouldNotPerformException;
 
-    public void setValue(Message.Builder msg, Object value) throws CouldNotPerformException, InterruptedException;
+    void setValue(Message.Builder msg, Object value) throws CouldNotPerformException, InterruptedException;
 
-    public boolean hasEqualValue(Message msg, Object value) throws CouldNotPerformException;
+    boolean hasEqualValue(Message msg, Object value) throws CouldNotPerformException;
 
-    public boolean hasEqualValue(Message.Builder msg, Object value) throws CouldNotPerformException;
+    boolean hasEqualValue(Message.Builder msg, Object value) throws CouldNotPerformException;
 
-    public List<Object> getValueList(List<Message.Builder> builderList) throws CouldNotPerformException;
+    List<Object> getValueList(List<Message.Builder> builderList) throws CouldNotPerformException;
 }
