@@ -50,7 +50,7 @@ public class EnablingStateEditingGraphic extends AbstractBuilderEditingGraphic<C
 
     @Override
     protected boolean updateBuilder(Builder builder) {
-        final State newState = State.valueOf(getControl().getSelectionModel().getSelectedItem().getNumber());
+        final State newState = State.forNumber(getControl().getSelectionModel().getSelectedItem().getNumber());
         if (builder.getValue().equals(newState)) {
             return false;
         }
