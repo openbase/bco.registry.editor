@@ -40,6 +40,6 @@ public class UnitTypeFieldPath extends FieldPathDescriptionProvider {
     @Override
     public String generateDescription(final Object value) {
         final EnumValueDescriptor unitType = (EnumValueDescriptor) value;
-        return StringProcessor.transformUpperCaseToCamelCase(unitType.getName());
+        return StringProcessor.transformUpperCaseToPascalCase(unitType.getName());
     }
 }

@@ -49,7 +49,7 @@ public abstract class AbstractListTreeItem<MB extends Message.Builder> extends A
     private final boolean modifiable;
 
     public AbstractListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable) throws InitializationException {
-        this(fieldDescriptor, builder, modifiable, StringProcessor.transformToCamelCase(fieldDescriptor.getName()) + "List");
+        this(fieldDescriptor, builder, modifiable, StringProcessor.transformToPascalCase(fieldDescriptor.getName()) + "List");
     }
 
     public AbstractListTreeItem(final FieldDescriptor fieldDescriptor, final MB builder, final boolean modifiable, final String description) throws InitializationException {

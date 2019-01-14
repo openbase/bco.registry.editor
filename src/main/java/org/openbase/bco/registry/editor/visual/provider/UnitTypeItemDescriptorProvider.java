@@ -42,7 +42,7 @@ public class UnitTypeItemDescriptorProvider extends AbstractTreeItemDescriptorPr
 
     @Override
     public String getDescriptor(Message.Builder builder) throws CouldNotPerformException, InterruptedException {
-        return StringProcessor.transformToCamelCase(((Descriptors.EnumValueDescriptor) fieldGroup.getValue(builder)).getName());
+        return StringProcessor.transformToPascalCase(((Descriptors.EnumValueDescriptor) fieldGroup.getValue(builder)).getName());
     }
 
     @Override

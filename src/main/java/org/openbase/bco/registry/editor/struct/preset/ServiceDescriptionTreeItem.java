@@ -73,7 +73,7 @@ public class ServiceDescriptionTreeItem extends BuilderTreeItem<ServiceDescripti
 
     @Override
     protected String createDescriptionText() {
-        return StringProcessor.transformUpperCaseToCamelCase(getBuilder().getServiceType().name().replace(
+        return StringProcessor.transformUpperCaseToPascalCase(getBuilder().getServiceType().name().replace(
                 "SERVICE", getBuilder().getPattern().name() + "_" + "SERVICE"));
     }
 }

@@ -100,7 +100,7 @@ public class BuilderTreeItem<MB extends Message.Builder> extends AbstractBuilder
                                 default:
                                     treeItem = new ValueListTreeItem<>(fieldDescriptor, fieldBuilder, editable);
                             }
-                            treeItem.setDescriptionText(StringProcessor.transformToCamelCase(field.getName()));
+                            treeItem.setDescriptionText(StringProcessor.transformToPascalCase(field.getName()));
                             // update description to the original field name
                             return treeItem;
                         }

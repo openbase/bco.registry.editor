@@ -76,7 +76,7 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     }
 
     public RegistryTab(final FieldDescriptor fieldDescriptor, final RD registryData, final FieldPathDescriptionProvider[] fieldPathDescriptionProviders) {
-        super(StringProcessor.transformToCamelCase(fieldDescriptor.getName()).
+        super(StringProcessor.transformToPascalCase(fieldDescriptor.getName()).
                 replace("UnitConfig", "").
                 replace("Config", "").
                 replace("Class", "").
@@ -221,7 +221,7 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
 
     @Override
     public String toString() {
-        return StringProcessor.transformToCamelCase(fieldDescriptor.getName()) + Tab.class.getSimpleName();
+        return StringProcessor.transformToPascalCase(fieldDescriptor.getName()) + Tab.class.getSimpleName();
     }
 
     private void extractRegistryFlags() {

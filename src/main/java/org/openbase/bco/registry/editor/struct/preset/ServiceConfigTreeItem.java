@@ -52,6 +52,6 @@ public class ServiceConfigTreeItem extends BuilderTreeItem<ServiceConfig.Builder
 
     @Override
     protected String createDescriptionText() {
-        return StringProcessor.transformToCamelCase(getBuilder().getServiceDescription().getServiceType().name()) + "Config";
+        return StringProcessor.transformToPascalCase(getBuilder().getServiceDescription().getServiceType().name()) + "Config";
     }
 }

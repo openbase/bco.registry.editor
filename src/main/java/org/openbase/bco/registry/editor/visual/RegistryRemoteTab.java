@@ -90,7 +90,7 @@ public class RegistryRemoteTab<RD extends Message> extends TabWithStatusLabel {
         });
         this.registryRemote.addConnectionStateObserver((source, data) -> {
             if (data != ConnectionState.State.CONNECTED) {
-                Platform.runLater(() -> setStatusText(StringProcessor.transformUpperCaseToCamelCase(data.name()) + "!"));
+                Platform.runLater(() -> setStatusText(StringProcessor.transformUpperCaseToPascalCase(data.name()) + "!"));
                 // TODO: make tabs uneditable or at least changes cannot be applied, also update status label style
             } else {
                 Platform.runLater(this::clearStatusLabel);
@@ -153,7 +153,7 @@ public class RegistryRemoteTab<RD extends Message> extends TabWithStatusLabel {
                     fieldDescriptorTabMap.get(fieldDescriptor).update(data);
                 } catch (CouldNotPerformException ex) {
                     ExceptionPrinter.printHistory("Could not update tab[" + StringProcessor.
-                            transformToCamelCase(fieldDescriptor.getName()) + "]", ex, LOGGER);
+                            transformToPascalCase(fieldDescriptor.getName()) + "]", ex, LOGGER);
                 }
             }
         });

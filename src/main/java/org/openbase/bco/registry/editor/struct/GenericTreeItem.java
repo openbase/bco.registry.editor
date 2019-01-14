@@ -139,7 +139,7 @@ public class GenericTreeItem<V> extends TreeItem<ValueType> {
     }
 
     protected String createDescriptionText() {
-        return StringProcessor.transformToCamelCase(fieldDescriptor.getName());
+        return StringProcessor.transformToPascalCase(fieldDescriptor.getName());
     }
 
     /**
