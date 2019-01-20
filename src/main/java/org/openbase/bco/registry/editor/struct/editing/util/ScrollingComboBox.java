@@ -26,11 +26,10 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyEvent;
 import org.openbase.bco.registry.editor.util.DescriptionGenerator;
-
-//import javafx.scene.control.ListView;
-//import javafx.scene.control.skin.ComboBoxListViewSkin;
 
 /**
  * Enhancement of a combo box which will scroll through the presented list view
@@ -44,7 +43,7 @@ public class ScrollingComboBox<V> extends ComboBox<V> {
      * Value in milli seconds of how long a delay between two key released events is waited
      * before a new search string will be initialized.`
      */
-    private static final long DEFAULT_ALLOWED_DELAY_BETWEEN_KEY_EVENTS = 500;
+    private static final long DEFAULT_ALLOWED_DELAY_BETWEEN_KEY_EVENTS = 1000;
 
     private final DescriptionGenerator<V> descriptionGenerator;
 
@@ -75,8 +74,8 @@ public class ScrollingComboBox<V> extends ComboBox<V> {
             return;
         }
 
-//        ComboBoxListViewSkin<V> skin = (ComboBoxListViewSkin<V>) ScrollingComboBox.this.getSkin();
-//        ((ListView<V>) skin.getPopupContent()).scrollTo(item);
+        ComboBoxListViewSkin<V> skin = (ComboBoxListViewSkin<V>) ScrollingComboBox.this.getSkin();
+        ((ListView<V>) skin.getPopupContent()).scrollTo(item);
     }
 
     private class Cell extends ListCell<V> {

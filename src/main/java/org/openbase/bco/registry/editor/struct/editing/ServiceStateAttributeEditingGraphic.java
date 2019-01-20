@@ -94,7 +94,7 @@ public class ServiceStateAttributeEditingGraphic extends AbstractEditingGraphic<
                 serviceStateEditingGraphic = new StandbyStateEditingGraphic();
                 break;
             default:
-                // just cancel the edit because no service type not yet supported TODO: inform the user about this
+                // just cancel the edit because service type not yet supported TODO: inform the user about this
                 getTreeTableCell().cancelEdit();
                 return;
         }
