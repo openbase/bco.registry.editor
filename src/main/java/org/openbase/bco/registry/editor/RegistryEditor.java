@@ -74,7 +74,6 @@ public class RegistryEditor extends Application {
             try {
                 LOGGER.debug("Try to load icon...");
                 primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/registry-editor.png")));
-                //primaryStage.getIcons().add(new Image("/registry-editor.png"));
                 LOGGER.debug("App icon loaded...");
             } catch (Exception ex) {
                 ExceptionPrinter.printHistory(ex, LOGGER, LogLevel.WARN);
