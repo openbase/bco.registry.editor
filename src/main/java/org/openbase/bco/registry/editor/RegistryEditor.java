@@ -29,6 +29,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
@@ -41,12 +42,12 @@ import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPVerbose;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
-import org.openbase.jul.visual.swing.image.ImageLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openbase.type.domotic.registry.ClassRegistryDataType.ClassRegistryData;
 import org.openbase.type.domotic.registry.UnitRegistryDataType.UnitRegistryData;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +73,8 @@ public class RegistryEditor extends Application {
             primaryStage.setTitle("BCO Registry Editor");
             try {
                 LOGGER.debug("Try to load icon...");
-                primaryStage.getIcons().add(SwingFXUtils.toFXImage(ImageLoader.getInstance().loadImage("registry-editor.png"), null));
+                primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/registry-editor.png")));
+                //primaryStage.getIcons().add(new Image("/registry-editor.png"));
                 LOGGER.debug("App icon loaded...");
             } catch (Exception ex) {
                 ExceptionPrinter.printHistory(ex, LOGGER, LogLevel.WARN);

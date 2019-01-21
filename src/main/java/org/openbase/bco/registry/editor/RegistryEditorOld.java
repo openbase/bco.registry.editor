@@ -35,6 +35,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -67,7 +68,6 @@ import org.openbase.jul.extension.rsb.com.jp.JPRSBTransport;
 import org.openbase.type.domotic.state.ConnectionStateType.ConnectionState;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import org.openbase.jul.storage.registry.RegistryRemote;
-import org.openbase.jul.visual.swing.image.ImageLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openbase.type.domotic.registry.ActivityRegistryDataType.ActivityRegistryData;
@@ -235,7 +235,7 @@ public class RegistryEditorOld extends Application {
         primaryStage.setTitle("BCO Registry Editor");
         try {
             LOGGER.debug("Try to load icon...");
-            primaryStage.getIcons().add(SwingFXUtils.toFXImage(ImageLoader.getInstance().loadImage("registry-editor.png"), null));
+            primaryStage.getIcons().add(new Image("registry-editor.png" ));
             LOGGER.debug("App icon loaded...");
         } catch (Exception ex) {
             printException(ex, LOGGER, LogLevel.WARN);
