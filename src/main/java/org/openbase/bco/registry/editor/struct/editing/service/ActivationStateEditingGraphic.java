@@ -41,7 +41,7 @@ public class ActivationStateEditingGraphic extends AbstractToggleEditingGraphic<
         if (isSelected) {
             builder.setValue(State.ACTIVE);
         } else {
-            builder.setValue(State.DEACTIVE);
+            builder.setValue(State.INACTIVE);
         }
         return builder.build();
     }
