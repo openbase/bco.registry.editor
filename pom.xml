@@ -70,8 +70,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <source>${source.java.version}</source>
-                    <target>${target.java.version}</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -130,7 +130,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>1.10</version>
+                <version>1.17</version>
                 <configuration>
                     <verbose>false</verbose>
                     <licenseName>gpl_v3</licenseName>
@@ -237,7 +237,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.7</version>
+                        <version>1.6.8</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
@@ -252,8 +252,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <target.java.version>11</target.java.version>
-        <source.java.version>11</source.java.version>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
         <dependency.jul.version>2.0-SNAPSHOT</dependency.jul.version>
         <dependency.bco.registry.version>2.0-SNAPSHOT</dependency.bco.registry.version>
     </properties>
