@@ -51,13 +51,14 @@ import static org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProces
 /**
  * @param <M>  The message type to use.
  * @param <MB> The message builder type to use.
+ *
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
  */
 public class RegistryTreeTableView<M extends AbstractMessage, MB extends M.Builder<MB>> extends TreeTableView<Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryTreeTableView.class);
 
-//    private final DescriptorColumn descriptorColumn;
+    //    private final DescriptorColumn descriptorColumn;
     private final SendableType type;
     private final ProtobufListDiff<?, M, ?> listDiff;
     private final VBox vBox;
@@ -353,16 +354,12 @@ public class RegistryTreeTableView<M extends AbstractMessage, MB extends M.Build
 
     public void setReadOnlyMode(boolean readOnly) {
         RegistryEditorOld.runOnFxThread(() -> {
-            try {
-                if (!Registries.isConsistent(type.getDefaultInstanceForType())) {
-                    statusInfoLabel.setText("Registry inconsistent!");
-                    statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");
-                } else {
-                    statusInfoLabel.setText("Read-Only-Mode");
-                    statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
-                }
-            } catch (CouldNotPerformException ex) {
-                ExceptionPrinter.printHistory("Failed to call is consistent for registry [" + type.name() + "]", ex, LOGGER);
+            if (!Registries.isConsistent(type.getDefaultInstanceForType())) {
+                statusInfoLabel.setText("Registry inconsistent!");
+                statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,0,0); -fx-font-weight: bold;");
+            } else {
+                statusInfoLabel.setText("Read-Only-Mode");
+                statusInfoLabel.setStyle("-fx-text-background-color: rgb(255,128,0); -fx-font-weight: bold;");
             }
             if (readOnly) {
                 getStylesheets().clear();
