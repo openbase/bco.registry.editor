@@ -65,6 +65,7 @@ import org.openbase.jul.exception.printer.LogLevel;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBHost;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBPort;
 import org.openbase.jul.extension.rsb.com.jp.JPRSBTransport;
+import org.openbase.jul.schedule.FutureProcessor;
 import org.openbase.type.domotic.state.ConnectionStateType.ConnectionState;
 import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import org.openbase.jul.storage.registry.RegistryRemote;
@@ -755,7 +756,7 @@ public class RegistryEditorOld extends Application {
     public static <V> Future<V> runOnFxThread(final Callable<V> callable, final String taskDescription) {
         try {
             if (Platform.isFxApplicationThread()) {
-                return CompletableFuture.completedFuture(callable.call());
+                return FutureProcessor.completedFuture(callable.call());
             }
 
             FutureTask<V> future = new FutureTask(() -> {
