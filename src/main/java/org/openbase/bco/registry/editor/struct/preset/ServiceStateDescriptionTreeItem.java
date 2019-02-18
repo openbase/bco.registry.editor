@@ -116,7 +116,7 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
         if (getBuilder().getServiceType() != ServiceType.UNKNOWN) {
             // if service type is set and not unknown the attribute becomes editable and the attribute type is updated
             // note: the order here is important, if the attribute type is not updated before the attribute parsing the empty json value will fail
-            attributeTypeLeaf.update(Registries.getTemplateRegistry().getServiceAttributeType(getBuilder().getServiceType()));
+            attributeTypeLeaf.update(Registries.getTemplateRegistry().getServiceStateClassName(getBuilder().getServiceType()));
             attributeLeaf.setEditable(true);
             // update value with empty json object
             attributeLeaf.update("{}");
@@ -191,18 +191,18 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
         final FieldDescriptor attributeField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.SERVICE_ATTRIBUTE_FIELD_NUMBER);
         final LeafTreeItem<String> attributeLeaf = (LeafTreeItem<String>) getDescriptorChildMap().get(attributeField);
         // create and set mew value graphic
-        attributeLeaf.setValueGraphic(getServiceAttributeValueGraphic());
+        attributeLeaf.setValueGraphic(getServiceStateValueGraphic());
     }
 
     /**
      * Create a nicer value graphic representation for the service attribute. This is done by de-serializing it
      * and creating a description graphic from the service state.
      * If the value cannot be de-serialized or no nicer representation for the service state is available a default
-     * label with the service attribute string is returned.
+     * label with the service state string is returned.
      *
      * @return a value graphic for the service attribute
      */
-    private Node getServiceAttributeValueGraphic() {
+    private Node getServiceStateValueGraphic() {
         if (!getBuilder().hasServiceAttribute() || getBuilder().getServiceAttribute().isEmpty()) {
             return new Label();
         }
@@ -279,10 +279,10 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
             case ServiceStateDescription.SERVICE_ATTRIBUTE_FIELD_NUMBER:
                 // service attribute is only editable if the service type is set, its value graphic is created and
                 // it received a special editing graphic
-                LeafTreeItem<String> serviceAttributeLeaf = new LeafTreeItem<>(field, getBuilder().getServiceAttribute(), getBuilder().getServiceType() != ServiceType.UNKNOWN);
-                serviceAttributeLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateAttributeEditingGraphic.class));
-                serviceAttributeLeaf.setValueGraphic(getServiceAttributeValueGraphic());
-                return serviceAttributeLeaf;
+                LeafTreeItem<String> serviceStateLeaf = new LeafTreeItem<>(field, getBuilder().getServiceAttribute(), getBuilder().getServiceType() != ServiceType.UNKNOWN);
+                serviceStateLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateAttributeEditingGraphic.class));
+                serviceStateLeaf.setValueGraphic(getServiceStateValueGraphic());
+                return serviceStateLeaf;
             case ServiceStateDescription.SERVICE_TYPE_FIELD_NUMBER:
                 // service type is always editable and gets a special editing graphic only
                 // displaying operation services according to the unit type
