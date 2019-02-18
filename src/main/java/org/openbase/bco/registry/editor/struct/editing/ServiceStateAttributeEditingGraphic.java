@@ -69,7 +69,7 @@ public class ServiceStateAttributeEditingGraphic extends AbstractEditingGraphic<
         try {
             // skipp deserialization if value is empty
             if (!value.isEmpty()) {
-                deserialize = new ProtoBufJSonProcessor().deserialize(value, parent.getBuilder().getServiceAttributeType());
+                deserialize = new ProtoBufJSonProcessor().deserialize(value, parent.getBuilder().getServiceStateClassName());
             }
         } catch (CouldNotPerformException ex) {
             // log error if it one occurs

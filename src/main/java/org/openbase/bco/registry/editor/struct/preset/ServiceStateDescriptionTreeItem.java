@@ -87,8 +87,8 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
                     case ServiceStateDescription.UNIT_TYPE_FIELD_NUMBER:
                         handleUnitTypeUpdate();
                         break;
-                    case ServiceStateDescription.SERVICE_ATTRIBUTE_FIELD_NUMBER:
-                        handleServiceAttributeUpdate();
+                    case ServiceStateDescription.SERVICE_STATE_FIELD_NUMBER:
+                        handleServiceStateUpdate();
                         break;
                 }
             } catch (CouldNotPerformException ex) {
@@ -106,8 +106,8 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
     @SuppressWarnings("unchecked")
     private void handleServiceTypeUpdate() throws CouldNotPerformException {
         // retrieve descriptors
-        final FieldDescriptor attributeField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.SERVICE_ATTRIBUTE_FIELD_NUMBER);
-        final FieldDescriptor attributeTypeField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.SERVICE_ATTRIBUTE_TYPE_FIELD_NUMBER);
+        final FieldDescriptor attributeField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.SERVICE_STATE_FIELD_NUMBER);
+        final FieldDescriptor attributeTypeField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.SERVICE_STATE_CLASS_NAME_FIELD_NUMBER);
 
         // retrieve tree items belonging to those descriptors
         final LeafTreeItem<String> attributeLeaf = (LeafTreeItem<String>) getDescriptorChildMap().get(attributeField);
@@ -181,14 +181,14 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
      * Handle changes in the service attribute by creating a nicer value graphic than just the serialized text.
      */
     @SuppressWarnings("unchecked")
-    private void handleServiceAttributeUpdate() {
+    private void handleServiceStateUpdate() {
         // do nothing if the service attribute has been cleared
-        if (getBuilder().getServiceAttribute().isEmpty()) {
+        if (getBuilder().getServiceState().isEmpty()) {
             return;
         }
 
         // retrieve service attribute leaf
-        final FieldDescriptor attributeField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.SERVICE_ATTRIBUTE_FIELD_NUMBER);
+        final FieldDescriptor attributeField = ServiceStateDescription.getDescriptor().findFieldByNumber(ServiceStateDescription.SERVICE_STATE_FIELD_NUMBER);
         final LeafTreeItem<String> attributeLeaf = (LeafTreeItem<String>) getDescriptorChildMap().get(attributeField);
         // create and set mew value graphic
         attributeLeaf.setValueGraphic(getServiceStateValueGraphic());
@@ -203,16 +203,16 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
      * @return a value graphic for the service attribute
      */
     private Node getServiceStateValueGraphic() {
-        if (!getBuilder().hasServiceAttribute() || getBuilder().getServiceAttribute().isEmpty()) {
+        if (!getBuilder().hasServiceState() || getBuilder().getServiceState().isEmpty()) {
             return new Label();
         }
         try {
             // deserialize service attribute
-            final Message serviceAttribute = new ProtoBufJSonProcessor().deserialize(getBuilder().getServiceAttribute(), getBuilder().getServiceAttributeType());
+            final Message serviceState = new ProtoBufJSonProcessor().deserialize(getBuilder().getServiceState(), getBuilder().getServiceStateClassName());
             switch (getBuilder().getServiceType()) {
                 case COLOR_STATE_SERVICE:
                     // build a java fx color from the color state
-                    final HSBColor hsbColor = ((ColorState) serviceAttribute).getColor().getHsbColor();
+                    final HSBColor hsbColor = ((ColorState) serviceState).getColor().getHsbColor();
                     final Color hsb = JFXColorToHSBColorTransformer.transform(hsbColor);
                     // create a rectangle of that color and set it as the value graphic
                     final Rectangle rectangle = new Rectangle(15, 15);
@@ -220,29 +220,29 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
                     return rectangle;
                 case ACTIVATION_STATE_SERVICE:
                     // for an activation state display the enum value
-                    final ActivationState.State activation = ((ActivationState) serviceAttribute).getValue();
+                    final ActivationState.State activation = ((ActivationState) serviceState).getValue();
                     return new Label(activation.name());
                 case POWER_STATE_SERVICE:
                     // for a power state display the enum value
-                    final PowerState.State power = ((PowerState) serviceAttribute).getValue();
+                    final PowerState.State power = ((PowerState) serviceState).getValue();
                     return new Label(power.name());
                 case STANDBY_STATE_SERVICE:
                     // for a standby state display the enum value
-                    final StandbyState.State standby = ((StandbyState) serviceAttribute).getValue();
+                    final StandbyState.State standby = ((StandbyState) serviceState).getValue();
                     return new Label(standby.name());
                 case BRIGHTNESS_STATE_SERVICE:
                     // for a brightness state format and display the brightness value
                     final DecimalFormat decimalFormat = new DecimalFormat("##.##");
-                    final double brightness = ((BrightnessState) serviceAttribute).getBrightness();
+                    final double brightness = ((BrightnessState) serviceState).getBrightness();
                     return new Label(decimalFormat.format(brightness));
                 default:
                     // show to the user that this service is currently not supported, meaning it cannot be edited
-                    return new Label("Uneditable Attribute: " + getBuilder().getServiceAttribute());
+                    return new Label("Uneditable Attribute: " + getBuilder().getServiceState());
             }
         } catch (CouldNotPerformException ex) {
             // log the exception and return a default value graphic
             ExceptionPrinter.printHistory("Could not generate value graphic for service attribute with type[" + getBuilder().getServiceType().name() + "]", ex, logger);
-            return new Label(getBuilder().getServiceAttribute());
+            return new Label(getBuilder().getServiceState());
         }
     }
 
@@ -273,13 +273,13 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
                     }
                 });
                 return unitIdLeaf;
-            case ServiceStateDescription.SERVICE_ATTRIBUTE_TYPE_FIELD_NUMBER:
+            case ServiceStateDescription.SERVICE_STATE_CLASS_NAME_FIELD_NUMBER:
                 // service attribute type is derived from the service type and thus uneditable
                 return super.createChild(field, false);
-            case ServiceStateDescription.SERVICE_ATTRIBUTE_FIELD_NUMBER:
+            case ServiceStateDescription.SERVICE_STATE_FIELD_NUMBER:
                 // service attribute is only editable if the service type is set, its value graphic is created and
                 // it received a special editing graphic
-                LeafTreeItem<String> serviceStateLeaf = new LeafTreeItem<>(field, getBuilder().getServiceAttribute(), getBuilder().getServiceType() != ServiceType.UNKNOWN);
+                LeafTreeItem<String> serviceStateLeaf = new LeafTreeItem<>(field, getBuilder().getServiceState(), getBuilder().getServiceType() != ServiceType.UNKNOWN);
                 serviceStateLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateAttributeEditingGraphic.class));
                 serviceStateLeaf.setValueGraphic(getServiceStateValueGraphic());
                 return serviceStateLeaf;
