@@ -313,7 +313,6 @@ public class RegistryEditorOld extends Application {
         Optional<Pair<String, String>> result = dialog.showAndWait();
 
         result.ifPresent(usernamePassword -> {
-            System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
             try {
                 try {
                     final String userId = Registries.getUnitRegistry(true).getUserUnitIdByUserName(usernamePassword.getKey());
