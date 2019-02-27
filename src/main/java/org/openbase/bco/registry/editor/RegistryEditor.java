@@ -58,7 +58,7 @@ import java.util.Map;
  */
 public class RegistryEditor extends Application {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryEditorOld.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryEditor.class);
 
     @Override
     public void init() throws Exception {

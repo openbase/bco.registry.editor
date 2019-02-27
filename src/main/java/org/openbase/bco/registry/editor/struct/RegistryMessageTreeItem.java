@@ -29,7 +29,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
-import org.openbase.bco.registry.editor.RegistryEditorOld;
 import org.openbase.bco.registry.editor.visual.RequiredFieldAlert;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
@@ -313,7 +312,8 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                 Platform.runLater(() -> RegistryMessageTreeItem.this.getParent().getChildren().remove(RegistryMessageTreeItem.this));
             }
         } catch (CouldNotPerformException ex) {
-            RegistryEditorOld.printException(ex, logger, LogLevel.WARN);
+            //TODO: handle better
+            ExceptionPrinter.printHistory(ex, logger);
         }
     }
 
