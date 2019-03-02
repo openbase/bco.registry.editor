@@ -28,8 +28,8 @@ import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.FocusedTextField;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
-import org.openbase.type.com.ScopeType.Scope;
-import org.openbase.type.com.ScopeType.Scope.Builder;
+import org.openbase.type.communication.ScopeType.Scope;
+import org.openbase.type.communication.ScopeType.Scope.Builder;
 
 import java.util.ArrayList;
 import java.util.List;
