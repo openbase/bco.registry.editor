@@ -56,12 +56,12 @@ public class UnitTemplateConfigTreeItem extends BuilderTreeItem<UnitTemplateConf
             }
 
             final GenericTreeItem source = (GenericTreeItem) event.getSource();
-            if (source.getFieldDescriptor().getNumber() == UnitTemplateConfig.TYPE_FIELD_NUMBER) {
+            if (source.getFieldDescriptor().getNumber() == UnitTemplateConfig.UNIT_TYPE_FIELD_NUMBER) {
                 try {
                     // filter so that every serviceType is only added once
                     final Set<ServiceType> serviceTypeSet = new HashSet<>();
                     for (final ServiceDescription serviceDescription :
-                            Registries.getTemplateRegistry().getUnitTemplateByType(getBuilder().getType()).getServiceDescriptionList()) {
+                            Registries.getTemplateRegistry().getUnitTemplateByType(getBuilder().getUnitType()).getServiceDescriptionList()) {
                         serviceTypeSet.add(serviceDescription.getServiceType());
                     }
 

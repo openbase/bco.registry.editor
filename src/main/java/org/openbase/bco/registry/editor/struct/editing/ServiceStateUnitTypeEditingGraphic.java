@@ -73,7 +73,7 @@ public class ServiceStateUnitTypeEditingGraphic extends EnumEditingGraphic {
             for (UnitTemplate unitTemplate : Registries.getTemplateRegistry().getUnitTemplates()) {
                 for (ServiceDescription serviceDescription : unitTemplate.getServiceDescriptionList()) {
                     if (serviceDescription.getPattern() == ServicePattern.OPERATION) {
-                        valueList.add(unitTemplate.getType().getValueDescriptor());
+                        valueList.add(unitTemplate.getUnitType().getValueDescriptor());
                         continue outer;
                     }
                 }

@@ -42,7 +42,7 @@ public class ServiceTemplateTreeItem extends RegistryMessageTreeItem<ServiceTemp
     @Override
     protected Set<Integer> getUneditableFields() {
         final Set<Integer> filteredFields = super.getUneditableFields();
-        filteredFields.add(ServiceTemplate.TYPE_FIELD_NUMBER);
+        filteredFields.add(ServiceTemplate.SERVICE_TYPE_FIELD_NUMBER);
         return filteredFields;
     }
 }

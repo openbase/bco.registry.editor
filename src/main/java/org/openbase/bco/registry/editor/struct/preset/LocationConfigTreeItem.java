@@ -52,7 +52,7 @@ public class LocationConfigTreeItem extends BuilderTreeItem<LocationConfig.Build
         addEventHandler(valueChangedEvent(), event -> {
             // if the location type has changed to tile display the tile config else remove it if it is there
             final GenericTreeItem source = (GenericTreeItem) event.getSource();
-            if (source.getFieldDescriptor().getNumber() == LocationConfig.TYPE_FIELD_NUMBER) {
+            if (source.getFieldDescriptor().getNumber() == LocationConfig.LOCATION_TYPE_FIELD_NUMBER) {
                 final LocationType locationType = LocationType.forNumber(((ValueType<EnumValueDescriptor>) event.getNewValue()).getValue().getNumber());
                 if (locationType == LocationType.TILE) {
                     FieldDescriptor fieldDescriptor1 = ProtoBufFieldProcessor.getFieldDescriptor(getBuilder(), LocationConfig.TILE_CONFIG_FIELD_NUMBER);
@@ -115,7 +115,7 @@ public class LocationConfigTreeItem extends BuilderTreeItem<LocationConfig.Build
     protected Set<Integer> getFilteredFields() {
         // only display the tile config if the location is of type tile
         final Set<Integer> filteredFields = super.getFilteredFields();
-        if (getBuilder().getType() != LocationType.TILE) {
+        if (getBuilder().getLocationType() != LocationType.TILE) {
             filteredFields.add(LocationConfig.TILE_CONFIG_FIELD_NUMBER);
         }
         return filteredFields;

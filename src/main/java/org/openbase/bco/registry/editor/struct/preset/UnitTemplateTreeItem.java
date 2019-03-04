@@ -42,7 +42,7 @@ public class UnitTemplateTreeItem extends RegistryMessageTreeItem<UnitTemplate.B
     @Override
     protected Set<Integer> getUneditableFields() {
         final Set<Integer> uneditableFields = super.getUneditableFields();
-        uneditableFields.add(UnitTemplate.TYPE_FIELD_NUMBER);
+        uneditableFields.add(UnitTemplate.UNIT_TYPE_FIELD_NUMBER);
         return uneditableFields;
     }
 }

@@ -50,7 +50,7 @@ public class LocationChildIdEditingGraphic extends AbstractUnitConfigEditingGrap
         final LocationConfigTreeItem locationTreeItem = (LocationConfigTreeItem) getValueType().getTreeItem().getParent().getParent();
         final UnitConfigTreeItem locationUnitTreeItem = (UnitConfigTreeItem) locationTreeItem.getParent();
 
-        final LocationType type = locationTreeItem.getBuilder().getType();
+        final LocationType type = locationTreeItem.getBuilder().getLocationType();
         for (final UnitConfig unitConfig : new ArrayList<>(unitConfigs)) {
             if (unitConfig.getId().equals(getValueType().getValue())) {
                 continue;
@@ -58,14 +58,14 @@ public class LocationChildIdEditingGraphic extends AbstractUnitConfigEditingGrap
 
             switch (type) {
                 case ZONE:
-                    if (unitConfig.getLocationConfig().getType() == LocationType.REGION) {
+                    if (unitConfig.getLocationConfig().getLocationType() == LocationType.REGION) {
                         unitConfigs.remove(unitConfig);
                         continue;
                     }
                     break;
                 case TILE:
                 case REGION:
-                    if (unitConfig.getLocationConfig().getType() != LocationType.REGION) {
+                    if (unitConfig.getLocationConfig().getLocationType() != LocationType.REGION) {
                         unitConfigs.remove(unitConfig);
                         continue;
                     }

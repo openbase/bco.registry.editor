@@ -42,7 +42,7 @@ public class ActivityTemplateTreeItem extends RegistryMessageTreeItem<ActivityTe
     @Override
     protected Set<Integer> getUneditableFields() {
         final Set<Integer> uneditableFields = super.getUneditableFields();
-        uneditableFields.add(ActivityTemplate.TYPE_FIELD_NUMBER);
+        uneditableFields.add(ActivityTemplate.ACTIVITY_TYPE_FIELD_NUMBER);
         return uneditableFields;
     }
 }
