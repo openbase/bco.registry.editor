@@ -38,7 +38,7 @@ import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufJSonProcessor;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.jul.visual.javafx.transform.JFXColorToHSBColorTransformer;
 import org.openbase.type.domotic.service.ServiceDescriptionType.ServiceDescription;
 import org.openbase.type.domotic.service.ServiceStateDescriptionType.ServiceStateDescription;
@@ -267,7 +267,7 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
                 unitIdLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateUnitIdEditingGraphic.class));
                 unitIdLeaf.setDescriptionGenerator(unitId -> {
                     try {
-                        return ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(unitId).getScope());
+                        return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(unitId).getScope());
                     } catch (CouldNotPerformException e) {
                         return unitId;
                     }

@@ -34,7 +34,7 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.domotic.unit.location.LocationConfigType.LocationConfig;
 import org.openbase.type.domotic.unit.location.LocationConfigType.LocationConfig.Builder;
 import org.openbase.type.domotic.unit.location.LocationConfigType.LocationConfig.LocationType;
@@ -94,7 +94,7 @@ public class LocationConfigTreeItem extends BuilderTreeItem<LocationConfig.Build
             childIdTreeItem.setDescriptionGenerator(value -> {
                 final String locationId = (String) value;
                 try {
-                    return ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(locationId).getScope());
+                    return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(locationId).getScope());
                 } catch (CouldNotPerformException e) {
                     return locationId;
                 }

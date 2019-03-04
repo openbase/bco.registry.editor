@@ -27,7 +27,7 @@ import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.util.FocusedTextField;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.communication.ScopeType.Scope;
 import org.openbase.type.communication.ScopeType.Scope.Builder;
 
@@ -51,7 +51,7 @@ public class ScopeEditingGraphic extends AbstractBuilderEditingGraphic<TextField
                 // ignore empty components
                 continue;
             }
-            newComponentList.add(ScopeGenerator.convertIntoValidScopeComponent(component));
+            newComponentList.add(ScopeProcessor.convertIntoValidScopeComponent(component));
         }
 
         if (equalLabelList(newComponentList, builder.getComponentList())) {
@@ -79,7 +79,7 @@ public class ScopeEditingGraphic extends AbstractBuilderEditingGraphic<TextField
     @Override
     protected void init(Scope.Builder value) {
         try {
-            getControl().setText(ScopeGenerator.generateStringRep(value.build()));
+            getControl().setText(ScopeProcessor.generateStringRep(value.build()));
         } catch (CouldNotPerformException ex) {
             logger.error("Could not init scope editing graphic", ex);
         }

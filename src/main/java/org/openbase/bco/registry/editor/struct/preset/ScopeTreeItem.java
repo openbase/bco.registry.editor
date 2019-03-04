@@ -29,7 +29,7 @@ import org.openbase.bco.registry.editor.struct.AbstractBuilderLeafTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.communication.ScopeType.Scope;
 import org.openbase.type.communication.ScopeType.Scope.Builder;
 
@@ -45,7 +45,7 @@ public class ScopeTreeItem extends AbstractBuilderLeafTreeItem<Builder> {
     @Override
     protected String createValueRepresentation() {
         try {
-            return ScopeGenerator.generateStringRep(getBuilder().build());
+            return ScopeProcessor.generateStringRep(getBuilder().build());
         } catch (CouldNotPerformException ex) {
             return ex.getMessage();
         }

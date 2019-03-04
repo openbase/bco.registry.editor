@@ -33,7 +33,7 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.domotic.service.ServiceConfigType.ServiceConfig;
 import org.openbase.type.domotic.service.ServiceDescriptionType.ServiceDescription;
 import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
@@ -129,7 +129,7 @@ public class UnitGroupConfigTreeItem extends BuilderTreeItem<UnitGroupConfig.Bui
             valueListTreeItem.setEditingGraphicFactory(EditingGraphicFactory.getInstance(UnitGroupMemberEditingGraphic.class));
             valueListTreeItem.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
                 try {
-                    return ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(value).getScope());
+                    return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(value).getScope());
                 } catch (CouldNotPerformException e) {
                     return value;
                 }

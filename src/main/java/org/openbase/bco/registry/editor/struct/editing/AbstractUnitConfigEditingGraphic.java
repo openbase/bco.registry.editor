@@ -27,7 +27,8 @@ import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.util.DescriptionGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
 
 /**
@@ -38,7 +39,7 @@ public abstract class AbstractUnitConfigEditingGraphic extends AbstractMessageEd
     public AbstractUnitConfigEditingGraphic(final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         this(unitConfig -> {
             try {
-                return ScopeGenerator.generateStringRep(unitConfig.getScope());
+                return ScopeProcessor.generateStringRep(unitConfig.getScope());
             } catch (CouldNotPerformException ex) {
                 return unitConfig.getId();
             }

@@ -31,7 +31,7 @@ import org.openbase.bco.registry.editor.struct.editing.LocationIdEditingGraphic;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.spatial.PlacementConfigType.PlacementConfig;
 import org.openbase.type.spatial.PlacementConfigType.PlacementConfig.Builder;
 
@@ -60,7 +60,7 @@ public class PlacementConfigTreeItem extends BuilderTreeItem<PlacementConfig.Bui
                 final LeafTreeItem<String> leafTreeItem = new LeafTreeItem<>(field, getBuilder().getLocationId(), editable);
                 leafTreeItem.setDescriptionGenerator(value -> {
                     try {
-                        return ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(value).getScope());
+                        return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(value).getScope());
                     } catch (CouldNotPerformException e) {
                         return value;
                     }

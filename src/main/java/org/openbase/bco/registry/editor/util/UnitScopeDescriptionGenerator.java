@@ -24,7 +24,8 @@ package org.openbase.bco.registry.editor.util;
 
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -34,7 +35,7 @@ public class UnitScopeDescriptionGenerator implements DescriptionGenerator<Strin
     @Override
     public String getDescription(final String unitId) {
         try {
-            return ScopeGenerator.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(unitId).getScope());
+            return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(unitId).getScope());
         } catch (CouldNotPerformException ex) {
             return unitId;
         }

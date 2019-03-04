@@ -28,7 +28,8 @@ import org.openbase.bco.registry.editor.struct.preset.ServiceStateDescriptionTre
 import org.openbase.bco.registry.editor.struct.preset.UnitConfigTreeItem;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
-import org.openbase.jul.extension.rsb.scope.ScopeGenerator;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
 import org.openbase.type.domotic.unit.UnitTemplateType.UnitTemplate.UnitType;
 
@@ -51,7 +52,7 @@ public class ServiceStateUnitIdEditingGraphic extends AbstractMessageEditingGrap
     public ServiceStateUnitIdEditingGraphic(final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(unitConfig -> {
             try {
-                return ScopeGenerator.generateStringRep(unitConfig.getScope());
+                return ScopeProcessor.generateStringRep(unitConfig.getScope());
             } catch (CouldNotPerformException e) {
                 return unitConfig.getId();
             }
