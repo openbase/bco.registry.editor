@@ -121,7 +121,8 @@ public class LoginPanel extends HBox implements DynamicPane {
     private void login() {
         try {
             final String userId = Registries.getUnitRegistry().getUserUnitIdByUserName(userNameTextField.getText());
-            SessionManager.getInstance().login(userId, passwordField.getText());
+            //TODO: allow users to specify if they want to stay logged in
+            SessionManager.getInstance().loginUser(userId, passwordField.getText(), false);
         } catch (NotAvailableException ex) {
             errorLabel.setText("Invalid username");
         } catch (CouldNotPerformException ex) {
