@@ -42,13 +42,13 @@ public class BrightnessStateEditingGraphic extends AbstractServiceStateEditingGr
         super(new HBox(), BrightnessState.class);
 
         this.decimalFormat = new DecimalFormat("##.##");
-        this.slider = new Slider(0, 100, 0);
+        this.slider = new Slider(0, 1, 0);
         this.slider.setShowTickLabels(true);
         this.slider.setShowTickMarks(true);
-        this.slider.setBlockIncrement(10);
+        this.slider.setBlockIncrement(0.1);
         this.label = new Label(decimalFormat.format(slider.getValue()));
 
-        this.slider.valueProperty().addListener((observable, oldValue, newValue) -> label.setText(decimalFormat.format(newValue.doubleValue())));
+        this.slider.valueProperty().addListener((observable, oldValue, newValue) -> label.setText(decimalFormat.format(newValue.doubleValue() * 100)));
 
         getGraphic().setSpacing(10);
         getGraphic().getChildren().addAll(slider, label);
