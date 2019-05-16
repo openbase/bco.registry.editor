@@ -43,8 +43,8 @@ public class MetaConfigEntryEditingGraphic extends AbstractBuilderEditingGraphic
 
         final String text = getControl().getText();
 
-        // do not change if not a valid key-value pair
-        if(!text.contains("=")) {
+        // do not update if not valid
+        if (!MetaConfigEntryTextField.validate(text)) {
             return false;
         }
 
@@ -53,13 +53,7 @@ public class MetaConfigEntryEditingGraphic extends AbstractBuilderEditingGraphic
 
         // extract key - value
         final String newKey = text.substring(0, limiterPos).strip();
-        final String newValue = text.substring(limiterPos).strip();
-
-        //validate
-        if(newKey.isEmpty() || newKey.contains(" ") || newValue.isBlank()) {
-            // invalid so do not apply changes
-            return false;
-        }
+        final String newValue = text.substring(limiterPos + 1).strip();
 
         // test if key or value changed
         if (builder.getKey().equals(newKey) && builder.getValue().equals(newValue)) {

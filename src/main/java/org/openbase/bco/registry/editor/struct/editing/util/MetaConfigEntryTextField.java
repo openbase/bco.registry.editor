@@ -29,9 +29,10 @@ public class MetaConfigEntryTextField extends ValidatedTextField {
 
     @Override
     protected boolean internalValidate() {
+        return validate(getText());
+    }
 
-        final String text = getText();
-
+    public static boolean validate(final String text) {
         // do not change if not a valid key-value pair
         if(!text.contains("=")) {
             return false;
@@ -39,8 +40,10 @@ public class MetaConfigEntryTextField extends ValidatedTextField {
 
         // find limiter
         final int limiterPos = text.indexOf("=");
+        final String key = text.substring(0, limiterPos).strip();
+        final String value = text.substring(limiterPos + 1).strip();
 
         // validate key - value
-        return !text.substring(0, limiterPos).isBlank() && !text.substring(0, limiterPos).strip().contains(" ") && !text.substring(limiterPos).isBlank();
+        return !key.isEmpty() && !key.contains(" ") && !value.isEmpty();
     }
 }
