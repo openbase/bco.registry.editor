@@ -29,6 +29,18 @@ public class MetaConfigEntryTextField extends ValidatedTextField {
 
     @Override
     protected boolean internalValidate() {
-        return getText().split("=").length == 2;
+
+        final String text = getText();
+
+        // do not change if not a valid key-value pair
+        if(!text.contains("=")) {
+            return false;
+        }
+
+        // find limiter
+        final int limiterPos = text.indexOf("=");
+
+        // validate key - value
+        return !text.substring(0, limiterPos).isBlank() && !text.substring(0, limiterPos).strip().contains(" ") && !text.substring(limiterPos).isBlank();
     }
 }

@@ -40,9 +40,26 @@ public class MetaConfigEntryEditingGraphic extends AbstractBuilderEditingGraphic
     @Override
     protected boolean updateBuilder(Builder builder) {
         // extract key and value from text field
-        final String[] split = getControl().getText().split("=");
-        final String newKey = split[0].replaceAll(" ", "");
-        final String newValue = split[1].replaceAll(" ", "");
+
+        final String text = getControl().getText();
+
+        // do not change if not a valid key-value pair
+        if(!text.contains("=")) {
+            return false;
+        }
+
+        // find limiter
+        final int limiterPos = text.indexOf("=");
+
+        // extract key - value
+        final String newKey = text.substring(0, limiterPos).strip();
+        final String newValue = text.substring(limiterPos).strip();
+
+        //validate
+        if(newKey.isEmpty() || newKey.contains(" ") || newValue.isBlank()) {
+            // invalid so do not apply changes
+            return false;
+        }
 
         // test if key or value changed
         if (builder.getKey().equals(newKey) && builder.getValue().equals(newValue)) {
