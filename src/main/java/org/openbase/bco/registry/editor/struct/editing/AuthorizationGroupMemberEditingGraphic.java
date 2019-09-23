@@ -44,7 +44,7 @@ public class AuthorizationGroupMemberEditingGraphic extends AbstractUnitConfigEd
 
     @Override
     protected List<UnitConfig> getMessages() throws CouldNotPerformException {
-        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigs(UnitType.USER);
+        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigsByUnitType(UnitType.USER);
 
         // get the current authorization group config
         final AuthorizationGroupConfig.Builder config = (AuthorizationGroupConfig.Builder) ((AbstractBuilderTreeItem) getValueType().getTreeItem().getParent()).getBuilder();

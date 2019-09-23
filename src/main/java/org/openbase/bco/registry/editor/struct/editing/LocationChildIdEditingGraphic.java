@@ -46,7 +46,7 @@ public class LocationChildIdEditingGraphic extends AbstractUnitConfigEditingGrap
 
     @Override
     protected List<UnitConfig> getMessages() throws CouldNotPerformException {
-        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigs(UnitType.LOCATION);
+        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigsByUnitType(UnitType.LOCATION);
         final LocationConfigTreeItem locationTreeItem = (LocationConfigTreeItem) getValueType().getTreeItem().getParent().getParent();
         final UnitConfigTreeItem locationUnitTreeItem = (UnitConfigTreeItem) locationTreeItem.getParent();
 

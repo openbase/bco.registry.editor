@@ -76,13 +76,13 @@ public class ServiceStateUnitIdEditingGraphic extends AbstractMessageEditingGrap
             final String locationId = unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId();
             if (!locationId.isEmpty()) {
                 // resolve all unit inside of same location as unit
-                final List<UnitConfig> unitConfigsByLocation = Registries.getUnitRegistry().getUnitConfigsByLocation(unitType, locationId);
+                final List<UnitConfig> unitConfigsByLocation = Registries.getUnitRegistry().getUnitConfigsByLocationIdAndUnitType(locationId, unitType);
                 // also add the same location of the unit
                 unitConfigsByLocation.add(Registries.getUnitRegistry().getUnitConfigById(locationId));
                 return unitConfigsByLocation;
             }
         }
-        return Registries.getUnitRegistry().getUnitConfigs(unitType);
+        return Registries.getUnitRegistry().getUnitConfigsByUnitType(unitType);
     }
 
     /**

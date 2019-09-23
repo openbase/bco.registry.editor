@@ -42,6 +42,6 @@ public class UserIdEditingGraphic extends AbstractUnitConfigEditingGraphic {
 
     @Override
     protected List<UnitConfig> getMessages() throws CouldNotPerformException {
-        return Registries.getUnitRegistry().getUnitConfigs(UnitType.USER);
+        return Registries.getUnitRegistry().getUnitConfigsByUnitType(UnitType.USER);
     }
 }

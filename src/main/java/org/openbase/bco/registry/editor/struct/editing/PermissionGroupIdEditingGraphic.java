@@ -56,7 +56,7 @@ public class PermissionGroupIdEditingGraphic extends AbstractMessageEditingGraph
         BuilderListTreeItem<PermissionConfig.Builder> parent = (BuilderListTreeItem<PermissionConfig.Builder>) getValueType().getTreeItem().getParent().getParent();
 
         // get all authorization groups
-        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigs(UnitType.AUTHORIZATION_GROUP);
+        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigsByUnitType(UnitType.AUTHORIZATION_GROUP);
         logger.info(unitConfigs.size() + " groups");
         // filter all group ids which already have entries defined
         for (final MapFieldEntry mapFieldEntry : parent.getBuilder().getGroupPermissionList()) {

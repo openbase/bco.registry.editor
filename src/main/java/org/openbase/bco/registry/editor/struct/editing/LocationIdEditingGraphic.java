@@ -44,7 +44,7 @@ public class LocationIdEditingGraphic extends AbstractUnitConfigEditingGraphic {
 
     @Override
     protected List<UnitConfig> getMessages() throws CouldNotPerformException {
-        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigs(UnitType.LOCATION);
+        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigsByUnitType(UnitType.LOCATION);
 
         // if the placement belongs to a location remove the location itself from the list
         final UnitConfigTreeItem locationUnitTreeItem = (UnitConfigTreeItem) getValueType().getTreeItem().getParent().getParent();
