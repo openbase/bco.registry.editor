@@ -47,7 +47,7 @@ public class TileIdEditingGraphic extends AbstractUnitConfigEditingGraphic {
     protected List<UnitConfig> getMessages() throws CouldNotPerformException {
         final ValueListTreeItem<ConnectionConfig.Builder> parent = (ValueListTreeItem<ConnectionConfig.Builder>) getValueType().getTreeItem().getParent();
 
-        final List<UnitConfig> tileList = Registries.getUnitRegistry().getLocationUnitConfigsByType(LocationType.TILE);
+        final List<UnitConfig> tileList = Registries.getUnitRegistry().getLocationUnitConfigsByLocationType(LocationType.TILE);
         for (final String tileId : parent.getBuilder().getTileIdList()) {
             if (tileId.equals(getValueType().getValue())) {
                 continue;
