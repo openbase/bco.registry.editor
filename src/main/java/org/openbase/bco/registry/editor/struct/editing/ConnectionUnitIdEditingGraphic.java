@@ -49,7 +49,7 @@ public class ConnectionUnitIdEditingGraphic extends AbstractUnitConfigEditingGra
 
         //TODO: is this fine or get only units from all tiles this connection connects
         // get all unit configs at the same location as the connection
-        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigsByLocation(unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId());
+        final List<UnitConfig> unitConfigs = Registries.getUnitRegistry().getUnitConfigsByLocationId(unitConfigTreeItem.getBuilder().getPlacementConfig().getLocationId());
         // remove all units already at this connection
         for (final String unitId : unitConfigTreeItem.getBuilder().getConnectionConfig().getUnitIdList()) {
             if (getValueType().getValue().equals(unitId)) {
