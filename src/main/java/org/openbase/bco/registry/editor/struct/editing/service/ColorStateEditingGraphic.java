@@ -56,7 +56,7 @@ public class ColorStateEditingGraphic extends AbstractServiceStateEditingGraphic
                 break;
             case RGB:
                 final RGBColor rgbColor = colorState.getColor().getRgbColor();
-                color = Color.rgb(rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
+                color = Color.rgb(((int) (rgbColor.getRed() * 255)), ((int) (rgbColor.getGreen() * 255)), ((int) (rgbColor.getBlue() * 255)));
                 break;
 
         }
