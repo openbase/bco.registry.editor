@@ -73,7 +73,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                 updateDescriptionGraphic();
 
                 if (!inUpdate && !(event.getSource().equals(RegistryMessageTreeItem.this))) {
-                    logger.debug("Set changed");
+                    logger.trace("Set changed");
                     changed = true;
                 }
 
@@ -147,7 +147,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
         }
 
         if (changed) {
-            logger.debug("Create buttons");
+            logger.trace("Create buttons");
             final Button applyButton, cancelButton;
             final HBox buttonLayout;
             applyButton = new Button("Apply");
