@@ -320,4 +320,8 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
     public boolean isChanged() {
         return changed;
     }
+
+    public void setChanged(final Boolean changed) {
+        this.changed = changed;
+    }
 }

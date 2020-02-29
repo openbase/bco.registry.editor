@@ -25,10 +25,12 @@ package org.openbase.bco.registry.editor.visual;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.stage.WindowEvent;
 import org.openbase.bco.registry.editor.struct.*;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.visual.cell.DescriptionCell;
@@ -70,6 +72,9 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
     private AbstractBuilderTreeItem<RD.Builder> root;
     private FieldPathDescriptionProvider[] fieldPathDescriptionProviders;
     private RD registryData;
+
+    //TODO: clipboard should be global to allow copying over different registry types
+    private Message.Builder clipboard = null;
 
     public RegistryTab(final FieldDescriptor fieldDescriptor, final RD registryData) {
         this(fieldDescriptor, registryData, null);
@@ -131,9 +136,56 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
             }
         });
 
+        final ContextMenu contextMenu = new ContextMenu();
+        treeTableView.setContextMenu(contextMenu);
+
+        final MenuItem copyMenuItem = new MenuItem("Copy");
+        final MenuItem pasteMenuItem = new MenuItem("Paste");
+        contextMenu.getItems().add(copyMenuItem);
+        contextMenu.getItems().add(pasteMenuItem);
+        copyMenuItem.setOnAction(actionEvent -> {
+            final ValueType value = treeTableView.getSelectionModel().getSelectedItem().getValue();
+            clipboard = ((Message.Builder) value.getValue()).build().toBuilder();
+            try {
+                clipboard.clearField(ProtoBufFieldProcessor.getFieldDescriptor(clipboard, "id"));
+            } catch (NotAvailableException e) {
+                // do nothing because not id has to be cleared
+            }
+        });
+        pasteMenuItem.setOnAction(actionEvent -> {
+            BuilderListTreeItem treeItem = (BuilderListTreeItem) treeTableView.getSelectionModel().getSelectedItem().getParent().getValue().getTreeItem();
+            try {
+                if(treeItem.getBuilder().equals(root.getBuilder())) {
+                    BuilderTreeItem builderTreeItem = AbstractBuilderTreeItem.loadTreeItem(fieldDescriptor, clipboard.build().toBuilder(), true);
+                    builderTreeItem.getChildren();
+                    ((RegistryMessageTreeItem) builderTreeItem).setChanged(true);
+                    treeItem.getChildren().add(builderTreeItem);
+                } else {
+                    Message.Builder builder = ProtoBufBuilderProcessor.addMessageToRepeatedField(treeItem.getFieldDescriptor(), clipboard, treeItem.getBuilder());
+                    treeItem.update(builder);
+                }
+            } catch (CouldNotPerformException e) {
+                ExceptionPrinter.printHistory("Could not paste from clipboard", e, LOGGER);
+            }
+        });
+        contextMenu.setOnHiding(windowEvent -> {
+            pasteMenuItem.setDisable(false);
+            copyMenuItem.setDisable(false);
+        });
+        contextMenu.setOnShowing(windowEvent -> {
+            if (!(treeTableView.getSelectionModel().getSelectedItem().getParent().getValue().getTreeItem() instanceof BuilderListTreeItem)) {
+                pasteMenuItem.setDisable(true);
+                copyMenuItem.setDisable(true);
+            }
+
+            if (clipboard == null || !treeTableView.getSelectionModel().getSelectedItem().getValue().getValue().getClass().equals(clipboard.getClass())) {
+                pasteMenuItem.setDisable(true);
+            }
+        });
+
         if (!(registryData instanceof TemplateRegistryData)) {
             // only generate context menu when not a template registry
-            final ContextMenu contextMenu = new ContextMenu();
+            // final ContextMenu contextMenu = new ContextMenu();
             final MenuItem addMenuItem = new MenuItem("Add");
             addMenuItem.setOnAction(event -> {
                 try {
@@ -151,13 +203,13 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
                     BuilderTreeItem builderTreeItem = AbstractBuilderTreeItem.loadTreeItem(fieldDescriptor, builder, true);
                     builderTreeItem.setExpanded(true);
                     builderTreeItem.getChildren();
+                    ((RegistryMessageTreeItem) builderTreeItem).setChanged(true);
                     root.getChildren().add(builderTreeItem);
                 } catch (CouldNotPerformException e) {
                     e.printStackTrace();
                 }
             });
             contextMenu.getItems().add(addMenuItem);
-            treeTableView.setContextMenu(contextMenu);
         }
 
         // create a search bar for the tree table view
