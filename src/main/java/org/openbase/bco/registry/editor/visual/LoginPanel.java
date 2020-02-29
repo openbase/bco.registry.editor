@@ -32,6 +32,7 @@ import org.openbase.bco.authentication.lib.SessionManager;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.NotAvailableException;
+import org.openbase.jul.schedule.GlobalCachedExecutorService;
 import org.openbase.jul.visual.javafx.iface.DynamicPane;
 
 /**
@@ -120,16 +121,21 @@ public class LoginPanel extends HBox implements DynamicPane {
 
     private void login() {
         try {
+            final String password = passwordField.getText();
+            passwordField.clear();
             final String userId = Registries.getUnitRegistry().getUserUnitIdByUserName(userNameTextField.getText());
             //TODO: allow users to specify if they want to stay logged in
-            SessionManager.getInstance().loginUser(userId, passwordField.getText(), false);
-        } catch (NotAvailableException ex) {
-            errorLabel.setText("Invalid username");
+            GlobalCachedExecutorService.submit(() -> {
+                try {
+                    SessionManager.getInstance().loginUser(userId, password, false);
+                } catch (org.openbase.jul.exception.TimeoutException e) {
+                    Platform.runLater(() -> errorLabel.setText("Authenticator not connected"));
+                } catch (CouldNotPerformException ex) {
+                    Platform.runLater(() -> errorLabel.setText("Invalid password"));
+                }
+            });
         } catch (CouldNotPerformException ex) {
-            errorLabel.setText("Invalid password");
-        } finally {
-            // always clear password field
-            passwordField.clear();
+            errorLabel.setText("Invalid username");
         }
     }
 }
