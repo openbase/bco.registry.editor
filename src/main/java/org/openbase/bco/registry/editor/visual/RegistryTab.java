@@ -173,7 +173,9 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
             copyMenuItem.setDisable(false);
         });
         contextMenu.setOnShowing(windowEvent -> {
-            if (!(treeTableView.getSelectionModel().getSelectedItem().getParent().getValue().getTreeItem() instanceof BuilderListTreeItem)) {
+            if (treeTableView.getSelectionModel().getSelectedItem() == null ||
+                    treeTableView.getSelectionModel().getSelectedItem().getParent() == null ||
+                    !(treeTableView.getSelectionModel().getSelectedItem().getParent().getValue().getTreeItem() instanceof BuilderListTreeItem)) {
                 pasteMenuItem.setDisable(true);
                 copyMenuItem.setDisable(true);
             }
