@@ -25,12 +25,10 @@ package org.openbase.bco.registry.editor.visual;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Message;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
-import javafx.stage.WindowEvent;
 import org.openbase.bco.registry.editor.struct.*;
 import org.openbase.bco.registry.editor.util.FieldPathDescriptionProvider;
 import org.openbase.bco.registry.editor.visual.cell.DescriptionCell;
@@ -146,11 +144,7 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
         copyMenuItem.setOnAction(actionEvent -> {
             final ValueType value = treeTableView.getSelectionModel().getSelectedItem().getValue();
             clipboard = ((Message.Builder) value.getValue()).build().toBuilder();
-            try {
-                clipboard.clearField(ProtoBufFieldProcessor.getFieldDescriptor(clipboard, "id"));
-            } catch (NotAvailableException e) {
-                // do nothing because not id has to be cleared
-            }
+            ProtoBufFieldProcessor.recursiveClearField(clipboard, "id");
         });
         pasteMenuItem.setOnAction(actionEvent -> {
             BuilderListTreeItem treeItem = (BuilderListTreeItem) treeTableView.getSelectionModel().getSelectedItem().getParent().getValue().getTreeItem();
@@ -229,7 +223,6 @@ public class RegistryTab<RD extends Message> extends TabWithStatusLabel {
         stackPane = new StackPane();
         stackPane.getChildren().addAll(treeTableView, searchBar);
     }
-
 
     public void update(RD registryData) throws CouldNotPerformException {
         this.registryData = registryData;
