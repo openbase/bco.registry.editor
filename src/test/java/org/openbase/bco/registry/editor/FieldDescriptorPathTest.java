@@ -68,18 +68,6 @@ public class FieldDescriptorPathTest {
         JPService.setupJUnitTestMode();
     }
 
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     /**
      * Test of getValue method, of class FieldGroup.
      *
