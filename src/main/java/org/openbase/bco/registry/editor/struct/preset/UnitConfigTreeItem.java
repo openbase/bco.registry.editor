@@ -107,7 +107,8 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
                 UnitConfig.SCENE_CONFIG_FIELD_NUMBER,
                 UnitConfig.UNIT_GROUP_CONFIG_FIELD_NUMBER,
                 UnitConfig.USER_CONFIG_FIELD_NUMBER,
-                UnitConfig.OBJECT_CONFIG_FIELD_NUMBER));
+                UnitConfig.OBJECT_CONFIG_FIELD_NUMBER,
+                UnitConfig.GATEWAY_CONFIG_FIELD_NUMBER));
 
         // remove filtered fields specified by unit type and save if it is a dal unit
         boolean isDalUnit = false;
@@ -141,6 +142,9 @@ public class UnitConfigTreeItem extends RegistryMessageTreeItem<Builder> {
                 break;
             case USER:
                 filteredFieldSet.remove(UnitConfig.USER_CONFIG_FIELD_NUMBER);
+                break;
+            case GATEWAY:
+                filteredFieldSet.remove(UnitConfig.GATEWAY_CONFIG_FIELD_NUMBER);
                 break;
             default:
                 isDalUnit = true;
