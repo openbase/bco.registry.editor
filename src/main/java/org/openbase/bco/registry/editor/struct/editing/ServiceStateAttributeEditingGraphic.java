@@ -85,6 +85,7 @@ public class ServiceStateAttributeEditingGraphic extends AbstractEditingGraphic<
                 serviceStateEditingGraphic = new PowerStateEditingGraphic();
                 break;
             case ACTIVATION_STATE_SERVICE:
+            case DISCOVERY_STATE_SERVICE:
                 serviceStateEditingGraphic = new ActivationStateEditingGraphic();
                 break;
             case BRIGHTNESS_STATE_SERVICE:

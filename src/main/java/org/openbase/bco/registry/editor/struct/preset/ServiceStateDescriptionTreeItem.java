@@ -219,6 +219,7 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
                     rectangle.setFill(hsb);
                     return rectangle;
                 case ACTIVATION_STATE_SERVICE:
+                case DISCOVERY_STATE_SERVICE:
                     // for an activation state display the enum value
                     final ActivationState.State activation = ((ActivationState) serviceState).getValue();
                     return new Label(activation.name());
