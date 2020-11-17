@@ -68,7 +68,7 @@ public class GatewayConfigTreeItem extends BuilderTreeItem<GatewayConfig.Builder
                 childGatewayId.setEditingGraphicFactory(EditingGraphicFactory.getInstance(NestedGatewayIdEditingGraphic.class));
                 childGatewayId.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
                     try {
-                        return LabelProcessor.getBestMatch(Registries.getClassRegistry().getGatewayClassById(value).getLabel());
+                        return LabelProcessor.getBestMatch(Registries.getUnitRegistry().getUnitConfigById(value).getLabel());
                     } catch (CouldNotPerformException e) {
                         return value;
                     }
