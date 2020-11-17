@@ -46,7 +46,7 @@ public class GatewayClassTreeItem extends RegistryMessageTreeItem<GatewayClass.B
     @Override
     protected GenericTreeItem createChild(FieldDescriptor field, Boolean editable) throws CouldNotPerformException {
         final GenericTreeItem child = super.createChild(field, editable);
-        if (field.getNumber() == GatewayClass.NESTED_GATEWAY_ID_FIELD_NUMBER) {
+        if (field.getNumber() == GatewayClass.NESTED_GATEWAY_CLASS_ID_FIELD_NUMBER) {
             ValueListTreeItem childIdTreeItem = (ValueListTreeItem) child;
             childIdTreeItem.setEditingGraphicFactory(EditingGraphicFactory.getInstance(GatewayClassIdEditingGraphic.class));
             childIdTreeItem.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
