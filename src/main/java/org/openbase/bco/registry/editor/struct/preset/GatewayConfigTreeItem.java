@@ -26,13 +26,16 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
 import org.openbase.bco.registry.editor.struct.GenericTreeItem;
 import org.openbase.bco.registry.editor.struct.LeafTreeItem;
+import org.openbase.bco.registry.editor.struct.ValueListTreeItem;
 import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
 import org.openbase.bco.registry.editor.struct.editing.GatewayClassIdEditingGraphic;
+import org.openbase.bco.registry.editor.struct.editing.NestedGatewayIdEditingGraphic;
 import org.openbase.bco.registry.editor.util.DescriptionGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.type.processing.LabelProcessor;
+import org.openbase.type.domotic.unit.gateway.GatewayClassType;
 import org.openbase.type.domotic.unit.gateway.GatewayConfigType.GatewayConfig;
 import org.openbase.type.domotic.unit.gateway.GatewayConfigType.GatewayConfig.Builder;
 
@@ -47,22 +50,33 @@ public class GatewayConfigTreeItem extends BuilderTreeItem<GatewayConfig.Builder
     @SuppressWarnings("unchecked")
     @Override
     protected GenericTreeItem createChild(FieldDescriptor field, Boolean editable) throws CouldNotPerformException {
-        GenericTreeItem child;
-        if (field.getNumber() == GatewayConfig.GATEWAY_CLASS_ID_FIELD_NUMBER) {
-            final LeafTreeItem leaf = new LeafTreeItem<>(field, getBuilder().getGatewayClassId(), editable);
-            leaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(GatewayClassIdEditingGraphic.class));
-            leaf.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
-                try {
-                    return LabelProcessor.getBestMatch(Registries.getClassRegistry().getGatewayClassById(value).getLabel());
-                } catch (CouldNotPerformException e) {
-                    return value;
-                }
-            });
-            child = leaf;
-        } else {
-            child = super.createChild(field, editable);
+        //GenericTreeItem child;
+        switch (field.getNumber()) {
+            case GatewayConfig.GATEWAY_CLASS_ID_FIELD_NUMBER:
+                final LeafTreeItem childClassID = new LeafTreeItem<>(field, getBuilder().getGatewayClassId(), editable);
+                childClassID.setEditingGraphicFactory(EditingGraphicFactory.getInstance(GatewayClassIdEditingGraphic.class));
+                childClassID.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
+                    try {
+                        return LabelProcessor.getBestMatch(Registries.getClassRegistry().getGatewayClassById(value).getLabel());
+                    } catch (CouldNotPerformException e) {
+                        return value;
+                    }
+                });
+                return childClassID;
+            case GatewayConfig.NESTED_GATEWAY_ID_FIELD_NUMBER:
+                ValueListTreeItem childGatewayId = (ValueListTreeItem) super.createChild(field, editable);
+                childGatewayId.setEditingGraphicFactory(EditingGraphicFactory.getInstance(NestedGatewayIdEditingGraphic.class));
+                childGatewayId.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
+                    try {
+                        return LabelProcessor.getBestMatch(Registries.getClassRegistry().getGatewayClassById(value).getLabel());
+                    } catch (CouldNotPerformException e) {
+                        return value;
+                    }
+                });
+                return childGatewayId;
+            default:
+                return super.createChild(field, editable);
         }
-        return child;
     }
 
     @Override
