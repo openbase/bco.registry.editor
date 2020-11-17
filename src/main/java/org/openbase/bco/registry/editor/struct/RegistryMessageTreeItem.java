@@ -92,7 +92,6 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
      * Match a builder by comparing their ids.
      *
      * @param builder {@inheritDoc}
-     *
      * @return {@inheritDoc}
      */
     @Override
@@ -216,6 +215,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
                 logger.info("Build failed", ex);
                 throw ex;
             }
+
             if (Registries.contains(message)) {
                 // save original value from model
                 final Message original = Registries.getById(ProtoBufFieldProcessor.getId(message));
@@ -264,7 +264,7 @@ public class RegistryMessageTreeItem<MB extends Message.Builder> extends Builder
             }
             setValue(getValueCasted().createNew(getBuilder()));
         } catch (CouldNotPerformException ex) {
-            logger.error("Error while applying event");
+            logger.error("Error while applying event", ex);
         }
     }
 

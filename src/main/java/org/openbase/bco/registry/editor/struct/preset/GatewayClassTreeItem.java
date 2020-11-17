@@ -23,13 +23,40 @@ package org.openbase.bco.registry.editor.struct.preset;
  */
 
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import org.openbase.bco.registry.editor.struct.GenericTreeItem;
 import org.openbase.bco.registry.editor.struct.RegistryMessageTreeItem;
+import org.openbase.bco.registry.editor.struct.ValueListTreeItem;
+import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
+import org.openbase.bco.registry.editor.struct.editing.GatewayClassIdEditingGraphic;
+import org.openbase.bco.registry.editor.struct.editing.LocationChildIdEditingGraphic;
+import org.openbase.bco.registry.editor.util.DescriptionGenerator;
+import org.openbase.bco.registry.remote.Registries;
+import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
+import org.openbase.jul.extension.type.processing.LabelProcessor;
+import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.domotic.unit.gateway.GatewayClassType.GatewayClass;
 
 public class GatewayClassTreeItem extends RegistryMessageTreeItem<GatewayClass.Builder> {
 
     public GatewayClassTreeItem(FieldDescriptor fieldDescriptor, GatewayClass.Builder builder, Boolean editable) throws InitializationException {
         super(fieldDescriptor, builder, editable);
+    }
+
+    @Override
+    protected GenericTreeItem createChild(FieldDescriptor field, Boolean editable) throws CouldNotPerformException {
+        final GenericTreeItem child = super.createChild(field, editable);
+        if (field.getNumber() == GatewayClass.NESTED_GATEWAY_ID_FIELD_NUMBER) {
+            ValueListTreeItem childIdTreeItem = (ValueListTreeItem) child;
+            childIdTreeItem.setEditingGraphicFactory(EditingGraphicFactory.getInstance(GatewayClassIdEditingGraphic.class));
+            childIdTreeItem.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
+                try {
+                    return LabelProcessor.getBestMatch(Registries.getClassRegistry().getGatewayClassById(value).getLabel());
+                } catch (CouldNotPerformException e) {
+                    return value;
+                }
+            });
+        }
+        return child;
     }
 }

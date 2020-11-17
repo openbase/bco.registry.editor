@@ -22,17 +22,23 @@ package org.openbase.bco.registry.editor.struct.editing;
  * #L%
  */
 
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
+import org.openbase.bco.registry.editor.struct.ValueListTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
+import org.openbase.bco.registry.editor.struct.preset.GatewayClassTreeItem;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.NotAvailableException;
 import org.openbase.jul.extension.type.processing.LabelProcessor;
+import org.openbase.jul.pattern.ListFilter;
 import org.openbase.type.domotic.unit.gateway.GatewayClassType.GatewayClass;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GatewayClassIdEditingGraphic extends AbstractMessageEditingGraphic<GatewayClass> {
+
 
     public GatewayClassIdEditingGraphic(ValueType<String> valueType, TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(value -> {
@@ -46,7 +52,31 @@ public class GatewayClassIdEditingGraphic extends AbstractMessageEditingGraphic<
 
     @Override
     protected List<GatewayClass> getMessages() throws CouldNotPerformException {
-        return Registries.getClassRegistry().getGatewayClasses();
+        final List<GatewayClass> gatewayClasses = Registries.getClassRegistry().getGatewayClasses();
+
+        // if list (nested gateway ids) remove ids of gateway class and other children
+        if (getValueType().getTreeItem().getParent() instanceof ValueListTreeItem) {
+            final List<String> idsToRemove = new ArrayList<>();
+            final ValueListTreeItem valueListTreeItem = (ValueListTreeItem) getValueType().getTreeItem().getParent();
+
+            // remove ids of other gateway classes already nested
+            for (final TreeItem child : (List<TreeItem>) valueListTreeItem.getChildren()) {
+                final String id = ((ValueType<String>) child.getValue()).getValue();
+
+                if (!id.isEmpty()) {
+                    idsToRemove.add(id);
+                }
+            }
+
+            // remove id of this gateway
+            final GatewayClassTreeItem parent = (GatewayClassTreeItem) valueListTreeItem.getParent();
+            idsToRemove.add(parent.getId());
+
+            final ListFilter<GatewayClass> idFilter = gatewayClass -> idsToRemove.contains(gatewayClass.getId());
+            idFilter.filter(gatewayClasses);
+        }
+
+        return gatewayClasses;
     }
 
     @Override
