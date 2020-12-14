@@ -33,6 +33,7 @@ import org.openbase.bco.registry.editor.struct.BuilderTreeItem;
 import org.openbase.bco.registry.editor.struct.GenericTreeItem;
 import org.openbase.bco.registry.editor.struct.LeafTreeItem;
 import org.openbase.bco.registry.editor.struct.editing.*;
+import org.openbase.bco.registry.editor.util.UnitStringGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
@@ -268,7 +269,7 @@ public class ServiceStateDescriptionTreeItem extends BuilderTreeItem<ServiceStat
                 unitIdLeaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(ServiceStateUnitIdEditingGraphic.class));
                 unitIdLeaf.setDescriptionGenerator(unitId -> {
                     try {
-                        return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(unitId).getScope());
+                        return UnitStringGenerator.generateLocationChainStringRep(Registries.getUnitRegistry().getUnitConfigById(unitId));
                     } catch (CouldNotPerformException e) {
                         return unitId;
                     }

@@ -30,6 +30,7 @@ import org.openbase.bco.registry.editor.struct.ValueListTreeItem;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
 import org.openbase.bco.registry.editor.struct.editing.LocationChildIdEditingGraphic;
+import org.openbase.bco.registry.editor.util.UnitStringGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
@@ -94,7 +95,7 @@ public class LocationConfigTreeItem extends BuilderTreeItem<LocationConfig.Build
             childIdTreeItem.setDescriptionGenerator(value -> {
                 final String locationId = (String) value;
                 try {
-                    return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(locationId).getScope());
+                    return UnitStringGenerator.generateLocationChainStringRep(Registries.getUnitRegistry().getUnitConfigById(locationId));
                 } catch (CouldNotPerformException e) {
                     return locationId;
                 }

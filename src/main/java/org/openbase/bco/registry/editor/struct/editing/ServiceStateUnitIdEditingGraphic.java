@@ -26,6 +26,7 @@ import javafx.scene.control.TreeTableCell;
 import org.openbase.bco.registry.editor.struct.ValueType;
 import org.openbase.bco.registry.editor.struct.preset.ServiceStateDescriptionTreeItem;
 import org.openbase.bco.registry.editor.struct.preset.UnitConfigTreeItem;
+import org.openbase.bco.registry.editor.util.UnitStringGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.extension.type.processing.ScopeProcessor;
@@ -52,7 +53,7 @@ public class ServiceStateUnitIdEditingGraphic extends AbstractMessageEditingGrap
     public ServiceStateUnitIdEditingGraphic(final ValueType<String> valueType, final TreeTableCell<ValueType, ValueType> treeTableCell) {
         super(unitConfig -> {
             try {
-                return ScopeProcessor.generateStringRep(unitConfig.getScope());
+                return UnitStringGenerator.generateLocationChainStringRep(unitConfig);
             } catch (CouldNotPerformException e) {
                 return unitConfig.getId();
             }

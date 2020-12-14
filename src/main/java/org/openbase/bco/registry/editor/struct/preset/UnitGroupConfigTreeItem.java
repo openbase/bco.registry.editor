@@ -29,11 +29,11 @@ import org.openbase.bco.registry.editor.struct.ValueListTreeItem;
 import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
 import org.openbase.bco.registry.editor.struct.editing.UnitGroupMemberEditingGraphic;
 import org.openbase.bco.registry.editor.util.DescriptionGenerator;
+import org.openbase.bco.registry.editor.util.UnitStringGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
 import org.openbase.jul.extension.protobuf.processing.ProtoBufFieldProcessor;
-import org.openbase.jul.extension.type.processing.ScopeProcessor;
 import org.openbase.type.domotic.service.ServiceConfigType.ServiceConfig;
 import org.openbase.type.domotic.service.ServiceDescriptionType.ServiceDescription;
 import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
@@ -129,7 +129,7 @@ public class UnitGroupConfigTreeItem extends BuilderTreeItem<UnitGroupConfig.Bui
             valueListTreeItem.setEditingGraphicFactory(EditingGraphicFactory.getInstance(UnitGroupMemberEditingGraphic.class));
             valueListTreeItem.setDescriptionGenerator((DescriptionGenerator<String>) value -> {
                 try {
-                    return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(value).getScope());
+                    return UnitStringGenerator.generateLocationChainStringRep(Registries.getUnitRegistry().getUnitConfigById(value));
                 } catch (CouldNotPerformException e) {
                     return value;
                 }

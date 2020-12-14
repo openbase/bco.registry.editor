@@ -29,6 +29,7 @@ import org.openbase.bco.registry.editor.struct.LeafTreeItem;
 import org.openbase.bco.registry.editor.struct.editing.EditingGraphicFactory;
 import org.openbase.bco.registry.editor.struct.editing.LocationIdEditingGraphic;
 import org.openbase.bco.registry.editor.struct.editing.UserIdEditingGraphic;
+import org.openbase.bco.registry.editor.util.UnitStringGenerator;
 import org.openbase.bco.registry.remote.Registries;
 import org.openbase.jul.exception.CouldNotPerformException;
 import org.openbase.jul.exception.InitializationException;
@@ -81,7 +82,7 @@ public class InventoryStateTreeItem extends BuilderTreeItem<Builder> {
                 leaf.setEditingGraphicFactory(EditingGraphicFactory.getInstance(LocationIdEditingGraphic.class));
                 leaf.setDescriptionGenerator(value -> {
                     try {
-                        return ScopeProcessor.generateStringRep(Registries.getUnitRegistry().getUnitConfigById(value).getScope());
+                        return UnitStringGenerator.generateLocationChainStringRep(Registries.getUnitRegistry().getUnitConfigById(value));
                     } catch (CouldNotPerformException e) {
                         return value;
                     }
