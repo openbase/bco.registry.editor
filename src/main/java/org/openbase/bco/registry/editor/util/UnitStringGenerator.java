@@ -34,7 +34,7 @@ public class UnitStringGenerator {
     /**
      * Generates a string representation of the given unit config that describes the hierarchy of this unit.
      * <p>
-     * Note: Default delimiter is " > ":
+     * Note: Default delimiter is " | ":
      *
      * @param unitConfig the unit used as baseline.
      *
@@ -46,7 +46,7 @@ public class UnitStringGenerator {
 
     /**
      * Generates a string representation of the given unit config that describes the hierarchy of this unit.
-     * e.g.: Home > Living > Ceiling [Light]
+     * e.g.: Home | Living | Ceiling [Light]
      *
      * @param unitConfig the unit used as baseline.
      * @param delimiter  the limiter used between unit and its placement.
