@@ -40,6 +40,8 @@ import org.openbase.bco.registry.remote.Registries;
 import org.openbase.bco.registry.remote.login.BCOLogin;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.preset.JPVerbose;
+import org.openbase.jul.communication.jp.JPComHost;
+import org.openbase.jul.communication.jp.JPComPort;
 import org.openbase.jul.exception.printer.ExceptionPrinter;
 import org.openbase.jul.exception.printer.LogLevel;
 import org.slf4j.Logger;
@@ -78,8 +80,6 @@ public class RegistryEditor extends Application {
             } catch (Exception ex) {
                 ExceptionPrinter.printHistory(ex, LOGGER, LogLevel.WARN);
             }
-
-            JPService.registerProperty(JPVerbose.class, true);
 
             final LoginPanel loginPanel = new LoginPanel();
 
@@ -150,6 +150,11 @@ public class RegistryEditor extends Application {
     }
 
     public static void main(String[] args) {
+        JPService.registerProperty(JPVerbose.class, true);
+        JPService.registerProperty(JPComHost.class);
+        JPService.registerProperty(JPComPort.class);
+        JPService.parseAndExitOnError(args);
+
         RegistryEditor.launch(args);
     }
 }
