@@ -277,7 +277,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.target.version>11</java.target.version>
         <java.source.version>11</java.source.version>
-        <dependency.jul.version>3.1.0</dependency.jul.version>
+        <dependency.jul.version>3.1-SNAPSHOT</dependency.jul.version>
         <dependency.bco.registry.version>3.0-SNAPSHOT</dependency.bco.registry.version>
         <dependency.org.junit.jupiter.version>[5.6,5.7-alpha)</dependency.org.junit.jupiter.version>
     </properties>
