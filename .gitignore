@@ -39,6 +39,7 @@ buildNumber.properties
 
 ### Gradle ###
 .gradle
+.gradletasknamecache
 build/
 
 # Ignore Gradle GUI config
@@ -105,6 +106,7 @@ local.properties
 
 # Generated files
 .idea/**/contentModel.xml
+.idea/**/jarRepositories.xml
 
 # Sensitive or high-churn files
 .idea/**/dataSources/
@@ -140,6 +142,7 @@ cmake-build-*/
 
 # IntelliJ
 out/
+**/.idea
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
