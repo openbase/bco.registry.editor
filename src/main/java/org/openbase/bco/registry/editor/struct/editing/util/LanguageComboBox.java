@@ -24,6 +24,7 @@ package org.openbase.bco.registry.editor.struct.editing.util;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.openbase.jul.extension.type.processing.LabelProcessor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,6 @@ import java.util.Locale;
 public class LanguageComboBox extends ScrollingComboBox<String> {
 
     private static final String LANGUAGE_TECHNICAL = "Technical";
-    private static final String LANGUAGE_CODE_TECHNICAL = "technical";
 
     private final boolean includeTechnical;
 
@@ -55,7 +55,7 @@ public class LanguageComboBox extends ScrollingComboBox<String> {
     private ObservableList<String> createSortedLanguageCodeList() {
         final List<String> languageCodeList = new ArrayList<>(Arrays.asList(Locale.getISOLanguages()));
         if (includeTechnical) {
-            languageCodeList.add(LANGUAGE_CODE_TECHNICAL);
+            languageCodeList.add(LabelProcessor.LANGUAGE_CODE_TECHNICAL);
         }
         languageCodeList.sort((languageCode1, languageCode2) -> {
             final String displayed1 = getDisplayedText(languageCode1);
@@ -66,7 +66,7 @@ public class LanguageComboBox extends ScrollingComboBox<String> {
     }
 
     public static String getDisplayedText(final String languageCode) {
-        if (languageCode.equals(LANGUAGE_CODE_TECHNICAL)) {
+        if (languageCode.equals(LabelProcessor.LANGUAGE_CODE_TECHNICAL)) {
             return LANGUAGE_TECHNICAL;
         } else {
             return new Locale(languageCode).getDisplayLanguage();

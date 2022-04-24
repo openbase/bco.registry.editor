@@ -25,15 +25,17 @@ package org.openbase.bco.registry.editor;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeItem.TreeModificationEvent;
-import org.junit.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.openbase.bco.registry.editor.util.FieldDescriptorPath;
 import org.openbase.jps.core.JPService;
 import org.openbase.jps.exception.JPServiceException;
 import org.openbase.jul.exception.InstantiationException;
 import org.openbase.type.domotic.unit.UnitConfigType.UnitConfig;
 import org.openbase.type.spatial.PlacementConfigType.PlacementConfig;
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author <a href="mailto:pleminoq@openbase.org">Tamino Huxohl</a>
@@ -63,7 +65,7 @@ public class FieldDescriptorPathTest {
         device3 = UnitConfig.newBuilder().setId("device_3").setPlacementConfig(kitchen);
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws JPServiceException {
         JPService.setupJUnitTestMode();
     }
@@ -73,7 +75,8 @@ public class FieldDescriptorPathTest {
      *
      * @throws java.lang.Exception
      */
-    @Test(timeout = 5000)
+    @Test
+    @Timeout(5)
     public void testGetValue() throws Exception {
         System.out.println("getValue");
 
@@ -91,7 +94,8 @@ public class FieldDescriptorPathTest {
      *
      * @throws java.lang.Exception
      */
-    @Test(timeout = 5000)
+    @Test
+    @Timeout(5)
     public void testsetValue() throws Exception {
         System.out.println("setValue");
 
@@ -101,6 +105,7 @@ public class FieldDescriptorPathTest {
     }
 
     @Test
+    @Timeout(5)
     public void testTest() throws Exception {
         Class clazz = UnitConfig.Builder.class;
 
