@@ -19,7 +19,7 @@ fi
 APP_NAME='bco-registry-editor'
 APP_NAME=${BLUE}${APP_NAME}${NC}
 echo -e "=== ${APP_NAME} project ${WHITE}cleanup${NC}" &&
-mvn clean --quiet $@ &&
+./mvnw clean --quiet $@ &&
 echo -e "=== ${APP_NAME} project ${WHITE}installation${NC}" &&
 ./mvnw install \
         -DassembleDirectory=${BCO_DIST} \
