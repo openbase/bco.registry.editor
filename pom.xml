@@ -279,7 +279,7 @@
         <java.source.version>17</java.source.version>
         <dependency.jul.version>3.3-SNAPSHOT</dependency.jul.version>
         <dependency.bco.registry.version>3.1-SNAPSHOT</dependency.bco.registry.version>
-        <dependency.org.junit.jupiter.version>[5.6,5.7-alpha)</dependency.org.junit.jupiter.version>
+        <dependency.org.junit.jupiter.version>[5.10,5.11-alpha)</dependency.org.junit.jupiter.version>
     </properties>
 
     <dependencies>
@@ -320,14 +320,14 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11</version>
+            <version>21.0.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-swing -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>11</version>
+            <version>21.0.1</version>
         </dependency>
     </dependencies>
 
