@@ -47,7 +47,6 @@ public class ActivityConfigTreeItem extends RegistryMessageTreeItem<ActivityConf
         super(fieldDescriptor, builder, editable);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected GenericTreeItem createChild(final FieldDescriptor field, final Boolean editable) throws CouldNotPerformException {
         GenericTreeItem child;
