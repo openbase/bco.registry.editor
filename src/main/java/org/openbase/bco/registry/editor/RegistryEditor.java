@@ -94,6 +94,7 @@ public class RegistryEditor extends Application {
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getClassRegistry(), getClassRegistryGrouping()));
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getTemplateRegistry()));
             globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getActivityRegistry()));
+            globalTabPane.getTabs().add(new RegistryRemoteTab<>(Registries.getMessageRegistry()));
 
             final StackPane stackPane = new StackPane();
             // make login panel appear in the top right with small margins at the top and right
